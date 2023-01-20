@@ -1,13 +1,13 @@
-package com.example.erd;
+package com.appleparty.ssily;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ErdApplication {
+public class SsilyApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ErdApplication.class, args);
+		SpringApplication.run(SsilyApplication.class, args);
 	}
 
 }
