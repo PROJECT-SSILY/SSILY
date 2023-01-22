@@ -18,7 +18,7 @@
     <v-btn
       color="success"
       class="mr-4"
-      @click="ClickLogIn"
+      @click="clickLogIn"
     >
       로그인
     </v-btn>
@@ -26,7 +26,7 @@
     <v-btn
       color="error"
       class="mr-4"
-      @click="ClickSignUp"
+      @click="clickSignUp"
     >
       회원가입
     </v-btn>
@@ -34,7 +34,7 @@
     <v-btn
       color="warning"
       class="mr-4"
-      @click="ClickFindPw"
+      @click="clickFindPw"
     >
       비밀번호 찾기
     </v-btn>
@@ -52,15 +52,15 @@ export default {
     }
   },
   methods: {
-    ClickLogIn() {
+    clickLogIn() {
       console.log('로그인 버튼 클릭')
       console.log("email=", this.email)
       console.log("password=", this.password)
     },
-    ClickSignUp() {
+    clickSignUp() {
       this.$router.push('signup')
     },
-    ClickFindPw() {
+    clickFindPw() {
       this.$router.push('findpw')
     }
   }
