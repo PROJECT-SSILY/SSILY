@@ -1,4 +1,4 @@
-package com.appleparty.ssily.common.security;
+package com.appleparty.ssily.common.config.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
