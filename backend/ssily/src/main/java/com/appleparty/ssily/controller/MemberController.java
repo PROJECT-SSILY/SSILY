@@ -21,4 +21,9 @@ public class MemberController {
     public SingleResult<Boolean> checkEmailDuplicate(@RequestParam("email") String email){
         return responseService.getSingleResult(memberService.checkEmailDuplicate(email));
     }
+
+    @GetMapping("/nickname")
+    public SingleResult<Boolean> checkNicknameDuplicate(@RequestParam("nickname") String nickname){
+        return responseService.getSingleResult(memberService.checkNicknameDuplicate(nickname));
+    }
 }
