@@ -2,6 +2,8 @@ package com.appleparty.ssily.exception;
 
 import com.appleparty.ssily.common.response.ResponseService;
 import com.appleparty.ssily.common.result.Result;
+import com.appleparty.ssily.exception.member.DuplicateEmailException;
+import com.appleparty.ssily.exception.member.DuplicationNicknameException;
 import com.appleparty.ssily.exception.member.InvalidEmailException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,18 @@ public class ExceptionAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result invalidEmailException(){
         return responseService.getFailureResult("올바르지 않은 이메일 형식입니다.");
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result duplicateEmailException(){
+        return responseService.getFailureResult("이미 존재하는 이메일입니다.");
+    }
+
+    @ExceptionHandler(DuplicationNicknameException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result duplicationNicknameException(){
+        return responseService.getFailureResult("이미 존재하는 닉네임입니다.");
     }
 
 
