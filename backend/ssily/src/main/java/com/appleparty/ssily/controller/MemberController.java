@@ -1,13 +1,12 @@
 package com.appleparty.ssily.controller;
 
 import com.appleparty.ssily.common.response.ResponseService;
+import com.appleparty.ssily.common.result.Result;
 import com.appleparty.ssily.common.result.SingleResult;
+import com.appleparty.ssily.dto.JoinMemberRequestDto;
 import com.appleparty.ssily.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/member")
@@ -25,5 +24,11 @@ public class MemberController {
     @GetMapping("/nickname")
     public SingleResult<Boolean> checkNicknameDuplicate(@RequestParam("nickname") String nickname){
         return responseService.getSingleResult(memberService.checkNicknameDuplicate(nickname));
+    }
+
+    @PostMapping
+    public Result join(@RequestBody JoinMemberRequestDto requestDto){
+        memberService.join(requestDto);
+        return responseService.getSuccessResult();
     }
 }
