@@ -3,10 +3,7 @@ package com.appleparty.ssily.domain.member;
 import com.appleparty.ssily.domain.BaseEntity;
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -34,4 +31,10 @@ public class Member extends BaseEntity {
     private int level;
 
     private long exp;
+
+    @Embedded
+    private Record record;
+
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.ROLE_MEMBER;
 }
