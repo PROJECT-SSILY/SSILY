@@ -1,0 +1,25 @@
+package com.appleparty.ssily.exception;
+
+import com.appleparty.ssily.common.response.ResponseService;
+import com.appleparty.ssily.common.result.Result;
+import com.appleparty.ssily.exception.member.InvalidEmailException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+@RequiredArgsConstructor
+public class ExceptionAdvice {
+
+    private final ResponseService responseService;
+
+    @ExceptionHandler(InvalidEmailException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result invalidEmailException(){
+        return responseService.getFailureResult("올바르지 않은 이메일 형식입니다.");
+    }
+
+
+}
