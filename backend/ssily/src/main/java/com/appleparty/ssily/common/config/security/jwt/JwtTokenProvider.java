@@ -25,6 +25,7 @@ public class JwtTokenProvider implements InitializingBean {
     private String secretKey;
 
     public static final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 30;  // 30분
+//    public static final long ACCESS_TOKEN_VALID_TIME = 1000L * 10;  // 10초
 
     private Key key;
 
@@ -67,13 +68,16 @@ public class JwtTokenProvider implements InitializingBean {
             return true;
         } catch (SecurityException | MalformedJwtException e){
             log.info("잘못된 JWT 서명입니다.");
+            throw new JwtException("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e){
             log.info("만료된 JWT 토큰입니다.");
+            throw new JwtException("만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e){
             log.info("지원되지 않는 JWT 토큰입니다.");
-        } catch (IllegalArgumentException e){
+            throw new JwtException("지원하지 않는 JWT 토큰입니다.");
+        } catch (IllegalArgumentException | SignatureException e){
             log.info("JWT 토큰이 잘못되었습니다.");
+            throw new JwtException("잘못된 토큰입니다.");
         }
-        return false;
     }
 }

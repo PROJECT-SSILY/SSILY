@@ -27,15 +27,15 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         try{
             filterChain.doFilter(request, response);  // go to "JwtAuthenticationFilter"
         } catch (JwtException e){
-            setErrorResponse(HttpStatus.UNAUTHORIZED, response, e);
+            setErrorResponse(HttpStatus.UNAUTHORIZED, response, e, -99);
         }
     }
 
-    public void setErrorResponse(HttpStatus status, HttpServletResponse res, Throwable e) throws IOException{
+    public void setErrorResponse(HttpStatus status, HttpServletResponse res, Throwable e, int code) throws IOException{
         res.setStatus(status.value());
         res.setContentType("application/json; charset=UTF-8");
 
-        Result result = responseService.getFailureResult(-99, e.getMessage());
+        Result result = responseService.getFailureResult(code, e.getMessage());
         res.getWriter().write(objectMapper.writeValueAsString(result));
     }
 
