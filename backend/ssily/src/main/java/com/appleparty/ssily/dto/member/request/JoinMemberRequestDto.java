@@ -1,4 +1,4 @@
-package com.appleparty.ssily.dto;
+package com.appleparty.ssily.dto.member.request;
 
 import com.appleparty.ssily.domain.member.Member;
 import com.appleparty.ssily.domain.member.Record;
