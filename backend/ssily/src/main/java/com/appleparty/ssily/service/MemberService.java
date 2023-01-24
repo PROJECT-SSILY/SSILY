@@ -2,7 +2,7 @@ package com.appleparty.ssily.service;
 
 import com.appleparty.ssily.common.util.ValidCheck;
 import com.appleparty.ssily.domain.member.Member;
-import com.appleparty.ssily.dto.JoinMemberRequestDto;
+import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
 import com.appleparty.ssily.exception.member.DuplicateEmailException;
 import com.appleparty.ssily.exception.member.DuplicationNicknameException;
 import com.appleparty.ssily.exception.member.InvalidEmailException;

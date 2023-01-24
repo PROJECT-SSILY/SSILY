@@ -3,7 +3,7 @@ package com.appleparty.ssily.controller;
 import com.appleparty.ssily.common.response.ResponseService;
 import com.appleparty.ssily.common.result.Result;
 import com.appleparty.ssily.common.result.SingleResult;
-import com.appleparty.ssily.dto.JoinMemberRequestDto;
+import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
 import com.appleparty.ssily.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
