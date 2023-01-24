@@ -36,17 +36,19 @@ public class ResponseService {
 
     public Result getSuccessResult() {
         Result result = new Result();
-        result.setMessage(SUCCESS_MESSAGE);
+        setSuccessResult(result);
 
         return result;
     }
 
     public void setSuccessResult(Result result) {
+        result.setCode(0);
         result.setMessage(SUCCESS_MESSAGE);
     }
 
-    public Result getFailureResult(String message){
+    public Result getFailureResult(int code, String message){
         Result result = new Result();
+        result.setCode(code);
         result.setMessage(message);
 
         return result;

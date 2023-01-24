@@ -20,19 +20,19 @@ public class ExceptionAdvice {
     @ExceptionHandler(InvalidEmailException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result invalidEmailException(){
-        return responseService.getFailureResult("올바르지 않은 이메일 형식입니다.");
+        return responseService.getFailureResult(-100, "올바르지 않은 이메일 형식입니다.");
     }
 
     @ExceptionHandler(DuplicateEmailException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result duplicateEmailException(){
-        return responseService.getFailureResult("이미 존재하는 이메일입니다.");
+        return responseService.getFailureResult(-101, "이미 존재하는 이메일입니다.");
     }
 
     @ExceptionHandler(DuplicationNicknameException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result duplicationNicknameException(){
-        return responseService.getFailureResult("이미 존재하는 닉네임입니다.");
+        return responseService.getFailureResult(-102, "이미 존재하는 닉네임입니다.");
     }
 
 
