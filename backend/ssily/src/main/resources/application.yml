@@ -1,3 +1,7 @@
+server:
+  servlet:
+    context-path: /api
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -13,7 +17,12 @@ spring:
       hibernate:
         format_sql: true
 
+  jwt:
+    secretKey: 123jkbndkancoqasndnk1jwnxckjn13dasjncxlkqmnlckmql1k2mlk31m5kol4m6lk42m3l
+
 logging:
   level:
-    hibernate:
-      SQL: debug
+    org:
+      hibernate:
+        SQL: debug
+
