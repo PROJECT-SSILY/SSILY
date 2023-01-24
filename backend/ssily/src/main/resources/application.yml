@@ -22,5 +22,7 @@ spring:
 
 logging:
   level:
-    hibernate:
-      SQL: debug
+    org:
+      hibernate:
+        SQL: debug
+
