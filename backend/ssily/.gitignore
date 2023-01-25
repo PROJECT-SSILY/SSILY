@@ -1,4 +1,5 @@
 .DS_Store
+application.yml
 
 HELP.md
 .gradle
