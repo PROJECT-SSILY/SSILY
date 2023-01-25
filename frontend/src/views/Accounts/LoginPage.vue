@@ -5,6 +5,7 @@
   >
     <v-text-field
       v-model="email"
+      :rules="emailRules"
       type="email"
       label="이메일(아이디)"
     ></v-text-field>
@@ -16,24 +17,24 @@
     ></v-text-field>
 
     <v-btn
-      color="success"
       class="mr-4"
+      color="success"
       @click="clickLogIn"
     >
       로그인
     </v-btn>
 
     <v-btn
-      color="error"
       class="mr-4"
+      color="success"
       @click="clickSignUp"
     >
       회원가입
     </v-btn>
 
     <v-btn
-      color="warning"
       class="mr-4"
+      color="success"
       @click="clickFindPw"
     >
       비밀번호 찾기
@@ -49,13 +50,15 @@ export default {
     return {
       email : '',
       password: '',
+      emailRules: [
+        v => !!v || '이메일을 입력해 주세요',
+        v => /.+@.+\..+/.test(v) || '이메일이 유효하지 않습니다.',
+      ],
     }
   },
   methods: {
     clickLogIn() {
-      console.log('로그인 버튼 클릭')
-      console.log("email=", this.email)
-      console.log("password=", this.password)
+      console.log('dd')
     },
     clickSignUp() {
       this.$router.push('signup')
