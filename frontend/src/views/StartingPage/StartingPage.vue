@@ -8,13 +8,12 @@
 <script>
 
 export default {
-name: 'StartingPage',
-methods: {
-    toLogin() {
-        this.$router.push({name: 'login'})
+    name: 'StartingPage',
+    methods: {
+        toLogin() {
+            this.$router.push({name: 'login'})
+        }
     }
-}
-
 }
 </script>
 
