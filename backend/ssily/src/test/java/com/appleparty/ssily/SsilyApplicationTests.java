@@ -1,10 +1,10 @@
-package com.example.erd;
+package com.appleparty.ssily;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ErdApplicationTests {
+class SsilyApplicationTests {
 
 	@Test
 	void contextLoads() {
