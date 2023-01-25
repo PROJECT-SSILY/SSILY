@@ -82,6 +82,7 @@
 
 <script>
 export default {
+  name: 'SignupPage',
     data() {
         return {
             valid: true,
