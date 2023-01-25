@@ -8,6 +8,7 @@
 <script>
 
 export default {
+
     name: 'StartingPage',
     methods: {
         toLogin() {
@@ -15,6 +16,7 @@ export default {
         }
     }
 }
+
 </script>
 
 <style>
