@@ -5,7 +5,7 @@ import SignupPage from '../views/Accounts/SignupPage.vue'
 import WaitingPage from '@/views/WaitingPage/WaitingPage.vue'
 import StartingPage from '../views/StartingPage/StartingPage.vue'
 import MainPage from '../views/MainPage/MainPage.vue'
-import FindPassword from '../views/Account/FindPassword.vue'
+import FindPassword from '../views/Accounts/FindPassword.vue'
 
 const routes = [
   {
