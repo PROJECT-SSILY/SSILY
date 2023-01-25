@@ -8,14 +8,15 @@
 <script>
 
 export default {
-name: 'StartingPage',
-methods: {
-    toLogin() {
-        this.$router.push({name: 'Login'})
+
+    name: 'StartingPage',
+    methods: {
+        toLogin() {
+            this.$router.push({name: 'login'})
+        }
     }
 }
 
-}
 </script>
 
 <style>
