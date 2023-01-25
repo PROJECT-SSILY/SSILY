@@ -11,7 +11,7 @@ export default {
 name: 'StartingPage',
 methods: {
     toLogin() {
-        this.$router.push({name: 'Login'})
+        this.$router.push({name: 'login'})
     }
 }
 
