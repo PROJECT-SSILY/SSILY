@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import LoginPage from '../views/Accounts/LoginPage.vue'
+import MyPage from '../views/MyPage.vue'
+import SignupPage from '../views/Accounts/SignupPage.vue'
+import WaitingPage from '@/views/WaitingPage/WaitingPage.vue'
 import StartingPage from '../views/StartingPage/StartingPage.vue'
 import MainPage from '../views/MainPage/MainPage.vue'
-import LoginPage from '../views/Account/LoginPage.vue'
-import FindPassword from '../views/Account/FindPassword.vue'
+import FindPassword from '../views/Accounts/FindPassword.vue'
 
 const routes = [
   {
@@ -12,8 +15,23 @@ const routes = [
   },
   {
     path: '/login',
-    name: 'Login',
+    name: 'login',
     component: LoginPage
+  },
+  {
+    path: '/mypage',
+    name: 'mypage',
+    component: MyPage
+  },
+  {
+    path: '/signup',
+    name: 'signup',
+    component: SignupPage
+  },
+  {
+    path: '/waiting',
+    name: 'waiting',
+    component: WaitingPage
   },
   {
     path: '/findpw',
