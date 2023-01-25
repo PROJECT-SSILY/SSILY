@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import LoginPage from '../views/Accounts/LoginPage.vue'
 import MyPage from '../views/MyPage.vue'
 import SignupPage from '../views/Accounts/SignupPage.vue'
+import WaitingPage from '@/views/WaitingPage/WaitingPage.vue'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/signup',
     name: 'signup',
     component: SignupPage
+  },
+  {
+    path: '/waiting',
+    name: 'waiting',
+    component: WaitingPage
   }
 ]
 
