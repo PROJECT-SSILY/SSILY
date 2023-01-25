@@ -1,8 +1,9 @@
 <template>
     <div>
       <v-btn @click="toLogin">Start</v-btn>
+      <img src="./images/rocket.svg" alt="">
     </div>
-  </template>
+</template>
   
 <script>
 
@@ -16,3 +17,7 @@ methods: {
 
 }
 </script>
+
+<style>
+</style>
+
