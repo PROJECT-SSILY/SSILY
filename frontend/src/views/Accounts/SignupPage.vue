@@ -79,7 +79,6 @@
   </v-container>
   </v-form>
 </template>
-
 <script>
 export default {
   name: 'SignupPage',
@@ -110,6 +109,30 @@ export default {
           return false;
         }
       },
+      EmailCheck () {
+
+      },
+      NicknameCheck () {
+
+      },
+      Signup() {
+        axios({
+          method: 'post',
+          url: `${this.state.API_URL}/accounts/signup/`,
+          data: {
+            email: this.email,
+            name: this.name,
+            nickname: this.nickname,
+            password1: this.password1,
+          }
+        })
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      }
     }
 }
 </script>
