@@ -1,0 +1,28 @@
+server:
+  servlet:
+    context-path: /api
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ssily?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 1234
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+  jwt:
+    secretKey: 123jkbndkancoqasndnk1jwnxckjn13dasjncxlkqmnlckmql1k2mlk31m5kol4m6lk42m3l
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+
