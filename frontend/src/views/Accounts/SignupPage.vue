@@ -105,7 +105,7 @@ export default {
     methods: {
       validate () {
         this.$refs.form.validate()
-        if (this.password1 != this.password2) {
+        if ( this.password1 != this.password2 ) {
           return false;
         }
       },
