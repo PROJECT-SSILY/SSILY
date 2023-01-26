@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static com.appleparty.ssily.domain.redis.RedisKey.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -70,10 +72,8 @@ public class AuthService {
         }
 
         String authNumber = MailUtil.makeRandomNumber(10);
-        log.info("authNumber = {}", authNumber);
-        redisService.setDataWithExpiration(RedisKey.EMAIL_AUTH.getKey() + requestDto.getEmail(),
-                authNumber, 60 * 5L);
-
+        redisService.setDataWithExpiration(EMAIL_AUTH.getKey() + requestDto.getEmail(), authNumber, 60 * 5L);
+        
         javaMailSender.send(MailUtil.setMailForAuth(requestDto.getEmail(), authNumber));
     }
 }
