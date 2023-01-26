@@ -5,10 +5,10 @@
 //     requestId,
 //   } from "../common/api/accountAPI";
 
-import { requestRegister } from "@/common/api/accountAPI";
+import { requestRegister, checkEmail, checkNickname } from "@/common/api/accountAPI";
 
 const state = {
-    API_URL: "http://localhost:8080",
+
 }
 
 const getters = {
@@ -55,14 +55,37 @@ const actions = {
     // },
     registerAction: async (commit, registerData) => {
         try {
-          const response = await requestRegister(registerData)
-          console.log(response);
+            console.log(registerData)
+            const response = await requestRegister(registerData)
+            console.log(response);
         } catch (err) {
-          console.log(err);
-          throw err;
+            console.log(err);
+            throw err;
         }
-      },
+    },
 
+    checkEmailAction: async (commit, email) => {
+        try {
+            console.log(email)
+            const response = await checkEmail(email)
+            console.log("응답!!", response)
+            return response
+        } catch (err) {
+            console.log(err)
+            throw err;
+        }
+    },
+
+    checkNicknameAction: async (commit, nickname) => {
+        try {
+            console.log(nickname)
+            const response = await checkNickname(nickname)
+            return response
+        } catch (err) {
+            console.log(err)
+            throw err;
+        }
+    },
     // getMeAction: async ({ commit }, token) => {
     //     try {
     //         // console.log("token : ", token);
