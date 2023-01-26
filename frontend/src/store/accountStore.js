@@ -5,10 +5,10 @@
 //     requestId,
 //   } from "../common/api/accountAPI";
 
-import { requestRegister, checkEmail, checkNickname } from "@/common/api/accountAPI";
+import { requestLogin, requestRegister, checkEmail, checkNickname } from "@/common/api/accountAPI";
 
 const state = {
-
+    token: null
 }
 
 const getters = {
@@ -26,7 +26,6 @@ const getters = {
 const mutations = {
     setToken: (state, token) => {
         state.token = token;
-        // console.log("loginACTINO", token);
     },
     setUser: (state, data) => {
         state.user = data;
@@ -37,15 +36,17 @@ const mutations = {
 }
 
 const actions = {
-    // loginAction: async ({ commit }, loginData) => {
-    //     console.log(loginData, "------------");
-    //     const response = await requestLogin(loginData);
-    //     console.log("response = ", response);
-    //     if (response == -100) {
-    //       return -100;
-    //     }
-    //     await commit("setToken", response.data.accessToken);
-    // },
+    loginAction: async ({ commit }, loginData) => {
+        console.log(loginData, "------------");
+        const response = await requestLogin(loginData);
+        console.log("response = ", response);
+        if (response == -100) {
+          return -100;
+        }
+        await commit("setToken", response.data.data.accessToken);
+        console.log(getters.getToken)
+        console.log(state.token, '토큰')
+    },
     // logoutAction: async ({ commit }) => {
     //     commit("setToken", null);
     // },
