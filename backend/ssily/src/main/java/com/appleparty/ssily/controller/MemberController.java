@@ -43,7 +43,7 @@ public class MemberController {
     }
 
     @GetMapping("/{member-id}")
-    public SingleResult<GetMemberResponseDto> getMember(@PathVariable("member-id") String email) {
-        return responseService.getSingleResult(memberService.getMember(email));
+    public SingleResult<GetMemberResponseDto> getMember(@PathVariable("member-id") long memberId) {
+        return responseService.getSingleResult(memberService.getMember(memberId));
     }
 }

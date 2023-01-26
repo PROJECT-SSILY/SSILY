@@ -67,9 +67,10 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public GetMemberResponseDto getMember(String email) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(MemberNotFoundException::new);
+    public GetMemberResponseDto getMember(long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
         return GetMemberResponseDto.builder()
+                .id(member.getId())
                 .email(member.getEmail())
                 .name(member.getName())
                 .nickname(member.getNickname())
