@@ -4,6 +4,7 @@ import com.appleparty.ssily.common.util.ValidCheck;
 import com.appleparty.ssily.domain.member.Member;
 import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
 import com.appleparty.ssily.dto.member.request.UpdateNicknameRequestDto;
+import com.appleparty.ssily.dto.member.response.GetMemberResponseDto;
 import com.appleparty.ssily.exception.member.DuplicateEmailException;
 import com.appleparty.ssily.exception.member.DuplicationNicknameException;
 import com.appleparty.ssily.exception.member.InvalidEmailException;
@@ -11,10 +12,13 @@ import com.appleparty.ssily.exception.member.MemberNotFoundException;
 import com.appleparty.ssily.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,5 +66,19 @@ public class MemberService {
         Member member = requestDto.toEntity(passwordEncoder.encode(requestDto.getPassword()));
         memberRepository.save(member);
     }
+
+    public GetMemberResponseDto getMember(long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
+        return GetMemberResponseDto.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .nickname(member.getNickname())
+                .level(member.getLevel())
+                .exp(member.getExp())
+                .record(member.getRecord())
+                .build();
+    }
+
 
 }
