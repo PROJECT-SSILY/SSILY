@@ -4,6 +4,7 @@ import com.appleparty.ssily.common.response.ResponseService;
 import com.appleparty.ssily.common.result.Result;
 import com.appleparty.ssily.common.result.SingleResult;
 import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
+import com.appleparty.ssily.dto.member.request.UpdateNicknameRequestDto;
 import com.appleparty.ssily.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,12 @@ public class MemberController {
     @GetMapping("/nickname")
     public SingleResult<Boolean> checkNicknameDuplicate(@RequestParam("nickname") String nickname){
         return responseService.getSingleResult(memberService.checkNicknameDuplicate(nickname));
+    }
+
+    @PutMapping("/nickname")
+    public Result updateNickname(@RequestBody UpdateNicknameRequestDto requestDto){
+        memberService.updateNickname(requestDto);
+        return responseService.getSuccessResult();
     }
 
     @PostMapping
