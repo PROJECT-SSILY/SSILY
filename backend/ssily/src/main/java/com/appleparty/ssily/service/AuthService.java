@@ -4,7 +4,6 @@ import com.appleparty.ssily.common.config.security.jwt.JwtTokenProvider;
 import com.appleparty.ssily.common.util.MailUtil;
 import com.appleparty.ssily.common.util.ValidCheck;
 import com.appleparty.ssily.domain.member.Member;
-import com.appleparty.ssily.domain.redis.RedisKey;
 import com.appleparty.ssily.dto.auth.request.EmailRequestDto;
 import com.appleparty.ssily.dto.auth.request.LoginRequestDto;
 import com.appleparty.ssily.dto.auth.response.LoginResponseDto;
@@ -23,8 +22,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 import static com.appleparty.ssily.domain.redis.RedisKey.*;
 
@@ -73,7 +70,7 @@ public class AuthService {
 
         String authNumber = MailUtil.makeRandomNumber(10);
         redisService.setDataWithExpiration(EMAIL_AUTH.getKey() + requestDto.getEmail(), authNumber, 60 * 5L);
-        
+
         javaMailSender.send(MailUtil.setMailForAuth(requestDto.getEmail(), authNumber));
     }
 }
