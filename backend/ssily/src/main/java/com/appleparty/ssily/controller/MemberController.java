@@ -5,8 +5,11 @@ import com.appleparty.ssily.common.result.Result;
 import com.appleparty.ssily.common.result.SingleResult;
 import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
 import com.appleparty.ssily.dto.member.request.UpdateNicknameRequestDto;
+import com.appleparty.ssily.dto.member.response.GetMemberResponseDto;
 import com.appleparty.ssily.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,4 +41,10 @@ public class MemberController {
         memberService.join(requestDto);
         return responseService.getSuccessResult();
     }
+
+//    @GetMapping
+//    public SingleResult<GetMemberResponseDto> getMember() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String loginEmail=authentication.getName();
+//    }
 }
