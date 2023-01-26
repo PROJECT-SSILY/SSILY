@@ -51,4 +51,16 @@ public class ExceptionAdvice {
     public Result wrongAuthNumberException(){
         return responseService.getFailureResult(-105, "인증번호가 일치하지 않습니다.");
     }
+    @ExceptionHandler(WrongEmailException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result WrongEmailException(){
+        return responseService.getFailureResult(-200, "이메일이 일치하지 않습니다.");
+    }
+
+    @ExceptionHandler(WrongNameException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result wrongNameException(){
+        return responseService.getFailureResult(-201, "이름이 일치하지 않습니다.");
+    }
+
 }
