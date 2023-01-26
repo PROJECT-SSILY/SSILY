@@ -15,7 +15,7 @@
           </v-col>
           <v-col>
             <v-avatar>
-              <v-img src="https://cdn.vuetifyjs.com/images/lists/2.jpg"></v-img>
+              <v-img @click="toMyPage" src="https://cdn.vuetifyjs.com/images/lists/2.jpg"></v-img>
             </v-avatar>
           </v-col>
         </v-row>
@@ -27,6 +27,11 @@
 
 export default {
 name: 'ProfileBox',
+methods: {
+  toMyPage() {
+    this.$router.push({name: 'mypage'})
+  }
+}
 
 }
 </script>

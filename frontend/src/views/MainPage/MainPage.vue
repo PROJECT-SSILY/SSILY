@@ -18,9 +18,7 @@
             </v-row>
             <v-row>
               <v-col>
-                <v-btn color="accent" large @click.stop="dialog = true">방 만들기</v-btn>
-                <make-room-dialog 
-                v-model="dialog"></make-room-dialog>
+                <make-room-dialog></make-room-dialog>
               </v-col>
             </v-row>
             <v-row>
@@ -49,7 +47,6 @@ export default {
 name: 'MainPage',
 data() {
   return {
-    dialog: false,
   };
 },
 components: {
