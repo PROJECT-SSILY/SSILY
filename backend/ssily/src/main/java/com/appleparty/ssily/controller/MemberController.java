@@ -8,8 +8,6 @@ import com.appleparty.ssily.dto.member.request.UpdateNicknameRequestDto;
 import com.appleparty.ssily.dto.member.response.GetMemberResponseDto;
 import com.appleparty.ssily.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -45,5 +43,10 @@ public class MemberController {
     @GetMapping("/{member-id}")
     public SingleResult<GetMemberResponseDto> getMember(@PathVariable("member-id") long memberId) {
         return responseService.getSingleResult(memberService.getMember(memberId));
+    }
+
+    @GetMapping
+    public SingleResult<GetMemberResponseDto> searchMyInfoByToken(){
+        return responseService.getSingleResult(memberService.searchMyInfoByToken());
     }
 }
