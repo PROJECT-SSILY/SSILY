@@ -42,9 +42,8 @@ public class MemberController {
         return responseService.getSuccessResult();
     }
 
-//    @GetMapping
-//    public SingleResult<GetMemberResponseDto> getMember() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String loginEmail=authentication.getName();
-//    }
+    @GetMapping("/{member-id}")
+    public SingleResult<GetMemberResponseDto> getMember(@PathVariable("member-id") String email) {
+        return responseService.getSingleResult(memberService.getMember(email));
+    }
 }

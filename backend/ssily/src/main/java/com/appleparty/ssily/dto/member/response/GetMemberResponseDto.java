@@ -15,6 +15,6 @@ public class GetMemberResponseDto {
     private String nickname;
     private int level;
     private long exp;
-    @Embedded
     private Record record;
+
 }
