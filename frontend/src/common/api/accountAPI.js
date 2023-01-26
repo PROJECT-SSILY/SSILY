@@ -11,7 +11,17 @@ import $axios from "axios";
 // return -100;
 // });
 
-const requestRegister = payload => $axios.post("/member", payload);
+const requestRegister = payload => $axios.post("/api/member", payload); // 회원가입 요청
+
+const checkEmail = (payload) => {
+    const params = { email: payload }
+    return $axios.get("api/member/email", { params })
+} // 이메일 중복 확인
+
+const checkNickname = (payload) => {
+    const params = { nickname: payload }
+    return $axios.get("api/member/nickname", { params })
+} // 이메일 중복 확인
 
 // const requestMe = async token => {
 //   console.log("getMeToken : ", token);
@@ -28,4 +38,4 @@ const requestRegister = payload => $axios.post("/member", payload);
 // });
 
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { requestRegister };
+export { requestRegister, checkEmail, checkNickname };
