@@ -11,32 +11,56 @@
       color="deep-purple accent-4"
       dark
     >
-      <v-toolbar-title>New Chat</v-toolbar-title>
+      <v-toolbar-title>방 제목</v-toolbar-title>
       <v-switch
-      v-model="ex11"
-      label=""
+      v-model="switch1"
+      :label="`모드: ${switch1 ? '개인':'팀'}`"
       color="orange darken-3"
-      value="orange darken-3"
       hide-details
     ></v-switch>
 
     </v-toolbar>
 
-    <v-list subheader>
-
+    <v-list subheader v-if="switch1">
       <v-list-item
-        v-for="chat in recent"
-        :key="chat.title"
+        
+        v-for="room in privaterooms"
+        :key="room.title"
       >
       
       <v-list-item-avatar>
       </v-list-item-avatar>
       
       <v-list-item-content>
-        <v-list-item-title v-text="chat.title"></v-list-item-title>
+        <v-list-item-title v-text="room.title"></v-list-item-title>
       </v-list-item-content>
       
       <v-list-item-icon>
+        <v-icon :color="room.secret ? 'deep-purple accent-4' : 'grey'">
+          mdi-lock-outline
+        </v-icon>
+      </v-list-item-icon>
+      <v-divider></v-divider>
+      </v-list-item>
+    </v-list>
+    <v-list subheader v-else>
+      <v-list-item
+        
+        v-for="room in teamrooms"
+        :key="room.title"
+      >
+      
+      <v-list-item-avatar>
+      </v-list-item-avatar>
+      
+      <v-list-item-content>
+        <v-list-item-title v-text="room.title"></v-list-item-title>
+      </v-list-item-content>
+      
+      <v-list-item-icon>
+        <v-icon :color="room.secret ? 'deep-purple accent-4' : 'grey'">
+          mdi-lock-outline
+        </v-icon>
       </v-list-item-icon>
       <v-divider></v-divider>
       </v-list-item>
@@ -51,25 +75,43 @@
 export default {
 name: 'RoomList',
 data: () => ({
-      recent: [
+      privaterooms: [
         {
-          active: true,
+          secret: true,
           title: '들어오시죠',
         },
         {
-          active: true,
+          secret: true,
           title: 'I 3D U',
         },
         {
-          active: true,
+          secret: false,
           title: 'Draw me if you catch',
         },
         {
-          active: true,
+          secret: false,
           title: '재밌다',
         },
       ],
-      ex11: ['red', 'indigo', 'orange', 'primary', 'secondary', 'success', 'info', 'warning', 'error', 'red darken-3', 'indigo darken-3', 'orange darken-3'],
+      teamrooms: [
+        {
+          secret: true,
+          title: '여기는',
+        },
+        {
+          secret: true,
+          title: '팀전',
+        },
+        {
+          secret: false,
+          title: '섹션입니다',
+        },
+        {
+          secret: false,
+          title: '짱~~',
+        },
+      ],
+      switch1: true,
       
     }),
 }

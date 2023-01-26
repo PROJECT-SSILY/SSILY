@@ -9,10 +9,7 @@ import com.appleparty.ssily.dto.auth.response.LoginResponseDto;
 import com.appleparty.ssily.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -29,9 +26,15 @@ public class AuthController {
         return responseService.getSingleResult(responseDto);
     }
 
-    @PostMapping("email")
+    @PostMapping("/email")
     public Result sendAuthToEmail(@RequestBody EmailRequestDto requestDto){
         authService.sendAuthToEmail(requestDto);
+        return responseService.getSuccessResult();
+    }
+
+    @GetMapping("/email")
+    public Result verifyAuthNumber(@RequestParam("email") String email, @RequestParam("authNumber") String authNumber){
+        authService.verifyAuthNumber(email, authNumber);
         return responseService.getSuccessResult();
     }
 }
