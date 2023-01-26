@@ -2,6 +2,7 @@ package com.appleparty.ssily.exception;
 
 import com.appleparty.ssily.common.response.ResponseService;
 import com.appleparty.ssily.common.result.Result;
+import com.appleparty.ssily.exception.auth.WrongAuthNumberException;
 import com.appleparty.ssily.exception.member.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -45,4 +46,9 @@ public class ExceptionAdvice {
         return responseService.getFailureResult(-104, "비밀번호가 일치하지 않습니다.");
     }
 
+    @ExceptionHandler(WrongAuthNumberException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result wrongAuthNumberException(){
+        return responseService.getFailureResult(-105, "인증번호가 일치하지 않습니다.");
+    }
 }

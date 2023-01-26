@@ -7,6 +7,7 @@ import com.appleparty.ssily.domain.member.Member;
 import com.appleparty.ssily.dto.auth.request.EmailRequestDto;
 import com.appleparty.ssily.dto.auth.request.LoginRequestDto;
 import com.appleparty.ssily.dto.auth.response.LoginResponseDto;
+import com.appleparty.ssily.exception.auth.WrongAuthNumberException;
 import com.appleparty.ssily.exception.member.DuplicateEmailException;
 import com.appleparty.ssily.exception.member.InvalidEmailException;
 import com.appleparty.ssily.exception.member.MemberNotFoundException;
@@ -72,5 +73,20 @@ public class AuthService {
         redisService.setDataWithExpiration(EMAIL_AUTH.getKey() + requestDto.getEmail(), authNumber, 60 * 5L);
 
         javaMailSender.send(MailUtil.setMailForAuth(requestDto.getEmail(), authNumber));
+    }
+
+    public void verifyAuthNumber(String email, String authNumber){
+        if(!ValidCheck.isEmailValid(email)){
+            throw new InvalidEmailException();
+        }
+
+        if(memberRepository.existsByEmail(email)){
+            throw new DuplicateEmailException();
+        }
+
+        String redisAuthNumber = redisService.getData(EMAIL_AUTH.getKey() + email);
+        if(redisAuthNumber == null || !redisAuthNumber.equals(authNumber)){
+            throw new WrongAuthNumberException();
+        }
     }
 }
