@@ -29,7 +29,7 @@ public class AuthController {
         return responseService.getSingleResult(responseDto);
     }
 
-    @PostMapping("email")
+    @PostMapping("/email")
     public Result sendAuthToEmail(@RequestBody EmailRequestDto requestDto){
         authService.sendAuthToEmail(requestDto);
         return responseService.getSuccessResult();
