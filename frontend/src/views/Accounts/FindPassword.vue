@@ -6,7 +6,7 @@
   >
   <v-container>
     <v-row>
-      <v-col cols="10">
+      <v-col cols="12">
     <v-text-field
       v-model="name"
       :counter="10"
@@ -17,7 +17,7 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="10">
+      <v-col cols="12">
     <v-text-field
       v-model="email"
       :rules="emailRules"
@@ -26,22 +26,16 @@
     ></v-text-field>
     </v-col>
     </v-row>
-    <!-- :disabled="!valid" -->
-    <v-btn
-      color="success"
-      class="mr-4"
-      @click="validate"
-    >
-      Validate
-    </v-btn>
-
-    <v-btn
-      color="error"
-      class="mr-4"
-      @click="reset"
-    >
-      Reset Form
-    </v-btn>
+    <v-row>
+      <v-col>
+        <v-btn
+          color="error"
+          @click="sendPw"
+        >
+          비밀번호 찾기
+        </v-btn>
+      </v-col>
+    </v-row>
     </v-container>
   </v-form>
 </template>
@@ -52,25 +46,19 @@
       valid: true,
       name: '',
       nameRules: [
-        v => !!v || 'Name is required',
-        v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+        v => !!v || '이름 입력은 필수입니다.',
+        v => (2 <= v && v.length <= 10) || '이름은 2자 이상 10자 이내로 작성해주세요.',
       ],
       email: '',
       emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+        v => !!v || '이메일 입력은 필수입니다.',
+        v => /.+@.+\..+/.test(v) || '이메일이 유효하지 않습니다.',
       ],
     }),
 
     methods: {
-      validate () {
-        this.$refs.form.validate()
-      },
-      reset () {
+      sendPw () {
         this.$refs.form.reset()
-      },
-      resetValidation () {
-        this.$refs.form.resetValidation()
       },
     },
   }
