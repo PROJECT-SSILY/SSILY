@@ -1,15 +1,15 @@
 import $axios from "axios";
 
-// const requestLogin = payload =>
-// $axios.post("/auth/login", payload).catch(error => {
-// if (error.response.status == 404) {
-//     alert("존재하지 않는 아이디입니다.");
-// }
-// if (error.response.status == 401) {
-//     alert("비밀번호를 확인하세요!");
-// }
-// return -100;
-// });
+const requestLogin = payload =>
+$axios.post("/api/auth/login", payload).catch(error => {
+if (error.response.status == 404) {
+    alert("존재하지 않는 아이디입니다.");
+}
+if (error.response.status == 401) {
+    alert("비밀번호를 확인하세요.");
+}
+return -100;
+});
 
 const requestRegister = payload => $axios.post("/api/member", payload); // 회원가입 요청
 
@@ -38,4 +38,4 @@ const checkNickname = (payload) => {
 // });
 
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { requestRegister, checkEmail, checkNickname };
+export { requestLogin, requestRegister, checkEmail, checkNickname };

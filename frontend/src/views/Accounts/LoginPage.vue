@@ -43,10 +43,12 @@
 <script>
 import { reactive, ref } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 export default {
   name: 'LoginPage',
   setup() {
     const loginForm = ref(null)
+    const store = useStore()
     const state = reactive({
       form: {
         email: '',
@@ -65,7 +67,19 @@ export default {
         name: 'findpw',
       })
     }
-    return {state, loginForm, clickSignUp, clickFindPw}
+    const clickLogIn = async function () {
+      const formData = {
+        email: state.form.email,
+        password: state.form.password
+      }
+      await store.dispatch('accountStore/loginAction', formData)
+      await console.log("로그인 끝")
+      console.log(store.getters['accountStore/getToken'])
+      router.push({
+        name: 'Main',
+      })
+    }
+    return {state, loginForm, store, clickSignUp, clickFindPw, clickLogIn}
   },
   data() {
     return {
