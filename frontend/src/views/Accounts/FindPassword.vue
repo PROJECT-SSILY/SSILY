@@ -1,80 +1,65 @@
 <template>
-    <div>
-      <h1>비밀번호 찾기</h1>
-      <form>
+  <v-form
+    ref="form"
+    v-model="valid"
+    lazy-validation
+  >
+  <v-container>
+    <v-row>
+      <v-col cols="12">
     <v-text-field
       v-model="name"
-      :error-messages="nameErrors"
       :counter="10"
+      :rules="nameRules"
       label="Name"
       required
-      @input="$v.name.$touch()"
-      @blur="$v.name.$touch()"
     ></v-text-field>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
     <v-text-field
       v-model="email"
-      :error-messages="emailErrors"
+      :rules="emailRules"
       label="E-mail"
       required
-      @input="$v.email.$touch()"
-      @blur="$v.email.$touch()"
     ></v-text-field>
-    <v-btn
-      class="mr-4"
-      @click="submit"
-    >
-      submit
-    </v-btn>
-    <v-btn @click="clear">
-      clear
-    </v-btn>
-  </form>
-    </div>
-  </template>
+    </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-btn
+          color="error"
+          @click="sendPw"
+        >
+          비밀번호 찾기
+        </v-btn>
+      </v-col>
+    </v-row>
+    </v-container>
+  </v-form>
+</template>
   
 <script>
-//  import { validationMixin } from 'vuelidate'
-//  import { required, maxLength, email } from 'vuelidate/lib/validators'
+ export default {
+    data: () => ({
+      valid: true,
+      name: '',
+      nameRules: [
+        v => !!v || '이름 입력은 필수입니다.',
+        v => (2 <= v && v.length <= 10) || '이름은 2자 이상 10자 이내로 작성해주세요.',
+      ],
+      email: '',
+      emailRules: [
+        v => !!v || '이메일 입력은 필수입니다.',
+        v => /.+@.+\..+/.test(v) || '이메일이 유효하지 않습니다.',
+      ],
+    }),
 
-//   export default {
-//     mixins: [validationMixin],
-
-//     validations: {
-//       name: { required, maxLength: maxLength(10) },
-//       email: { required, email },
-//     },
-
-//     data: () => ({
-//       name: '',
-//       email: '',
-//     }),
-
-//     computed: {
-//       nameErrors () {
-//         const errors = []
-//         if (!this.$v.name.$dirty) return errors
-//         !this.$v.name.maxLength && errors.push('Name must be at most 10 characters long')
-//         !this.$v.name.required && errors.push('Name is required.')
-//         return errors
-//       },
-//       emailErrors () {
-//         const errors = []
-//         if (!this.$v.email.$dirty) return errors
-//         !this.$v.email.email && errors.push('Must be valid e-mail')
-//         !this.$v.email.required && errors.push('E-mail is required')
-//         return errors
-//       },
-//     },
-
-//     methods: {
-//       submit () {
-//         this.$v.$touch()
-//       },
-//       clear () {
-//         this.$v.$reset()
-//         this.name = ''
-//         this.email = ''
-//       },
-//     },
-//   }
+    methods: {
+      sendPw () {
+        this.$refs.form.reset()
+      },
+    },
+  }
 </script>
