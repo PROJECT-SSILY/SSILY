@@ -12,13 +12,10 @@ import com.appleparty.ssily.exception.member.MemberNotFoundException;
 import com.appleparty.ssily.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +66,21 @@ public class MemberService {
 
     public GetMemberResponseDto getMember(long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
+        return GetMemberResponseDto.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .name(member.getName())
+                .nickname(member.getNickname())
+                .level(member.getLevel())
+                .exp(member.getExp())
+                .record(member.getRecord())
+                .build();
+    }
+
+    public GetMemberResponseDto searchMyInfoByToken(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow(MemberNotFoundException::new);
+
         return GetMemberResponseDto.builder()
                 .id(member.getId())
                 .email(member.getEmail())
