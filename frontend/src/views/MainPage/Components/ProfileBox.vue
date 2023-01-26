@@ -2,7 +2,7 @@
     <div>
       <v-container>
         <v-row>
-          <v-col id="proleft">
+          <v-col col="9" id="proleft">
             <v-row>
               <v-col>어서오세요, {{}}님!</v-col>
             </v-row>
@@ -13,8 +13,8 @@
               </v-col>
             </v-row>
           </v-col>
-          <v-col>
-            <v-avatar>
+          <v-col col="2">
+            <v-avatar size="64">
               <v-img @click="toMyPage" src="https://cdn.vuetifyjs.com/images/lists/2.jpg"></v-img>
             </v-avatar>
           </v-col>
