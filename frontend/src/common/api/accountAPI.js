@@ -14,8 +14,8 @@ import $axios from "axios";
 const requestRegister = payload => $axios.post("/api/member", payload); // 회원가입 요청
 
 const checkEmail = (payload) => {
-    const params = { email: payload }
-    return $axios.get("api/member/email", { params })
+    console.log(payload)
+    return $axios.get(`api/member/email?email=${payload}`)
 } // 이메일 중복 확인
 
 const checkNickname = (payload) => {

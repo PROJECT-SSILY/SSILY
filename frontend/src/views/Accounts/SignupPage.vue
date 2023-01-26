@@ -144,15 +144,12 @@ export default {
     }
 
     const checkEmail = async function () {
-      // console.log(state.form.email.status)
       const result = await store.dispatch('accountStore/checkEmailAction', state.form.email.value )
-      if (result.data) {
+      if (result.data.data) {
         state.form.email.status = true
-        // console.log(state.form.email.status)
         alert("사용 가능한 이메일입니다.")
       } else {
         state.form.email.status = false
-        // console.log(state.form.email.status)
         alert("이미 사용 중인 이메일입니다.")
       }
     }
@@ -160,13 +157,11 @@ export default {
     const checkNickname = async function () {
       console.log(state.form.nickname.status)
       const result = await store.dispatch('accountStore/checkNicknameAction', state.form.nickname.value )
-      if (result.data) {
+      if (result.data.data) {
         state.form.nickname.status = true
-        // console.log(state.form.nickname.status)
         alert("사용 가능한 닉네임입니다.")
       } else {
         state.form.nickname.status = false
-        // console.log(state.form.nickname.status)
         alert("이미 사용 중인 닉네임입니다.")
       }
     }
