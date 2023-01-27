@@ -5,7 +5,7 @@
 //     requestId,
 //   } from "../common/api/accountAPI";
 
-import { requestLogin, requestRegister, checkEmail, checkNickname } from "@/common/api/accountAPI";
+import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction } from "@/common/api/accountAPI";
 
 const state = {
     token: localStorage.getItem('token') || null,
@@ -86,6 +86,19 @@ const actions = {
             throw err;
         }
     },
+
+    sendAction: async (commit, userInfo) => {
+        try {
+            console.log(userInfo)
+            const response = await sendNewPwAction(userInfo)
+            console.log(response,'11111111111여긴 코드가 와야댐')
+            return response
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
+    }
+
     // getMeAction: async ({ commit }, token) => {
     //     try {
     //         // console.log("token : ", token);

@@ -18,8 +18,13 @@
         <v-card-title class="text-h5 grey lighten-2">
           방 만들기
         </v-card-title>
-
+        <v-form
+          ref="form"
+          v-model="valid"
+          lazy-validation
+        >
         <v-radio-group
+          :rules="[rules.required]"
           v-model="row"
           inline
         >
@@ -35,6 +40,7 @@
           ></v-radio>
         </v-radio-group>
         <v-radio-group
+          :rules="[rules.required]"
           v-model="row2"
           inline
         >
@@ -56,12 +62,14 @@
           <v-spacer></v-spacer>
           <v-btn
             color="primary"
+            type="submit"
             text
             @click="toWaiting"
           >
             방 만들기
           </v-btn>
         </v-card-actions>
+      </v-form>
       </v-card>
     </v-dialog>
   </div>
@@ -74,6 +82,9 @@
         dialog: false,
         row: null,
         row2: null,
+        rules: {
+          required: value => !!value || '필수',
+        }
       }
     },
     methods: {
