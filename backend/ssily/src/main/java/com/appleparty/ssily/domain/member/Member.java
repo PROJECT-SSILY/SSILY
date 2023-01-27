@@ -42,4 +42,9 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
         return this;
     }
+
+    public Member updatePassword(String password) {
+        this.password=password;
+        return this;
+    }
 }
