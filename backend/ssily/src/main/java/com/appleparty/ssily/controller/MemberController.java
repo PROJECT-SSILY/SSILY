@@ -3,6 +3,7 @@ package com.appleparty.ssily.controller;
 import com.appleparty.ssily.common.response.ResponseService;
 import com.appleparty.ssily.common.result.Result;
 import com.appleparty.ssily.common.result.SingleResult;
+import com.appleparty.ssily.dto.member.request.FindPwRequestDto;
 import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
 import com.appleparty.ssily.dto.member.request.UpdateNicknameRequestDto;
 import com.appleparty.ssily.dto.member.response.GetMemberResponseDto;
@@ -48,5 +49,11 @@ public class MemberController {
     @GetMapping
     public SingleResult<GetMemberResponseDto> searchMyInfoByToken(){
         return responseService.getSingleResult(memberService.searchMyInfoByToken());
+    }
+
+    @PostMapping("/password")
+    public Result findPw(@RequestBody FindPwRequestDto findPwRequestDto) {
+        memberService.sendTempPwToEmail(findPwRequestDto);
+        return responseService.getSuccessResult();
     }
 }
