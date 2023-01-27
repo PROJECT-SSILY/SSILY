@@ -8,6 +8,7 @@ import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
 import com.appleparty.ssily.dto.member.request.UpdateNicknameRequestDto;
 import com.appleparty.ssily.dto.member.response.GetMemberResponseDto;
 import com.appleparty.ssily.exception.member.*;
+import com.appleparty.ssily.dto.member.request.UpdatePasswordRequestDto;
 import com.appleparty.ssily.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -47,6 +48,18 @@ public class MemberService {
         String loginMemberEmail = authentication.getName();
         Member member = memberRepository.findByEmail(loginMemberEmail).orElseThrow(MemberNotFoundException::new);
         member.updateNickname(requestDto.getNickname());
+    }
+
+    @Transactional
+    public void updatePassword(UpdatePasswordRequestDto requestDto){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginMemberEmail=authentication.getName();
+        Member member = memberRepository.findByEmail(loginMemberEmail).orElseThrow(MemberNotFoundException::new);
+
+        if(!passwordEncoder.matches(requestDto.getOldPassword(), member.getPassword())){
+            throw new WrongPasswordException();
+        }
+        member.updatePassword(passwordEncoder.encode(requestDto.getNewPassword()));
     }
 
     @Transactional

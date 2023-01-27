@@ -43,8 +43,8 @@ public class Member extends BaseEntity {
         return this;
     }
 
-    public Member updatePassword(String password) {
-        this.password=password;
+    public Member updatePassword(String password){
+        this.password = password;
         return this;
     }
 }
