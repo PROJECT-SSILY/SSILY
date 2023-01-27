@@ -9,14 +9,14 @@
                     <img src="" alt="">
                 </div>
                 <div class="inner_section1_right">
-                    <h2>{{ nickname }}님</h2>
+                    <h2>{{ userinfo.nickname }}님</h2>
                     <v-btn>회원정보 변경</v-btn>
-                    <p>승률 : {{ winrate }}%</p>
+                    <!-- <p>승률 : {{ userinfo.winrate }}%</p>  -->
                 </div>
 
             </div>
             <div class="section2">
-                <h2>나의 경험치 <span>{{ exp }} exp</span></h2>
+                <h2>나의 경험치 <span>{{ userinfo.exp }} exp</span></h2>
 
             </div>
         </div>
@@ -24,23 +24,23 @@
 </template>
 
 <script>
-import { ref, reactive } from 'vue'
+import { reactive } from 'vue'
 export default {
+    name: 'MyPage',
     setup() {
-        const exp = ref(2723)
-        const nickname = ref('홍길동')
-        const history = reactive({ plays: 11, wins: 3, throws: 2 })
+        const userinfo = reactive({ 
+            nickname: "", 
+            exp: 0, 
+            plays: 11,
+            wins: 3, 
+            throws: 2,
+            // winrate: userinfo.wins/userinfo.plays*100, 
+        })
+
         return {
-            exp,
-            nickname,
-            history,
+            userinfo,
         }
     },
-    computed: {
-        winrate() {
-            return this.history.wins/this.history.plays*100
-        }
-    }
 }
 </script>
 
