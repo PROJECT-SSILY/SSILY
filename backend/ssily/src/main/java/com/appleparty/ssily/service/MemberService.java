@@ -98,7 +98,7 @@ public class MemberService {
         if(!ValidCheck.isEmailValid(findPwRequestDto.getEmail())) {
             throw new InvalidEmailException();
         }
-        System.out.println(findPwRequestDto.getEmail()+"이메일!!");
+
         String tempPw= MailUtil.makeRandomNumber(12);
         String encTempPw=passwordEncoder.encode(tempPw);
         Member member = memberRepository.findByEmail(findPwRequestDto.getEmail()).orElseThrow(MemberNotFoundException::new);
