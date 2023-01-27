@@ -32,7 +32,8 @@ const routes = [
   {
     path: '/',
     name: 'Starting',
-    component: StartingPage
+    component: StartingPage,
+    beforeEnter: loginAuth()
   },
   {
     path: '/login',
@@ -49,7 +50,8 @@ const routes = [
   {
     path: '/signup',
     name: 'signup',
-    component: SignupPage
+    component: SignupPage,
+    beforeEnter: loginAuth()
   },
   {
     path: '/waiting',
