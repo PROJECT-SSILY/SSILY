@@ -1,22 +1,23 @@
 <template>
   <v-form
+  v-model="state.valid"
   ref="loginForm"
   lazy-validation
   >
     <v-text-field
-      v-model="email"
+      v-model="state.form.email"
       type="email"
+      :rules="emailRules"
       label="이메일(아이디)"
     ></v-text-field>
 
     <v-text-field
-      v-model="password"
+      v-model="state.form.password"
       type="password"
       label="비밀번호"
     ></v-text-field>
 
     <v-btn
-      color="success"
       class="mr-4"
       @click="clickLogIn"
     >
@@ -24,7 +25,6 @@
     </v-btn>
 
     <v-btn
-      color="error"
       class="mr-4"
       @click="clickSignUp"
     >
@@ -32,7 +32,6 @@
     </v-btn>
 
     <v-btn
-      color="warning"
       class="mr-4"
       @click="clickFindPw"
     >
@@ -42,27 +41,54 @@
 </template>
 
 <script>
+import { reactive, ref } from '@vue/reactivity'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 export default {
   name: 'LoginPage',
+  setup() {
+    const loginForm = ref(null)
+    const store = useStore()
+    const state = reactive({
+      form: {
+        email: '',
+        password: '',
+      },
+      valid: true,
+    })
+    const router = useRouter()
+    function clickSignUp() {
+      router.push({
+        name: 'signup',
+      })
+    }
+    function clickFindPw() {
+      router.push({
+        name: 'findpw',
+      })
+    }
+    const clickLogIn = async function () {
+      const formData = {
+        email: state.form.email,
+        password: state.form.password
+      }
+      await store.dispatch('accountStore/loginAction', formData)
+      await console.log("로그인 끝")
+      console.log(store.getters['accountStore/getToken'])
+      router.push({
+        name: 'Main',
+      })
+    }
+    return {state, loginForm, store, clickSignUp, clickFindPw, clickLogIn}
+  },
   data() {
     return {
-      email : '',
-      password: '',
+      emailRules: [
+        v => !!v || '이메일을 입력해 주세요',
+        v => /.+@.+\..+/.test(v) || '이메일이 유효하지 않습니다.',
+      ],
     }
   },
-  methods: {
-    clickLogIn() {
-      console.log('로그인 버튼 클릭')
-      console.log("email=", this.email)
-      console.log("password=", this.password)
-    },
-    clickSignUp() {
-      this.$router.push('signup')
-    },
-    clickFindPw() {
-      this.$router.push('findpw')
-    }
-  }
 }
 </script>
 
