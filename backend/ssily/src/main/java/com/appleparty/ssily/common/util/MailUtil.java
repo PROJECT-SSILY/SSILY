@@ -28,4 +28,13 @@ public class MailUtil {
 
         return message;
     }
+
+    public static SimpleMailMessage setMailForFindPw(String email, String tempPw) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("SSILY 임시 비밀번호");
+        message.setText("임시 비밀번호 : "+ tempPw);
+
+        return message;
+    }
 }
