@@ -69,7 +69,6 @@ const actions = {
         try {
             console.log(email)
             const response = await checkEmail(email)
-            console.log("응답!!", response)
             return response
         } catch (err) {
             console.log(err)
