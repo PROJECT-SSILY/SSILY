@@ -37,15 +37,14 @@ const mutations = {
 
 const actions = {
     loginAction: async ({ commit }, loginData) => {
-        console.log(loginData, "------------");
+        // console.log("loginData : ", loginData);
         const response = await requestLogin(loginData);
-        console.log("response = ", response);
+        // console.log("response : ", response);
         if (response == -100) {
           return -100;
         }
         await commit("setToken", response.data.data.accessToken);
-        console.log(getters.getToken)
-        console.log(state.token, '토큰')
+        // console.log('토큰: ', state.token)
     },
     // logoutAction: async ({ commit }) => {
     //     commit("setToken", null);

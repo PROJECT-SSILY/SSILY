@@ -1,7 +1,7 @@
 <template>
   <v-form
+  ref="form"
   v-model="state.valid"
-  ref="loginForm"
   lazy-validation
   >
     <v-text-field
@@ -41,13 +41,13 @@
 </template>
 
 <script>
-import { reactive, ref } from '@vue/reactivity'
+import { reactive } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { onMounted } from '@vue/runtime-core'
 export default {
   name: 'LoginPage',
   setup() {
-    const loginForm = ref(null)
     const store = useStore()
     const state = reactive({
       form: {
@@ -72,14 +72,18 @@ export default {
         email: state.form.email,
         password: state.form.password
       }
-      await store.dispatch('accountStore/loginAction', formData)
-      await console.log("로그인 끝")
-      console.log(store.getters['accountStore/getToken'])
-      router.push({
-        name: 'Main',
-      })
+      const response = await store.dispatch('accountStore/loginAction', formData)
+      if (response == -100 ) {
+        console.log('로그인 실패!!') 
+        router.go()
+      } else {
+        console.log('로그인 성공!!')
+        router.push({
+          name: 'Main'
+        })
+      }
     }
-    return {state, loginForm, store, clickSignUp, clickFindPw, clickLogIn}
+    return {state, store, onMounted, clickSignUp, clickFindPw, clickLogIn}
   },
   data() {
     return {
