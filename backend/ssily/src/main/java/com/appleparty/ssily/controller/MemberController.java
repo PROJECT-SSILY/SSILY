@@ -63,4 +63,10 @@ public class MemberController {
         memberService.sendTempPwToEmail(findPwRequestDto);
         return responseService.getSuccessResult();
     }
+
+    @DeleteMapping
+    public Result deleteMember() {
+        memberService.deleteMember();
+        return responseService.getSuccessResult();
+    }
 }

@@ -124,4 +124,11 @@ public class MemberService {
         member.updatePassword(encTempPw);
     }
 
+    @Transactional
+    public void deleteMember() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow(MemberNotFoundException::new);
+
+        memberRepository.delete(member);
+    }
 }
