@@ -98,20 +98,13 @@ public class MemberService {
         if(!ValidCheck.isEmailValid(findPwRequestDto.getEmail())) {
             throw new InvalidEmailException();
         }
-
+        System.out.println(findPwRequestDto.getEmail()+"이메일!!");
         String tempPw= MailUtil.makeRandomNumber(12);
         String encTempPw=passwordEncoder.encode(tempPw);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loginMemberEmail = authentication.getName();
-        Member member = memberRepository.findByEmail(loginMemberEmail).orElseThrow(MemberNotFoundException::new);
-
-        if(!findPwRequestDto.getEmail().equals(member.getEmail())) {
-            throw new WrongEmailException();
-        }
+        Member member = memberRepository.findByEmail(findPwRequestDto.getEmail()).orElseThrow(MemberNotFoundException::new);
 
         if(!findPwRequestDto.getName().equals(member.getName())) {
-            throw new WrongNameException();
+            throw new MemberNotFoundException();
         }
 
         javaMailSender.send(MailUtil.setMailForFindPw(findPwRequestDto.getEmail(), tempPw));
