@@ -6,6 +6,27 @@ import WaitingPage from '@/views/WaitingPage/WaitingPage.vue'
 import StartingPage from '../views/StartingPage/StartingPage.vue'
 import MainPage from '../views/MainPage/MainPage.vue'
 import FindPassword from '../views/Accounts/FindPassword.vue'
+import accountStore from '@/store/accountStore'
+
+
+const requireAuth = () => (to, from, next) => {
+  const token = accountStore.state.token
+  if (token !== null) {
+    console.log(token)
+    return next();
+  }
+  console.log(token)
+  next('/login');
+};
+
+const loginAuth = () => (to, from, next) => {
+  const token = accountStore.state.token
+  if (token == null) {
+    return next();
+  }
+  router.go(-1);
+};
+
 
 const routes = [
   {
@@ -16,12 +37,14 @@ const routes = [
   {
     path: '/login',
     name: 'login',
-    component: LoginPage
+    component: LoginPage,
+    beforeEnter: loginAuth()
   },
   {
     path: '/mypage',
     name: 'mypage',
-    component: MyPage
+    component: MyPage,
+    beforeEnter: requireAuth()
   },
   {
     path: '/signup',
@@ -31,17 +54,20 @@ const routes = [
   {
     path: '/waiting',
     name: 'waiting',
-    component: WaitingPage
+    component: WaitingPage,
+    beforeEnter: requireAuth()
   },
   {
     path: '/findpw',
     name: 'Findpw',
-    component: FindPassword
+    component: FindPassword,
+    beforeEnter: loginAuth()
   },
   {
     path: '/main',
     name: 'Main',
-    component: MainPage
+    component: MainPage,
+    beforeEnter: requireAuth()
   },
   // {
   //   path: '/about',

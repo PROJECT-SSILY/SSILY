@@ -8,7 +8,7 @@
 import { requestLogin, requestRegister, checkEmail, checkNickname } from "@/common/api/accountAPI";
 
 const state = {
-    token: null
+    token: localStorage.getItem('token') || null,
 }
 
 const getters = {
@@ -44,6 +44,7 @@ const actions = {
           return -100;
         }
         await commit("setToken", response.data.data.accessToken);
+        localStorage.setItem('token', state.token)
         // console.log('토큰: ', state.token)
     },
     // logoutAction: async ({ commit }) => {
