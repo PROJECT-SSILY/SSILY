@@ -10,7 +10,7 @@ import FindPassword from '../views/Accounts/FindPassword.vue'
 const routes = [
   {
     path: '/',
-    name: 'Starting',
+    name: 'starting',
     component: StartingPage
   },
   {
@@ -35,12 +35,12 @@ const routes = [
   },
   {
     path: '/findpw',
-    name: 'Findpw',
+    name: 'findpw',
     component: FindPassword
   },
   {
     path: '/main',
-    name: 'Main',
+    name: 'main',
     component: MainPage
   },
   // {
