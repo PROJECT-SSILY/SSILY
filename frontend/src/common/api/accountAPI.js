@@ -21,7 +21,7 @@ const checkEmail = (payload) => {
 const checkNickname = (payload) => {
     const params = { nickname: payload }
     return $axios.get("api/member/nickname", { params })
-} // 이메일 중복 확인
+} // 닉네임 중복 확인
 
 // const requestMe = async token => {
 //   console.log("getMeToken : ", token);
