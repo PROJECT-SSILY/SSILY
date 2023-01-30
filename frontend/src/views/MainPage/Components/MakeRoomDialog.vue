@@ -1,14 +1,14 @@
 <template>
   <div class="text-center">
     <v-dialog
-      v-model="dialog"
+      v-model="state.dialog"
       width="500"
     >
       <template v-slot:activator="{ attrs }">
         <v-btn
           dark
           v-bind="attrs"
-          @click.stop="dialog = true"
+          @click.stop="state.dialog = true"
         >
           방 만들기
         </v-btn>
@@ -24,8 +24,8 @@
           lazy-validation
         >
         <v-radio-group
-          :rules="[rules.required]"
-          v-model="row"
+          :rules="[state.rules.required]"
+          v-model="state.teamorprivate"
           inline
         >
           <v-radio
@@ -40,8 +40,8 @@
           ></v-radio>
         </v-radio-group>
         <v-radio-group
-          :rules="[rules.required]"
-          v-model="row2"
+          :rules="[state.rules.required]"
+          v-model="state.secretornot"
           inline
         >
           <v-radio
@@ -55,7 +55,11 @@
             value="radio-2"
           ></v-radio>
         </v-radio-group>
-
+        <v-text-field 
+          v-if="state.secretornot ==='radio-2'"
+          label="비밀번호 숫자 4자리를 입력하세요."
+          hide-details="auto"
+        ></v-text-field>
         <v-divider></v-divider>
 
         <v-card-actions>
@@ -76,21 +80,43 @@
 </template>
 
 <script>
+  import { useRouter } from 'vue-router'
+  import { reactive } from 'vue'
   export default {
-    data () {
-      return {
+    setup() {
+      const router = useRouter()
+      const state = reactive({
         dialog: false,
-        row: null,
-        row2: null,
+        teamorprivate: null,
+        secretornot: null,
+        otp:null,
         rules: {
           required: value => !!value || '필수',
         }
+      })
+      const toWaiting = async function () {
+
       }
-    },
-    methods: {
-      toWaiting() {
-        this.$router.push({name: 'waiting'})
+      return {
+        router, 
+        state,
+        toWaiting
       }
     }
+    // data () {
+    //   return {
+    //     dialog: false,
+    //     row: null,
+    //     row2: null,
+    //     rules: {
+    //       required: value => !!value || '필수',
+    //     }
+    //   }
+    // },
+    // methods: {
+    //   toWaiting() {
+    //     this.$router.push({name: 'waiting'})
+    //   }
+    // }
   }
 </script>
