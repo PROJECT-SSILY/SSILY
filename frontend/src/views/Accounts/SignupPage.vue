@@ -85,11 +85,13 @@
 <script>
 import { reactive, watch } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'SignupPage',
   setup() {
     const store = useStore()
+    const router = useRouter()
     const state = reactive({
       form: {
         name: "",
@@ -140,6 +142,7 @@ export default {
         }
         await store.dispatch('accountStore/registerAction', formData )
         await console.log("회원가입 완료")
+        router.push('login')
       } 
     }
 

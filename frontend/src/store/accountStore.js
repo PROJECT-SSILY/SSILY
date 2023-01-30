@@ -5,10 +5,10 @@
 //     requestId,
 //   } from "../common/api/accountAPI";
 
-import { requestLogin, requestRegister, checkEmail, checkNickname } from "@/common/api/accountAPI";
+import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction } from "@/common/api/accountAPI";
 
 const state = {
-    token: null
+    token: localStorage.getItem('token') || null,
 }
 
 const getters = {
@@ -37,15 +37,15 @@ const mutations = {
 
 const actions = {
     loginAction: async ({ commit }, loginData) => {
-        console.log(loginData, "------------");
+        // console.log("loginData : ", loginData);
         const response = await requestLogin(loginData);
-        console.log("response = ", response);
+        // console.log("response : ", response);
         if (response == -100) {
           return -100;
         }
         await commit("setToken", response.data.data.accessToken);
-        console.log(getters.getToken)
-        console.log(state.token, '토큰')
+        localStorage.setItem('token', state.token)
+        // console.log('토큰: ', state.token)
     },
     // logoutAction: async ({ commit }) => {
     //     commit("setToken", null);
@@ -69,7 +69,6 @@ const actions = {
         try {
             console.log(email)
             const response = await checkEmail(email)
-            console.log("응답!!", response)
             return response
         } catch (err) {
             console.log(err)
@@ -87,6 +86,19 @@ const actions = {
             throw err;
         }
     },
+
+    sendAction: async (commit, userInfo) => {
+        try {
+            console.log(userInfo)
+            const response = await sendNewPwAction(userInfo)
+            console.log(response,'11111111111여긴 코드가 와야댐')
+            return response
+        } catch (err) {
+            console.log(err);
+            throw err;
+        }
+    }
+
     // getMeAction: async ({ commit }, token) => {
     //     try {
     //         // console.log("token : ", token);

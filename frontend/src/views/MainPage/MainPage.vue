@@ -23,7 +23,9 @@
             </v-row>
             <v-row>
               <v-col>
-                <v-btn>게임 시작</v-btn>
+                <v-btn color="success"
+                >
+                게임 시작</v-btn>
               </v-col>
             </v-row>
             <v-row>
@@ -56,3 +58,7 @@ components: {
 },
 }
 </script>
+
+<style scoped>
+
+</style>

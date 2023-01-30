@@ -8,6 +8,7 @@ import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
 import com.appleparty.ssily.dto.member.request.UpdateNicknameRequestDto;
 import com.appleparty.ssily.dto.member.response.GetMemberResponseDto;
 import com.appleparty.ssily.exception.member.*;
+import com.appleparty.ssily.dto.member.request.UpdatePasswordRequestDto;
 import com.appleparty.ssily.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -47,6 +48,18 @@ public class MemberService {
         String loginMemberEmail = authentication.getName();
         Member member = memberRepository.findByEmail(loginMemberEmail).orElseThrow(MemberNotFoundException::new);
         member.updateNickname(requestDto.getNickname());
+    }
+
+    @Transactional
+    public void updatePassword(UpdatePasswordRequestDto requestDto){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginMemberEmail=authentication.getName();
+        Member member = memberRepository.findByEmail(loginMemberEmail).orElseThrow(MemberNotFoundException::new);
+
+        if(!passwordEncoder.matches(requestDto.getOldPassword(), member.getPassword())){
+            throw new WrongPasswordException();
+        }
+        member.updatePassword(passwordEncoder.encode(requestDto.getNewPassword()));
     }
 
     @Transactional
@@ -101,21 +114,21 @@ public class MemberService {
 
         String tempPw= MailUtil.makeRandomNumber(12);
         String encTempPw=passwordEncoder.encode(tempPw);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loginMemberEmail = authentication.getName();
-        Member member = memberRepository.findByEmail(loginMemberEmail).orElseThrow(MemberNotFoundException::new);
-
-        if(!findPwRequestDto.getEmail().equals(member.getEmail())) {
-            throw new WrongEmailException();
-        }
+        Member member = memberRepository.findByEmail(findPwRequestDto.getEmail()).orElseThrow(MemberNotFoundException::new);
 
         if(!findPwRequestDto.getName().equals(member.getName())) {
-            throw new WrongNameException();
+            throw new MemberNotFoundException();
         }
 
         javaMailSender.send(MailUtil.setMailForFindPw(findPwRequestDto.getEmail(), tempPw));
         member.updatePassword(encTempPw);
     }
 
+    @Transactional
+    public void deleteMember() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow(MemberNotFoundException::new);
+
+        memberRepository.delete(member);
+    }
 }

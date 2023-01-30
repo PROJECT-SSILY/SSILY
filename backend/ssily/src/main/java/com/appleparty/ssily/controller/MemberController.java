@@ -6,6 +6,7 @@ import com.appleparty.ssily.common.result.SingleResult;
 import com.appleparty.ssily.dto.member.request.FindPwRequestDto;
 import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
 import com.appleparty.ssily.dto.member.request.UpdateNicknameRequestDto;
+import com.appleparty.ssily.dto.member.request.UpdatePasswordRequestDto;
 import com.appleparty.ssily.dto.member.response.GetMemberResponseDto;
 import com.appleparty.ssily.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,12 @@ public class MemberController {
         return responseService.getSuccessResult();
     }
 
+    @PutMapping("/password")
+    public Result updatePassword(@RequestBody UpdatePasswordRequestDto requestDto){
+        memberService.updatePassword(requestDto);
+        return responseService.getSuccessResult();
+    }
+
     @PostMapping
     public Result join(@RequestBody JoinMemberRequestDto requestDto){
         memberService.join(requestDto);
@@ -54,6 +61,12 @@ public class MemberController {
     @PostMapping("/password")
     public Result findPw(@RequestBody FindPwRequestDto findPwRequestDto) {
         memberService.sendTempPwToEmail(findPwRequestDto);
+        return responseService.getSuccessResult();
+    }
+
+    @DeleteMapping
+    public Result deleteMember() {
+        memberService.deleteMember();
         return responseService.getSuccessResult();
     }
 }

@@ -6,42 +6,70 @@ import WaitingPage from '@/views/WaitingPage/WaitingPage.vue'
 import StartingPage from '../views/StartingPage/StartingPage.vue'
 import MainPage from '../views/MainPage/MainPage.vue'
 import FindPassword from '../views/Accounts/FindPassword.vue'
+import accountStore from '@/store/accountStore'
+
+
+const requireAuth = () => (to, from, next) => {
+  const token = accountStore.state.token
+  if (token !== null) {
+    console.log(token)
+    return next();
+  }
+  console.log(token)
+  next('/login');
+};
+
+const loginAuth = () => (to, from, next) => {
+  const token = accountStore.state.token
+  if (token == null) {
+    return next();
+  }
+  router.go(-1);
+};
+
 
 const routes = [
   {
     path: '/',
     name: 'starting',
-    component: StartingPage
+    component: StartingPage,
+    beforeEnter: loginAuth()
   },
   {
     path: '/login',
     name: 'login',
-    component: LoginPage
+    component: LoginPage,
+    beforeEnter: loginAuth()
   },
   {
     path: '/mypage',
     name: 'mypage',
-    component: MyPage
+    component: MyPage,
+    beforeEnter: requireAuth()
   },
   {
     path: '/signup',
     name: 'signup',
-    component: SignupPage
+    component: SignupPage,
+    beforeEnter: loginAuth()
   },
   {
     path: '/waiting',
     name: 'waiting',
-    component: WaitingPage
+    component: WaitingPage,
+    beforeEnter: requireAuth()
   },
   {
     path: '/findpw',
     name: 'findpw',
-    component: FindPassword
+    component: FindPassword,
+    beforeEnter: loginAuth()
   },
   {
     path: '/main',
     name: 'main',
-    component: MainPage
+    component: MainPage,
+    beforeEnter: requireAuth()
   },
   // {
   //   path: '/about',

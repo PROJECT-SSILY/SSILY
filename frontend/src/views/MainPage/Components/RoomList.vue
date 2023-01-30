@@ -11,57 +11,61 @@
       color="deep-purple accent-4"
       dark
     >
-      <v-toolbar-title>방 제목</v-toolbar-title>
-      <v-switch
-      v-model="switch1"
-      :label="`모드: ${switch1 ? '개인':'팀'}`"
-      color="orange darken-3"
-      hide-details
-    ></v-switch>
-
+      <v-row>
+        <v-col class="title">
+          <h3>방 제목</h3>
+        </v-col>
+        <v-col>
+            <v-switch
+            v-model="switch1"
+            :label="`모드: ${switch1 ? '개인':'팀'}`"
+            color="orange darken-3"
+            hide-details
+            ></v-switch>
+        </v-col>
+      </v-row>
     </v-toolbar>
-
     <v-list subheader v-if="switch1">
       <v-list-item
-        
         v-for="room in privaterooms"
         :key="room.title"
       >
-      
-      <v-list-item-avatar>
-      </v-list-item-avatar>
-      
-      <v-list-item-content>
-        <v-list-item-title v-text="room.title"></v-list-item-title>
-      </v-list-item-content>
-      
-      <v-list-item-icon>
-        <v-icon :color="room.secret ? 'deep-purple accent-4' : 'grey'">
-          mdi-lock-outline
-        </v-icon>
-      </v-list-item-icon>
-      <v-divider></v-divider>
+        <v-row class="d-flex justify-space-between">
+          <v-col cols="10"> 
+            <v-list-item-content>
+              <v-list-item-title v-text="room.title"></v-list-item-title>
+            </v-list-item-content>
+          </v-col>
+          <v-col>
+            <v-list-item-icon>
+              <v-icon :color="room.secret ? 'deep-purple accent-4' : 'grey'">
+                mdi-lock-outline
+              </v-icon>
+            </v-list-item-icon>
+          </v-col>
+        </v-row>
+        <v-divider></v-divider>
       </v-list-item>
     </v-list>
     <v-list subheader v-else>
       <v-list-item
-        
         v-for="room in teamrooms"
         :key="room.title"
       >
-      
-      <v-list-item-avatar>
-      </v-list-item-avatar>
-      
-      <v-list-item-content>
-        <v-list-item-title v-text="room.title"></v-list-item-title>
-      </v-list-item-content>
-      
-      <v-list-item-icon>
-        <v-icon :color="room.secret ? 'deep-purple accent-4' : 'grey'">
-          mdi-lock-outline
-        </v-icon>
-      </v-list-item-icon>
+      <v-row class="d-flex justify-space-between">
+        <v-col cols="10">
+          <v-list-item-content>
+            <v-list-item-title v-text="room.title"></v-list-item-title>
+          </v-list-item-content>
+        </v-col>
+        <v-col>
+          <v-list-item-icon>
+            <v-icon :color="room.secret ? 'deep-purple accent-4' : 'grey'">
+              mdi-lock-outline
+            </v-icon>
+          </v-list-item-icon>
+        </v-col>
+      </v-row>
       <v-divider></v-divider>
       </v-list-item>
     </v-list>
@@ -116,3 +120,14 @@ data: () => ({
     }),
 }
 </script>
+
+<style scoped>
+
+.title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+</style>
