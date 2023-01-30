@@ -37,5 +37,16 @@ const checkNickname = (payload) => {
 //   return false;
 // });
 
+const sendNewPwAction = (payload) => {
+    return $axios.post("/api/member/password", payload)
+    .then(res => {
+        console.log(res.data.code)
+        return res.data.code
+    })
+    .catch(error => {
+        return error.response.data.code
+    });
+}
+
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { requestLogin, requestRegister, checkEmail, checkNickname };
+export { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction };
