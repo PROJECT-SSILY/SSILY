@@ -6,6 +6,7 @@ import WaitingPage from '@/views/WaitingPage/WaitingPage.vue'
 import StartingPage from '../views/StartingPage/StartingPage.vue'
 import MainPage from '../views/MainPage/MainPage.vue'
 import FindPassword from '../views/Accounts/FindPassword.vue'
+import InGamePage from '../views/InGamePage/InGamePage.vue'
 import accountStore from '@/store/accountStore'
 
 
@@ -69,6 +70,12 @@ const routes = [
     path: '/main',
     name: 'main',
     component: MainPage,
+    beforeEnter: requireAuth()
+  },
+  {
+    path: '/ingame',
+    name: 'ingame',
+    component: InGamePage,
     beforeEnter: requireAuth()
   },
   // {
