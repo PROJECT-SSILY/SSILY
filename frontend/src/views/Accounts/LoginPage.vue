@@ -64,7 +64,7 @@ export default {
     }
     function clickFindPw() {
       router.push({
-        name: 'Findpw',
+        name: 'findpw',
       })
     }
     const clickLogIn = async function () {
@@ -79,7 +79,7 @@ export default {
       } else {
         console.log('로그인 성공!!')
         router.push({
-          name: 'Main'
+          name: 'main'
         })
       }
     }

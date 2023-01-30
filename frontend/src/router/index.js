@@ -24,7 +24,7 @@ const loginAuth = () => (to, from, next) => {
   if (token == null) {
     return next();
   }
-  router.go(-1);
+  router.push('main');
 };
 
 
