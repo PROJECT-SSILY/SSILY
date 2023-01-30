@@ -12,20 +12,21 @@ const state = {
 }
 
 const getters = {
+    getTeam: (state) => {
+        return state.teamorprivate;
+    },
 }
 
 const mutations = {
-    
+    setTeam: (state) => {
+        state.teamorprivate = !state.teamorprivate;
+    },
 }
 
 const actions = {
     isTeam: (state) => {
-        if(state.teamorprivate == false){
-            state.teamorprivate == true
-        } else {
-            state.teamorprivate = false;
-        }
-        console.log(state.teamorprivate);
+        state.commit("setTeam", null)
+        console.log(state.getters.getTeam);
     },
     roomAction: async (commit, formData) => {
         try {

@@ -134,6 +134,7 @@ export default {
     }
     const teamOrPrivate = async function() {
       const switchvalue = state.switch1
+      console.log(switchvalue);
       await store.dispatch('gameroomStore/isTeam', switchvalue)
     }
     return {

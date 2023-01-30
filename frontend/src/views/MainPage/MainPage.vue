@@ -24,7 +24,6 @@
             <v-row>
               <v-col v-if="teamorprivate">
                 <v-btn color="success"
-                
                 >
                 팀 게임 시작</v-btn>
               </v-col>
