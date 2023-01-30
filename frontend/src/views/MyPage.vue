@@ -20,14 +20,26 @@
 
             </div>
         </div>
+        <div class="footer">
+            <v-btn class="ma-2" @click="logOut">
+                LOGOUT
+            </v-btn>
+            <v-btn class="ma-2" @click="main">
+                MAIN
+            </v-btn>
+        </div>
     </div>
 </template>
 
 <script>
 import { reactive } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 export default {
     name: 'MyPage',
     setup() {
+        const store = useStore()
+        const router = useRouter()
         const userinfo = reactive({ 
             nickname: "", 
             exp: 0, 
@@ -37,8 +49,18 @@ export default {
             // winrate: userinfo.wins/userinfo.plays*100, 
         })
 
+        const logOut = async function() {
+            await store.dispatch('accountStore/logoutAction')
+            router.push('/')
+        }
+        const main = function() {
+            router.push('main')
+        }
+
         return {
             userinfo,
+            logOut,
+            main,
         }
     },
 }

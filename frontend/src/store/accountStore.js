@@ -47,9 +47,10 @@ const actions = {
         localStorage.setItem('token', state.token)
         // console.log('토큰: ', state.token)
     },
-    // logoutAction: async ({ commit }) => {
-    //     commit("setToken", null);
-    // },
+    logoutAction: async ({ commit }) => {
+        commit("setToken", null);
+        localStorage.removeItem('token')
+    },
     // mountAction: async ({ commit }) => {
     //     const local = await localStorage.getItem("token");
     //     commit("setToken", local);
