@@ -59,6 +59,7 @@
           v-if="state.secretornot ==='radio-2'"
           label="비밀번호 숫자 4자리를 입력하세요."
           hide-details="auto"
+          v-model="state.password"
         ></v-text-field>
         <v-divider></v-divider>
 
@@ -82,20 +83,30 @@
 <script>
   import { useRouter } from 'vue-router'
   import { reactive } from 'vue'
+  import { useStore } from 'vuex'
   export default {
     setup() {
       const router = useRouter()
+      const store = useStore()
       const state = reactive({
         dialog: false,
         teamorprivate: null,
         secretornot: null,
-        otp:null,
+        password:null,
         rules: {
           required: value => !!value || '필수',
         }
       })
       const toWaiting = async function () {
-
+        const formData = {
+          teamorprivate: state.teamorprivate.value,
+          isSecret: state.secretornot.value,
+          password: state.password,
+        }
+        await store.dispatch('gameroomStore/roomAction', formData )
+        await console.log("방 생성 완료")
+        router.push('waiting')
+      
       }
       return {
         router, 

@@ -22,15 +22,22 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col>
+              <v-col v-if="teamorprivate">
                 <v-btn color="success"
+                
                 >
-                게임 시작</v-btn>
+                팀 게임 시작</v-btn>
+              </v-col>
+              <v-col v-else>
+                <v-btn color="primary"
+                @click="cons"
+                >
+                개인 게임 시작</v-btn>
               </v-col>
             </v-row>
             <v-row>
               <v-col>
-                <v-btn>튜토리얼</v-btn>
+                <tutorial-dialog></tutorial-dialog>
               </v-col>
             </v-row>
           </v-col>
@@ -42,20 +49,34 @@
 <script>
 
 import MakeRoomDialog from './Components/MakeRoomDialog.vue';
+import TutorialDialog from './Components/TutorialDialog.vue';
 import ProfileBox from './Components/ProfileBox.vue';
 import RoomList from './Components/RoomList.vue';
+import { useStore } from "vuex"
+import { reactive } from "vue"
 
 export default {
-name: 'MainPage',
-data() {
-  return {
-  };
-},
-components: {
-  MakeRoomDialog,
-  ProfileBox,
-  RoomList
-},
+  name: 'MainPage',
+  setup() {
+    const store = useStore()
+    const state = reactive({
+      teamorprivate: store.state.teamorprivate
+    })
+    const cons = function() {
+      console.log(state.teamorprivate)
+    }
+    return {
+      store, 
+      state,
+      cons
+      }
+    },
+  components: {
+    MakeRoomDialog,
+    TutorialDialog,
+    ProfileBox,
+    RoomList,
+  },
 }
 </script>
 

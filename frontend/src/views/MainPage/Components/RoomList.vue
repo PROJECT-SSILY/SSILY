@@ -19,6 +19,7 @@
                 <v-switch
                 v-model="state.switch1"
                 :label="`모드: ${state.switch1 ? '개인':'팀'}`"
+                @click="teamOrPrivate"
                 color="orange darken-3"
                 hide-details
                 ></v-switch>
@@ -29,6 +30,7 @@
           <v-list-item
             v-for="room in state.privaterooms"
             :key="room.title"
+            @click="toPrivateRoom"
           >
             <v-row class="d-flex justify-space-between">
               <v-col cols="10"> 
@@ -51,6 +53,7 @@
           <v-list-item
             v-for="room in state.teamrooms"
             :key="room.title"
+            @click="toTeamRoom"
           >
           <v-row class="d-flex justify-space-between">
             <v-col cols="10">
@@ -74,10 +77,14 @@
   </template>
   
 <script>
-import { reactive } from "vue";
+import { reactive } from "vue"
+import { useRouter } from "vue-router"
+import { useStore } from "vuex"
 export default {
-  name: 'RoomList',
+  name: "RoomList",
   setup() {
+    const router = useRouter()
+    const store = useStore()
     const state = reactive({
       privaterooms: [
           {
@@ -117,8 +124,23 @@ export default {
         ],
         switch1: true,
     })
+    const toTeamRoom = async function () {
+      console.log('team')  
+      router.push({name:'waiting'})
+    }
+    const toPrivateRoom = function () {
+      console.log('private')
+      router.push({name:'waiting'})
+    }
+    const teamOrPrivate = async function() {
+      const switchvalue = state.switch1
+      await store.dispatch('gameroomStore/isTeam', switchvalue)
+    }
     return {
-      state
+      state,
+      toTeamRoom,
+      toPrivateRoom,
+      teamOrPrivate
     }
   }
 }
