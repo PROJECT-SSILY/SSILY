@@ -31,7 +31,7 @@ const loginAuth = () => (to, from, next) => {
 const routes = [
   {
     path: '/',
-    name: 'Starting',
+    name: 'starting',
     component: StartingPage,
     beforeEnter: loginAuth()
   },
@@ -61,13 +61,13 @@ const routes = [
   },
   {
     path: '/findpw',
-    name: 'Findpw',
+    name: 'findpw',
     component: FindPassword,
     beforeEnter: loginAuth()
   },
   {
     path: '/main',
-    name: 'Main',
+    name: 'main',
     component: MainPage,
     beforeEnter: requireAuth()
   },

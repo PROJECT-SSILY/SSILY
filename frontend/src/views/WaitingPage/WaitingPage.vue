@@ -1,19 +1,35 @@
 <template>
+  <p class="text-subtitle-1">
+    방 : {{ state.title }}
+  </p>
   <div id="flex-container">
     <div class="flex-item">
       <UserInfo/>
     </div>
-    <div class="flex-item">
-      <p>{{ team  || '팀 선택' }}</p>
-      <v-radio-group inline v-model="team">
-        <v-radio label="RED" value="RED" class="ma-2"></v-radio>
-        <v-radio label="BLUE" value="BLUE" class="ma-2"></v-radio>
-      </v-radio-group>
+    <div id="flex-container">
+      <div class="flex-item">
+      <p>{{ state.team  || '팀 선택' }}</p>
+      <v-radio-group inline v-model="state.team" justify-content="center">
+        <v-radio label="RED" value="RED" color="red" class="ma-2"></v-radio>
+        <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2"></v-radio>
+      </v-radio-group> 
       <ChatBox/>
-    </div>      
+    </div>
+    </div>
   </div>
-  <v-btn class="ma-2">
-    READY
+  <v-btn 
+  class="ma-2" 
+  v-if="!state.ready"
+  @Click="clickReady"
+  >
+  READY
+  </v-btn>
+  <v-btn 
+  class="ma-2" 
+  v-if="state.ready"
+  disabled
+  >
+  READY함
   </v-btn>
   <v-btn class="ma-2" @click="clickExit">
     나가기
@@ -21,6 +37,8 @@
 </template>
 
 <script>
+import { reactive } from '@vue/reactivity'
+import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
 import ChatBox from './components/ChatBox.vue';
 export default {
@@ -29,18 +47,22 @@ export default {
     UserInfo,
     ChatBox,
   },
-  data() {
-    return {
+  setup() {
+    const router = useRouter()
+    const state = reactive({
+      title: "",
       team: null,
+      ready: false,
+    })
+    function clickExit() {
+      router.push({
+        name: 'main'
+      })
     }
-  },
-  methods: {
-    clickExit() {
-      this.$router.push('main')
-    },
-    clickReady() {
-      console.log('ready 버튼 클릭')
+    function clickReady() {
+      state.ready = !state.ready
     }
+    return { router, state, clickExit, clickReady }
   }
 }
 </script>
