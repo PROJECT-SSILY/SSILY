@@ -9,7 +9,6 @@
             <v-row justify="center">
               <v-col id="btnbox">
                 <v-btn>Setting</v-btn>
-                <v-btn>Logout</v-btn>
               </v-col>
             </v-row>
           </v-col>
