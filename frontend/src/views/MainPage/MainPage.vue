@@ -22,7 +22,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col v-if="teamorprivate">
+              <v-col v-if="state.teamorprivate">
                 <v-btn color="success"
                 >
                 팀 게임 시작</v-btn>
@@ -53,13 +53,14 @@ import ProfileBox from './Components/ProfileBox.vue';
 import RoomList from './Components/RoomList.vue';
 import { useStore } from "vuex"
 import { reactive } from "vue"
+// import { mapGetters } from 'vuex'
 
 export default {
   name: 'MainPage',
   setup() {
     const store = useStore()
     const state = reactive({
-      teamorprivate: store.state.teamorprivate
+      teamorprivate: null
     })
     const cons = function() {
       console.log(state.teamorprivate)
@@ -70,6 +71,10 @@ export default {
       cons
       }
     },
+    // computed: {
+    //   ...mapGetters([
+    //     'getTeam'
+    //   ]),
   components: {
     MakeRoomDialog,
     TutorialDialog,
@@ -77,6 +82,7 @@ export default {
     RoomList,
   },
 }
+// }
 </script>
 
 <style scoped>

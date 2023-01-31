@@ -1,12 +1,12 @@
 import { createStore } from 'vuex'
 import accountStore from './accountStore'
-import gameroomStore from './gameroomStore'
+import gameStore from './gameStore'
 
 
 
 export default createStore({
   modules: {
     accountStore,
-    gameroomStore
+    gameStore
   }
 })

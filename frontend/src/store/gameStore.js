@@ -5,7 +5,7 @@
 //     requestId,
 //   } from "../common/api/accountAPI";
 
-import { makeRoomAction } from "@/common/api/gameroomAPI";
+import { makeRoomAction } from "@/common/api/gameAPI";
 
 const state = {
     teamorprivate: null
