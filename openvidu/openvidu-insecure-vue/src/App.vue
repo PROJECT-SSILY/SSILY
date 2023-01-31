@@ -32,6 +32,9 @@
 				<user-video :stream-manager="publisher" @click.native="updateMainVideoStreamManager(publisher)"/>
 				<user-video v-for="sub in subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click.native="updateMainVideoStreamManager(sub)"/>
 			</div>
+			<div id="chat-head" class="col-md-6">
+				<chatting :session="session"/>
+			</div>
 		</div>
 	</div>
 </template>
