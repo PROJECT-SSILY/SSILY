@@ -127,6 +127,12 @@ public class SessionRestController {
 
 		Session sessionNotActive = sessionManager.storeSessionNotActive(sessionId, sessionProperties);
 
+		/**
+		 * 김윤미 : 테스트용 코드
+		 */
+		Session createdSession=sessionManager.getSessionNotActive(sessionId);
+		log.info("방제목: {}", createdSession.getSessionProperties().title());
+
 		if (sessionNotActive == null) {
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		} else {
@@ -724,6 +730,12 @@ public class SessionRestController {
 		}
 	}
 
+	/**
+	 * 김윤미
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
 	protected SessionProperties.Builder getSessionPropertiesFromParams(Map<?, ?> params) throws Exception {
 
 		SessionProperties.Builder builder = new SessionProperties.Builder();
@@ -736,12 +748,24 @@ public class SessionRestController {
 			String recordingModeString;
 			String forcedVideoCodecStr;
 			Boolean allowTranscoding;
+
+			/**
+			 * 김윤미
+			 */
+			String title=null;
+			Boolean isSecret=null;
+			String password=null;
 			try {
 				mediaModeString = (String) params.get("mediaMode");
 				recordingModeString = (String) params.get("recordingMode");
 				customSessionId = (String) params.get("customSessionId");
 				forcedVideoCodecStr = (String) params.get("forcedVideoCodec");
 				allowTranscoding = (Boolean) params.get("allowTranscoding");
+				title=(String) params.get("title");
+				isSecret=(Boolean) params.get("isSecret");
+				if(isSecret!=null && isSecret) {
+					password=(String) params.get("password");
+				}
 			} catch (ClassCastException e) {
 				throw new Exception("Type error in some parameter: " + e.getMessage());
 			}
@@ -822,6 +846,21 @@ public class SessionRestController {
 					}
 				} else {
 					builder.defaultRecordingProperties(new RecordingProperties.Builder().build());
+				}
+
+				/**
+				 * 김윤미
+				 */
+				if(title!=null && !title.isEmpty()) {
+					builder=builder.title(title);
+				}
+
+				if(isSecret!=null) {
+					builder=builder.isSecret(isSecret);
+				}
+
+				if(isSecret!=null && isSecret && password!=null && !password.isEmpty()) {
+					builder=builder.password(password);
 				}
 
 			} catch (IllegalArgumentException e) {

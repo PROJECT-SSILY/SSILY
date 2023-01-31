@@ -34,6 +34,13 @@ public class SessionProperties {
 	private Boolean allowTranscoding;
 
 	/**
+	 * 김윤미
+	 */
+	private String title;
+	private Boolean isSecret;
+	private String password;
+
+	/**
 	 * Builder for {@link io.openvidu.java.client.SessionProperties}
 	 */
 	public static class Builder {
@@ -48,13 +55,20 @@ public class SessionProperties {
 		private Boolean allowTranscoding = false;
 
 		/**
+		 * 김윤미
+		 */
+		private String title="";
+		private Boolean isSecret=false;
+		private String password="";
+
+		/**
 		 * Returns the {@link io.openvidu.java.client.SessionProperties} object properly
 		 * configured
 		 */
 		public SessionProperties build() {
 			return new SessionProperties(this.mediaMode, this.recordingMode, this.defaultRecordingProperties,
 					this.customSessionId, this.mediaNode, this.forcedVideoCodec, this.forcedVideoCodecResolved,
-					this.allowTranscoding);
+					this.allowTranscoding, this.title, this.isSecret, this.password);
 		}
 
 		/**
@@ -161,6 +175,25 @@ public class SessionProperties {
 			return this;
 		}
 
+		/**
+		 * 김윤미
+		 * @param title
+		 * @return
+		 */
+		public SessionProperties.Builder title(String title) {
+			this.title=title;
+			return this;
+		}
+
+		public SessionProperties.Builder isSecret(Boolean isSecret) {
+			this.isSecret=isSecret;
+			return this;
+		}
+
+		public SessionProperties.Builder password(String password) {
+			this.password=password;
+			return this;
+		}
 	}
 
 	protected SessionProperties() {
@@ -182,6 +215,36 @@ public class SessionProperties {
 		this.forcedVideoCodec = forcedVideoCodec;
 		this.forcedVideoCodecResolved = forcedVideoCodecResolved;
 		this.allowTranscoding = allowTranscoding;
+	}
+
+	/**
+	 * 김윤미
+	 * @param mediaMode
+	 * @param recordingMode
+	 * @param defaultRecordingProperties
+	 * @param customSessionId
+	 * @param mediaNode
+	 * @param forcedVideoCodec
+	 * @param forcedVideoCodecResolved
+	 * @param allowTranscoding
+	 * @param title
+	 * @param isSecret
+	 * @param password
+	 */
+	private SessionProperties(MediaMode mediaMode, RecordingMode recordingMode,
+							  RecordingProperties defaultRecordingProperties, String customSessionId, String mediaNode,
+							  VideoCodec forcedVideoCodec, VideoCodec forcedVideoCodecResolved, Boolean allowTranscoding, String title, Boolean isSecret, String password) {
+		this.mediaMode = mediaMode;
+		this.recordingMode = recordingMode;
+		this.defaultRecordingProperties = defaultRecordingProperties;
+		this.customSessionId = customSessionId;
+		this.mediaNode = mediaNode;
+		this.forcedVideoCodec = forcedVideoCodec;
+		this.forcedVideoCodecResolved = forcedVideoCodecResolved;
+		this.allowTranscoding = allowTranscoding;
+		this.title=title;
+		this.isSecret=isSecret;
+		this.password=password;
 	}
 
 	/**
@@ -262,6 +325,17 @@ public class SessionProperties {
 	public Boolean isTranscodingAllowed() {
 		return this.allowTranscoding;
 	}
+
+	/**
+	 * 김윤미
+	 * @return
+	 */
+	public String title() { return this.title; }
+
+	public Boolean isSecret() { return this.isSecret; }
+
+	public String password() { return this.password; }
+
 
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
