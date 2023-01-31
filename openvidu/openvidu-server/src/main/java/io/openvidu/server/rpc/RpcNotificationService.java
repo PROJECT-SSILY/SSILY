@@ -25,7 +25,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.google.gson.JsonParser;
-import io.openvidu.server.game.GameService;
 import org.kurento.commons.exception.KurentoException;
 import org.kurento.jsonrpc.Session;
 import org.kurento.jsonrpc.Transaction;
