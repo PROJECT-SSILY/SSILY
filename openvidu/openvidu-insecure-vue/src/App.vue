@@ -169,7 +169,7 @@ export default {
 		createSession (sessionId) {
 			return new Promise((resolve, reject) => {
 				axios
-					.post(`${OPENVIDU_SERVER_URL}/openvidu/api/sessions`, JSON.stringify({
+					.post(`${OPENVIDU_SERVER_URL}/api/sessions`, JSON.stringify({
 						customSessionId: sessionId,
 					}), {
 						auth: {
@@ -197,7 +197,7 @@ export default {
 		createToken (sessionId) {
 			return new Promise((resolve, reject) => {
 				axios
-					.post(`${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${sessionId}/connection`, {}, {
+					.post(`${OPENVIDU_SERVER_URL}/api/sessions/${sessionId}/connection`, {}, {
 						auth: {
 							username: 'OPENVIDUAPP',
 							password: OPENVIDU_SERVER_SECRET,
