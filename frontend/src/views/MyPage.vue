@@ -10,7 +10,8 @@
                 </div>
                 <div class="inner_section1_right">
                     <h2>{{ userinfo.nickname }}님</h2>
-                    <v-btn>회원정보 변경</v-btn>
+                    <v-btn @click="changePassword">비밀번호 변경</v-btn>
+                    <v-btn>닉네임 변경</v-btn>
                     <!-- <p>승률 : {{ userinfo.winrate }}%</p>  -->
                 </div>
 
@@ -49,6 +50,14 @@ export default {
             // winrate: userinfo.wins/userinfo.plays*100, 
         })
 
+        const changePassword = async function() {
+
+        }
+
+        const changeNickname = async function() {
+            
+        }
+
         const logOut = async function() {
             await store.dispatch('accountStore/logoutAction')
             router.push('/')
@@ -59,6 +68,8 @@ export default {
 
         return {
             userinfo,
+            changePassword,
+            changeNickname,
             logOut,
             main,
         }
