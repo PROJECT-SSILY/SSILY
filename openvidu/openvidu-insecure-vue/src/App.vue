@@ -43,6 +43,7 @@
 import axios from 'axios';
 import { OpenVidu } from 'openvidu-browser';
 import UserVideo from './components/UserVideo';
+import Chatting from './components/Chatting';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -54,6 +55,7 @@ export default {
 
 	components: {
 		UserVideo,
+		Chatting,
 	},
 
 	data () {
