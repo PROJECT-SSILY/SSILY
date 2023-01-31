@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import io.openvidu.server.game.Player;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -216,14 +217,20 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions/{sessionId}/connection", method = RequestMethod.POST)
-	public ResponseEntity<?> initializeConnection(@PathVariable("sessionId") String sessionId,
+	/**
+	 * 서영탁
+	 * 게임방 입장 [직접 참여]
+	 * @param roomId : 방 번호
+	 * @param params : player 정보 담기
+	 * @return
+	 */
+	@RequestMapping(value = "/rooms/{room-id}", method = RequestMethod.POST)
+	public ResponseEntity<?> initializeConnection(@PathVariable("room-id") String roomId,
 			@RequestBody Map<?, ?> params) {
 
-		log.info("REST API: POST {} {}", RequestMappings.API + "/sessions/" + sessionId + "/connection",
-				params.toString());
+		log.info("REST API: POST {}, params : {}", "/api" + "/rooms/" + roomId, params.toString());
 
-		Session session = this.sessionManager.getSessionWithNotActive(sessionId);
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
 		if (session == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -232,16 +239,20 @@ public class SessionRestController {
 		try {
 			connectionProperties = getConnectionPropertiesFromParams(params).build();
 		} catch (Exception e) {
-			return this.generateErrorResponse(e.getMessage(), "/sessions/" + sessionId + "/connection",
+			return this.generateErrorResponse(e.getMessage(), "/api" + "/rooms/" + roomId,
 					HttpStatus.BAD_REQUEST);
 		}
+
+		int level = (int) params.get("level");
+		Player player = new Player(level);
+
 		switch (connectionProperties.getType()) {
 		case WEBRTC:
-			return this.newWebrtcConnection(session, connectionProperties);
+			return this.newWebrtcConnection(session, connectionProperties, player);
 		case IPCAM:
 			return this.newIpcamConnection(session, connectionProperties);
 		default:
-			return this.generateErrorResponse("Wrong type parameter", "/sessions/" + sessionId + "/connection",
+			return this.generateErrorResponse("Wrong type parameter", "/api" + "/rooms/" + roomId,
 					HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -538,7 +549,14 @@ public class SessionRestController {
 			return this.generateErrorResponse(e.getMessage(), "/sessions/" + sessionId + "/connection",
 					HttpStatus.BAD_REQUEST);
 		}
-		ResponseEntity<?> entity = this.newWebrtcConnection(session, connectionProperties);
+
+		// TODO
+		/**
+		 * 서영탁
+		 * 오류때문에 일단 player 생성해서 넣어둠
+		 */
+		Player player = new Player();
+		ResponseEntity<?> entity = this.newWebrtcConnection(session, connectionProperties, player);
 		JsonObject jsonResponse = JsonParser.parseString(entity.getBody().toString()).getAsJsonObject();
 
 		if (jsonResponse.has("error")) {
@@ -653,10 +671,11 @@ public class SessionRestController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	protected ResponseEntity<?> newWebrtcConnection(Session session, ConnectionProperties connectionProperties) {
+	protected ResponseEntity<?> newWebrtcConnection(Session session, ConnectionProperties connectionProperties, Player player) {
 
-		final String REQUEST_PATH = "/sessions/" + session.getSessionId() + "/connection";
+		final String REQUEST_PATH = "/api/rooms/" + session.getSessionId();
 
+		log.info("newWebrtcConnection");
 		// While closing a session tokens can't be generated
 		if (session.closingLock.readLock().tryLock()) {
 			try {
@@ -828,6 +847,7 @@ public class SessionRestController {
 
 	protected ConnectionProperties.Builder getConnectionPropertiesFromParams(Map<?, ?> params) throws Exception {
 
+		log.info("getConnectionPropertiesFromParams params = {}", params);
 		ConnectionProperties.Builder builder = new ConnectionProperties.Builder();
 
 		String typeString;

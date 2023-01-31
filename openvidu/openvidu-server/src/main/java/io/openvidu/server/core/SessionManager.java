@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import io.openvidu.server.game.Player;
 import org.kurento.jsonrpc.message.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -402,15 +403,23 @@ public abstract class SessionManager {
         this.insecureUsers.put(participantPrivateId, true);
     }
 
+    /**
+     * 서영탁
+     * 생성자에 player 추가
+     */
     public Participant newParticipant(Session session, String participantPrivateId, Token token, String clientMetadata,
-                                      GeoLocation location, String platform, String finalUserId) {
+                                      GeoLocation location, String platform, String finalUserId, Player player) {
 
         String sessionId = session.getSessionId();
         if (this.sessionidParticipantpublicidParticipant.get(sessionId) != null) {
 
+//            Participant p = new Participant(finalUserId, participantPrivateId, token.getConnectionId(), sessionId,
+//                    session.getUniqueSessionId(), token, clientMetadata, location, platform,
+//                    EndpointType.WEBRTC_ENDPOINT, null);
+
             Participant p = new Participant(finalUserId, participantPrivateId, token.getConnectionId(), sessionId,
                     session.getUniqueSessionId(), token, clientMetadata, location, platform,
-                    EndpointType.WEBRTC_ENDPOINT, null);
+                    EndpointType.WEBRTC_ENDPOINT, null, player);
 
             this.tokenRegister.registerToken(sessionId, p, token);
 

@@ -6,7 +6,7 @@ import io.openvidu.server.core.Participant;
 public class Player {
 
     // 게임에 참가하는 openvidu 참가자
-    private Participant participant;
+//    private Participant participant;
 
     // 누적 점수
     private int score = 0;
@@ -23,16 +23,23 @@ public class Player {
     // 방장 여부
     private boolean isHost = false;
 
-    public Player(Participant participant) {
-        this.participant = participant;
+    private int level;
+
+    public Player() {
+        this.score = 0;
+        this.team = Team.NONE;
+        this.isPresenter = false;
+        this.isReady = false;
+        this.isHost = false;
     }
 
-    public Participant getParticipant() {
-        return participant;
-    }
-
-    public void setParticipant(Participant participant) {
-        this.participant = participant;
+    public Player(int level) {
+        this.score = 0;
+        this.team = Team.NONE;
+        this.isPresenter = false;
+        this.isReady = false;
+        this.isHost = false;
+        this.level = level;
     }
 
     public int getScore() {
