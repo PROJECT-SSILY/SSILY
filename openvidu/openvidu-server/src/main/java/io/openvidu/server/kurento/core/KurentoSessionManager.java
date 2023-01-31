@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PreDestroy;
 
-import io.openvidu.server.game.GameService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.kurento.client.GenericMediaElement;
 import org.kurento.client.GenericMediaEvent;
@@ -221,36 +220,14 @@ public class KurentoSessionManager extends SessionManager {
         try {
             if (session.joinLeaveLock.tryLock(15, TimeUnit.SECONDS)) {
                 try {
-                    String subSessionId = "sub" + sessionId;
-                    if (!subSessionId.equals(sessionId)) {
-                        //방을 나가면 레디 목록에서 사라지게 함.
-                        HashMap<String, Boolean> readyState = GameService.readySetting.getOrDefault(sessionId, null);
-                        if (readyState != null) {
-                            readyState.remove(participant.getParticipantPublicId());
-                            GameService.readySetting.computeIfPresent(sessionId, (k, v) -> v = readyState);
-
-                            String nickName = participant.getClientMetadata().substring(15, participant.getClientMetadata().length() - 2);
-                            //세션 종료되면 방 비활성화.
-                            String url = "http://localhost:8080/room/delete/" + sessionId + "?nickName=" + nickName;
-                            RestTemplate restTemplate = new RestTemplate();
-                            HttpHeaders headers = new HttpHeaders();
-                            UriComponents uri = UriComponentsBuilder.fromHttpUrl(url).build();
-                            HttpEntity<?> httpEntity = new HttpEntity<>(headers);
-                            restTemplate.delete(uri.toString(), httpEntity, String.class);
-                        }
-                    }
 
                     session.leave(participant.getParticipantPrivateId(), reason);
 
                     // Update control data structures
+
                     if (sessionidParticipantpublicidParticipant.get(sessionId) != null) {
                         Participant p = sessionidParticipantpublicidParticipant.get(sessionId)
                                 .remove(participant.getParticipantPublicId());
-
-                        if (p != null && p.getToken() != null && p.getToken().getTurnCredentials() != null
-                                && this.openviduConfig.isTurnadminAvailable()) {
-                            this.coturnCredentialsService.deleteUser(p.getToken().getTurnCredentials().getUsername());
-                        }
 
                         // TODO: why is this necessary??
                         if (p != null && insecureUsers.containsKey(p.getParticipantPrivateId())) {
@@ -280,43 +257,16 @@ public class KurentoSessionManager extends SessionManager {
                     sessionEventsHandler.onParticipantLeft(participant, sessionId, remainingParticipants, transactionId,
                             null, reason, scheduleWebsocketClose);
 
+                    // If session is closed by a call to "DELETE /api/sessions" do NOT stop the
+                    // recording. Will be stopped after in method
+                    // "SessionManager.closeSessionAndEmptyCollections"
                     if (!EndReason.sessionClosedByServer.equals(reason)) {
-                        // If session is closed by a call to "DELETE /api/sessions" do NOT stop the
-                        // recording. Will be stopped after in method
-                        // "SessionManager.closeSessionAndEmptyCollections"
+
                         if (remainingParticipants.isEmpty()) {
-
-                            //게임 자원 반납.
-                            Thread deathNoteThread = GameService.gameThread.get(sessionId);
-                            GameService.gameThread.remove(sessionId);
-                            GameService.gameRoles.remove(sessionId);
-                            GameService.roleMatching.remove(sessionId);
-                            GameService.participantsList.remove(sessionId);
-                            GameService.alivePolices.remove(sessionId);
-                            GameService.kiraAndL.remove(sessionId);
-                            GameService.deathNoteList.remove(sessionId);
-                            GameService.readySetting.remove(sessionId);
-                            GameService.roleInfo.remove(sessionId);
-
-                            if (deathNoteThread != null) {
-                                deathNoteThread.interrupt();
-                            }
-                            subSessionId = "sub" + sessionId;
-                            if (!subSessionId.equals(sessionId)) {
-                                //세션 종료되면 방 비활성화.
-                                String apiUrl = "http://localhost:8080/room/finish/" + sessionId;
-                                RestTemplate restTemplate = new RestTemplate();
-                                HttpHeaders httpHeaders = new HttpHeaders();
-                                UriComponents uri = UriComponentsBuilder.fromHttpUrl(apiUrl).build();
-                                HttpEntity<?> httpEntity = new HttpEntity<>(httpHeaders);
-                                restTemplate.put(uri.toString(), httpEntity, String.class);
-                            }
-
-                            if (openviduConfig.isRecordingModuleEnabled()
-                                    && MediaMode.ROUTED.equals(session.getSessionProperties().mediaMode())
-                                    && (this.recordingManager.sessionIsBeingRecorded(sessionId))) {
+                            if (this.recordingManager.sessionIsBeingRecorded(sessionId)) {
                                 // Start countdown to stop recording. Will be aborted if a Publisher starts
-                                // before timeout
+                                // before timeout. This only applies to INDIVIDUAL recordings, as for COMPOSED
+                                // recordings it would still remain a recorder participant
                                 log.info(
                                         "Last participant left. Starting {} seconds countdown for stopping recording of session {}",
                                         this.openviduConfig.getOpenviduRecordingAutostopTimeout(), sessionId);
@@ -328,7 +278,6 @@ public class KurentoSessionManager extends SessionManager {
                                             if (session.isClosed()) {
                                                 return false;
                                             }
-
                                             log.info("No more participants in session '{}', removing it and closing it",
                                                     sessionId);
                                             this.closeSessionAndEmptyCollections(session, reason, true);
@@ -347,26 +296,8 @@ public class KurentoSessionManager extends SessionManager {
                                             sessionId);
                                 }
                             }
-                        } else if (remainingParticipants.size() == 1 && openviduConfig.isRecordingModuleEnabled()
-                                && MediaMode.ROUTED.equals(session.getSessionProperties().mediaMode())
-                                && this.recordingManager.sessionIsBeingRecorded(sessionId)
-                                && ProtocolElements.RECORDER_PARTICIPANT_PUBLICID
-                                .equals(remainingParticipants.iterator().next().getParticipantPublicId())) {
-                            // RECORDER participant is the last one standing. Start countdown
-                            log.info(
-                                    "Last participant left. Starting {} seconds countdown for stopping recording of session {}",
-                                    this.openviduConfig.getOpenviduRecordingAutostopTimeout(), sessionId);
-                            recordingManager.initAutomaticRecordingStopThread(session);
+                        } else {
 
-                        } else if (remainingParticipants.size() == 1 && openviduConfig.isRecordingModuleEnabled()
-                                && MediaMode.ROUTED.equals(session.getSessionProperties().mediaMode())
-                                && session.getSessionProperties().defaultRecordingProperties().outputMode()
-                                .equals(Recording.OutputMode.COMPOSED_QUICK_START)
-                                && ProtocolElements.RECORDER_PARTICIPANT_PUBLICID
-                                .equals(remainingParticipants.iterator().next().getParticipantPublicId())) {
-                            // If no recordings are active in COMPOSED_QUICK_START output mode, stop
-                            // container
-                            recordingManager.stopComposedQuickStartContainer(session, reason);
                         }
                     }
 
@@ -405,7 +336,6 @@ public class KurentoSessionManager extends SessionManager {
      * generated by the WebRTC endpoint on the server.
      *
      * @param participant   Participant publishing video
-     * @param MediaOptions  configuration of the stream to publish
      * @param transactionId identifier of the Transaction
      * @throws OpenViduException on error
      */
