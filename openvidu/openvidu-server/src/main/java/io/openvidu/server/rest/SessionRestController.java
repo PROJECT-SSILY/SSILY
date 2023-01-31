@@ -96,16 +96,21 @@ public class SessionRestController {
 	@Autowired
 	protected OpenviduConfig openviduConfig;
 
-	@RequestMapping(value = "/sessions", method = RequestMethod.POST)
+	/**
+	 * 김윤미
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value = "/rooms", method = RequestMethod.POST)
 	public ResponseEntity<?> initializeSession(@RequestBody(required = false) Map<?, ?> params) {
 
-		log.info("REST API: POST {}/sessions {}", RequestMappings.API, params != null ? params.toString() : "{}");
+		log.info("REST API: POST {}/rooms {}", RequestMappings.API, params != null ? params.toString() : "{}");
 
 		SessionProperties sessionProperties;
 		try {
 			sessionProperties = getSessionPropertiesFromParams(params).build();
 		} catch (Exception e) {
-			return this.generateErrorResponse(e.getMessage(), "/sessions", HttpStatus.BAD_REQUEST);
+			return this.generateErrorResponse(e.getMessage(), "/rooms", HttpStatus.BAD_REQUEST);
 		}
 
 		String sessionId;

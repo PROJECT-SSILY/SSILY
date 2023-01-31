@@ -167,9 +167,18 @@ export default {
 
 		// See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-session
 		createSession (sessionId) {
+			console.log("보내는 값")
+			console.log(JSON.stringify({
+						customSessionId: sessionId,
+					}), {
+						auth: {
+							username: 'OPENVIDUAPP',
+							password: OPENVIDU_SERVER_SECRET,
+						},
+				})
 			return new Promise((resolve, reject) => {
 				axios
-					.post(`${OPENVIDU_SERVER_URL}/api/sessions`, JSON.stringify({
+					.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
 						customSessionId: sessionId,
 					}), {
 						auth: {
