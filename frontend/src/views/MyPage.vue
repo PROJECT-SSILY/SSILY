@@ -12,14 +12,12 @@
                     <h2>{{ userinfo.nickname }}님</h2>
                     <v-btn @click="changePassword">비밀번호 변경</v-btn>
                     <v-btn>닉네임 변경</v-btn>
-                    <p>승률 : {{ userinfo.record.winrate }}%</p> 
+                    <p>승률 : {{ userinfo.record.winrate }}%</p>
                 </div>
-
             </div>
             <div class="section2">
                 <h5>나의 경험치 : <span>{{ userinfo.exp }} exp</span></h5>
                 <h5>나의 레벨 : <span>{{ userinfo.exp }} level</span></h5>
-
             </div>
         </div>
         <div class="footer">
@@ -34,29 +32,27 @@
 </template>
 
 <script>
-import { reactive, onMounted } from 'vue'
+import { reactive, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-// import accountStore from '@/store/accountStore'
 export default {
     name: 'MyPage',
     setup() {
         const store = useStore()
         const router = useRouter()
-        const userinfo = reactive({ 
+        const userinfo = reactive({
             name: "",
-            nickname: "", 
+            nickname: "",
             level: 0,
-            exp: 0, 
+            exp: 0,
             record: {
                 plays: 0,
                 wins: 0,
                 draws: 0,
                 winrate: 0,
             }
-            // winrate: userinfo.wins/userinfo.plays*100, 
         })
-        onMounted(async ()=> {
+        onBeforeMount(async ()=> {
             const token = store.getters['accountStore/getToken']
             const res = await store.dispatch('accountStore/getMeAction', token)
             userinfo.name = res.name
@@ -66,6 +62,7 @@ export default {
             userinfo.record.plays = res.record.plays
             userinfo.record.wins = res.record.wins
             userinfo.record.draws = res.record.draws
+
             if (res.record.plays == 0) {
                 userinfo.record.winrate =  0
             } else {
@@ -78,16 +75,15 @@ export default {
         }
 
         const changeNickname = async function() {
-            
+
         }
 
         const logOut = async function() {
             await store.dispatch('accountStore/logoutAction')
             router.push('/')
         }
-        const main = function() {
-            router.push('main')
-        }
+
+        const main = function() {router.push('main')}
 
         return {
             userinfo,
