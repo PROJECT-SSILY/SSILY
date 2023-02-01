@@ -4,7 +4,7 @@
         <v-row>
           <v-col col="9" id="proleft">
             <v-row>
-              <v-col>어서오세요, {{}}님!</v-col>
+              <v-col>어서오세요, {{state.nickname}}님!</v-col>
             </v-row>
             <v-row justify="center">
               <v-col id="btnbox">
@@ -23,16 +23,36 @@
   </template>
   
 <script>
+import { reactive, onBeforeMount } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
 export default {
-name: 'ProfileBox',
-methods: {
-  toMyPage() {
-    this.$router.push({name: 'mypage'})
+  name: 'ProfileBox',
+  setup() {
+    const route = useRouter()
+    const store = useStore()
+    const state = reactive({
+      nickname: null
+    })
+    onBeforeMount(async ()=> {
+          const token = store.getters['accountStore/getToken']
+          const res = await store.dispatch('accountStore/getMeAction', token)
+          state.nickname = res.nickname
+      })
+    const toMyPage = function() {
+      route.push('mypage')
+    }
+    return {
+      store, 
+      state,
+      route,
+      toMyPage
+      }
   }
 }
 
-}
+
 </script>
 
 <style scoped>
