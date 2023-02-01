@@ -23,6 +23,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import io.openvidu.server.exception.ExceptionCode;
+import io.openvidu.server.exception.ExceptionResponseBody;
 import io.openvidu.server.game.Player;
 import io.openvidu.java.client.room.Team;
 import org.slf4j.Logger;
@@ -71,6 +73,8 @@ import io.openvidu.server.recording.Recording;
 import io.openvidu.server.recording.service.RecordingManager;
 import io.openvidu.server.utils.RecordingUtils;
 import io.openvidu.server.utils.RestUtils;
+
+import static io.openvidu.server.exception.ExceptionCode.*;
 
 /**
  *
@@ -135,19 +139,19 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/rooms/{room-id}", method = RequestMethod.GET)
-	public ResponseEntity<?> getSession(@PathVariable("room-id") String roomId,
+	@RequestMapping(value = "/sessions/{sessionId}", method = RequestMethod.GET)
+	public ResponseEntity<?> getSession(@PathVariable("sessionId") String sessionId,
 			@RequestParam(value = "pendingConnections", defaultValue = "false", required = false) boolean pendingConnections,
 			@RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
 
-		log.info("REST API: GET {}/rooms/{}", RequestMappings.API, roomId);
+		log.info("REST API: GET {}/sessions/{}", RequestMappings.API, sessionId);
 
-		Session session = this.sessionManager.getSession(roomId);
+		Session session = this.sessionManager.getSession(sessionId);
 		if (session != null) {
 			JsonObject response = session.toJson(pendingConnections, webRtcStats);
 			return new ResponseEntity<>(response.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
 		} else {
-			Session sessionNotActive = this.sessionManager.getSessionNotActive(roomId);
+			Session sessionNotActive = this.sessionManager.getSessionNotActive(sessionId);
 			if (sessionNotActive != null) {
 				JsonObject response = sessionNotActive.toJson(pendingConnections, webRtcStats);
 				return new ResponseEntity<>(response.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
@@ -237,9 +241,16 @@ public class SessionRestController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
+		if(session.getParticipants().size() >= 4){
+			log.info("[error] : {}", FULL_ROOM_MESSAGE);
+			ExceptionResponseBody body = new ExceptionResponseBody(FULL_ROOM, FULL_ROOM_MESSAGE);
+			return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
+		}
+
 		if(session.getSessionProperties().isPlaying()){
-			log.info("이미 게임이 진행중인 방입니다.");
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			log.info("[error] : {}", PLAYING_ROOM_MESSAGE);
+			ExceptionResponseBody body = new ExceptionResponseBody(PLAYING_ROOM, PLAYING_ROOM_MESSAGE);
+			return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
 		}
 
 		ConnectionProperties connectionProperties;
