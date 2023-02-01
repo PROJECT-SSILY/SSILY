@@ -1,51 +1,80 @@
 <template>
-	<div id="main-container" class="container">
-		<div id="join" v-if="!session">
-			<div id="img-div"><img src="resources/images/openvidu_grey_bg_transp_cropped.png" /></div>
-			<div id="join-dialog" class="jumbotron vertical-center">
-				<h1>Join a video session</h1>
-				<div class="form-group">
-					<p>
-						<label>Participant</label>
-						<input v-model="myUserName" class="form-control" type="text" required>
-					</p>
-					<p>
-						<label>Session</label>
-						<input v-model="mySessionId" class="form-control" type="text" required>
-					</p>
-					<p class="text-center">
-						<button class="btn btn-lg btn-success" @click="createTest()">방생성!</button>
-            <button class="btn btn-lg btn-success" @click="joinSession()">Join!</button>
-					</p>
-				</div>
-			</div>
-		</div>
+  <div id="main-container" class="container">
+    <div id="join" v-if="!session">
+      <div id="img-div">
+        <img src="resources/images/openvidu_grey_bg_transp_cropped.png" />
+      </div>
+      <div id="join-dialog" class="jumbotron vertical-center">
+        <h1>Join a video session</h1>
+        <div class="form-group">
+          <p>
+            <label>Participant</label>
+            <input
+              v-model="myUserName"
+              class="form-control"
+              type="text"
+              required
+            />
+          </p>
+          <p>
+            <label>Session</label>
+            <input
+              v-model="mySessionId"
+              class="form-control"
+              type="text"
+              required
+            />
+          </p>
+          <p class="text-center">
+            <button class="btn btn-lg btn-success" @click="createTest()">
+              방생성!
+            </button>
+            <button class="btn btn-lg btn-success" @click="joinSession()">
+              Join!
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
 
-		<div id="session" v-if="session">
-			<div id="session-header">
-				<h1 id="session-title">{{ mySessionId }}</h1>
-				<input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="Leave session">
-			</div>
-			<div id="main-video" class="col-md-6">
-				<user-video :stream-manager="mainStreamManager"/>
-			</div>
-			<div id="video-container" class="col-md-6">
-				<user-video :stream-manager="publisher" @click.native="updateMainVideoStreamManager(publisher)"/>
-				<user-video v-for="sub in subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click.native="updateMainVideoStreamManager(sub)"/>
-			</div>
-			<div id="chat-head" class="col-md-6">
-				<chatting :session="session"/>
-			</div>
-		</div>
-	</div>
+    <div id="session" v-if="session">
+      <div id="session-header">
+        <h1 id="session-title">{{ mySessionId }}</h1>
+        <input
+          class="btn btn-large btn-danger"
+          type="button"
+          id="buttonLeaveSession"
+          @click="leaveSession"
+          value="Leave session"
+        />
+      </div>
+      <div id="main-video" class="col-md-6">
+        <user-video :stream-manager="mainStreamManager" />
+      </div>
+      <div id="video-container" class="col-md-6">
+        <user-video
+          :stream-manager="publisher"
+          @click.native="updateMainVideoStreamManager(publisher)"
+        />
+        <user-video
+          v-for="sub in subscribers"
+          :key="sub.stream.connection.connectionId"
+          :stream-manager="sub"
+          @click.native="updateMainVideoStreamManager(sub)"
+        />
+      </div>
+      <div id="chat-head" class="col-md-6">
+        <chatting :session="session" />
+      </div>
+    </div>
+  </div>
 </template>
 
-
 <script>
-import axios from 'axios';
-import { OpenVidu } from 'openvidu-browser';
-import UserVideo from './components/UserVideo';
-import Chatting from './components/Chatting';
+import axios from "axios";
+import { OpenVidu } from "openvidu-browser";
+import UserVideo from "./components/UserVideo";
+import Chatting from "./components/Chatting";
 
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
@@ -55,10 +84,10 @@ const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 export default {
   name: "App",
 
-	components: {
-		UserVideo,
-		Chatting,
-	},
+  components: {
+    UserVideo,
+    Chatting,
+  },
 
   data() {
     return {
@@ -185,7 +214,8 @@ export default {
         JSON.stringify({
           title: "안녕하세용",
           isSecret: true,
-          password: "1234"
+          password: "1234",
+          isHost: false,
         }),
         {
           auth: {
@@ -200,7 +230,7 @@ export default {
           username: "OPENVIDUAPP",
           password: OPENVIDU_SERVER_SECRET,
         },
-      })
+      });
 
       return new Promise((resolve, reject) => {
         axios
@@ -210,7 +240,8 @@ export default {
               title: "방제목2",
               isSecret: true,
               password: "1234",
-              team:"NONE"
+              team: "NONE",
+              customSessionId: this.mySessionId,
             }),
             {
               auth: {
@@ -242,22 +273,21 @@ export default {
     },
 
     createTest() {
-      axios
-          .post(
-            `${OPENVIDU_SERVER_URL}/api/rooms`,
-            JSON.stringify({
-              title: "방제목2",
-              isSecret: true,
-              password: "1234",
-              team:"NONE",
-            }),
-            {
-              auth: {
-                username: "OPENVIDUAPP",
-                password: OPENVIDU_SERVER_SECRET,
-              },
-            }
-          )
+      axios.post(
+        `${OPENVIDU_SERVER_URL}/api/rooms`,
+        JSON.stringify({
+          title: "방제목2",
+          isSecret: true,
+          password: "1234",
+          team: "NONE",
+        }),
+        {
+          auth: {
+            username: "OPENVIDUAPP",
+            password: OPENVIDU_SERVER_SECRET,
+          },
+        }
+      );
     },
 
     // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-connection
@@ -268,8 +298,9 @@ export default {
             `${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`,
             {
               level: 1,
-              nickname : "서영탁",
-              rate : 70.1
+              nickname: "서영탁",
+              rate: 70.1,
+              isHost: false,
             },
             {
               auth: {
