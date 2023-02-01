@@ -676,7 +676,7 @@ public class Session {
 						.defaultRecordingProperties(properties.defaultRecordingProperties())
 						.customSessionId(properties.customSessionId()).mediaNode(properties.mediaNode())
 						.forcedVideoCodec(forcedVideoCodec).forcedVideoCodecResolved(forcedVideoCodecResolved)
-						.allowTranscoding(allowTranscoding).title(properties.title()).isSecret(properties.isSecret()).password(properties.password()).build();
+						.allowTranscoding(allowTranscoding).title(properties.title()).isSecret(properties.isSecret()).password(properties.password()).team(properties.team()).build();
 
 				this.properties = responseProperties;
 				log.info("Session '{}' created", this.sessionId);

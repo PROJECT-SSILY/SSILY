@@ -18,14 +18,12 @@
 package io.openvidu.server.rest;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import io.openvidu.java.client.room.Team;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,17 +119,12 @@ public class SessionRestController {
 			}
 			sessionId = sessionProperties.customSessionId();
 		} else {
-			sessionId = IdentifierPrefixes.SESSION_ID + RandomStringUtils.randomAlphabetic(1).toUpperCase()
-					+ RandomStringUtils.randomAlphanumeric(9);
+			sessionId= UUID.randomUUID().toString();
+			//sessionId = IdentifierPrefixes.SESSION_ID + RandomStringUtils.randomAlphabetic(1).toUpperCase()
+			// 		+ RandomStringUtils.randomAlphanumeric(9);
 		}
 
 		Session sessionNotActive = sessionManager.storeSessionNotActive(sessionId, sessionProperties);
-
-		/**
-		 * 김윤미 : 테스트용 코드
-		 */
-		Session createdSession=sessionManager.getSessionNotActive(sessionId);
-		log.info("방제목: {}", createdSession.getSessionProperties().title());
 
 		if (sessionNotActive == null) {
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -755,6 +748,7 @@ public class SessionRestController {
 			String title=null;
 			Boolean isSecret=null;
 			String password=null;
+			Team team=null;
 			try {
 				mediaModeString = (String) params.get("mediaMode");
 				recordingModeString = (String) params.get("recordingMode");
@@ -766,6 +760,7 @@ public class SessionRestController {
 				if(isSecret!=null && isSecret) {
 					password=(String) params.get("password");
 				}
+				team= Team.valueOf((String) params.get("team"));
 			} catch (ClassCastException e) {
 				throw new Exception("Type error in some parameter: " + e.getMessage());
 			}
@@ -861,6 +856,10 @@ public class SessionRestController {
 
 				if(isSecret!=null && isSecret && password!=null && !password.isEmpty()) {
 					builder=builder.password(password);
+				}
+
+				if(team!=null) {
+					builder=builder.team(team);
 				}
 
 			} catch (IllegalArgumentException e) {

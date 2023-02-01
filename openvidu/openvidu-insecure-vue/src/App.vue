@@ -204,7 +204,9 @@ export default {
       console.log("보내는 값");
       console.log(
         JSON.stringify({
-          customSessionId: sessionId,
+          title: "안녕하세용",
+          isSecret: true,
+          password: "1234"
         }),
         {
           auth: {
@@ -218,9 +220,10 @@ export default {
           .post(
             `${OPENVIDU_SERVER_URL}/api/rooms`,
             JSON.stringify({
-              customSessionId: sessionId,
               title: "방제목2",
-              isSecret: false,
+              isSecret: true,
+              password: "1234",
+              team:"NONE"
             }),
             {
               auth: {
