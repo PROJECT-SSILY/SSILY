@@ -22,7 +22,7 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col v-if="state.teamorprivate">
+              <v-col v-if="isTeam">
                 <v-btn color="success"
                 >
                 팀 게임 시작</v-btn>
@@ -31,6 +31,7 @@
                 <v-btn color="primary"
                 @click="cons"
                 >
+                {{ teamvalue }}
                 개인 게임 시작</v-btn>
               </v-col>
             </v-row>
@@ -52,29 +53,30 @@ import TutorialDialog from './Components/TutorialDialog.vue';
 import ProfileBox from './Components/ProfileBox.vue';
 import RoomList from './Components/RoomList.vue';
 import { useStore } from "vuex"
-import { reactive } from "vue"
+// import store from '@/store/gameStore';
+import { computed } from "vue"
 // import { mapGetters } from 'vuex'
 
 export default {
   name: 'MainPage',
+  // computed: {
+  //   teamorprivate() {
+  //     return this.$store.state.teamorprivate
+  //   }
+  // },
+  // methods: {
+  //   cons() {
+  //     console.log(this.teamorprivate)
+  //   }
+  // },
   setup() {
     const store = useStore()
-    const state = reactive({
-      teamorprivate: null
-    })
-    const cons = function() {
-      console.log(state.teamorprivate)
-    }
+    const isTeam = computed(()=> store.getters['gameStore/getTeam'])
     return {
       store, 
-      state,
-      cons
+      isTeam
       }
     },
-    // computed: {
-    //   ...mapGetters([
-    //     'getTeam'
-    //   ]),
   components: {
     MakeRoomDialog,
     TutorialDialog,
