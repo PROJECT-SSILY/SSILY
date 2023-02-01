@@ -8,7 +8,14 @@
 import { makeRoomAction } from "@/common/api/gameAPI";
 
 const state = {
-    teamorprivate: null
+    teamorprivate: null,
+    OV: undefined,
+    session: undefined,
+    mainStreamManager: undefined,
+    publisher: undefined,
+    subscribers: [],
+    mySessionId: '',
+    myUserName: '',
 }
 
 const getters = {
