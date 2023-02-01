@@ -307,14 +307,18 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions/{sessionId}/connection", method = RequestMethod.GET)
-	public ResponseEntity<?> listConnections(@PathVariable("sessionId") String sessionId,
+	/**
+	 * 서영탁
+	 * 게임방 참여자 정보 목록 조회
+	 */
+	@RequestMapping(value = "/rooms/{room-id}/players", method = RequestMethod.GET)
+	public ResponseEntity<?> listConnections(@PathVariable("room-id") String roomId,
 			@RequestParam(value = "pendingConnections", defaultValue = "true", required = false) boolean pendingConnections,
 			@RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
 
-		log.info("REST API: GET {}/sessions/{}/connection", RequestMappings.API, sessionId);
+		log.info("REST API: GET {}/sessions/{}/connection", "/api", roomId);
 
-		Session session = this.sessionManager.getSessionWithNotActive(sessionId);
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
 
 		if (session != null) {
 			JsonObject json = new JsonObject();
