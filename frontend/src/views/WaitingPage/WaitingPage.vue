@@ -1,78 +1,80 @@
 <template>
-  <p class="text-subtitle-1">
-    방 : {{ state.title }}
-  </p>
-  <div id="flex-container">
-    <div class="flex-item">
-      <UserInfo/>
-    </div>
-    <div id="flex-container">
-      <div class="flex-item">
-      <p>{{ state.team  || '팀 선택' }}</p>
-      <v-radio-group inline v-model="state.team" justify-content="center">
-        <v-radio label="RED" value="RED" color="red" class="ma-2"></v-radio>
-        <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2"></v-radio>
-      </v-radio-group> 
-      <ChatBox/>
-    </div>
-    </div>
-  </div>
-  <v-btn 
-  class="ma-2" 
-  v-if="!state.ready"
-  @Click="clickReady"
-  >
-  READY
-  </v-btn>
-  <v-btn 
-  class="ma-2" 
-  v-if="state.ready"
-  disabled
-  >
-  READY함
-  </v-btn>
-  <v-btn class="ma-2" @click="clickExit">
-    나가기
-  </v-btn>
-
-
-
-
-  <div id="main-container" class="container">
-		<div id="join" v-if="!state.session">
-			<div id="img-div"><img src="resources/images/openvidu_grey_bg_transp_cropped.png" /></div>
-			<div id="join-dialog" class="jumbotron vertical-center">
-				<h1>Join a video session</h1>
-				<div class="form-group">
-					<p>
-						<label>Participant</label>
-						<input v-model="state.myUserName" class="form-control" type="text" required>
-					</p>
-					<p>
-						<label>Session</label>
-						<input v-model="state.mySessionId" class="form-control" type="text" required>
-					</p>
-					<p class="text-center">
-						<button class="btn btn-lg btn-success" @click="joinSession()">Join!</button>
-					</p>
-				</div>
+	<div class="wrapper">
+		<p class="text-subtitle-1">
+			방 : {{ state.title }}
+		</p>
+		<div id="flex-container">
+			<div class="flex-item">
+			<UserInfo/>
+			</div>
+			<div id="flex-container">
+			<div class="flex-item">
+			<p>{{ state.team  || '팀 선택' }}</p>
+			<v-radio-group inline v-model="state.team" justify-content="center">
+				<v-radio label="RED" value="RED" color="red" class="ma-2"></v-radio>
+				<v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2"></v-radio>
+			</v-radio-group> 
+			<ChatBox/>
+			</div>
 			</div>
 		</div>
+		<v-btn 
+		class="ma-2" 
+		v-if="!state.ready"
+		@Click="clickReady"
+		>
+		READY
+		</v-btn>
+		<v-btn 
+		class="ma-2" 
+		v-if="state.ready"
+		disabled
+		>
+		READY함
+		</v-btn>
+		<v-btn class="ma-2" @click="clickExit">
+			나가기
+		</v-btn>
+		<v-btn @click="test">test</v-btn>
 
-		<div id="session" v-if="state.session">
-			<div id="session-header">
-				<h1 id="session-title">{{ state.mySessionId }}</h1>
-				<input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="Leave session">
+
+
+		<div id="main-container" class="container">
+			<div id="join" v-if="!state.session">
+				<div id="img-div"><img src="resources/images/openvidu_grey_bg_transp_cropped.png" /></div>
+				<div id="join-dialog" class="jumbotron vertical-center">
+					<h1>Join a video session</h1>
+					<div class="form-group">
+						<p>
+							<label>Participant</label>
+							<input v-model="state.myUserName" class="form-control" type="text" required>
+						</p>
+						<p>
+							<label>Session</label>
+							<input v-model="state.mySessionId" class="form-control" type="text" required>
+						</p>
+						<p class="text-center">
+							<button class="btn btn-lg btn-success" @click="joinSession()">Join!</button>
+						</p>
+					</div>
+				</div>
 			</div>
-			<div id="main-video" class="col-md-6">
-				<user-video :stream-manager="state.mainStreamManager"/>
-			</div>
-			<div id="video-container" class="col-md-6">
-				<user-video :stream-manager="state.publisher" @click="updateMainVideoStreamManager(state.publisher)"/>
-				<user-video v-for="sub in state.subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click="updateMainVideoStreamManager(sub)"/>
-			</div>
-			<div id="chat-head" class="col-md-6">
-				<chatting-box :session="state.session"/>
+
+			<div id="session" v-if="state.session">
+				<div id="session-header">
+					<h1 id="session-title">{{ state.mySessionId }}</h1>
+					<input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="Leave session">
+				</div>
+				<div id="main-video" class="col-md-6">
+					<user-video :stream-manager="state.mainStreamManager"/>
+				</div>
+				<div id="video-container" class="col-md-6">
+					<user-video :stream-manager="state.publisher" @click="updateMainVideoStreamManager(state.publisher)"/>
+					<user-video v-for="sub in state.subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click="updateMainVideoStreamManager(sub)"/>
+				</div>
+				<div id="chat-head" class="col-md-6">
+					<chatting-box :session="state.session"/>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -137,6 +139,14 @@ export default {
     const clickReady = () => {
       state.ready = !state.ready
     }
+
+	
+	//=======================setter 참고============================
+	const test = () => {
+		store.commit('gameStore/setPublisher', 'test')
+		console.log(store.state.gameStore.publisher)
+	}
+	//==============================================================
 
 
     const joinSession = () => {
@@ -289,13 +299,14 @@ export default {
       createSession,
       createToken,
       // == OpenVidu State ==
-      OV,
-      session,
-      mainStreamManager,
-      publisher,
-      subscribers,
-      mySessionId,
-      myUserName,
+		OV,
+		session,
+		mainStreamManager,
+		publisher,
+		subscribers,
+		mySessionId,
+		myUserName,
+		test,
       // =====================
     }
   }
