@@ -668,12 +668,15 @@ public class Session {
 						.valueOf(responseJson.get("forcedVideoCodecResolved").getAsString());
 				Boolean allowTranscoding = responseJson.get("allowTranscoding").getAsBoolean();
 
+				/**
+				 * 김윤미
+				 */
 				SessionProperties responseProperties = new SessionProperties.Builder().mediaMode(properties.mediaMode())
 						.recordingMode(properties.recordingMode())
 						.defaultRecordingProperties(properties.defaultRecordingProperties())
 						.customSessionId(properties.customSessionId()).mediaNode(properties.mediaNode())
 						.forcedVideoCodec(forcedVideoCodec).forcedVideoCodecResolved(forcedVideoCodecResolved)
-						.allowTranscoding(allowTranscoding).build();
+						.allowTranscoding(allowTranscoding).title(properties.title()).isSecret(properties.isSecret()).password(properties.password()).team(properties.team()).build();
 
 				this.properties = responseProperties;
 				log.info("Session '{}' created", this.sessionId);
