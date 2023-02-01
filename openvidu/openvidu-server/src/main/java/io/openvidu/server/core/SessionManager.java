@@ -472,7 +472,7 @@ public abstract class SessionManager {
         if (this.sessionidParticipantpublicidParticipant.get(sessionId) != null) {
             Participant p = new Participant(null, participantPrivateId, ProtocolElements.RECORDER_PARTICIPANT_PUBLICID,
                     sessionId, session.getUniqueSessionId(), token, clientMetadata, null, null,
-                    EndpointType.WEBRTC_ENDPOINT, null);
+                    EndpointType.WEBRTC_ENDPOINT, null, token.getPlayer());
             this.tokenRegister.registerToken(sessionId, p, token);
             this.sessionidParticipantpublicidParticipant.get(sessionId)
                     .put(ProtocolElements.RECORDER_PARTICIPANT_PUBLICID, p);
@@ -487,7 +487,7 @@ public abstract class SessionManager {
         String sessionId = session.getSessionId();
         if (this.sessionidParticipantpublicidParticipant.get(sessionId) != null) {
             Participant p = new Participant(ipcamId, ipcamId, ipcamId, sessionId, session.getUniqueSessionId(), token,
-                    null, location, platform, EndpointType.PLAYER_ENDPOINT, null);
+                    null, location, platform, EndpointType.PLAYER_ENDPOINT, null, token.getPlayer());
             this.tokenRegister.registerToken(sessionId, p, token);
             this.sessionidParticipantpublicidParticipant.get(sessionId).put(ipcamId, p);
             return p;
