@@ -60,6 +60,15 @@ public class Session implements SessionInterface {
 	protected AtomicInteger activeIndividualRecordedPublishers = new AtomicInteger(0);
 
 	/**
+	 * 김윤미
+	 */
+	protected String title; //방 제목
+
+	protected boolean isSecret; //비밀방 여부
+
+	protected String password; //비밀번호
+
+	/**
 	 * This lock protects the following operations with read lock: [REST API](POST
 	 * /api/tokens, POST /sessions/{sessionId}/connection), [RPC](joinRoom).
 	 * 

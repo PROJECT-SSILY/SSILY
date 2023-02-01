@@ -59,15 +59,19 @@
           :stream-manager="sub"
           @click.native="updateMainVideoStreamManager(sub)"
         />
+        <div id="chat-head" class="col-md-6">
+				<chatting :session="session"/>
+			</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import { OpenVidu } from "openvidu-browser";
-import UserVideo from "./components/UserVideo";
+import axios from 'axios';
+import { OpenVidu } from 'openvidu-browser';
+import UserVideo from './components/UserVideo';
+import Chatting from './components/Chatting';
 
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
@@ -77,9 +81,10 @@ const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 export default {
   name: "App",
 
-  components: {
-    UserVideo,
-  },
+	components: {
+		UserVideo,
+		Chatting,
+	},
 
   data() {
     return {
@@ -201,12 +206,37 @@ export default {
 
     // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-session
     createSession(sessionId) {
+      console.log("보내는 값");
+      console.log(
+        JSON.stringify({
+          title: "안녕하세용",
+          isSecret: true,
+          password: "1234"
+        }),
+        {
+          auth: {
+            username: "OPENVIDUAPP",
+            password: OPENVIDU_SERVER_SECRET,
+          },
+        }
+      );
+
+      axios.get(`${OPENVIDU_SERVER_URL}/api/rooms`, {
+        auth: {
+          username: "OPENVIDUAPP",
+          password: OPENVIDU_SERVER_SECRET,
+        },
+      })
+
       return new Promise((resolve, reject) => {
         axios
           .post(
-            `${OPENVIDU_SERVER_URL}/api/sessions`,
+            `${OPENVIDU_SERVER_URL}/api/rooms`,
             JSON.stringify({
-              customSessionId: sessionId,
+              title: "방제목2",
+              isSecret: true,
+              password: "1234",
+              team:"NONE"
             }),
             {
               auth: {

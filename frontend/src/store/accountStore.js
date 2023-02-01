@@ -5,7 +5,7 @@
 //     requestId,
 //   } from "../common/api/accountAPI";
 
-import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction } from "@/common/api/accountAPI";
+import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe } from "@/common/api/accountAPI";
 
 const state = {
     token: localStorage.getItem('token') || null,
@@ -98,18 +98,17 @@ const actions = {
             console.log(err);
             throw err;
         }
-    }
-
-    // getMeAction: async ({ commit }, token) => {
-    //     try {
-    //         // console.log("token : ", token);
-    //         const response = await requestMe(token);
-    //         console.log("getMe : ", response);
-    //         await commit("setUser", response);
-    //     } catch (err) {
-    //         console.log("111");
-    //     }
-    // },
+    },
+    getMeAction: async ( context, token) => {
+        try {
+            const response = await requestMe(token);
+            console.log("getMe : ", response.data.data);
+            await context.commit("setUser", response.data.data);
+            return response.data.data
+        } catch (err) {
+            console.log(err);
+        }
+    },
     // idAction: async ({ commit }, idData) => {
     //     console.log(idData, "------axios------");
     //     const response = await requestId(idData.id);

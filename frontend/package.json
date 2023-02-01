@@ -12,6 +12,7 @@
     "axios": "^1.2.4",
     "core-js": "^3.8.3",
     "fabric": "^5.3.0",
+    "openvidu-browser": "^2.25.0",
     "roboto-fontface": "*",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",

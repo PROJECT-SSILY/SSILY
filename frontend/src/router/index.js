@@ -9,7 +9,6 @@ import FindPassword from '../views/Accounts/FindPassword.vue'
 import InGamePage from '../views/InGamePage/InGamePage.vue'
 import accountStore from '@/store/accountStore'
 
-
 const requireAuth = () => (to, from, next) => {
   const token = accountStore.state.token
   if (token !== null) {

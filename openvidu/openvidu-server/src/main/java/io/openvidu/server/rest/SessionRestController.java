@@ -18,16 +18,13 @@
 package io.openvidu.server.rest;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import io.openvidu.server.game.Player;
-import org.apache.commons.lang3.RandomStringUtils;
+import io.openvidu.java.client.room.Team;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +62,6 @@ import io.openvidu.java.client.SessionProperties;
 import io.openvidu.java.client.VideoCodec;
 import io.openvidu.server.config.OpenviduConfig;
 import io.openvidu.server.core.EndReason;
-import io.openvidu.server.core.IdentifierPrefixes;
 import io.openvidu.server.core.Participant;
 import io.openvidu.server.core.Session;
 import io.openvidu.server.core.SessionManager;
@@ -97,16 +93,21 @@ public class SessionRestController {
 	@Autowired
 	protected OpenviduConfig openviduConfig;
 
-	@RequestMapping(value = "/sessions", method = RequestMethod.POST)
+	/**
+	 * 김윤미
+	 * @param params
+	 * @return
+	 */
+	@RequestMapping(value = "/rooms", method = RequestMethod.POST)
 	public ResponseEntity<?> initializeSession(@RequestBody(required = false) Map<?, ?> params) {
 
-		log.info("REST API: POST {}/sessions {}", RequestMappings.API, params != null ? params.toString() : "{}");
+		log.info("REST API: POST {}/rooms {}", RequestMappings.API, params != null ? params.toString() : "{}");
 
 		SessionProperties sessionProperties;
 		try {
 			sessionProperties = getSessionPropertiesFromParams(params).build();
 		} catch (Exception e) {
-			return this.generateErrorResponse(e.getMessage(), "/sessions", HttpStatus.BAD_REQUEST);
+			return this.generateErrorResponse(e.getMessage(), "/rooms", HttpStatus.BAD_REQUEST);
 		}
 
 		String sessionId;
@@ -117,8 +118,9 @@ public class SessionRestController {
 			}
 			sessionId = sessionProperties.customSessionId();
 		} else {
-			sessionId = IdentifierPrefixes.SESSION_ID + RandomStringUtils.randomAlphabetic(1).toUpperCase()
-					+ RandomStringUtils.randomAlphanumeric(9);
+			sessionId= UUID.randomUUID().toString();
+			//sessionId = IdentifierPrefixes.SESSION_ID + RandomStringUtils.randomAlphabetic(1).toUpperCase()
+			// 		+ RandomStringUtils.randomAlphanumeric(9);
 		}
 
 		Session sessionNotActive = sessionManager.storeSessionNotActive(sessionId, sessionProperties);
@@ -155,12 +157,12 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions", method = RequestMethod.GET)
+	@RequestMapping(value = "/rooms", method = RequestMethod.GET)
 	public ResponseEntity<?> listSessions(
 			@RequestParam(value = "pendingConnections", defaultValue = "false", required = false) boolean pendingConnections,
 			@RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
 
-		log.info("REST API: GET {}/sessions", RequestMappings.API);
+		log.info("REST API: GET {}/rooms", RequestMappings.API);
 
 		Collection<Session> sessions = this.sessionManager.getSessionsWithNotActive();
 		JsonObject json = new JsonObject();
@@ -766,6 +768,12 @@ public class SessionRestController {
 		}
 	}
 
+	/**
+	 * 김윤미
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
 	protected SessionProperties.Builder getSessionPropertiesFromParams(Map<?, ?> params) throws Exception {
 
 		SessionProperties.Builder builder = new SessionProperties.Builder();
@@ -778,12 +786,26 @@ public class SessionRestController {
 			String recordingModeString;
 			String forcedVideoCodecStr;
 			Boolean allowTranscoding;
+
+			/**
+			 * 김윤미
+			 */
+			String title=null;
+			Boolean isSecret=null;
+			String password=null;
+			Team team=null;
 			try {
 				mediaModeString = (String) params.get("mediaMode");
 				recordingModeString = (String) params.get("recordingMode");
 				customSessionId = (String) params.get("customSessionId");
 				forcedVideoCodecStr = (String) params.get("forcedVideoCodec");
 				allowTranscoding = (Boolean) params.get("allowTranscoding");
+				title=(String) params.get("title");
+				isSecret=(Boolean) params.get("isSecret");
+				if(isSecret!=null && isSecret) {
+					password=(String) params.get("password");
+				}
+				team= Team.valueOf((String) params.get("team"));
 			} catch (ClassCastException e) {
 				throw new Exception("Type error in some parameter: " + e.getMessage());
 			}
@@ -866,6 +888,25 @@ public class SessionRestController {
 					builder.defaultRecordingProperties(new RecordingProperties.Builder().build());
 				}
 
+				/**
+				 * 김윤미
+				 */
+				if(title!=null && !title.isEmpty()) {
+					builder=builder.title(title);
+				}
+
+				if(isSecret!=null) {
+					builder=builder.isSecret(isSecret);
+				}
+
+				if(isSecret!=null && isSecret && password!=null && !password.isEmpty()) {
+					builder=builder.password(password);
+				}
+
+				if(team!=null) {
+					builder=builder.team(team);
+				}
+
 			} catch (IllegalArgumentException e) {
 				throw new Exception("Some parameter is not valid. " + e.getMessage());
 			}
@@ -875,7 +916,6 @@ public class SessionRestController {
 
 	protected ConnectionProperties.Builder getConnectionPropertiesFromParams(Map<?, ?> params) throws Exception {
 
-		log.info("getConnectionPropertiesFromParams params = {}", params);
 		ConnectionProperties.Builder builder = new ConnectionProperties.Builder();
 
 		String typeString;

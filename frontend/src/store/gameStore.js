@@ -8,7 +8,14 @@
 import { makeRoomAction } from "@/common/api/gameAPI";
 
 const state = {
-    teamorprivate: null
+    teamorprivate: null,
+    OV: undefined,
+    session: undefined,
+    mainStreamManager: undefined,
+    publisher: undefined,
+    subscribers: [],
+    mySessionId: '',
+    myUserName: '',
 }
 
 const getters = {
@@ -20,6 +27,27 @@ const getters = {
 const mutations = {
     setTeam: (state) => {
         state.teamorprivate = !state.teamorprivate;
+    },
+    setOV: (state, data) => {
+        state.OV = data;
+    },
+    setSession: (state, data) => {
+        state.session = data;
+    },
+    setMainStreamManager: (state, data) => {
+        state.mainStreamManager = data;
+    },
+    setPublisher: (state, data) => {
+        state.publisher = data;
+    },
+    setSubscribers: (state, data) => {
+        state.subscribers = data;
+    },
+    setMySessionId: (state, id) => {
+        state.mySessionId = id;
+    },
+    setMyUserName: (state, name) => {
+        state.myUserName = name;
     },
 }
 
