@@ -77,7 +77,6 @@
 		</div>
 	</div>
 </template>
-
 <script>
 import { reactive } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
