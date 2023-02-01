@@ -22,6 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.google.gson.JsonObject;
 
+import io.openvidu.server.game.Player;
 import io.openvidu.server.kurento.endpoint.EndpointType;
 import io.openvidu.server.utils.GeoLocation;
 
@@ -42,6 +43,12 @@ public class Participant {
 		 */
 		active
 	}
+
+	/**
+	 * 서영탁
+	 * Player 정보 추가
+	 */
+	protected Player player;
 
 	protected String finalUserId; // ID to match this connection with a final user (HttpSession id)
 	protected String participantPrivateId; // ID to identify the user on server (org.kurento.jsonrpc.Session.id)
@@ -97,6 +104,42 @@ public class Participant {
 		this.location = location;
 		this.platform = platform;
 		this.endpointType = endpointType;
+	}
+
+	/**
+	 * 서영탁
+	 * 생성자 추가
+	 */
+	public Participant(String finalUserId, String participantPrivateId, String participantPublicId, String sessionId,
+					   String uniqueSessionId, Token token, String clientMetadata, GeoLocation location, String platform,
+					   EndpointType endpointType, Long activeAt, Player player) {
+		this.finalUserId = finalUserId;
+		this.participantPrivateId = participantPrivateId;
+		this.participantPublicId = participantPublicId;
+		this.sessionId = sessionId;
+		this.uniqueSessionId = uniqueSessionId;
+		this.status = ParticipantStatus.active;
+		this.token = token;
+		if (activeAt != null) {
+			this.activeAt = activeAt;
+		} else {
+			this.activeAt = System.currentTimeMillis();
+		}
+		if (clientMetadata != null) {
+			this.clientMetadata = clientMetadata;
+		}
+		this.location = location;
+		this.platform = platform;
+		this.endpointType = endpointType;
+		this.player = player;
+	}
+
+	public Player getPlayer() {
+		return player;
+	}
+
+	public void setPlayer(Player player) {
+		this.player = player;
 	}
 
 	public String getFinalUserId() {

@@ -107,6 +107,7 @@ public class KurentoSessionManager extends SessionManager {
     @Override
     /* Protected by Session.closingLock.readLock */
     public void joinRoom(Participant participant, String sessionId, Integer transactionId) {
+        log.info("participant player = {}", participant.getPlayer().getScore());
         Set<Participant> existingParticipants = null;
         try {
 

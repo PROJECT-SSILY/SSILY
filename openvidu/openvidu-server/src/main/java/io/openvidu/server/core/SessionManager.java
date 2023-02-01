@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import io.openvidu.server.game.Player;
 import org.kurento.jsonrpc.message.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -357,6 +358,38 @@ public abstract class SessionManager {
         return tokenObj;
     }
 
+    /**
+     * 서영탁
+     * newToken override
+     */
+    public Token newToken(Session session, OpenViduRole role, String serverMetadata, boolean record,
+                          KurentoOptions kurentoOptions, Player player) throws Exception {
+        if (!formatChecker.isServerMetadataFormatCorrect(serverMetadata)) {
+            log.error("Data invalid format");
+            throw new OpenViduException(Code.GENERIC_ERROR_CODE, "Data invalid format");
+        }
+        Token tokenObj = tokenGenerator.generateToken(session.getSessionId(), serverMetadata, record, role,
+                kurentoOptions, player);
+
+        // Internal dev feature: allows customizing connectionId
+        if (serverMetadata.contains("openviduCustomConnectionId")) {
+            try {
+                JsonObject serverMetadataJson = JsonParser.parseString(serverMetadata).getAsJsonObject();
+                String customConnectionId = serverMetadataJson.get("openviduCustomConnectionId").getAsString();
+                customConnectionId = customConnectionId.replaceAll("\\W", ""); // Remove all non-word characters: [^A-Za-z0-9_]
+                customConnectionId = customConnectionId.replaceAll(IdentifierPrefixes.PARTICIPANT_PUBLIC_ID, "");
+                tokenObj.setConnectionId(IdentifierPrefixes.PARTICIPANT_PUBLIC_ID + customConnectionId);
+            } catch (Exception e) {
+                log.debug(
+                        "Tried to parse server metadata as JSON after encountering \"openviduCustomConnectionId\" string, but failed with {}: {}",
+                        e.getClass().getCanonicalName(), e.getMessage());
+            }
+        }
+
+        session.storeToken(tokenObj);
+        return tokenObj;
+    }
+
     public Token newTokenForInsecureUser(Session session, String token, ConnectionProperties connectionProperties)
             throws Exception {
         Token tokenObj = new Token(token, session.getSessionId(), connectionProperties,
@@ -402,6 +435,10 @@ public abstract class SessionManager {
         this.insecureUsers.put(participantPrivateId, true);
     }
 
+    /**
+     * 서영탁
+     * 생성자에 player 추가
+     */
     public Participant newParticipant(Session session, String participantPrivateId, Token token, String clientMetadata,
                                       GeoLocation location, String platform, String finalUserId) {
 
@@ -410,7 +447,7 @@ public abstract class SessionManager {
 
             Participant p = new Participant(finalUserId, participantPrivateId, token.getConnectionId(), sessionId,
                     session.getUniqueSessionId(), token, clientMetadata, location, platform,
-                    EndpointType.WEBRTC_ENDPOINT, null);
+                    EndpointType.WEBRTC_ENDPOINT, null, token.getPlayer());
 
             this.tokenRegister.registerToken(sessionId, p, token);
 

@@ -272,8 +272,12 @@ export default {
       return new Promise((resolve, reject) => {
         axios
           .post(
-            `${OPENVIDU_SERVER_URL}/api/sessions/${sessionId}/connection`,
-            {},
+            `${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`,
+            {
+              level: 1,
+              nickname : "서영탁",
+              rate : 70.1
+            },
             {
               auth: {
                 username: "OPENVIDUAPP",

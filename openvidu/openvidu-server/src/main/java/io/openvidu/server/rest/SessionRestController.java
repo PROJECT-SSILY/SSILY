@@ -23,8 +23,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import io.openvidu.server.game.Player;
 import io.openvidu.java.client.room.Team;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,6 @@ import io.openvidu.java.client.SessionProperties;
 import io.openvidu.java.client.VideoCodec;
 import io.openvidu.server.config.OpenviduConfig;
 import io.openvidu.server.core.EndReason;
-import io.openvidu.server.core.IdentifierPrefixes;
 import io.openvidu.server.core.Participant;
 import io.openvidu.server.core.Session;
 import io.openvidu.server.core.SessionManager;
@@ -220,14 +219,20 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions/{sessionId}/connection", method = RequestMethod.POST)
-	public ResponseEntity<?> initializeConnection(@PathVariable("sessionId") String sessionId,
+	/**
+	 * 서영탁
+	 * 게임방 입장 [직접 참여]
+	 * @param roomId : 방 번호
+	 * @param params : player 정보 담기
+	 * @return
+	 */
+	@RequestMapping(value = "/rooms/{room-id}", method = RequestMethod.POST)
+	public ResponseEntity<?> initializeConnection(@PathVariable("room-id") String roomId,
 			@RequestBody Map<?, ?> params) {
 
-		log.info("REST API: POST {} {}", RequestMappings.API + "/sessions/" + sessionId + "/connection",
-				params.toString());
+		log.info("REST API: POST {}, params : {}", "/api" + "/rooms/" + roomId, params.toString());
 
-		Session session = this.sessionManager.getSessionWithNotActive(sessionId);
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
 		if (session == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
@@ -236,16 +241,22 @@ public class SessionRestController {
 		try {
 			connectionProperties = getConnectionPropertiesFromParams(params).build();
 		} catch (Exception e) {
-			return this.generateErrorResponse(e.getMessage(), "/sessions/" + sessionId + "/connection",
+			return this.generateErrorResponse(e.getMessage(), "/api" + "/rooms/" + roomId,
 					HttpStatus.BAD_REQUEST);
 		}
+
+		int level = (int)params.get("level");
+		String nickname = (String) params.get("nickname");
+		double rate = (double) params.get("rate");
+		Player player = new Player(level,nickname, rate);
+
 		switch (connectionProperties.getType()) {
 		case WEBRTC:
-			return this.newWebrtcConnection(session, connectionProperties);
+			return this.newWebrtcConnection(session, connectionProperties, player);
 		case IPCAM:
 			return this.newIpcamConnection(session, connectionProperties);
 		default:
-			return this.generateErrorResponse("Wrong type parameter", "/sessions/" + sessionId + "/connection",
+			return this.generateErrorResponse("Wrong type parameter", "/api" + "/rooms/" + roomId,
 					HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -542,6 +553,7 @@ public class SessionRestController {
 			return this.generateErrorResponse(e.getMessage(), "/sessions/" + sessionId + "/connection",
 					HttpStatus.BAD_REQUEST);
 		}
+
 		ResponseEntity<?> entity = this.newWebrtcConnection(session, connectionProperties);
 		JsonObject jsonResponse = JsonParser.parseString(entity.getBody().toString()).getAsJsonObject();
 
@@ -659,14 +671,47 @@ public class SessionRestController {
 
 	protected ResponseEntity<?> newWebrtcConnection(Session session, ConnectionProperties connectionProperties) {
 
-		final String REQUEST_PATH = "/sessions/" + session.getSessionId() + "/connection";
+		final String REQUEST_PATH = "/api/rooms/" + session.getSessionId();
 
+		log.info("newWebrtcConnection");
 		// While closing a session tokens can't be generated
 		if (session.closingLock.readLock().tryLock()) {
 			try {
 				Token token = sessionManager.newToken(session, connectionProperties.getRole(),
 						connectionProperties.getData(), connectionProperties.record(),
 						connectionProperties.getKurentoOptions());
+				return new ResponseEntity<>(token.toJsonAsParticipant().toString(), RestUtils.getResponseHeaders(),
+						HttpStatus.OK);
+			} catch (Exception e) {
+				return this.generateErrorResponse(
+						"Error creating Connection for session " + session.getSessionId() + ": " + e.getMessage(),
+						REQUEST_PATH, HttpStatus.INTERNAL_SERVER_ERROR);
+			} finally {
+				session.closingLock.readLock().unlock();
+			}
+		} else {
+			log.error("Session {} is in the process of closing. Connection couldn't be created",
+					session.getSessionId());
+			return this.generateErrorResponse("Session " + session.getSessionId() + " not found", REQUEST_PATH,
+					HttpStatus.NOT_FOUND);
+		}
+	}
+
+	/**
+	 * 서영탁
+	 * newWebrtcConnection override
+	 */
+	protected ResponseEntity<?> newWebrtcConnection(Session session, ConnectionProperties connectionProperties, Player player) {
+
+		final String REQUEST_PATH = "/api/rooms/" + session.getSessionId();
+
+		log.info("newWebrtcConnection");
+		// While closing a session tokens can't be generated
+		if (session.closingLock.readLock().tryLock()) {
+			try {
+				Token token = sessionManager.newToken(session, connectionProperties.getRole(),
+						connectionProperties.getData(), connectionProperties.record(),
+						connectionProperties.getKurentoOptions(), player);
 				return new ResponseEntity<>(token.toJsonAsParticipant().toString(), RestUtils.getResponseHeaders(),
 						HttpStatus.OK);
 			} catch (Exception e) {

@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.http.HttpSession;
 
+import io.openvidu.server.game.Player;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.kurento.jsonrpc.DefaultJsonRpcHandler;
@@ -188,7 +189,12 @@ public class RpcHandler extends DefaultJsonRpcHandler<JsonObject> {
 		}
 	}
 
+	/**
+	 * 서영탁
+	 * 게입방 입장
+	 */
 	private void joinRoom(RpcConnection rpcConnection, Request<JsonObject> request) {
+		log.info("joinRoom request = {}", request);
 
 		String sessionId = getStringParam(request, ProtocolElements.JOINROOM_ROOM_PARAM);
 		String token = getStringParam(request, ProtocolElements.JOINROOM_TOKEN_PARAM);
