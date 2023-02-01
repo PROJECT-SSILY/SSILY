@@ -237,6 +237,11 @@ public class SessionRestController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
+		if(session.getSessionProperties().isPlaying()){
+			log.info("이미 게임이 진행중인 방입니다.");
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
 		ConnectionProperties connectionProperties;
 		try {
 			connectionProperties = getConnectionPropertiesFromParams(params).build();
@@ -248,7 +253,8 @@ public class SessionRestController {
 		int level = (int)params.get("level");
 		String nickname = (String) params.get("nickname");
 		double rate = (double) params.get("rate");
-		Player player = new Player(level,nickname, rate);
+		boolean isHost = (boolean) params.get("isHost");
+		Player player = new Player(level,nickname, rate, isHost);
 
 		switch (connectionProperties.getType()) {
 		case WEBRTC:
