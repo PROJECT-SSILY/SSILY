@@ -359,6 +359,8 @@ public class SessionProperties {
 
 	public Boolean isPlaying() { return this.isPlaying; }
 
+	public void setTitle(String title) { this.title=title; }
+
 	/**
 	 * 김윤미
 	 * @return

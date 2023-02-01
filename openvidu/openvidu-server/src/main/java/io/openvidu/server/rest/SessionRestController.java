@@ -73,6 +73,8 @@ import io.openvidu.server.recording.service.RecordingManager;
 import io.openvidu.server.utils.RecordingUtils;
 import io.openvidu.server.utils.RestUtils;
 
+import javax.ws.rs.Path;
+
 import static io.openvidu.server.exception.ExceptionCode.*;
 
 /**
@@ -98,6 +100,7 @@ public class SessionRestController {
 
 	/**
 	 * 김윤미
+	 * 게임 방 생성
 	 * @param params
 	 * @return
 	 */
@@ -138,6 +141,14 @@ public class SessionRestController {
 		}
 	}
 
+	/**
+	 * 김윤미
+	 * 게임 방 조회
+	 * @param sessionId
+	 * @param pendingConnections
+	 * @param webRtcStats
+	 * @return
+	 */
 	@RequestMapping(value = "/sessions/{sessionId}", method = RequestMethod.GET)
 	public ResponseEntity<?> getSession(@PathVariable("sessionId") String sessionId,
 			@RequestParam(value = "pendingConnections", defaultValue = "false", required = false) boolean pendingConnections,
@@ -160,6 +171,13 @@ public class SessionRestController {
 		}
 	}
 
+	/**
+	 * 김윤미
+	 * 게임 방 목록 조회
+	 * @param pendingConnections
+	 * @param webRtcStats
+	 * @return
+	 */
 	@RequestMapping(value = "/rooms", method = RequestMethod.GET)
 	public ResponseEntity<?> listSessions(
 			@RequestParam(value = "pendingConnections", defaultValue = "false", required = false) boolean pendingConnections,
@@ -177,6 +195,42 @@ public class SessionRestController {
 		json.addProperty("numberOfElements", sessions.size());
 		json.add("content", jsonArray);
 		return new ResponseEntity<>(json.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
+	}
+
+	/**
+	 * 김윤미
+	 * 게임방 정보 수정
+	 * @param roomId
+	 * @return
+	 */
+	@RequestMapping(value="/rooms/{room-id}", method = RequestMethod.PUT)
+	public ResponseEntity<?> modifySession(@PathVariable("room-id") String roomId, @RequestBody Map<?, ?> params,
+										   @RequestParam(value = "pendingConnections", defaultValue = "false", required = false) boolean pendingConnections,
+										   @RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
+
+		log.info("REST API: PUT {}/rooms", RequestMappings.API, roomId);
+		String title;
+		try {
+			title=(String)params.get("title");
+		}catch (Exception e) {
+			return this.generateErrorResponse(e.getMessage(), "/rooms", HttpStatus.BAD_REQUEST);
+		}
+
+		Session session = this.sessionManager.getSession(roomId);
+		if (session != null) {
+			session.getSessionProperties().setTitle(title);
+			JsonObject response = session.toJson(pendingConnections, webRtcStats);
+			return new ResponseEntity<>(response.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
+		} else {
+			Session sessionNotActive = this.sessionManager.getSessionNotActive(roomId);
+			if (sessionNotActive != null) {
+				sessionNotActive.getSessionProperties().setTitle(title);
+				JsonObject response = sessionNotActive.toJson(pendingConnections, webRtcStats);
+				return new ResponseEntity<>(response.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		}
 	}
 
 	@RequestMapping(value = "/sessions/{sessionId}", method = RequestMethod.DELETE)
