@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import io.openvidu.server.exception.ExceptionCode;
 import io.openvidu.server.exception.ExceptionResponseBody;
 import io.openvidu.server.game.Player;
-import io.openvidu.java.client.room.Team;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -810,7 +809,7 @@ public class SessionRestController {
 			String title=null;
 			Boolean isSecret=null;
 			String password=null;
-			Team team=null;
+			Boolean isTeamBattle=null;
 			try {
 				mediaModeString = (String) params.get("mediaMode");
 				recordingModeString = (String) params.get("recordingMode");
@@ -822,7 +821,7 @@ public class SessionRestController {
 				if(isSecret!=null && isSecret) {
 					password=(String) params.get("password");
 				}
-				team= Team.valueOf((String) params.get("team"));
+				isTeamBattle= (Boolean) params.get("isTeamBattle");
 			} catch (ClassCastException e) {
 				throw new Exception("Type error in some parameter: " + e.getMessage());
 			}
@@ -920,8 +919,8 @@ public class SessionRestController {
 					builder=builder.password(password);
 				}
 
-				if(team!=null) {
-					builder=builder.team(team);
+				if(isTeamBattle!=null) {
+					builder=builder.isTeamBattle(isTeamBattle);
 				}
 
 			} catch (IllegalArgumentException e) {
