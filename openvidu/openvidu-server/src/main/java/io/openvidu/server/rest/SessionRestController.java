@@ -233,18 +233,18 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions/{sessionId}", method = RequestMethod.DELETE)
-	public ResponseEntity<?> closeSession(@PathVariable("sessionId") String sessionId) {
+	@RequestMapping(value = "/rooms/{room-id}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> closeSession(@PathVariable("room-id") String roomId) {
 
-		log.info("REST API: DELETE {}/sessions/{}", RequestMappings.API, sessionId);
+		log.info("REST API: DELETE {}/rooms/{}", RequestMappings.API, roomId);
 
-		Session session = this.sessionManager.getSession(sessionId);
+		Session session = this.sessionManager.getSession(roomId);
 		if (session != null) {
-			this.sessionManager.closeSession(sessionId, EndReason.sessionClosedByServer);
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			this.sessionManager.closeSession(roomId, EndReason.sessionClosedByServer);
+			return new ResponseEntity<>(HttpStatus.OK);
 		}
 
-		Session sessionNotActive = this.sessionManager.getSessionNotActive(sessionId);
+		Session sessionNotActive = this.sessionManager.getSessionNotActive(roomId);
 		if (sessionNotActive != null) {
 			try {
 				if (sessionNotActive.closingLock.writeLock().tryLock(15, TimeUnit.SECONDS)) {
@@ -254,22 +254,22 @@ public class SessionRestController {
 						}
 						this.sessionManager.closeSessionAndEmptyCollections(sessionNotActive,
 								EndReason.sessionClosedByServer, true);
-						return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+						return new ResponseEntity<>(HttpStatus.OK);
 					} finally {
 						sessionNotActive.closingLock.writeLock().unlock();
 					}
 				} else {
-					String errorMsg = "Timeout waiting for Session " + sessionId
+					String errorMsg = "Timeout waiting for Session " + roomId
 							+ " closing lock to be available for closing from DELETE " + RequestMappings.API
 							+ "/sessions";
 					log.error(errorMsg);
-					return this.generateErrorResponse(errorMsg, "/sessions", HttpStatus.BAD_REQUEST);
+					return this.generateErrorResponse(errorMsg, "/rooms", HttpStatus.BAD_REQUEST);
 				}
 			} catch (InterruptedException e) {
-				String errorMsg = "InterruptedException while waiting for Session " + sessionId
-						+ " closing lock to be available for closing from DELETE " + RequestMappings.API + "/sessions";
+				String errorMsg = "InterruptedException while waiting for Session " + roomId
+						+ " closing lock to be available for closing from DELETE " + RequestMappings.API + "/rooms";
 				log.error(errorMsg);
-				return this.generateErrorResponse(errorMsg, "/sessions", HttpStatus.BAD_REQUEST);
+				return this.generateErrorResponse(errorMsg, "/rooms", HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
