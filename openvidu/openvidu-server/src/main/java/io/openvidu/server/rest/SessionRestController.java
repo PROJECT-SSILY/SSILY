@@ -158,12 +158,12 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions", method = RequestMethod.GET)
+	@RequestMapping(value = "/rooms", method = RequestMethod.GET)
 	public ResponseEntity<?> listSessions(
 			@RequestParam(value = "pendingConnections", defaultValue = "false", required = false) boolean pendingConnections,
 			@RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
 
-		log.info("REST API: GET {}/sessions", RequestMappings.API);
+		log.info("REST API: GET {}/rooms", RequestMappings.API);
 
 		Collection<Session> sessions = this.sessionManager.getSessionsWithNotActive();
 		JsonObject json = new JsonObject();
