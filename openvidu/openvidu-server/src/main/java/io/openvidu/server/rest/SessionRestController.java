@@ -144,24 +144,24 @@ public class SessionRestController {
 	/**
 	 * 김윤미
 	 * 게임 방 조회
-	 * @param sessionId
+	 * @param roomId
 	 * @param pendingConnections
 	 * @param webRtcStats
 	 * @return
 	 */
-	@RequestMapping(value = "/sessions/{sessionId}", method = RequestMethod.GET)
-	public ResponseEntity<?> getSession(@PathVariable("sessionId") String sessionId,
+	@RequestMapping(value = "/rooms/{room-id}", method = RequestMethod.GET)
+	public ResponseEntity<?> getSession(@PathVariable("room-id") String roomId,
 			@RequestParam(value = "pendingConnections", defaultValue = "false", required = false) boolean pendingConnections,
 			@RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
 
-		log.info("REST API: GET {}/sessions/{}", RequestMappings.API, sessionId);
+		log.info("REST API: GET {}/rooms/{}", RequestMappings.API, roomId);
 
-		Session session = this.sessionManager.getSession(sessionId);
+		Session session = this.sessionManager.getSession(roomId);
 		if (session != null) {
 			JsonObject response = session.toJson(pendingConnections, webRtcStats);
 			return new ResponseEntity<>(response.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
 		} else {
-			Session sessionNotActive = this.sessionManager.getSessionNotActive(sessionId);
+			Session sessionNotActive = this.sessionManager.getSessionNotActive(roomId);
 			if (sessionNotActive != null) {
 				JsonObject response = sessionNotActive.toJson(pendingConnections, webRtcStats);
 				return new ResponseEntity<>(response.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
