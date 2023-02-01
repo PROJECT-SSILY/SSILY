@@ -83,28 +83,28 @@ public class Participant {
 	 */
 	public Lock singleRecordingLock = new ReentrantLock();
 
-	public Participant(String finalUserId, String participantPrivateId, String participantPublicId, String sessionId,
-			String uniqueSessionId, Token token, String clientMetadata, GeoLocation location, String platform,
-			EndpointType endpointType, Long activeAt) {
-		this.finalUserId = finalUserId;
-		this.participantPrivateId = participantPrivateId;
-		this.participantPublicId = participantPublicId;
-		this.sessionId = sessionId;
-		this.uniqueSessionId = uniqueSessionId;
-		this.status = ParticipantStatus.active;
-		this.token = token;
-		if (activeAt != null) {
-			this.activeAt = activeAt;
-		} else {
-			this.activeAt = System.currentTimeMillis();
-		}
-		if (clientMetadata != null) {
-			this.clientMetadata = clientMetadata;
-		}
-		this.location = location;
-		this.platform = platform;
-		this.endpointType = endpointType;
-	}
+//	public Participant(String finalUserId, String participantPrivateId, String participantPublicId, String sessionId,
+//			String uniqueSessionId, Token token, String clientMetadata, GeoLocation location, String platform,
+//			EndpointType endpointType, Long activeAt) {
+//		this.finalUserId = finalUserId;
+//		this.participantPrivateId = participantPrivateId;
+//		this.participantPublicId = participantPublicId;
+//		this.sessionId = sessionId;
+//		this.uniqueSessionId = uniqueSessionId;
+//		this.status = ParticipantStatus.active;
+//		this.token = token;
+//		if (activeAt != null) {
+//			this.activeAt = activeAt;
+//		} else {
+//			this.activeAt = System.currentTimeMillis();
+//		}
+//		if (clientMetadata != null) {
+//			this.clientMetadata = clientMetadata;
+//		}
+//		this.location = location;
+//		this.platform = platform;
+//		this.endpointType = endpointType;
+//	}
 
 	/**
 	 * 서영탁
@@ -371,6 +371,7 @@ public class Participant {
 			json.add(entry.getKey(), entry.getValue());
 		});
 		json.addProperty("clientData", this.clientMetadata);
+		json.add("player", this.getPlayer().toJson());
 		return json;
 	}
 
