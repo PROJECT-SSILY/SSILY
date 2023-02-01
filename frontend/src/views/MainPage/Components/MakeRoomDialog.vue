@@ -114,20 +114,5 @@
         toWaiting
       }
     }
-    // data () {
-    //   return {
-    //     dialog: false,
-    //     row: null,
-    //     row2: null,
-    //     rules: {
-    //       required: value => !!value || '필수',
-    //     }
-    //   }
-    // },
-    // methods: {
-    //   toWaiting() {
-    //     this.$router.push({name: 'waiting'})
-    //   }
-    // }
   }
 </script>

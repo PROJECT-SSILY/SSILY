@@ -8,7 +8,7 @@
 import { makeRoomAction } from "@/common/api/gameAPI";
 
 const state = {
-    teamorprivate: null
+    teamorprivate: false
 }
 
 const getters = {
