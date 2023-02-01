@@ -245,6 +245,8 @@ export default {
             `${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`,
             {
               level: 1,
+              nickname : "서영탁",
+              rate : 70.1
             },
             {
               auth: {

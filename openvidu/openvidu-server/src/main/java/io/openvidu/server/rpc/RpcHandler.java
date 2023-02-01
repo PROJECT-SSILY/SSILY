@@ -93,7 +93,6 @@ public class RpcHandler extends DefaultJsonRpcHandler<JsonObject> {
 			throw e;
 		}
 
-		log.info("handleRequest request = {}", request);
 		log.debug("WebSocket session #{} - Request: {}", participantPrivateId, request);
 
 		RpcConnection rpcConnection;
@@ -190,10 +189,12 @@ public class RpcHandler extends DefaultJsonRpcHandler<JsonObject> {
 		}
 	}
 
+	/**
+	 * 서영탁
+	 * 게입방 입장
+	 */
 	private void joinRoom(RpcConnection rpcConnection, Request<JsonObject> request) {
-
 		log.info("joinRoom request = {}", request);
-		Player player = new Player();
 
 		String sessionId = getStringParam(request, ProtocolElements.JOINROOM_ROOM_PARAM);
 		String token = getStringParam(request, ProtocolElements.JOINROOM_TOKEN_PARAM);
@@ -298,7 +299,7 @@ public class RpcHandler extends DefaultJsonRpcHandler<JsonObject> {
 						} else {
 							participant = sessionManager.newParticipant(session, participantPrivateId, tokenObj,
 									clientMetadata, location, platform,
-									httpSession.getId().substring(0, Math.min(16, httpSession.getId().length())), player);
+									httpSession.getId().substring(0, Math.min(16, httpSession.getId().length())));
 							log.info("New Connection {} in Session {} with IP {} and platform {}",
 									participant.getParticipantPublicId(), sessionId, remoteAddress.getHostAddress(),
 									participant.getPlatform());

@@ -243,8 +243,10 @@ public class SessionRestController {
 					HttpStatus.BAD_REQUEST);
 		}
 
-		int level = (int) params.get("level");
-		Player player = new Player(level);
+		int level = (int)params.get("level");
+		String nickname = (String) params.get("nickname");
+		double rate = (double) params.get("rate");
+		Player player = new Player(level,nickname, rate);
 
 		switch (connectionProperties.getType()) {
 		case WEBRTC:
@@ -550,13 +552,7 @@ public class SessionRestController {
 					HttpStatus.BAD_REQUEST);
 		}
 
-		// TODO
-		/**
-		 * 서영탁
-		 * 오류때문에 일단 player 생성해서 넣어둠
-		 */
-		Player player = new Player();
-		ResponseEntity<?> entity = this.newWebrtcConnection(session, connectionProperties, player);
+		ResponseEntity<?> entity = this.newWebrtcConnection(session, connectionProperties);
 		JsonObject jsonResponse = JsonParser.parseString(entity.getBody().toString()).getAsJsonObject();
 
 		if (jsonResponse.has("error")) {
@@ -671,7 +667,7 @@ public class SessionRestController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	protected ResponseEntity<?> newWebrtcConnection(Session session, ConnectionProperties connectionProperties, Player player) {
+	protected ResponseEntity<?> newWebrtcConnection(Session session, ConnectionProperties connectionProperties) {
 
 		final String REQUEST_PATH = "/api/rooms/" + session.getSessionId();
 
@@ -682,6 +678,38 @@ public class SessionRestController {
 				Token token = sessionManager.newToken(session, connectionProperties.getRole(),
 						connectionProperties.getData(), connectionProperties.record(),
 						connectionProperties.getKurentoOptions());
+				return new ResponseEntity<>(token.toJsonAsParticipant().toString(), RestUtils.getResponseHeaders(),
+						HttpStatus.OK);
+			} catch (Exception e) {
+				return this.generateErrorResponse(
+						"Error creating Connection for session " + session.getSessionId() + ": " + e.getMessage(),
+						REQUEST_PATH, HttpStatus.INTERNAL_SERVER_ERROR);
+			} finally {
+				session.closingLock.readLock().unlock();
+			}
+		} else {
+			log.error("Session {} is in the process of closing. Connection couldn't be created",
+					session.getSessionId());
+			return this.generateErrorResponse("Session " + session.getSessionId() + " not found", REQUEST_PATH,
+					HttpStatus.NOT_FOUND);
+		}
+	}
+
+	/**
+	 * 서영탁
+	 * newWebrtcConnection override
+	 */
+	protected ResponseEntity<?> newWebrtcConnection(Session session, ConnectionProperties connectionProperties, Player player) {
+
+		final String REQUEST_PATH = "/api/rooms/" + session.getSessionId();
+
+		log.info("newWebrtcConnection");
+		// While closing a session tokens can't be generated
+		if (session.closingLock.readLock().tryLock()) {
+			try {
+				Token token = sessionManager.newToken(session, connectionProperties.getRole(),
+						connectionProperties.getData(), connectionProperties.record(),
+						connectionProperties.getKurentoOptions(), player);
 				return new ResponseEntity<>(token.toJsonAsParticipant().toString(), RestUtils.getResponseHeaders(),
 						HttpStatus.OK);
 			} catch (Exception e) {
