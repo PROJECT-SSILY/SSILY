@@ -28,6 +28,27 @@ const mutations = {
     setTeam: (state) => {
         state.teamorprivate = !state.teamorprivate;
     },
+    setOV: (state, data) => {
+        state.OV = data;
+    },
+    setSession: (state, data) => {
+        state.session = data;
+    },
+    setMainStreamManager: (state, data) => {
+        state.mainStreamManager = data;
+    },
+    setPublisher: (state, data) => {
+        state.publisher = data;
+    },
+    setSubscribers: (state, data) => {
+        state.subscribers = data;
+    },
+    setMySessionId: (state, id) => {
+        state.mySessionId = id;
+    },
+    setMyUserName: (state, name) => {
+        state.myUserName = name;
+    },
 }
 
 const actions = {
