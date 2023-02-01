@@ -82,7 +82,7 @@ import io.openvidu.server.utils.RestUtils;
 @RestController
 @CrossOrigin("*")
 @ConditionalOnMissingBean(name = "sessionRestControllerPro")
-@RequestMapping(RequestMappings.API)
+@RequestMapping("/api")
 public class SessionRestController {
 
 	private static final Logger log = LoggerFactory.getLogger(SessionRestController.class);

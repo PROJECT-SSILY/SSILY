@@ -32,6 +32,9 @@
 				<user-video :stream-manager="publisher" @click.native="updateMainVideoStreamManager(publisher)"/>
 				<user-video v-for="sub in subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click.native="updateMainVideoStreamManager(sub)"/>
 			</div>
+			<div id="chat-head" class="col-md-6">
+				<chatting :session="session"/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -40,6 +43,7 @@
 import axios from 'axios';
 import { OpenVidu } from 'openvidu-browser';
 import UserVideo from './components/UserVideo';
+import Chatting from './components/Chatting';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -51,6 +55,7 @@ export default {
 
 	components: {
 		UserVideo,
+		Chatting,
 	},
 
 	data () {
@@ -169,7 +174,7 @@ export default {
 		createSession (sessionId) {
 			return new Promise((resolve, reject) => {
 				axios
-					.post(`${OPENVIDU_SERVER_URL}/openvidu/api/sessions`, JSON.stringify({
+					.post(`${OPENVIDU_SERVER_URL}/api/sessions`, JSON.stringify({
 						customSessionId: sessionId,
 					}), {
 						auth: {
@@ -197,7 +202,7 @@ export default {
 		createToken (sessionId) {
 			return new Promise((resolve, reject) => {
 				axios
-					.post(`${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${sessionId}/connection`, {}, {
+					.post(`${OPENVIDU_SERVER_URL}/api/sessions/${sessionId}/connection`, {}, {
 						auth: {
 							username: 'OPENVIDUAPP',
 							password: OPENVIDU_SERVER_SECRET,
