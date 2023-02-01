@@ -39,7 +39,7 @@
 
 
   <div id="main-container" class="container">
-		<div id="join" v-if="!state.session">
+		<div id="join" v-if="!session">
 			<div id="img-div"><img src="resources/images/openvidu_grey_bg_transp_cropped.png" /></div>
 			<div id="join-dialog" class="jumbotron vertical-center">
 				<h1>Join a video session</h1>
@@ -59,20 +59,20 @@
 			</div>
 		</div>
 
-		<div id="session" v-if="state.session">
+		<div id="session" v-if="session">
 			<div id="session-header">
-				<h1 id="session-title">{{ state.mySessionId }}</h1>
+				<h1 id="session-title">{{ mySessionId }}</h1>
 				<input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="Leave session">
 			</div>
 			<div id="main-video" class="col-md-6">
-				<user-video :stream-manager="state.mainStreamManager"/>
+				<user-video :stream-manager="mainStreamManager"/>
 			</div>
 			<div id="video-container" class="col-md-6">
-				<user-video :stream-manager="state.publisher" @click="updateMainVideoStreamManager(state.publisher)"/>
-				<user-video v-for="sub in state.subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click="updateMainVideoStreamManager(sub)"/>
+				<user-video :stream-manager="publisher" @click="updateMainVideoStreamManager(publisher)"/>
+				<user-video v-for="sub in subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click="updateMainVideoStreamManager(sub)"/>
 			</div>
 			<div id="chat-head" class="col-md-6">
-				<chatting-box :session="state.session"/>
+				<chatting-box :session="session"/>
 			</div>
 		</div>
 	</div>
@@ -88,7 +88,6 @@ import { useStore } from 'vuex';
 
 //=================OpenVdue====================
 
-import { OpenVidu } from 'openvidu-browser';
 import UserVideo from './components/UserVideo.vue';
 import ChattingBox from './components/ChattingBox.vue';
 
@@ -137,66 +136,74 @@ export default {
     const clickReady = () => {
       state.ready = !state.ready
     }
+    // const teamOrPrivate = async function() {
+    //   const switchvalue = state.switch1
+    //   console.log(switchvalue);
+    //   await store.dispatch('gameStore/isTeam', switchvalue)
+    // }
 
+    const joinSession = async function() {
+		store.dispatch('gameStore/joinSession')
+		const session = store.getters['gameStore/getsession']
+		state.session = session
+		console.log('joinsession 후 : ', state.session)
+			// state.OV = new OpenVidu(); // --- Get an OpenVidu object ---
+			// state.session = state.OV.initSession();// --- Init a session ---
+			// // --- Specify the actions when events take place in the session ---
+			// // On every new Stream received...
+			// state.session.on('streamCreated', ({ stream }) => {
+      //   const subscriber = state.session.subscribe(stream);
+			// 	state.subscribers.push(subscriber);
+			// });
 
-    const joinSession = () => {
-			state.OV = new OpenVidu(); // --- Get an OpenVidu object ---
-			state.session = state.OV.initSession();// --- Init a session ---
-			// --- Specify the actions when events take place in the session ---
-			// On every new Stream received...
-			state.session.on('streamCreated', ({ stream }) => {
-        const subscriber = state.session.subscribe(stream);
-				state.subscribers.push(subscriber);
-			});
-
-			// On every Stream destroyed...
-			state.session.on('streamDestroyed', ({ stream }) => {
-				const index = state.subscribers.indexOf(stream.streamManager, 0);
-				if (index >= 0) {
-          state.subscribers.splice(index, 1);
-				}
-			});
+			// // On every Stream destroyed...
+			// state.session.on('streamDestroyed', ({ stream }) => {
+			// 	const index = state.subscribers.indexOf(stream.streamManager, 0);
+			// 	if (index >= 0) {
+      //     state.subscribers.splice(index, 1);
+			// 	}
+			// });
       
-			// On every asynchronous exception...
-			state.session.on('exception', ({ exception }) => {
-        console.warn(exception);
-			});
+			// // On every asynchronous exception...
+			// state.session.on('exception', ({ exception }) => {
+      //   console.warn(exception);
+			// });
       
-      console.log("ok")
-			// --- Connect to the session with a valid user token ---
+      // console.log("ok")
+			// // --- Connect to the session with a valid user token ---
 
-			// 'getToken' method is simulating what your server-side should do.
-			// 'token' parameter should be retrieved and returned by your own backend
-			getToken(state.mySessionId).then(token => {
-				state.session.connect(token, { clientData: state.myUserName })
-					.then(() => {
+			// // 'getToken' method is simulating what your server-side should do.
+			// // 'token' parameter should be retrieved and returned by your own backend
+			// getToken(state.mySessionId).then(token => {
+			// 	state.session.connect(token, { clientData: state.myUserName })
+			// 		.then(() => {
 
-						// --- Get your own camera stream with the desired properties ---
+			// 			// --- Get your own camera stream with the desired properties ---
 
-						let publisher = state.OV.initPublisher(undefined, {
-							audioSource: undefined, // The source of audio. If undefined default microphone
-							videoSource: undefined, // The source of video. If undefined default webcam
-							publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
-							publishVideo: true,  	// Whether you want to start publishing with your video enabled or not
-							resolution: '640x480',  // The resolution of your video
-							frameRate: 30,			// The frame rate of your video
-							insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
-							mirror: false       	// Whether to mirror your local video or not
-						});
+			// 			let publisher = state.OV.initPublisher(undefined, {
+			// 				audioSource: undefined, // The source of audio. If undefined default microphone
+			// 				videoSource: undefined, // The source of video. If undefined default webcam
+			// 				publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
+			// 				publishVideo: true,  	// Whether you want to start publishing with your video enabled or not
+			// 				resolution: '640x480',  // The resolution of your video
+			// 				frameRate: 30,			// The frame rate of your video
+			// 				insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
+			// 				mirror: false       	// Whether to mirror your local video or not
+			// 			});
 
-						state.mainStreamManager = publisher;
-						state.publisher = publisher;
+			// 			state.mainStreamManager = publisher;
+			// 			state.publisher = publisher;
 
-						// --- Publish your stream ---
+			// 			// --- Publish your stream ---
 
-						state.session.publish(state.publisher);
-					})
-					.catch(error => {
-						console.log('There was an error connecting to the session:', error.code, error.message);
-					});
-			});
+			// 			state.session.publish(state.publisher);
+			// 		})
+			// 		.catch(error => {
+			// 			console.log('There was an error connecting to the session:', error.code, error.message);
+			// 		});
+			// });
 
-			window.addEventListener('beforeunload', state.leaveSession)
+			// window.addEventListener('beforeunload', state.leaveSession)
 		}
 
 		const leaveSession = () => {
