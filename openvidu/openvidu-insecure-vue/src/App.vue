@@ -1,71 +1,45 @@
 <template>
-  <div id="main-container" class="container">
-    <div id="join" v-if="!session">
-      <div id="img-div">
-        <img src="resources/images/openvidu_grey_bg_transp_cropped.png" />
-      </div>
-      <div id="join-dialog" class="jumbotron vertical-center">
-        <h1>Join a video session</h1>
-        <div class="form-group">
-          <p>
-            <label>Participant</label>
-            <input
-              v-model="myUserName"
-              class="form-control"
-              type="text"
-              required
-            />
-          </p>
-          <p>
-            <label>Session</label>
-            <input
-              v-model="mySessionId"
-              class="form-control"
-              type="text"
-              required
-            />
-          </p>
-          <p class="text-center">
-            <button class="btn btn-lg btn-success" @click="joinSession()">
-              Join!
-            </button>
-          </p>
-        </div>
-      </div>
-    </div>
+	<div id="main-container" class="container">
+		<div id="join" v-if="!session">
+			<div id="img-div"><img src="resources/images/openvidu_grey_bg_transp_cropped.png" /></div>
+			<div id="join-dialog" class="jumbotron vertical-center">
+				<h1>Join a video session</h1>
+				<div class="form-group">
+					<p>
+						<label>Participant</label>
+						<input v-model="myUserName" class="form-control" type="text" required>
+					</p>
+					<p>
+						<label>Session</label>
+						<input v-model="mySessionId" class="form-control" type="text" required>
+					</p>
+					<p class="text-center">
+						<button class="btn btn-lg btn-success" @click="createTest()">방생성!</button>
+            <button class="btn btn-lg btn-success" @click="joinSession()">Join!</button>
+					</p>
+				</div>
+			</div>
+		</div>
 
-    <div id="session" v-if="session">
-      <div id="session-header">
-        <h1 id="session-title">{{ mySessionId }}</h1>
-        <input
-          class="btn btn-large btn-danger"
-          type="button"
-          id="buttonLeaveSession"
-          @click="leaveSession"
-          value="Leave session"
-        />
-      </div>
-      <div id="main-video" class="col-md-6">
-        <user-video :stream-manager="mainStreamManager" />
-      </div>
-      <div id="video-container" class="col-md-6">
-        <user-video
-          :stream-manager="publisher"
-          @click.native="updateMainVideoStreamManager(publisher)"
-        />
-        <user-video
-          v-for="sub in subscribers"
-          :key="sub.stream.connection.connectionId"
-          :stream-manager="sub"
-          @click.native="updateMainVideoStreamManager(sub)"
-        />
-        <div id="chat-head" class="col-md-6">
+		<div id="session" v-if="session">
+			<div id="session-header">
+				<h1 id="session-title">{{ mySessionId }}</h1>
+				<input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="Leave session">
+			</div>
+			<div id="main-video" class="col-md-6">
+				<user-video :stream-manager="mainStreamManager"/>
+			</div>
+			<div id="video-container" class="col-md-6">
+				<user-video :stream-manager="publisher" @click.native="updateMainVideoStreamManager(publisher)"/>
+				<user-video v-for="sub in subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click.native="updateMainVideoStreamManager(sub)"/>
+			</div>
+			<div id="chat-head" class="col-md-6">
 				<chatting :session="session"/>
 			</div>
-      </div>
-    </div>
-  </div>
+		</div>
+	</div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -265,6 +239,25 @@ export default {
             }
           });
       });
+    },
+
+    createTest() {
+      axios
+          .post(
+            `${OPENVIDU_SERVER_URL}/api/rooms`,
+            JSON.stringify({
+              title: "방제목2",
+              isSecret: true,
+              password: "1234",
+              team:"NONE",
+            }),
+            {
+              auth: {
+                username: "OPENVIDUAPP",
+                password: OPENVIDU_SERVER_SECRET,
+              },
+            }
+          )
     },
 
     // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-connection

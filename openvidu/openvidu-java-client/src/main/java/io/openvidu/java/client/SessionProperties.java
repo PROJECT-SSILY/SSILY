@@ -40,8 +40,8 @@ public class SessionProperties {
 	private String title;
 	private Boolean isSecret;
 	private String password;
-
 	private Team team;
+	private Boolean isPlaying;
 
 	/**
 	 * Builder for {@link io.openvidu.java.client.SessionProperties}
@@ -63,8 +63,8 @@ public class SessionProperties {
 		private String title="";
 		private Boolean isSecret=false;
 		private String password="";
-
 		private Team team=Team.NONE;
+		private Boolean isPlaying=false;
 
 		/**
 		 * Returns the {@link io.openvidu.java.client.SessionProperties} object properly
@@ -73,7 +73,7 @@ public class SessionProperties {
 		public SessionProperties build() {
 			return new SessionProperties(this.mediaMode, this.recordingMode, this.defaultRecordingProperties,
 					this.customSessionId, this.mediaNode, this.forcedVideoCodec, this.forcedVideoCodecResolved,
-					this.allowTranscoding, this.title, this.isSecret, this.password, this.team);
+					this.allowTranscoding, this.title, this.isSecret, this.password, this.team, this.isPlaying);
 		}
 
 		/**
@@ -182,7 +182,7 @@ public class SessionProperties {
 
 		/**
 		 * 김윤미
-		 * @param title
+		 * @param title, isSecret, password, team, isPlaying
 		 * @return
 		 */
 		public SessionProperties.Builder title(String title) {
@@ -202,6 +202,11 @@ public class SessionProperties {
 
 		public SessionProperties.Builder team(Team team) {
 			this.team=team;
+			return this;
+		}
+
+		public SessionProperties.Builder isPlaying(Boolean isPlaying) {
+			this.isPlaying=isPlaying;
 			return this;
 		}
 	}
@@ -241,10 +246,12 @@ public class SessionProperties {
 	 * @param isSecret
 	 * @param password
 	 * @param team
+	 * @param isPlaying
 	 */
 	private SessionProperties(MediaMode mediaMode, RecordingMode recordingMode,
 							  RecordingProperties defaultRecordingProperties, String customSessionId, String mediaNode,
-							  VideoCodec forcedVideoCodec, VideoCodec forcedVideoCodecResolved, Boolean allowTranscoding, String title, Boolean isSecret, String password, Team team) {
+							  VideoCodec forcedVideoCodec, VideoCodec forcedVideoCodecResolved, Boolean allowTranscoding,
+							  String title, Boolean isSecret, String password, Team team, Boolean isPlaying) {
 		this.mediaMode = mediaMode;
 		this.recordingMode = recordingMode;
 		this.defaultRecordingProperties = defaultRecordingProperties;
@@ -257,6 +264,7 @@ public class SessionProperties {
 		this.isSecret=isSecret;
 		this.password=password;
 		this.team=team;
+		this.isPlaying=isPlaying;
 	}
 
 	/**
@@ -350,6 +358,8 @@ public class SessionProperties {
 
 	public Team team() { return this.team; }
 
+	public Boolean isPlaying() { return this.isPlaying; }
+
 	/**
 	 * 김윤미
 	 * @return
@@ -380,6 +390,7 @@ public class SessionProperties {
 		json.addProperty("isSecret", this.isSecret);
 		json.addProperty("password", this.password);
 		json.addProperty("team", this.team.toString());
+		json.addProperty("isPlaying", this.isPlaying);
 		return json;
 	}
 
