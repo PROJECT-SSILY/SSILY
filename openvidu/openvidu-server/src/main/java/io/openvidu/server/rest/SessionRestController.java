@@ -277,19 +277,24 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions/{sessionId}/connection/{connectionId}", method = RequestMethod.GET)
-	public ResponseEntity<?> getConnection(@PathVariable("sessionId") String sessionId,
-			@PathVariable("connectionId") String connectionId) {
+	/**
+	 * 서영탁
+	 * 참여자 정보 조회
+	 * @return
+	 */
+	@RequestMapping(value = "/rooms/{room-id}/players/{player-id}", method = RequestMethod.GET)
+	public ResponseEntity<?> getConnection(@PathVariable("room-id") String roomId,
+			@PathVariable("player-id") String playerId) {
 
-		log.info("REST API: GET {}/sessions/{}/connection/{}", RequestMappings.API, sessionId, connectionId);
+		log.info("REST API: GET {}/rooms/{}/players/{}", "/api", roomId, playerId);
 
-		Session session = this.sessionManager.getSessionWithNotActive(sessionId);
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
 		if (session != null) {
-			Participant p = session.getParticipantByPublicId(connectionId);
+			Participant p = session.getParticipantByPublicId(playerId);
 			if (p != null) {
 				return new ResponseEntity<>(p.toJson().toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
 			} else {
-				Token t = getTokenFromConnectionId(connectionId, session.getTokenIterator());
+				Token t = getTokenFromConnectionId(playerId, session.getTokenIterator());
 				if (t != null) {
 					return new ResponseEntity<>(t.toJsonAsParticipant().toString(), RestUtils.getResponseHeaders(),
 							HttpStatus.OK);
