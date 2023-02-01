@@ -24,7 +24,7 @@ const state = {
     mainStreamManager: undefined,
     publisher: undefined,
     subscribers: [],
-    mySessionId: 'sessionA',
+    mySessionId: '',
     myUserName: '',
 }
 
@@ -35,6 +35,9 @@ const getters = {
     getSession: (state) => {
         return state.session;
     },
+    getSessionId: (state) => {
+      return state.mySessionId;
+    }
 }
 
 const mutations = {
@@ -79,7 +82,7 @@ const actions = {
             throw err;
         }
     },
-    // ---------------openvidu-----------------------------------------------
+    // ---------------openvidu-------------------
     joinSession: ({dispatch, state, commit}) => {
       const OV = new OpenVidu();
       const session = OV.initSession();
@@ -89,48 +92,41 @@ const actions = {
         const subscriber = session.subscribe(stream);
 				subscribers.push(subscriber);
 			});
-      console.log('streamCreated 완')
+
+
       session.on("streamDestroyed", ({ stream }) => {
         const index = subscribers.indexOf(stream.streamManager, 0);
         if (index >= 0) {
           subscribers.splice(index, 1);
         }
       });
-      console.log('streamDestroyed 완')
 
       session.on("exception", ({ exception }) => {
         console.warn(exception);
       });
 
-      console.log('mySessionId', state.mySessionId)
       
-      // get token
       dispatch("getToken", state.mySessionId).then(token => {
         session
         .connect(token, { clientData: state.myUserName })
         .then(()=>{
 
           let publisher = OV.initPublisher(undefined, {
-            audioSource: undefined, // The source of audio. If undefined default microphone
-            videoSource: undefined, // The source of video. If undefined default webcam
-            publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
-            publishVideo: true,  	// Whether you want to start publishing with your video enabled or not
-            resolution: '640x480',  // The resolution of your video
-            frameRate: 30,			// The frame rate of your video
-            insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
-            mirror: false       	// Whether to mirror your local video or not
+            audioSource: undefined, 
+            videoSource: undefined, 
+            publishAudio: true,  	
+            publishVideo: true, 
+            resolution: '640x480', 
+            frameRate: 30,			
+            insertMode: 'APPEND',	
+            mirror: false       
           });
-          // 추가
           commit("setOV", OV)
           commit("setSession", session)
-
-          // WaitingPage에 있음
           commit("setMainStreamManager", publisher)
           commit("setPublisher", publisher)
-          console.log('state변경완 : ', state)
 
           session.publish(publisher)
-          console.log('publish완')
         })
         .catch(error => {
           console.log('There was an error connecting to the session:', error.code, error.message);
@@ -140,18 +136,16 @@ const actions = {
     },
 
     getToken: ({dispatch}, mySessionId) => {
-      console.log('gettoken진입')
-      console.log('gettoken에 있는 mysessionId', mySessionId)
       return dispatch("createSession", mySessionId)
       .then((mySessionId) =>
       dispatch("createToken", mySessionId)
       )
     },
     createToken: (context, mySessionId) => {
-      console.log('sessionId',mySessionId);
       return new Promise((resolve, reject)=> {
         $axios
 					.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
+            // 하드코딩한 부분 나중에 수정 필요
             "level" : 5,
             "nickname" : "회원 닉네임",
             "rate" : 0.5,
@@ -169,11 +163,10 @@ const actions = {
 
     },
     createSession: (context, sessionId) => {
-      console.log('createsession 진입 session Id : ', sessionId)
       return new Promise((resolve, reject) => {
-        console.log("DDDDDD")
 				$axios
 					.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+            // 하드코딩한 부분 나중에 수정 필요
             "title" : "방제목",
             "isSecret" : false,
             "password" : "123",
@@ -198,6 +191,19 @@ const actions = {
 						}
 					});
 			});
+    },
+    leaveSession: (commit) => {
+      if (state.session) state.session.disconnect();
+      commit("setSession", undefined)
+      commit("setMainStreamManager", undefined)
+      commit("setPublisher", undefined)
+      commit("setSubscribers", [])
+      commit("setOV", undefined)
+    },
+    
+    updateMainVideoStreamManager: (commit, stream) => {
+      if (state.mainStreamManager === stream) return;
+      commit("setMainStreamManager", stream)
     }
 }
 
