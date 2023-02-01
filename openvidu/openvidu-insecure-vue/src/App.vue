@@ -59,26 +59,12 @@
           :stream-manager="sub"
           @click.native="updateMainVideoStreamManager(sub)"
         />
+        <div id="chat-head" class="col-md-6">
+				<chatting :session="session"/>
+			</div>
       </div>
     </div>
   </div>
-		<div id="session" v-if="session">
-			<div id="session-header">
-				<h1 id="session-title">{{ mySessionId }}</h1>
-				<input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="Leave session">
-			</div>
-			<div id="main-video" class="col-md-6">
-				<user-video :stream-manager="mainStreamManager"/>
-			</div>
-			<div id="video-container" class="col-md-6">
-				<user-video :stream-manager="publisher" @click.native="updateMainVideoStreamManager(publisher)"/>
-				<user-video v-for="sub in subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click.native="updateMainVideoStreamManager(sub)"/>
-			</div>
-			<div id="chat-head" class="col-md-6">
-				<chatting :session="session"/>
-			</div>
-		</div>
-	</div>
 </template>
 
 <script>
@@ -234,6 +220,14 @@ export default {
           },
         }
       );
+
+      axios.get(`${OPENVIDU_SERVER_URL}/api/rooms`, {
+        auth: {
+          username: "OPENVIDUAPP",
+          password: OPENVIDU_SERVER_SECRET,
+        },
+      })
+
       return new Promise((resolve, reject) => {
         axios
           .post(
