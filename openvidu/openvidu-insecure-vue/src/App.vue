@@ -240,7 +240,7 @@ export default {
               title: "방제목2",
               isSecret: true,
               password: "1234",
-              team: "NONE",
+              isTeamBattle: false,
               customSessionId: this.mySessionId,
             }),
             {

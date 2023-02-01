@@ -18,7 +18,6 @@
 package io.openvidu.java.client;
 
 import com.google.gson.JsonObject;
-import io.openvidu.java.client.room.Team;
 
 /**
  * See {@link io.openvidu.java.client.OpenVidu#createSession(SessionProperties)}
@@ -40,7 +39,7 @@ public class SessionProperties {
 	private String title;
 	private Boolean isSecret;
 	private String password;
-	private Team team;
+	private Boolean isTeamBattle;
 	private Boolean isPlaying;
 
 	/**
@@ -63,7 +62,7 @@ public class SessionProperties {
 		private String title="";
 		private Boolean isSecret=false;
 		private String password="";
-		private Team team=Team.NONE;
+		private Boolean isTeamBattle=false;
 		private Boolean isPlaying=false;
 
 		/**
@@ -73,7 +72,7 @@ public class SessionProperties {
 		public SessionProperties build() {
 			return new SessionProperties(this.mediaMode, this.recordingMode, this.defaultRecordingProperties,
 					this.customSessionId, this.mediaNode, this.forcedVideoCodec, this.forcedVideoCodecResolved,
-					this.allowTranscoding, this.title, this.isSecret, this.password, this.team, this.isPlaying);
+					this.allowTranscoding, this.title, this.isSecret, this.password, this.isTeamBattle, this.isPlaying);
 		}
 
 		/**
@@ -200,8 +199,8 @@ public class SessionProperties {
 			return this;
 		}
 
-		public SessionProperties.Builder team(Team team) {
-			this.team=team;
+		public SessionProperties.Builder isTeamBattle(Boolean isTeamBattle) {
+			this.isTeamBattle=isTeamBattle;
 			return this;
 		}
 
@@ -245,13 +244,13 @@ public class SessionProperties {
 	 * @param title
 	 * @param isSecret
 	 * @param password
-	 * @param team
+	 * @param isTeamBattle
 	 * @param isPlaying
 	 */
 	private SessionProperties(MediaMode mediaMode, RecordingMode recordingMode,
 							  RecordingProperties defaultRecordingProperties, String customSessionId, String mediaNode,
 							  VideoCodec forcedVideoCodec, VideoCodec forcedVideoCodecResolved, Boolean allowTranscoding,
-							  String title, Boolean isSecret, String password, Team team, Boolean isPlaying) {
+							  String title, Boolean isSecret, String password, Boolean isTeamBattle, Boolean isPlaying) {
 		this.mediaMode = mediaMode;
 		this.recordingMode = recordingMode;
 		this.defaultRecordingProperties = defaultRecordingProperties;
@@ -263,7 +262,7 @@ public class SessionProperties {
 		this.title=title;
 		this.isSecret=isSecret;
 		this.password=password;
-		this.team=team;
+		this.isTeamBattle=isTeamBattle;
 		this.isPlaying=isPlaying;
 	}
 
@@ -356,7 +355,7 @@ public class SessionProperties {
 
 	public String password() { return this.password; }
 
-	public Team team() { return this.team; }
+	public Boolean isTeamBattle() { return this.isTeamBattle; }
 
 	public Boolean isPlaying() { return this.isPlaying; }
 
@@ -389,7 +388,7 @@ public class SessionProperties {
 		json.addProperty("title", this.title);
 		json.addProperty("isSecret", this.isSecret);
 		json.addProperty("password", this.password);
-		json.addProperty("team", this.team.toString());
+		json.addProperty("isTeamBattle", this.isTeamBattle);
 		json.addProperty("isPlaying", this.isPlaying);
 		return json;
 	}
