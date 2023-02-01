@@ -41,12 +41,12 @@ public class Player {
         this.isHost = false;
     }
 
-    public Player(int level, String nickname, double rate) {
+    public Player(int level, String nickname, double rate, boolean isHost) {
         this.score = 0;
         this.team = Team.NONE;
         this.isPresenter = false;
         this.isReady = false;
-        this.isHost = false;
+        this.isHost = isHost;
         this.level = level;
         this.nickname = nickname;
         this.rate = rate;
