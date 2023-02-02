@@ -220,7 +220,7 @@ const actions = {
             "title" : myTitle,
             "isSecret" : state.isSecret,
             "password" : state.password,
-            "team" : state.isTeamBattle
+            "isTeamBattle" : state.isTeamBattle
           }), {
 						auth: {
 							username: 'OPENVIDUAPP',
