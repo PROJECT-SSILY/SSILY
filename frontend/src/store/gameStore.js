@@ -9,7 +9,10 @@ const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 
 const state = {
-    teamorprivate: null,
+    title: null,
+    isSecret: false,
+    password: null,
+    isTeamBattle: null,
     OV: undefined,
     session: undefined,
     title: '',
@@ -19,23 +22,38 @@ const state = {
     mySessionId: '',
     myUserName: '',
     isHost: true,
+
 }
 
 const getters = {
     getTeam: (state) => {
-        return state.teamorprivate;
+        return state.isTeamBattle;
     },
     getSession: (state) => {
         return state.session;
     },
     getSessionId: (state) => {
       return state.mySessionId;
-    }
+    },
+    getTitle: (state) => {
+      return state.title;
+    },
+    
 }
 
 const mutations = {
-    setTeam: (state) => {
-        state.teamorprivate = !state.teamorprivate;
+    
+    setTitle: (state, data) => {
+        state.title = data
+    },
+    setSecret: (state, payload) => {
+        state.isSecret = payload
+    },
+    setPassword: (state, payload) => {
+        state.password = payload
+    },
+    setTeam: (state, payload) => {
+        state.isTeamBattle = payload
     },
     setOV: (state, data) => {
         state.OV = data;
@@ -131,66 +149,75 @@ const actions = {
     },
 
     getToken: ({dispatch}, mySessionId) => {
+      console.log('gettoken 진입')
       return dispatch("createSession", mySessionId)
       .then((mySessionId) =>
       dispatch("createToken", mySessionId)
       )
     },
     createToken: (context, mySessionId) => {
-        const level = context.rootState.accountStore.level
-        const nickname = context.rootState.accountStore.nickname
-        // const rate = context.rootState.accountStore.rate
-        const isHost = state.isHost
-        console.log(level)
-        return new Promise((resolve, reject)=> {
+      console.log('안됨?')
+      const level = context.rootState.accountStore.user.level
+      const nickname = context.rootState.accountStore.user.nickname
+      const isHost = state.isHost
+      const rate = context.rootGetters['accountStore/getRate']
+      console.log('------------',rate)
+      return new Promise((resolve, reject)=> {
+        console.log("level=",level);
+        console.log("nickname=",nickname);
+        console.log("isHost=", isHost);
+        console.log("rate=", rate);
+
         $axios
-			.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
-            // 하드코딩한 부분 나중에 수정 필요
-                "level" : level,
-                "nickname" : nickname,
-                "rate" : 0.1,
-                "isHost" : isHost,
-            }), {
-                auth: {
-                    username: 'OPENVIDUAPP',
-                    password: OPENVIDU_SERVER_SECRET,
-                },
-            })
-            .then(response => response.data)
-            .then(data => resolve(data.token))
-            .catch(error => reject(error.response));
+					.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
+            "level" : level,
+            "nickname" : nickname,
+            "rate" : rate,
+            "isHost" : isHost,
+          }), {
+						auth: {
+							username: 'OPENVIDUAPP',
+							password: OPENVIDU_SERVER_SECRET,
+						},
+					})
+					.then(response => response.data)
+					.then(data => resolve(data.token))
+					.catch(error => reject(error.response));
       })
 
     },
     createSession: (context, sessionId) => {
+      const myTitle= state.title;
+      console.log("내 타이틀 이거임", myTitle);
       return new Promise((resolve, reject) => {
-        $axios
-            .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
-                // 하드코딩한 부분 나중에 수정 필요
-                "title" : "방제목",
-                "isSecret" : false,
-                "password" : "123",
-                "team" : "NONE"
-            }), {
-                auth: {
-                    username: 'OPENVIDUAPP',
-                    password: OPENVIDU_SERVER_SECRET,
-                },
-            })
-            .then(response => response.data)
-            .then(data => resolve(data.id))
-            .catch(error => {
-                if (error.response.status === 409) {
-                    resolve(sessionId);
-                } else {
-                    console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
-                    if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
-                        location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
-                    }
-                    reject(error.response);
-                }
-            });
-        });
+				$axios
+					.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+            // 하드코딩한 부분 나중에 수정 필요
+
+            "title" : myTitle,
+            "isSecret" : state.isSecret,
+            "password" : state.password,
+            "team" : state.isTeamBattle
+          }), {
+						auth: {
+							username: 'OPENVIDUAPP',
+							password: OPENVIDU_SERVER_SECRET,
+						},
+					})
+					.then(response => response.data)
+					.then(data => resolve(data.id))
+					.catch(error => {
+						if (error.response.status === 409) {
+							resolve(sessionId);
+						} else {
+							console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
+							if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
+								location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
+							}
+							reject(error.response);
+						}
+					});
+			});
     },
     leaveSession: (commit) => {
       if (state.session) state.session.disconnect();

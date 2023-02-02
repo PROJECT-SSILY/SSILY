@@ -1,21 +1,20 @@
 <template>
     <div>
-  <div id='chat-area'>
-    <div v-for="val in chat" v-bind:key="val.id">
-            <div v-if="val.user === myUserNick" class="mychat">
-               {{ val.text }}
+    <div id='chat-area'>
+        <div v-for="val in chat" v-bind:key="val.id">
+                <div v-if="val.user === myUserNick" class="mychat">
+                    {{ val.text }}
+                </div>
+                <div v-else class="otherchat">
+                    {{ val.user }} : {{ val.text }}
+                </div>
             </div>
-            <div v-else class="otherchat">
-               {{ val.user }} : {{ val.text }}
-            </div>
-         
-         </div>
+        </div>
+    <div class='chat_input'>
+            <input v-model='chattings' @keyup.enter='sendMessage' placeholder="input message.." type="text" class="message_input"/>
+            <button :disabled="!chattings" @click='sendMessage' type="submit" class="message_submit">Send</button>
+        </div>
     </div>
-  <div class='chat_input'>
-         <input v-model='chattings' @keyup.enter='sendMessage' placeholder="input message.." type="text" class="message_input"/>
-         <button :disabled="!chattings" @click='sendMessage' type="submit" class="message_submit">Send</button>
-    </div>
-</div>
 </template>
 
 <script>
