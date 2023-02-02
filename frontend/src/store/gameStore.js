@@ -211,6 +211,7 @@ const actions = {
     createSession: (context, sessionId) => {
       const myTitle= state.title;
       console.log("내 타이틀 이거임", myTitle);
+      console.log("createsession 팀 ", state.isTeamBattle);
       return new Promise((resolve, reject) => {
 			$axios
 			.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({

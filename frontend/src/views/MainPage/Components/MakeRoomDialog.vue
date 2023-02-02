@@ -123,6 +123,7 @@
       const joinSession = async function() {
         
         if (state.isTeamBattle === "radio-1") {
+          console.log("team 적용됨")
           state.isTeamBattle = true
         } else {
           state.isTeamBattle = false
