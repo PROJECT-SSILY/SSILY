@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import io.openvidu.server.exception.ExceptionResponseBody;
+import io.openvidu.server.game.GameService;
 import io.openvidu.server.game.Player;
 import io.openvidu.server.game.Team;
 import org.slf4j.Logger;
@@ -1623,5 +1624,13 @@ public class SessionRestController {
 		log.warn("REST API error response to path {} ({}): {}", path, status.value(), errorMessage);
 		return new ResponseEntity<>(responseJson.toString(), RestUtils.getResponseHeaders(), status);
 	}
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	public ResponseEntity<?> test() {
 
+		log.info("test한다");
+		GameService gameService=new GameService();
+		gameService.pickWords();
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
 }
