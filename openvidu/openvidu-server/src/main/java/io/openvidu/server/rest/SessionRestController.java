@@ -352,6 +352,83 @@ public class SessionRestController {
 
 	/**
 	 * 서영탁
+	 * 게임방 입장 [바로 입장]
+	 */
+	@PostMapping("/rooms/random")
+	public ResponseEntity<?> joinRoomByRandom(@RequestBody Map<?, ?> params){
+
+		log.info("REST API: POST {}, params : {}", "/api/rooms/random", params.toString());
+
+		boolean isTeamBattle = (boolean) params.get("isTeamBattle");
+		Collection<Session> sessions = this.sessionManager.getSessionsWithNotActive();
+
+		List<Session> filteredSessions = sessions.stream()
+				.filter(session -> !session.getSessionProperties().isSecret())
+				.filter(session -> session.getSessionProperties().isTeamBattle() == isTeamBattle)
+				.filter(session -> !session.getSessionProperties().isPlaying())
+				.filter(session -> session.getParticipants().size() < 4)
+				.collect(Collectors.toList());
+
+		int size = filteredSessions.size();
+		if(size == 0){
+			log.info("[error] : {}", NO_AVAILABLE_ROOM_MESSAGE);
+			ExceptionResponseBody body = new ExceptionResponseBody(NO_AVAILABLE_ROOM, NO_AVAILABLE_ROOM_MESSAGE);
+			return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
+		}
+
+		for (Session filteredSession : filteredSessions) {
+			log.info("입장 가능한 방 = {}", filteredSession.getSessionId());
+		}
+
+		int randomIndex = (int)(Math.random() * size);
+		Session session = filteredSessions.get(randomIndex);
+
+		if(session.getParticipants().size() >= 4){
+			log.info("[error] : {}", FULL_ROOM_MESSAGE);
+			ExceptionResponseBody body = new ExceptionResponseBody(FULL_ROOM, FULL_ROOM_MESSAGE);
+			return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
+		}
+
+		SessionProperties sessionProperties = session.getSessionProperties();
+		if(sessionProperties.isPlaying()){
+			log.info("[error] : {}", PLAYING_ROOM_MESSAGE);
+			ExceptionResponseBody body = new ExceptionResponseBody(PLAYING_ROOM, PLAYING_ROOM_MESSAGE);
+			return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
+		}
+
+		ConnectionProperties connectionProperties;
+		try {
+			connectionProperties = getConnectionPropertiesFromParams(params).build();
+		} catch (Exception e) {
+			return this.generateErrorResponse(e.getMessage(), "/api/rooms/random", HttpStatus.BAD_REQUEST);
+		}
+
+		int level = (int)params.get("level");
+		String nickname = (String) params.get("nickname");
+		String rateString = (String) params.get("rate");
+		double rate = Double.parseDouble(rateString);
+		Team team = Team.NONE;
+
+		if(sessionProperties.isTeamBattle()){
+			team = setPlayerTeam(session);
+		}
+
+		Player player = new Player(level,nickname, rate, false, team);
+
+		switch (connectionProperties.getType()) {
+			case WEBRTC:
+				return this.newWebrtcConnection(session, connectionProperties, player);
+			case IPCAM:
+				return this.newIpcamConnection(session, connectionProperties);
+			default:
+				return this.generateErrorResponse("Wrong type parameter", "/api/rooms/random",
+						HttpStatus.BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 서영탁
 	 * 현재 입장하는 참가자의 팀 선정
 	 */
 	private static Team setPlayerTeam(Session session) {
