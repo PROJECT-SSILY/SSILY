@@ -411,12 +411,11 @@ public class SessionRestController {
 	}
 
 	/**
-<<<<<<< Updated upstream
 	 * 서영탁
 	 * 참여자(플레이어) 준비 상태 변경
 	 */
 	@PutMapping("/rooms/{room-id}/players/{player-id}/ready")
-	public ResponseEntity<?> changeReadyState(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId){
+	public ResponseEntity<?> changeReadyState(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId) {
 
 		log.info("REST API: GET {}/rooms/{}/players/{}/ready", "/api", roomId, playerId);
 
@@ -439,9 +438,9 @@ public class SessionRestController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+	}
 
-
-=======
+	/**
 	 * 김윤미
 	 * 방장 넘겨주기
 	 * @param roomId : 방 id
@@ -484,8 +483,8 @@ public class SessionRestController {
 
 		oldHost.getPlayer().setHost(false);
 		newHost.getPlayer().setHost(true);
+
 		return new ResponseEntity<>(HttpStatus.OK);
->>>>>>> Stashed changes
 	}
 
 	@RequestMapping(value = "/recordings/start", method = RequestMethod.POST)
