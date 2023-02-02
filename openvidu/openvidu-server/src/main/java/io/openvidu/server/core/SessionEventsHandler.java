@@ -394,7 +394,6 @@ public class SessionEventsHandler {
         String from = null;
         String type = null;
         String data = null;
-        Player player =null;
 
         JsonObject params = new JsonObject();
         if (message.has("data")) {
@@ -408,8 +407,6 @@ public class SessionEventsHandler {
         if (participant != null) {
             from = participant.getParticipantPublicId();
             params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_FROM_PARAM, from);
-            player =participant.getPlayer();
-            params.add("player", player.toJson());
         }
 
         Set<String> toSet = new HashSet<String>();
@@ -448,7 +445,7 @@ public class SessionEventsHandler {
             }
         }
 
-        CDR.recordSignalSent(sessionId, uniqueSessionId, from, toSet.toArray(new String[toSet.size()]), type, data, player);
+        CDR.recordSignalSent(sessionId, uniqueSessionId, from, toSet.toArray(new String[toSet.size()]), type, data);
 
         if (isRpcCall) {
             rpcNotificationService.sendResponse(participant.getParticipantPrivateId(), transactionId, new JsonObject());

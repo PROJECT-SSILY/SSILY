@@ -27,10 +27,9 @@ public class CDREventSignal extends CDREvent {
 	private String[] to;
 	private String type;
 	private String data;
-	private Player player;
 
 	public CDREventSignal(String sessionId, String uniqueSessionId, String from, String[] to, String type,
-			String data, Player player) {
+			String data) {
 		super(CDREventName.signalSent, sessionId, uniqueSessionId, System.currentTimeMillis());
 		this.from = from;
 		this.to = to;
@@ -49,7 +48,6 @@ public class CDREventSignal extends CDREvent {
 		json.add("to", toArray);
 		json.addProperty("type", this.type);
 		json.addProperty("data", this.data);
-		json.add("player", player.toJson());
 		return json;
 	}
 
