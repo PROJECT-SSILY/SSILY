@@ -34,11 +34,10 @@ const getters = {
         return state.checkId;
     },
     getRate: (state) => {
-        if (state.plays+1) {
-            return state.wins / (state.plays+1-state.wins-state.draws)
-        } else {
-            return 0
-        }    
+        if (state.plays) {
+            return state.wins/(state.plays - state.draws - state.wins)
+        }
+        return parseFloat(0).toFixed(1)
     }
 }
 

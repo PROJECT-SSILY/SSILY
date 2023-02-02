@@ -147,12 +147,16 @@ const actions = {
       const level = context.rootState.accountStore.user.level
       const nickname = context.rootState.accountStore.user.nickname
       const isHost = state.isHost
-      const rate = context.rootGetters.accountStore.getRate
-      console.log('createToken: ', level, nickname,  isHost, rate)
+      const rate = context.rootGetters['accountStore/getRate']
+      console.log('------------',rate)
       return new Promise((resolve, reject)=> {
+        console.log("level=",level);
+        console.log("nickname=",nickname);
+        console.log("isHost=", isHost);
+        console.log("rate=", rate);
+
         $axios
 					.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
-            // 하드코딩한 부분 나중에 수정 필요
             "level" : level,
             "nickname" : nickname,
             "rate" : rate,
