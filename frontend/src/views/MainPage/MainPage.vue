@@ -34,7 +34,6 @@
                 <v-btn color="primary"
                 @click="cons"
                 >
-                {{ teamvalue }}
                 개인 게임 시작</v-btn>
               </v-col>
             </v-row>
