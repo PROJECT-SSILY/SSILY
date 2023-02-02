@@ -419,6 +419,54 @@ public class SessionRestController {
 	}
 
 	/**
+	 * 김윤미
+	 * 퇴장시키기
+	 * @param roomId : 퇴장 방 id
+	 * @return
+	 */
+	@RequestMapping(value = "/rooms/{room-id}/players", method = RequestMethod.DELETE)
+	public ResponseEntity<?> closeOtherConnection(@PathVariable("room-id") String roomId, @RequestBody Map<?, ?> params) {
+
+		log.info("REST API: DELETE {}/rooms/{}/players", "/api", roomId);
+
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
+		if (session == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		String hostId, exitPlayerId;
+		try {
+			hostId = (String)params.get("hostId");
+			exitPlayerId = (String)params.get("exitPlayerId");
+		} catch (Exception e) {
+			log.info("PLAYER ID NOT FOUND");
+			return this.generateErrorResponse(e.getMessage(), "/rooms/{}/players", HttpStatus.BAD_REQUEST);
+		}
+
+		Participant host=session.getParticipantByPublicId(hostId);
+		if(host==null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+
+		if(!host.getPlayer().isHost()) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		Participant participant = session.getParticipantByPublicId(exitPlayerId);
+		if (participant != null) {
+			this.sessionManager.evictParticipant(participant, null, null, EndReason.forceDisconnectByServer);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} else {
+			// Try to delete unused token
+			if (session.deleteTokenFromConnectionId(exitPlayerId)) {
+				return new ResponseEntity<>(HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		}
+	}
+
+	/**
 	 * 서영탁
 	 * 참여자(플레이어) 준비 상태 변경
 	 */
