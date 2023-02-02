@@ -117,6 +117,7 @@ const actions = {
       });
 
       context.commit("setMySessionId", state.mySessionId)
+      state.myUserName = context.rootState.accountStore.user.nickname;
       context.dispatch("getToken", state.mySessionId).then(token => {
         session
         .connect(token, { clientData: state.myUserName })

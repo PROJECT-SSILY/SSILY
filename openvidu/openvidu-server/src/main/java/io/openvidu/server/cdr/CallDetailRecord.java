@@ -174,11 +174,11 @@ public class CallDetailRecord {
 	}
 
 	public void recordSignalSent(String sessionId, String uniqueSessionId, String from, String[] to, String type,
-			String data, Player player) {
+			String data) {
 		if (from != null) {
 			type = type.replaceFirst("^signal:", "");
 		}
-		this.log(new CDREventSignal(sessionId, uniqueSessionId, from, to, type, data, player));
+		this.log(new CDREventSignal(sessionId, uniqueSessionId, from, to, type, data));
 	}
 
 	protected void log(CDREvent event) {
