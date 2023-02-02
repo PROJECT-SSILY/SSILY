@@ -316,7 +316,8 @@ public class SessionRestController {
 
 		int level = (int)params.get("level");
 		String nickname = (String) params.get("nickname");
-		double rate = (double) params.get("rate");
+		String rateString = (String) params.get("rate");
+		double rate = Double.parseDouble(rateString);
 		boolean isHost = (boolean) params.get("isHost");
 		Player player = new Player(level,nickname, rate, isHost);
 
