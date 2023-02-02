@@ -385,25 +385,32 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions/{sessionId}/connection/{connectionId}", method = RequestMethod.DELETE)
-	public ResponseEntity<?> closeConnection(@PathVariable("sessionId") String sessionId,
-			@PathVariable("connectionId") String participantPublicId) {
+	/**
+	 * 김윤미
+	 * 퇴장하기
+	 * @param roomId : 퇴장 방 id
+	 * @param playerId : 퇴장하는 사람 id
+	 * @return
+	 */
+	@RequestMapping(value = "/rooms/{room-id}/players/{player-id}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> closeConnection(@PathVariable("room-id") String roomId,
+			@PathVariable("player-id") String playerId) {
 
-		log.info("REST API: DELETE {}/sessions/{}/connection/{}", RequestMappings.API, sessionId, participantPublicId);
+		log.info("REST API: DELETE {}/rooms/{}/players/{}", "/api", roomId, playerId);
 
-		Session session = this.sessionManager.getSessionWithNotActive(sessionId);
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
 		if (session == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		Participant participant = session.getParticipantByPublicId(participantPublicId);
+		Participant participant = session.getParticipantByPublicId(playerId);
 		if (participant != null) {
 			this.sessionManager.evictParticipant(participant, null, null, EndReason.forceDisconnectByServer);
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			// Try to delete unused token
-			if (session.deleteTokenFromConnectionId(participantPublicId)) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			if (session.deleteTokenFromConnectionId(playerId)) {
+				return new ResponseEntity<>(HttpStatus.OK);
 			} else {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
