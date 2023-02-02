@@ -4,6 +4,10 @@ import com.google.gson.JsonParser;
 import io.openvidu.client.internal.ProtocolElements;
 import io.openvidu.server.core.Participant;
 import io.openvidu.server.rpc.RpcNotificationService;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class GameService {
     static final int GET_TEAMS_SETTING = 0;
@@ -27,8 +33,9 @@ public class GameService {
      * 김윤미
      * 게임에 쓰이는 static 변수 추가
      */
-    public static ConcurrentHashMap<String, ArrayList<String>> words=new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, List<String>> words=new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, ArrayList<Participant>> participants=new ConcurrentHashMap<>();
+    public final List<String> allWords=allWords();
 
 
     // RPC 프로토콜을 위한 전역변수
@@ -76,6 +83,7 @@ public class GameService {
      */
     private void gameStart(Participant participant, JsonObject message, String sessionId, Set<Participant> gameParticipants,
                            JsonObject params, JsonObject data, RpcNotificationService notice) {
+
         //제시어 불러오기
         words.putIfAbsent(sessionId, new ArrayList<>());
 
@@ -90,31 +98,22 @@ public class GameService {
 
     /**
      * 김윤미
-     * @return : 제시어 12개 리스트
+     * @return : 전체 단어 조회
      */
-    public List<String> pickWords() {
-        String url="http://localhost:8080/api/game/words";
-//        List<String> words=new ArrayList<>();
-        httpGetConnection(url);
-
-        return null;
-    }
-
-    public static void httpGetConnection(String urlData) {
+    public List<String> allWords() {
         //http 통신을 하기위한 객체 선언 실시
         URL url = null;
         HttpURLConnection conn = null;
-
-        //http 통신 요청 후 응답 받은 데이터를 담기 위한 변수
-        JsonObject responseData = null;
 
         //메소드 호출 결과값을 반환하기 위한 변수
         String returnData = "";
         BufferedReader br=null;
 
+        List<String> wordList=null;
+
         try {
             //파라미터로 들어온 url을 사용해 connection 실시
-            url = new URL(urlData);
+            url = new URL("http://localhost:8080/api/game/words");
             conn = (HttpURLConnection) url.openConnection();
 
             //http 요청에 필요한 타입 정의 실시
@@ -125,10 +124,6 @@ public class GameService {
 
             //http 요청 실시
             conn.connect();
-            System.out.println("http 요청 방식 : "+"GET");
-            System.out.println("http 요청 타입 : "+"application/json");
-            System.out.println("http 요청 주소 : "+urlData);
-            System.out.println("");
 
             StringBuffer sb = new StringBuffer();
             br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
@@ -138,12 +133,10 @@ public class GameService {
 
             returnData=sb.toString();
 
-            //http 요청 응답 코드 확인 실시
-            String responseCode = String.valueOf(conn.getResponseCode());
-            System.out.println("http 응답 코드 : "+responseCode);
-            System.out.println("http 응답 데이터 : "+returnData);
-
-        } catch (IOException e) {
+            JSONParser parser = new JSONParser();
+            JSONObject returnJson = (JSONObject)parser.parse(returnData);
+            wordList= (List<String>) returnJson.get("data");
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         } finally {
             //http 요청 및 응답 완료 후 BufferedReader를 닫아줍니다
@@ -155,5 +148,21 @@ public class GameService {
                 e.printStackTrace();
             }
         }
+        return wordList;
+    }
+
+    /**
+     * 김윤미
+     * 12개의 제시어 목록 반환
+     * @return
+     */
+    public List<String> pickWords() {
+        if(allWords==null) return null;
+
+        List<String> pickedWords=new ArrayList<>();
+        ThreadLocalRandom.current().ints(0, allWords.size()).distinct().limit(12).forEach(index -> pickedWords.add(allWords.get(index).toString()));
+        System.out.println("출력테스트!!!");
+        System.out.println(pickedWords);
+        return pickedWords;
     }
 }

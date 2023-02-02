@@ -1629,8 +1629,8 @@ public class SessionRestController {
 
 		log.info("test한다");
 		GameService gameService=new GameService();
+		gameService.allWords();
 		gameService.pickWords();
-
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
