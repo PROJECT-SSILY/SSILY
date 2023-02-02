@@ -18,7 +18,10 @@ const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 
 const state = {
-    teamorprivate: null,
+    title: null,
+    isSecret: false,
+    password: null,
+    isTeamBattle: null,
     OV: undefined,
     session: undefined,
     mainStreamManager: undefined,
@@ -31,19 +34,33 @@ const state = {
 
 const getters = {
     getTeam: (state) => {
-        return state.teamorprivate;
+        return state.isTeamBattle;
     },
     getSession: (state) => {
         return state.session;
     },
     getSessionId: (state) => {
       return state.mySessionId;
-    }
+    },
+    getTitle: (state) => {
+      return state.title;
+    },
+    
 }
 
 const mutations = {
-    setTeam: (state) => {
-        state.teamorprivate = !state.teamorprivate;
+    
+    setTitle: (state, data) => {
+        state.title = data
+    },
+    setSecret: (state, payload) => {
+        state.isSecret = payload
+    },
+    setPassword: (state, payload) => {
+        state.password = payload
+    },
+    setTeam: (state, payload) => {
+        state.isTeamBattle = payload
     },
     setOV: (state, data) => {
         state.OV = data;
@@ -175,14 +192,17 @@ const actions = {
 
     },
     createSession: (context, sessionId) => {
+      const myTitle= state.title;
+      console.log("내 타이틀 이거임", myTitle);
       return new Promise((resolve, reject) => {
 				$axios
 					.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
             // 하드코딩한 부분 나중에 수정 필요
-            "title" : "방제목",
-            "isSecret" : true,
-            "password" : "123",
-            "isTeamBattle" : false
+
+            "title" : myTitle,
+            "isSecret" : state.isSecret,
+            "password" : state.password,
+            "team" : state.isTeamBattle
           }), {
 						auth: {
 							username: 'OPENVIDUAPP',
