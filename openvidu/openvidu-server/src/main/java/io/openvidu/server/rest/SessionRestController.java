@@ -32,13 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -370,7 +364,7 @@ public class SessionRestController {
 			@RequestParam(value = "pendingConnections", defaultValue = "true", required = false) boolean pendingConnections,
 			@RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
 
-		log.info("REST API: GET {}/sessions/{}/connection", "/api", roomId);
+		log.info("REST API: GET {}/rooms/{}/players", "/api", roomId);
 
 		Session session = this.sessionManager.getSessionWithNotActive(roomId);
 
@@ -408,6 +402,38 @@ public class SessionRestController {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
 		}
+	}
+
+	/**
+	 * 서영탁
+	 * 참여자(플레이어) 준비 상태 변경
+	 */
+	@PutMapping("/rooms/{room-id}/players/{player-id}/ready")
+	public ResponseEntity<?> changeReadyState(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId){
+
+		log.info("REST API: GET {}/rooms/{}/players/{}/ready", "/api", roomId, playerId);
+
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
+		if (session != null) {
+			Participant p = session.getParticipantByPublicId(playerId);
+			if (p != null) {
+				boolean ready = p.getPlayer().isReady();
+				p.getPlayer().setReady(!ready);
+				return new ResponseEntity<>(p.toJson().toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
+			} else {
+				Token t = getTokenFromConnectionId(playerId, session.getTokenIterator());
+				if (t != null) {
+					return new ResponseEntity<>(t.toJsonAsParticipant().toString(), RestUtils.getResponseHeaders(),
+							HttpStatus.OK);
+				} else {
+					return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				}
+			}
+		} else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+
 	}
 
 	@RequestMapping(value = "/recordings/start", method = RequestMethod.POST)
