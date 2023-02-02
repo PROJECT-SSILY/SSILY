@@ -83,11 +83,13 @@ const mutations = {
     setMyUserName: (state, name) => {
         state.myUserName = name;
     },
+    changeMode: (state) => {
+      state.isTeamBattle = !state.isTeamBattle
+    }
 }
-
 const actions = {
     isTeam: (state) => {
-        state.commit("setTeam", null)
+        state.commit("changeMode", null)
         console.log(state.getters.getTeam);
     },
     roomAction: async (commit, formData) => {
