@@ -126,6 +126,7 @@ export default {
       team: null,
       ready: false,
     })
+	
     const clickExit = () => {
       router.push({
         name: 'main'
