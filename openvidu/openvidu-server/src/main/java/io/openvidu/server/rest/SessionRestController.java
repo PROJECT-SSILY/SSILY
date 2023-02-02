@@ -331,7 +331,13 @@ public class SessionRestController {
 		String rateString = (String) params.get("rate");
 		double rate = Double.parseDouble(rateString);
 		boolean isHost = (boolean) params.get("isHost");
-		Player player = new Player(level,nickname, rate, isHost);
+		Team team = Team.NONE;
+
+		if(sessionProperties.isTeamBattle()){
+			team = setPlayerTeam(session);
+		}
+
+		Player player = new Player(level,nickname, rate, isHost, team);
 
 		switch (connectionProperties.getType()) {
 		case WEBRTC:
@@ -342,6 +348,24 @@ public class SessionRestController {
 			return this.generateErrorResponse("Wrong type parameter", "/api" + "/rooms/" + roomId,
 					HttpStatus.BAD_REQUEST);
 		}
+	}
+
+	/**
+	 * 서영탁
+	 * 현재 입장하는 참가자의 팀 선정
+	 */
+	private static Team setPlayerTeam(Session session) {
+		int redTeam = 0, blueTeam = 0;
+
+		Set<Participant> participants = session.getParticipants();
+		for (Participant p : participants) {
+			Team playerTeam = p.getPlayer().getTeam();
+			if(playerTeam == Team.RED) redTeam++;
+			else if(playerTeam == Team.BLUE) blueTeam++;
+		}
+
+		if(redTeam > blueTeam) return Team.BLUE;
+		else return Team.RED;
 	}
 
 	/**
