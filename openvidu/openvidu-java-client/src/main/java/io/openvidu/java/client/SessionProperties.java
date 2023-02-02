@@ -34,6 +34,15 @@ public class SessionProperties {
 	private Boolean allowTranscoding;
 
 	/**
+	 * 김윤미
+	 */
+	private String title;
+	private Boolean isSecret;
+	private String password;
+	private Boolean isTeamBattle;
+	private Boolean isPlaying;
+
+	/**
 	 * Builder for {@link io.openvidu.java.client.SessionProperties}
 	 */
 	public static class Builder {
@@ -48,13 +57,22 @@ public class SessionProperties {
 		private Boolean allowTranscoding = false;
 
 		/**
+		 * 김윤미
+		 */
+		private String title="";
+		private Boolean isSecret=false;
+		private String password="";
+		private Boolean isTeamBattle=false;
+		private Boolean isPlaying=false;
+
+		/**
 		 * Returns the {@link io.openvidu.java.client.SessionProperties} object properly
 		 * configured
 		 */
 		public SessionProperties build() {
 			return new SessionProperties(this.mediaMode, this.recordingMode, this.defaultRecordingProperties,
 					this.customSessionId, this.mediaNode, this.forcedVideoCodec, this.forcedVideoCodecResolved,
-					this.allowTranscoding);
+					this.allowTranscoding, this.title, this.isSecret, this.password, this.isTeamBattle, this.isPlaying);
 		}
 
 		/**
@@ -161,6 +179,35 @@ public class SessionProperties {
 			return this;
 		}
 
+		/**
+		 * 김윤미
+		 * @param title, isSecret, password, team, isPlaying
+		 * @return
+		 */
+		public SessionProperties.Builder title(String title) {
+			this.title=title;
+			return this;
+		}
+
+		public SessionProperties.Builder isSecret(Boolean isSecret) {
+			this.isSecret=isSecret;
+			return this;
+		}
+
+		public SessionProperties.Builder password(String password) {
+			this.password=password;
+			return this;
+		}
+
+		public SessionProperties.Builder isTeamBattle(Boolean isTeamBattle) {
+			this.isTeamBattle=isTeamBattle;
+			return this;
+		}
+
+		public SessionProperties.Builder isPlaying(Boolean isPlaying) {
+			this.isPlaying=isPlaying;
+			return this;
+		}
 	}
 
 	protected SessionProperties() {
@@ -182,6 +229,41 @@ public class SessionProperties {
 		this.forcedVideoCodec = forcedVideoCodec;
 		this.forcedVideoCodecResolved = forcedVideoCodecResolved;
 		this.allowTranscoding = allowTranscoding;
+	}
+
+	/**
+	 * 김윤미
+	 * @param mediaMode
+	 * @param recordingMode
+	 * @param defaultRecordingProperties
+	 * @param customSessionId
+	 * @param mediaNode
+	 * @param forcedVideoCodec
+	 * @param forcedVideoCodecResolved
+	 * @param allowTranscoding
+	 * @param title
+	 * @param isSecret
+	 * @param password
+	 * @param isTeamBattle
+	 * @param isPlaying
+	 */
+	private SessionProperties(MediaMode mediaMode, RecordingMode recordingMode,
+							  RecordingProperties defaultRecordingProperties, String customSessionId, String mediaNode,
+							  VideoCodec forcedVideoCodec, VideoCodec forcedVideoCodecResolved, Boolean allowTranscoding,
+							  String title, Boolean isSecret, String password, Boolean isTeamBattle, Boolean isPlaying) {
+		this.mediaMode = mediaMode;
+		this.recordingMode = recordingMode;
+		this.defaultRecordingProperties = defaultRecordingProperties;
+		this.customSessionId = customSessionId;
+		this.mediaNode = mediaNode;
+		this.forcedVideoCodec = forcedVideoCodec;
+		this.forcedVideoCodecResolved = forcedVideoCodecResolved;
+		this.allowTranscoding = allowTranscoding;
+		this.title=title;
+		this.isSecret=isSecret;
+		this.password=password;
+		this.isTeamBattle=isTeamBattle;
+		this.isPlaying=isPlaying;
 	}
 
 	/**
@@ -263,12 +345,33 @@ public class SessionProperties {
 		return this.allowTranscoding;
 	}
 
+	/**
+	 * 김윤미
+	 * @return
+	 */
+	public String title() { return this.title; }
+
+	public Boolean isSecret() { return this.isSecret; }
+
+	public String password() { return this.password; }
+
+	public Boolean isTeamBattle() { return this.isTeamBattle; }
+
+	public Boolean isPlaying() { return this.isPlaying; }
+
+	public void setTitle(String title) { this.title=title; }
+
+	/**
+	 * 김윤미
+	 * @return
+	 */
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 		json.addProperty("mediaMode", this.mediaMode.name());
 		json.addProperty("recordingMode", this.recordingMode.name());
 		json.add("defaultRecordingProperties", this.defaultRecordingProperties.toJson());
 		json.addProperty("customSessionId", this.customSessionId);
+
 		if (this.mediaNode != null && !this.mediaNode.isEmpty()) {
 			JsonObject mediaNodeJson = new JsonObject();
 			mediaNodeJson.addProperty("id", this.mediaNode);
@@ -283,6 +386,12 @@ public class SessionProperties {
 		if (this.allowTranscoding != null) {
 			json.addProperty("allowTranscoding", this.allowTranscoding);
 		}
+
+		json.addProperty("title", this.title);
+		json.addProperty("isSecret", this.isSecret);
+		json.addProperty("password", this.password);
+		json.addProperty("isTeamBattle", this.isTeamBattle);
+		json.addProperty("isPlaying", this.isPlaying);
 		return json;
 	}
 

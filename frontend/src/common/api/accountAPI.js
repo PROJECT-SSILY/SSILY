@@ -13,6 +13,7 @@ return -100;
 
 const requestRegister = payload => $axios.post("/api/member", payload); // 회원가입 요청
 
+
 const checkEmail = (payload) => {
     console.log(payload)
     return $axios.get(`api/member/email?email=${payload}`)
@@ -23,13 +24,12 @@ const checkNickname = (payload) => {
     return $axios.get("api/member/nickname", { params })
 } // 닉네임 중복 확인
 
-// const requestMe = async token => {
+const requestMe = (token) => {
 //   console.log("getMeToken : ", token);
-//   const getME = await $axios.get("/users/me", {headers: {Authorization: `Bearer ${token}`}}).then(res => {
-//     return res.data;
-//   });
-//   return getME;
-// };
+    return $axios.get("/api/member", {
+        headers: {Authorization: `Bearer ${token}`}
+    })
+};
 
 // const requestId = userId => $axios.get(`/users/${userId}`).then(res => {
 //   return true;
@@ -49,4 +49,4 @@ const sendNewPwAction = (payload) => {
 }
 
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction };
+export { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe };

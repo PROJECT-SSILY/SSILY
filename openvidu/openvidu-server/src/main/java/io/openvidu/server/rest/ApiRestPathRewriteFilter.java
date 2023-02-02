@@ -32,7 +32,7 @@ public class ApiRestPathRewriteFilter implements Filter {
 			// WS
 			put("/info", RequestMappings.WS_INFO);
 			// APIs
-			put("/api/", RequestMappings.API + "/");
+//			put("/api/", RequestMappings.API + "/");
 			put("/config", RequestMappings.API + "/config");
 			put("/config/", RequestMappings.API + "/config/");
 			put("/cdr", RequestMappings.CDR);

@@ -17,6 +17,7 @@
 
 package io.openvidu.server.core;
 
+import io.openvidu.server.game.Player;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import com.google.gson.JsonNull;
@@ -37,6 +38,15 @@ public class Token {
 	private ConnectionProperties connectionProperties;
 	private TurnCredentials turnCredentials;
 
+	/**
+	 * 서영탁
+	 */
+	private Player player;
+
+	public Player getPlayer() {
+		return player;
+	}
+
 	private String connectionId = IdentifierPrefixes.PARTICIPANT_PUBLIC_ID
 			+ RandomStringUtils.randomAlphabetic(1).toUpperCase() + RandomStringUtils.randomAlphanumeric(9);
 
@@ -47,6 +57,16 @@ public class Token {
 		this.createdAt = System.currentTimeMillis();
 		this.connectionProperties = connectionProperties;
 		this.turnCredentials = turnCredentials;
+	}
+
+	public Token(String token, String sessionId, ConnectionProperties connectionProperties,
+				 TurnCredentials turnCredentials, Player player) {
+		this.token = token;
+		this.sessionId = sessionId;
+		this.createdAt = System.currentTimeMillis();
+		this.connectionProperties = connectionProperties;
+		this.turnCredentials = turnCredentials;
+		this.player = player;
 	}
 
 	public ConnectionType getType() {
@@ -123,6 +143,9 @@ public class Token {
 		this.connectionId = connectionId;
 	}
 
+	/**
+	 * 서영탁
+	 */
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();
 		json.addProperty("id", this.getToken());
@@ -135,9 +158,13 @@ public class Token {
 		if (this.getKurentoOptions() != null) {
 			json.add("kurentoOptions", this.getKurentoOptions().toJson());
 		}
+		json.add("player", this.getPlayer().toJson());
 		return json;
 	}
 
+	/**
+	 * 서영탁
+	 */
 	public JsonObject toJsonAsParticipant() {
 		JsonObject json = new JsonObject();
 		json.addProperty("id", this.getConnectionId());
@@ -161,6 +188,7 @@ public class Token {
 		json.add("clientData", null);
 		json.add("publishers", null);
 		json.add("subscribers", null);
+		json.add("player", this.getPlayer().toJson());
 		return json;
 	}
 

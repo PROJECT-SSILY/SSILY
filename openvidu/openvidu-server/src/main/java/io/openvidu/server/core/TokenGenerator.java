@@ -17,6 +17,7 @@
 
 package io.openvidu.server.core;
 
+import io.openvidu.server.game.Player;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -54,6 +55,25 @@ public class TokenGenerator {
 		ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC)
 				.data(serverMetadata).record(record).role(role).kurentoOptions(kurentoOptions).build();
 		return new Token(token, sessionId, connectionProperties, turnCredentials);
+	}
+
+	/**
+	 * 서영탁
+	 * generateToken override
+	 */
+	public Token generateToken(String sessionId, String serverMetadata, boolean record, OpenViduRole role,
+							   KurentoOptions kurentoOptions, Player player) throws Exception {
+		String token = OpenViduServer.wsUrl;
+		token += "?sessionId=" + sessionId;
+		token += "&token=" + IdentifierPrefixes.TOKEN_ID + RandomStringUtils.randomAlphabetic(1).toUpperCase()
+				+ RandomStringUtils.randomAlphanumeric(15);
+		TurnCredentials turnCredentials = null;
+		if (this.openviduConfig.isTurnadminAvailable()) {
+			turnCredentials = coturnCredentialsService.createUser();
+		}
+		ConnectionProperties connectionProperties = new ConnectionProperties.Builder().type(ConnectionType.WEBRTC)
+				.data(serverMetadata).record(record).role(role).kurentoOptions(kurentoOptions).build();
+		return new Token(token, sessionId, connectionProperties, turnCredentials, player);
 	}
 
 }
