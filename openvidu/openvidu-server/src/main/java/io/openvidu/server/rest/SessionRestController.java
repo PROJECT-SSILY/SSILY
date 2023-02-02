@@ -23,8 +23,9 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import io.openvidu.server.exception.ExceptionCode;
+import io.openvidu.server.exception.ExceptionResponseBody;
 import io.openvidu.server.game.Player;
-import io.openvidu.java.client.room.Team;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,10 @@ import io.openvidu.server.recording.service.RecordingManager;
 import io.openvidu.server.utils.RecordingUtils;
 import io.openvidu.server.utils.RestUtils;
 
+import javax.ws.rs.Path;
+
+import static io.openvidu.server.exception.ExceptionCode.*;
+
 /**
  *
  * @author Pablo Fuente (pablofuenteperez@gmail.com)
@@ -95,6 +100,7 @@ public class SessionRestController {
 
 	/**
 	 * 김윤미
+	 * 게임 방 생성
 	 * @param params
 	 * @return
 	 */
@@ -135,19 +141,27 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions/{sessionId}", method = RequestMethod.GET)
-	public ResponseEntity<?> getSession(@PathVariable("sessionId") String sessionId,
+	/**
+	 * 김윤미
+	 * 게임 방 조회
+	 * @param roomId
+	 * @param pendingConnections
+	 * @param webRtcStats
+	 * @return
+	 */
+	@RequestMapping(value = "/rooms/{room-id}", method = RequestMethod.GET)
+	public ResponseEntity<?> getSession(@PathVariable("room-id") String roomId,
 			@RequestParam(value = "pendingConnections", defaultValue = "false", required = false) boolean pendingConnections,
 			@RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
 
-		log.info("REST API: GET {}/sessions/{}", RequestMappings.API, sessionId);
+		log.info("REST API: GET {}/rooms/{}", RequestMappings.API, roomId);
 
-		Session session = this.sessionManager.getSession(sessionId);
+		Session session = this.sessionManager.getSession(roomId);
 		if (session != null) {
 			JsonObject response = session.toJson(pendingConnections, webRtcStats);
 			return new ResponseEntity<>(response.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
 		} else {
-			Session sessionNotActive = this.sessionManager.getSessionNotActive(sessionId);
+			Session sessionNotActive = this.sessionManager.getSessionNotActive(roomId);
 			if (sessionNotActive != null) {
 				JsonObject response = sessionNotActive.toJson(pendingConnections, webRtcStats);
 				return new ResponseEntity<>(response.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
@@ -157,6 +171,13 @@ public class SessionRestController {
 		}
 	}
 
+	/**
+	 * 김윤미
+	 * 게임 방 목록 조회
+	 * @param pendingConnections
+	 * @param webRtcStats
+	 * @return
+	 */
 	@RequestMapping(value = "/rooms", method = RequestMethod.GET)
 	public ResponseEntity<?> listSessions(
 			@RequestParam(value = "pendingConnections", defaultValue = "false", required = false) boolean pendingConnections,
@@ -176,18 +197,54 @@ public class SessionRestController {
 		return new ResponseEntity<>(json.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/sessions/{sessionId}", method = RequestMethod.DELETE)
-	public ResponseEntity<?> closeSession(@PathVariable("sessionId") String sessionId) {
+	/**
+	 * 김윤미
+	 * 게임방 정보 수정
+	 * @param roomId
+	 * @return
+	 */
+	@RequestMapping(value="/rooms/{room-id}", method = RequestMethod.PUT)
+	public ResponseEntity<?> modifySession(@PathVariable("room-id") String roomId, @RequestBody Map<?, ?> params,
+										   @RequestParam(value = "pendingConnections", defaultValue = "false", required = false) boolean pendingConnections,
+										   @RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
 
-		log.info("REST API: DELETE {}/sessions/{}", RequestMappings.API, sessionId);
-
-		Session session = this.sessionManager.getSession(sessionId);
-		if (session != null) {
-			this.sessionManager.closeSession(sessionId, EndReason.sessionClosedByServer);
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		log.info("REST API: PUT {}/rooms", RequestMappings.API, roomId);
+		String title;
+		try {
+			title=(String)params.get("title");
+		}catch (Exception e) {
+			return this.generateErrorResponse(e.getMessage(), "/rooms", HttpStatus.BAD_REQUEST);
 		}
 
-		Session sessionNotActive = this.sessionManager.getSessionNotActive(sessionId);
+		Session session = this.sessionManager.getSession(roomId);
+		if (session != null) {
+			session.getSessionProperties().setTitle(title);
+			JsonObject response = session.toJson(pendingConnections, webRtcStats);
+			return new ResponseEntity<>(response.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
+		} else {
+			Session sessionNotActive = this.sessionManager.getSessionNotActive(roomId);
+			if (sessionNotActive != null) {
+				sessionNotActive.getSessionProperties().setTitle(title);
+				JsonObject response = sessionNotActive.toJson(pendingConnections, webRtcStats);
+				return new ResponseEntity<>(response.toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		}
+	}
+
+	@RequestMapping(value = "/rooms/{room-id}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> closeSession(@PathVariable("room-id") String roomId) {
+
+		log.info("REST API: DELETE {}/rooms/{}", RequestMappings.API, roomId);
+
+		Session session = this.sessionManager.getSession(roomId);
+		if (session != null) {
+			this.sessionManager.closeSession(roomId, EndReason.sessionClosedByServer);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+
+		Session sessionNotActive = this.sessionManager.getSessionNotActive(roomId);
 		if (sessionNotActive != null) {
 			try {
 				if (sessionNotActive.closingLock.writeLock().tryLock(15, TimeUnit.SECONDS)) {
@@ -197,22 +254,22 @@ public class SessionRestController {
 						}
 						this.sessionManager.closeSessionAndEmptyCollections(sessionNotActive,
 								EndReason.sessionClosedByServer, true);
-						return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+						return new ResponseEntity<>(HttpStatus.OK);
 					} finally {
 						sessionNotActive.closingLock.writeLock().unlock();
 					}
 				} else {
-					String errorMsg = "Timeout waiting for Session " + sessionId
+					String errorMsg = "Timeout waiting for Session " + roomId
 							+ " closing lock to be available for closing from DELETE " + RequestMappings.API
 							+ "/sessions";
 					log.error(errorMsg);
-					return this.generateErrorResponse(errorMsg, "/sessions", HttpStatus.BAD_REQUEST);
+					return this.generateErrorResponse(errorMsg, "/rooms", HttpStatus.BAD_REQUEST);
 				}
 			} catch (InterruptedException e) {
-				String errorMsg = "InterruptedException while waiting for Session " + sessionId
-						+ " closing lock to be available for closing from DELETE " + RequestMappings.API + "/sessions";
+				String errorMsg = "InterruptedException while waiting for Session " + roomId
+						+ " closing lock to be available for closing from DELETE " + RequestMappings.API + "/rooms";
 				log.error(errorMsg);
-				return this.generateErrorResponse(errorMsg, "/sessions", HttpStatus.BAD_REQUEST);
+				return this.generateErrorResponse(errorMsg, "/rooms", HttpStatus.BAD_REQUEST);
 			}
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -237,9 +294,16 @@ public class SessionRestController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
+		if(session.getParticipants().size() >= 4){
+			log.info("[error] : {}", FULL_ROOM_MESSAGE);
+			ExceptionResponseBody body = new ExceptionResponseBody(FULL_ROOM, FULL_ROOM_MESSAGE);
+			return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
+		}
+
 		if(session.getSessionProperties().isPlaying()){
-			log.info("이미 게임이 진행중인 방입니다.");
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			log.info("[error] : {}", PLAYING_ROOM_MESSAGE);
+			ExceptionResponseBody body = new ExceptionResponseBody(PLAYING_ROOM, PLAYING_ROOM_MESSAGE);
+			return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
 		}
 
 		ConnectionProperties connectionProperties;
@@ -267,19 +331,24 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions/{sessionId}/connection/{connectionId}", method = RequestMethod.GET)
-	public ResponseEntity<?> getConnection(@PathVariable("sessionId") String sessionId,
-			@PathVariable("connectionId") String connectionId) {
+	/**
+	 * 서영탁
+	 * 참여자 정보 조회
+	 * @return
+	 */
+	@RequestMapping(value = "/rooms/{room-id}/players/{player-id}", method = RequestMethod.GET)
+	public ResponseEntity<?> getConnection(@PathVariable("room-id") String roomId,
+			@PathVariable("player-id") String playerId) {
 
-		log.info("REST API: GET {}/sessions/{}/connection/{}", RequestMappings.API, sessionId, connectionId);
+		log.info("REST API: GET {}/rooms/{}/players/{}", "/api", roomId, playerId);
 
-		Session session = this.sessionManager.getSessionWithNotActive(sessionId);
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
 		if (session != null) {
-			Participant p = session.getParticipantByPublicId(connectionId);
+			Participant p = session.getParticipantByPublicId(playerId);
 			if (p != null) {
 				return new ResponseEntity<>(p.toJson().toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
 			} else {
-				Token t = getTokenFromConnectionId(connectionId, session.getTokenIterator());
+				Token t = getTokenFromConnectionId(playerId, session.getTokenIterator());
 				if (t != null) {
 					return new ResponseEntity<>(t.toJsonAsParticipant().toString(), RestUtils.getResponseHeaders(),
 							HttpStatus.OK);
@@ -292,14 +361,18 @@ public class SessionRestController {
 		}
 	}
 
-	@RequestMapping(value = "/sessions/{sessionId}/connection", method = RequestMethod.GET)
-	public ResponseEntity<?> listConnections(@PathVariable("sessionId") String sessionId,
+	/**
+	 * 서영탁
+	 * 게임방 참여자 정보 목록 조회
+	 */
+	@RequestMapping(value = "/rooms/{room-id}/players", method = RequestMethod.GET)
+	public ResponseEntity<?> listConnections(@PathVariable("room-id") String roomId,
 			@RequestParam(value = "pendingConnections", defaultValue = "true", required = false) boolean pendingConnections,
 			@RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
 
-		log.info("REST API: GET {}/sessions/{}/connection", RequestMappings.API, sessionId);
+		log.info("REST API: GET {}/sessions/{}/connection", "/api", roomId);
 
-		Session session = this.sessionManager.getSessionWithNotActive(sessionId);
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
 
 		if (session != null) {
 			JsonObject json = new JsonObject();
@@ -799,7 +872,7 @@ public class SessionRestController {
 			String title=null;
 			Boolean isSecret=null;
 			String password=null;
-			Team team=null;
+			Boolean isTeamBattle=null;
 			try {
 				mediaModeString = (String) params.get("mediaMode");
 				recordingModeString = (String) params.get("recordingMode");
@@ -811,7 +884,7 @@ public class SessionRestController {
 				if(isSecret!=null && isSecret) {
 					password=(String) params.get("password");
 				}
-				team= Team.valueOf((String) params.get("team"));
+				isTeamBattle= (Boolean) params.get("isTeamBattle");
 			} catch (ClassCastException e) {
 				throw new Exception("Type error in some parameter: " + e.getMessage());
 			}
@@ -909,8 +982,8 @@ public class SessionRestController {
 					builder=builder.password(password);
 				}
 
-				if(team!=null) {
-					builder=builder.team(team);
+				if(isTeamBattle!=null) {
+					builder=builder.isTeamBattle(isTeamBattle);
 				}
 
 			} catch (IllegalArgumentException e) {

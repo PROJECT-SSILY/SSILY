@@ -153,10 +153,10 @@ export default {
 
 	const sessionInfo = () => {
 		const session1 = store.getters['gameStore/getSession']
-    const sessionId1 = store.getters['gameStore/getSessionId']
+    	const sessionId1 = store.getters['gameStore/getSessionId']
 
 		console.log('session클릭', session1)
-    console.log('sessionId', sessionId1)
+    	console.log('sessionId', sessionId1)
 	}
 	
 
@@ -171,13 +171,14 @@ export default {
 		updateMainVideoStreamManager,
 
       // == OpenVidu State ==
-      OV,
-      session,
-      mainStreamManager,
-      publisher,
-      subscribers,
-      mySessionId,
-      myUserName,
+		OV,
+		session,
+		mainStreamManager,
+		publisher,
+		subscribers,
+		mySessionId,
+		myUserName,
+		test,
       // =====================
     }
   }
