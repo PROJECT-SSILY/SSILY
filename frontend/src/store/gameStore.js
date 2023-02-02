@@ -44,6 +44,7 @@ const mutations = {
     
     setTitle: (state, data) => {
         state.title = data
+        console.log('set적용되는지확인' + state.title);
     },
     setSecret: (state, payload) => {
         state.isSecret = payload
@@ -53,6 +54,7 @@ const mutations = {
     },
     setTeam: (state, payload) => {
         state.isTeamBattle = payload
+        console.log('set적용되는지확인' + state.isTeamBattle);
     },
     setOV: (state, data) => {
         state.OV = data;

@@ -8,7 +8,7 @@
         max-width="500"
       >
         <v-toolbar
-          color="deep-purple accent-4"
+        :color="state.switch1 ? 'deep-purple accent-4' : 'success'"
           dark
         >
           <v-row>
@@ -38,13 +38,6 @@
                   <RoomListItem :room="room"/>
                 </v-list-item-content>
               </v-col>
-              <v-col>
-                <v-list-item-icon>
-                  <v-icon :color="room.secret ? 'deep-purple accent-4' : 'grey'">
-                    mdi-lock-outline
-                  </v-icon>
-                </v-list-item-icon>
-              </v-col>
             </v-row>
             <!-- <v-divider></v-divider> -->
           </v-list-item>
@@ -60,13 +53,6 @@
               <v-list-item-content>
                 <RoomListItem :room="room"/>
               </v-list-item-content>
-            </v-col>
-            <v-col>
-              <v-list-item-icon>
-                <v-icon :color="room.secret ? 'deep-purple accent-4' : 'grey'">
-                  mdi-lock-outline
-                </v-icon>
-              </v-list-item-icon>
             </v-col>
           </v-row>
           <!-- <v-divider></v-divider> -->
@@ -108,7 +94,7 @@ export default {
 
     const teamOrPrivate = async function() {
       const switchvalue = state.switch1
-      console.log(switchvalue);
+      console.log(state.privaterooms);
       await store.dispatch('gameStore/isTeam', switchvalue)
     }
 

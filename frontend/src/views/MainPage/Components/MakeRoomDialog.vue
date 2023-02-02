@@ -123,9 +123,9 @@
       const joinSession = async function() {
         
         if (state.isTeamBattle === "radio-1") {
-          state.isTeamBattle = false
-        } else {
           state.isTeamBattle = true
+        } else {
+          state.isTeamBattle = false
         }
         
         if (state.isSecret === "radio-1") {
