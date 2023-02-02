@@ -36,11 +36,11 @@ const getters = {
     getTitle: (state) => {
       return state.title;
     },
-    
+
 }
 
 const mutations = {
-    
+
     setTitle: (state, data) => {
         state.title = data
     },
@@ -123,14 +123,14 @@ const actions = {
         .then(()=>{
 
           let publisher = OV.initPublisher(undefined, {
-            audioSource: undefined, 
-            videoSource: undefined, 
-            publishAudio: true,  	
-            publishVideo: true, 
-            resolution: '640x480', 
-            frameRate: 30,			
-            insertMode: 'APPEND',	
-            mirror: false       
+            audioSource: undefined,
+            videoSource: undefined,
+            publishAudio: true,
+            publishVideo: true,
+            resolution: '640x480',
+            frameRate: 30,
+            insertMode: 'APPEND',
+            mirror: false
           });
           context.commit("setOV", OV)
           context.commit("setSession", session)
@@ -225,7 +225,7 @@ const actions = {
       commit("setSubscribers", [])
       commit("setOV", undefined)
     },
-    
+
     updateMainVideoStreamManager: (commit, stream) => {
       if (state.mainStreamManager === stream) return;
       commit("setMainStreamManager", stream)

@@ -1,81 +1,35 @@
 <template>
-    <div>
-      <h3>
-        RoomList
-      </h3>
-      <v-card
-        class="mx-auto"
-        max-width="500"
-      >
-        <v-toolbar
-          color="deep-purple accent-4"
-          dark
+  <div>
+    <h3>RoomList</h3>
+    <v-card class="mx-auto" max-width="500">
+      <v-toolbar color="deep-purple accent-4" dark>
+        <v-row>
+          <v-col class="title">
+            <h3>방 제목</h3>
+          </v-col>
+          <v-col>
+            <v-switch
+              v-model="state.switch1"
+              :label="`모드: ${state.switch1 ? '개인':'팀'}`"
+              @click="isTeamGame"
+              color="orange darken-3"
+              hide-details
+            ></v-switch>
+          </v-col>
+        </v-row>
+      </v-toolbar>
+      <v-list subheader>
+        <v-list-item
+          v-for="room in state.roomlist"
+          :key="room.id"
+          @click="getInRoom(room)"
         >
-          <v-row>
-            <v-col class="title">
-              <h3>방 제목</h3>
-            </v-col>
-            <v-col>
-                <v-switch
-                v-model="state.switch1"
-                :label="`모드: ${state.switch1 ? '개인':'팀'}`"
-                @click="teamOrPrivate"
-                color="orange darken-3"
-                hide-details
-                ></v-switch>
-            </v-col>
-          </v-row>
-        </v-toolbar>
-        <v-list subheader v-if="state.switch1">
-          <v-list-item
-            v-for="room in state.privaterooms"
-            :key="room.id"
-            @click="getInRoom(room)"
-          >
-            <v-row class="d-flex justify-space-between">
-              <v-col cols="10"> 
-                <v-list-item-content>
-                  <RoomListItem :room="room"/>
-                </v-list-item-content>
-              </v-col>
-              <v-col>
-                <v-list-item-icon>
-                  <v-icon :color="room.secret ? 'deep-purple accent-4' : 'grey'">
-                    mdi-lock-outline
-                  </v-icon>
-                </v-list-item-icon>
-              </v-col>
-            </v-row>
-            <!-- <v-divider></v-divider> -->
-          </v-list-item>
-        </v-list>
-        <v-list subheader v-else>
-          <v-list-item
-            v-for="room in state.teamrooms"
-            :key="room.title"
-            @click="getInRoom(room)"
-          >
-          <v-row class="d-flex justify-space-between">
-            <v-col cols="10">
-              <v-list-item-content>
-                <RoomListItem :room="room"/>
-              </v-list-item-content>
-            </v-col>
-            <v-col>
-              <v-list-item-icon>
-                <v-icon :color="room.secret ? 'deep-purple accent-4' : 'grey'">
-                  mdi-lock-outline
-                </v-icon>
-              </v-list-item-icon>
-            </v-col>
-          </v-row>
-          <!-- <v-divider></v-divider> -->
-          </v-list-item>
-        </v-list>
-      </v-card>      
-    </div>
-  </template>
-  
+        <RoomListItem :room="room"/>
+        </v-list-item>
+      </v-list>
+    </v-card>
+  </div>
+</template>
 <script>
 import { reactive, onMounted } from "vue"
 import { roomList } from "@/common/api/gameAPI";
@@ -93,8 +47,10 @@ export default {
     const state = reactive({
       privaterooms: [],
       teamrooms: [],
+      roomlist: [],
       switch1: true,
     })
+
     const getInRoom = function (params) {
       const roominfo = JSON.parse(JSON.stringify(params));
       console.log('roominfo : ', roominfo)
@@ -106,10 +62,13 @@ export default {
       router.push({name: 'waiting'})
     }
 
-    const teamOrPrivate = async function() {
-      const switchvalue = state.switch1
-      console.log(switchvalue);
-      await store.dispatch('gameStore/isTeam', switchvalue)
+    const isTeamGame = async function() {
+      console.log(state.switch1);
+      if (state.switch1) {
+        state.roomlist = state.privaterooms
+      } else {
+        state.roomlist = state.teamrooms
+      }
     }
 
     // 방 리스트 조회
@@ -129,7 +88,7 @@ export default {
     return {
       state,
       getInRoom,
-      teamOrPrivate,
+      isTeamGame,
     }
   }
 }
