@@ -13,6 +13,7 @@ return -100;
 
 const requestRegister = payload => $axios.post("/api/member", payload); // 회원가입 요청
 
+
 const checkEmail = (payload) => {
     console.log(payload)
     return $axios.get(`api/member/email?email=${payload}`)

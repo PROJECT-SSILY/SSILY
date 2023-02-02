@@ -26,6 +26,7 @@ const state = {
     subscribers: [],
     mySessionId: '',
     myUserName: '',
+    isHost: true
 }
 
 const getters = {
@@ -142,14 +143,20 @@ const actions = {
       )
     },
     createToken: (context, mySessionId) => {
+      console.log('안됨?')
+      const level = context.rootState.accountStore.user.level
+      const nickname = context.rootState.accountStore.user.nickname
+      const isHost = state.isHost
+      const rate = context.rootGetters.accountStore.getRate
+      console.log('createToken: ', level, nickname,  isHost, rate)
       return new Promise((resolve, reject)=> {
         $axios
 					.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
             // 하드코딩한 부분 나중에 수정 필요
-            "level" : 5,
-            "nickname" : "회원 닉네임",
-            "rate" : 0.5,
-            "isHost" : true,
+            "level" : level,
+            "nickname" : nickname,
+            "rate" : rate,
+            "isHost" : isHost,
           }), {
 						auth: {
 							username: 'OPENVIDUAPP',
