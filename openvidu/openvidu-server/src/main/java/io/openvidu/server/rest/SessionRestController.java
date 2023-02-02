@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import io.openvidu.server.exception.ExceptionCode;
 import io.openvidu.server.exception.ExceptionResponseBody;
 import io.openvidu.server.game.Player;
+import io.openvidu.server.game.Team;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -432,8 +433,46 @@ public class SessionRestController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+	}
 
+	/**
+	 * 서영탁
+	 * 참여자(플레이어) 팀 변경
+	 */
+	@PutMapping("/rooms/{room-id}/players/{player-id}/team")
+	public ResponseEntity<?> changeTeam(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId,
+										@RequestBody Map<?, ?> params){
 
+		log.info("REST API: GET {}/rooms/{}/players/{}/team", "/api", roomId, playerId);
+
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
+
+		if (session != null) {
+			if(!session.getSessionProperties().isTeamBattle()){
+				log.info("[error] : {}", NOT_TEAM_BATTLE_MESSAGE);
+				ExceptionResponseBody body = new ExceptionResponseBody(NOT_TEAM_BATTLE, NOT_TEAM_BATTLE_MESSAGE);
+				return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
+			}
+
+			Participant p = session.getParticipantByPublicId(playerId);
+			if (p != null) {
+				String team = (String) params.get("team");
+				if(team.equals("RED")) p.getPlayer().setTeam(Team.RED);
+				else if(team.equals("BLUE")) p.getPlayer().setTeam(Team.BLUE);
+
+				return new ResponseEntity<>(p.toJson().toString(), RestUtils.getResponseHeaders(), HttpStatus.OK);
+			} else {
+				Token t = getTokenFromConnectionId(playerId, session.getTokenIterator());
+				if (t != null) {
+					return new ResponseEntity<>(t.toJsonAsParticipant().toString(), RestUtils.getResponseHeaders(),
+							HttpStatus.OK);
+				} else {
+					return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+				}
+			}
+		} else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@RequestMapping(value = "/recordings/start", method = RequestMethod.POST)
