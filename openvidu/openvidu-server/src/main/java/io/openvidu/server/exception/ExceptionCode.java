@@ -10,4 +10,7 @@ public class ExceptionCode {
     public static final int NOT_TEAM_BATTLE = -402;
     public static final String NOT_TEAM_BATTLE_MESSAGE = "팀전이 아닙니다.";
 
+    public static final int WRONG_PASSWORD = -403;
+    public static final String WRONG_PASSWORD_MESSAGE = "비밀번호가 틀렸습니다.";
+
 }
