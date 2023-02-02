@@ -19,7 +19,7 @@
                 <v-switch
                 v-model="state.switch1"
                 :label="`모드: ${state.switch1 ? '개인':'팀'}`"
-                @click="teamOrPrivate"
+                @click="isTeamGame"
                 color="orange darken-3"
                 hide-details
                 ></v-switch>
@@ -94,11 +94,13 @@ export default {
       router.push({name: 'waiting'})
     }
 
-    const teamOrPrivate = async function() {
-      const switchvalue = state.switch1
-      console.log(state.privaterooms);
-      await store.dispatch('gameStore/isTeam', switchvalue)
-
+    const isTeamGame = async function() {
+      console.log(state.switch1);
+      if (state.switch1) {
+        state.roomlist = state.privaterooms
+      } else {
+        state.roomlist = state.teamrooms
+      }
     }
 
     // 방 리스트 조회
@@ -119,7 +121,7 @@ export default {
     return {
       state,
       getInRoom,
-      teamOrPrivate
+      isTeamGame,
     }
   }
 }

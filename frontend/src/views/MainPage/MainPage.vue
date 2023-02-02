@@ -56,24 +56,14 @@ import ProfileBox from './Components/ProfileBox.vue';
 import RoomList from './Components/RoomList.vue';
 import { useStore } from "vuex"
 // import store from '@/store/gameStore';
-import { computed } from "vue"
+import { reactive } from "vue"
 // import { mapGetters } from 'vuex'
 
 export default {
   name: 'MainPage',
-  // computed: {
-  //   teamorprivate() {
-  //     return this.$store.state.teamorprivate
-  //   }
-  // },
-  // methods: {
-  //   cons() {
-  //     console.log(this.teamorprivate)
-  //   }
-  // },
   setup() {
     const store = useStore()
-    const isTeam = computed(()=> store.getters['gameStore/getTeam'])
+    const isTeam = reactive(null)
     function getMe () {
       console.log(store.getters['accountStore/getUser'])
     }
