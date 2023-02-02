@@ -19,13 +19,12 @@
         </v-row>
       </v-toolbar>
       <v-list subheader>
-        <v-list-item
+        <RoomListItem
           v-for="room in state.roomlist"
+          :room="room"
           :key="room.id"
           @click="getInRoom(room)"
-        >
-        <RoomListItem :room="room"/>
-        </v-list-item>
+          />
       </v-list>
     </v-card>
   </div>
@@ -85,6 +84,7 @@ export default {
       }
       // response.data
     })
+
     return {
       state,
       getInRoom,
