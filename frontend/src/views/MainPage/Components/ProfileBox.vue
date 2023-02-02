@@ -21,7 +21,7 @@
       </v-container>
     </div>
   </template>
-  
+
 <script>
 import { reactive, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
@@ -44,7 +44,7 @@ export default {
       route.push('mypage')
     }
     return {
-      store, 
+      store,
       state,
       route,
       toMyPage

@@ -79,8 +79,10 @@ export default {
     const state = reactive({
       privaterooms: [],
       teamrooms: [],
+      roomlist: [],
       switch1: true,
     })
+
     const getInRoom = function (params) {
       const roominfo = JSON.parse(JSON.stringify(params));
       console.log('roominfo : ', roominfo)
@@ -96,6 +98,7 @@ export default {
       const switchvalue = state.switch1
       console.log(state.privaterooms);
       await store.dispatch('gameStore/isTeam', switchvalue)
+
     }
 
     // 방 리스트 조회
@@ -112,10 +115,11 @@ export default {
       }
       // response.data
     })
+
     return {
       state,
       getInRoom,
-      teamOrPrivate,
+      teamOrPrivate
     }
   }
 }

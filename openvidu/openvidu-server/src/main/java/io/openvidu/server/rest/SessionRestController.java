@@ -586,7 +586,7 @@ public class SessionRestController {
 	@PutMapping("/rooms/{room-id}/players/{player-id}/ready")
 	public ResponseEntity<?> changeReadyState(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId) {
 
-		log.info("REST API: GET {}/rooms/{}/players/{}/ready", "/api", roomId, playerId);
+		log.info("REST API: PUT {}/rooms/{}/players/{}/ready", "/api", roomId, playerId);
 
 		Session session = this.sessionManager.getSessionWithNotActive(roomId);
 		if (session != null) {
@@ -617,7 +617,7 @@ public class SessionRestController {
 	public ResponseEntity<?> changeTeam(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId,
 										@RequestBody Map<?, ?> params){
 
-		log.info("REST API: GET {}/rooms/{}/players/{}/team", "/api", roomId, playerId);
+		log.info("REST API: PUT {}/rooms/{}/players/{}/team", "/api", roomId, playerId);
 
 		Session session = this.sessionManager.getSessionWithNotActive(roomId);
 

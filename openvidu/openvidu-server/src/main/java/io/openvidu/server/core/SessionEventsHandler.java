@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import io.openvidu.server.game.Player;
 import org.kurento.client.GenericMediaEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -393,6 +394,7 @@ public class SessionEventsHandler {
         String from = null;
         String type = null;
         String data = null;
+        Player player =null;
 
         JsonObject params = new JsonObject();
         if (message.has("data")) {
@@ -406,6 +408,8 @@ public class SessionEventsHandler {
         if (participant != null) {
             from = participant.getParticipantPublicId();
             params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_FROM_PARAM, from);
+            player =participant.getPlayer();
+            params.add("player", player.toJson());
         }
 
         Set<String> toSet = new HashSet<String>();
@@ -444,7 +448,7 @@ public class SessionEventsHandler {
             }
         }
 
-        CDR.recordSignalSent(sessionId, uniqueSessionId, from, toSet.toArray(new String[toSet.size()]), type, data);
+        CDR.recordSignalSent(sessionId, uniqueSessionId, from, toSet.toArray(new String[toSet.size()]), type, data, player);
 
         if (isRpcCall) {
             rpcNotificationService.sendResponse(participant.getParticipantPrivateId(), transactionId, new JsonObject());

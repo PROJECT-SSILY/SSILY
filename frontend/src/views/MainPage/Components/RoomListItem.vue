@@ -1,6 +1,7 @@
 <template>
   <!-- <v-list-item-title v-text="room.title"></v-list-item-title> -->
   <v-row class="d-flex justify-space-between">
+
     <v-col md="8">
       <v-list-item-content>
         <h3>{{ room.title }}</h3>

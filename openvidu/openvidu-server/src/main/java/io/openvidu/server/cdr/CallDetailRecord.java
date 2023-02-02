@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import io.openvidu.server.game.Player;
 import org.kurento.client.GenericMediaEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,11 +174,11 @@ public class CallDetailRecord {
 	}
 
 	public void recordSignalSent(String sessionId, String uniqueSessionId, String from, String[] to, String type,
-			String data) {
+			String data, Player player) {
 		if (from != null) {
 			type = type.replaceFirst("^signal:", "");
 		}
-		this.log(new CDREventSignal(sessionId, uniqueSessionId, from, to, type, data));
+		this.log(new CDREventSignal(sessionId, uniqueSessionId, from, to, type, data, player));
 	}
 
 	protected void log(CDREvent event) {
