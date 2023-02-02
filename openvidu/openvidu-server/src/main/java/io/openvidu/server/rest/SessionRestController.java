@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import io.openvidu.server.exception.ExceptionCode;
 import io.openvidu.server.exception.ExceptionResponseBody;
 import io.openvidu.server.game.Player;
 import io.openvidu.server.game.Team;
@@ -228,6 +227,12 @@ public class SessionRestController {
 		}
 	}
 
+	/**
+	 * 김윤미
+	 * 게임 방 삭제
+	 * @param roomId
+	 * @return
+	 */
 	@RequestMapping(value = "/rooms/{room-id}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> closeSession(@PathVariable("room-id") String roomId) {
 
@@ -410,7 +415,7 @@ public class SessionRestController {
 	 * 참여자(플레이어) 준비 상태 변경
 	 */
 	@PutMapping("/rooms/{room-id}/players/{player-id}/ready")
-	public ResponseEntity<?> changeReadyState(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId){
+	public ResponseEntity<?> changeReadyState(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId) {
 
 		log.info("REST API: GET {}/rooms/{}/players/{}/ready", "/api", roomId, playerId);
 
@@ -473,6 +478,53 @@ public class SessionRestController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+	}
+
+	/**
+	 * 김윤미
+	 * 방장 넘겨주기
+	 * @param roomId : 방 id
+	 * @return
+	 */
+    @RequestMapping(value = "/rooms/{room-id}/players/host", method = RequestMethod.PUT)
+	public ResponseEntity<?> changeSessionHost(@PathVariable("room-id") String roomId,
+											   @RequestBody Map<?, ?> params,
+											   @RequestParam(value = "pendingConnections", defaultValue = "true", required = false) boolean pendingConnections,
+											   @RequestParam(value = "webRtcStats", defaultValue = "false", required = false) boolean webRtcStats) {
+		log.info("REST API: PUT {}/rooms/{}/players/host", "/api", roomId);
+
+		Session session = this.sessionManager.getSessionWithNotActive(roomId);
+		if (session == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		String oldHostId, newHostId;
+		try {
+			oldHostId = (String)params.get("oldHostId");
+			newHostId = (String)params.get("newHostId");
+		} catch (Exception e) {
+			log.info("ID NOT FOUND");
+			return this.generateErrorResponse(e.getMessage(), "/rooms/{}/players/host", HttpStatus.BAD_REQUEST);
+		}
+
+		Participant oldHost, newHost;
+		try {
+			oldHost=session.getParticipantByPublicId(oldHostId);
+			newHost=session.getParticipantByPublicId(newHostId);
+
+			if(!oldHost.getPlayer().isHost()) {
+				log.info("{} IS NOT HOST", oldHostId);
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			log.info("HOST NOT FOUND");
+			return this.generateErrorResponse(e.getMessage(), "/rooms/{}/players/host", HttpStatus.BAD_REQUEST);
+		}
+
+		oldHost.getPlayer().setHost(false);
+		newHost.getPlayer().setHost(true);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/recordings/start", method = RequestMethod.POST)
