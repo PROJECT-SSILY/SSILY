@@ -1,13 +1,4 @@
-// import {
-//     requestLogin,
-//     requestRegister,
-//     requestMe,
-//     requestId,
-//   } from "../common/api/accountAPI";
-
-import { makeRoomAction } from "@/common/api/gameAPI";
-
-
+// import { roomList } from "@/common/api/gameAPI";
 import { OpenVidu } from "openvidu-browser";
 import $axios from "axios";
 
@@ -30,7 +21,7 @@ const state = {
     subscribers: [],
     mySessionId: '',
     myUserName: '',
-    isHost: true
+    isHost: true,
 }
 
 const getters = {
@@ -93,18 +84,20 @@ const actions = {
         state.commit("changeMode", null)
         console.log(state.getters.getTeam);
     },
-    roomAction: async (commit, formData) => {
-        try {
-            console.log(formData)
-            const response = await makeRoomAction(formData)
-            console.log(response);
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    },
+    // getRoomList: async() => {
+    //     // const res = await roomList()
+    //     const res = ''
+    //     console.log('room리스트 ', roomList());
+    //     console.log('getroomlist : ',res)
+    //     try {
+    //         return res
+    //     } catch (err) {
+    //         console.log(err);
+    //         throw err;
+    //     }
+    // },
     // ---------------openvidu-------------------
-    joinSession: ({dispatch, state, commit}) => {
+    joinSession: (context) => {
       const OV = new OpenVidu();
       const session = OV.initSession();
       const subscribers = [];
@@ -126,8 +119,8 @@ const actions = {
         console.warn(exception);
       });
 
-      
-      dispatch("getToken", state.mySessionId).then(token => {
+      context.commit("setMySessionId", state.mySessionId)
+      context.dispatch("getToken", state.mySessionId).then(token => {
         session
         .connect(token, { clientData: state.myUserName })
         .then(()=>{
@@ -142,10 +135,10 @@ const actions = {
             insertMode: 'APPEND',	
             mirror: false       
           });
-          commit("setOV", OV)
-          commit("setSession", session)
-          commit("setMainStreamManager", publisher)
-          commit("setPublisher", publisher)
+          context.commit("setOV", OV)
+          context.commit("setSession", session)
+          context.commit("setMainStreamManager", publisher)
+          context.commit("setPublisher", publisher)
 
           session.publish(publisher)
         })
@@ -217,8 +210,8 @@ const actions = {
       const myTitle= state.title;
       console.log("내 타이틀 이거임", myTitle);
       return new Promise((resolve, reject) => {
-				$axios
-					.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+			$axios
+			.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
             // 하드코딩한 부분 나중에 수정 필요
 
             "title" : myTitle,

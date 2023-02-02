@@ -1,7 +1,6 @@
 <template>
-  <p class="text-subtitle-1">
-    방 : {{ state.title }}
-  </p>
+  <p>세션 : {{ mySessionId }}</p>
+  <p>세션 : {{ title }}</p>
   <div id="flex-container">
     <div class="flex-item">
       <UserInfo/>
@@ -108,14 +107,14 @@ export default {
 		UserVideo,
 		ChattingBox,
   },
-
   setup() {
     const router = useRouter()
     const store = useStore()
-
+	
     // == OpenVidu State ==
     const OV = computed(() => store.state.gameStore.OV)
     const session = computed(() => store.state.gameStore.session)
+    const title = computed(() => store.state.gameStore.title)
     const mainStreamManager = computed(() => store.state.gameStore.mainStreamManager ) 
     const publisher = computed(() => store.state.gameStore.publisher )
     const subscribers = computed(() => store.state.gameStore.subscribers ) 
@@ -124,10 +123,8 @@ export default {
     // =====================
 
     const state = reactive({
-      title: "",
       team: null,
       ready: false,
-      
     })
     const clickExit = () => {
       router.push({
@@ -153,16 +150,17 @@ export default {
 
 	const sessionInfo = () => {
 		const session1 = store.getters['gameStore/getSession']
-    const sessionId1 = store.getters['gameStore/getSessionId']
-
+		const sessionId1 = store.getters['gameStore/getSessionId']
 		console.log('session클릭', session1)
-    console.log('sessionId', sessionId1)
+		console.log('sessionId', sessionId1)
 	}
 	
 
+
     return { 
 		router, 
-		state, 
+		state,
+		title,
 		clickExit, 
 		clickReady, 
 		joinSession, 
