@@ -15,14 +15,12 @@ const state = {
     isTeamBattle: null,
     OV: undefined,
     session: undefined,
-    title: '',
     mainStreamManager: undefined,
     publisher: undefined,
     subscribers: [],
     mySessionId: '',
     myUserName: '',
     isHost: true,
-
 }
 
 const getters = {
@@ -96,7 +94,7 @@ const actions = {
     //     }
     // },
     // ---------------openvidu-------------------
-    joinSession: (context, sessionId) => {
+    joinSession: (context) => {
       const OV = new OpenVidu();
       const session = OV.initSession();
       const subscribers = [];
@@ -118,7 +116,7 @@ const actions = {
         console.warn(exception);
       });
 
-      context.commit("setMySessionId", sessionId)
+      context.commit("setMySessionId", state.mySessionId)
       context.dispatch("getToken", state.mySessionId).then(token => {
         session
         .connect(token, { clientData: state.myUserName })
@@ -169,7 +167,7 @@ const actions = {
         console.log("rate=", rate);
 
         $axios
-					.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
+			.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
             "level" : level,
             "nickname" : nickname,
             "rate" : rate,
@@ -190,8 +188,8 @@ const actions = {
       const myTitle= state.title;
       console.log("내 타이틀 이거임", myTitle);
       return new Promise((resolve, reject) => {
-				$axios
-					.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+			$axios
+			.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
             // 하드코딩한 부분 나중에 수정 필요
 
             "title" : myTitle,
