@@ -35,7 +35,7 @@ const getters = {
     },
     getRate: (state) => {
         if (state.plays) {
-            return state.wins/(state.plays - state.draws - state.wins)
+            return parseFloat(state.wins/(state.plays - state.draws - state.wins)).toFixed(1)
         }
         return parseFloat(0).toFixed(1)
     }

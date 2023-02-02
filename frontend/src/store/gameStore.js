@@ -137,6 +137,7 @@ const actions = {
     },
 
     getToken: ({dispatch}, mySessionId) => {
+      console.log('gettoken 진입')
       return dispatch("createSession", mySessionId)
       .then((mySessionId) =>
       dispatch("createToken", mySessionId)
@@ -179,9 +180,9 @@ const actions = {
 					.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
             // 하드코딩한 부분 나중에 수정 필요
             "title" : "방제목",
-            "isSecret" : false,
+            "isSecret" : true,
             "password" : "123",
-            "team" : "NONE"
+            "isTeamBattle" : false
           }), {
 						auth: {
 							username: 'OPENVIDUAPP',
