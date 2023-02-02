@@ -57,6 +57,7 @@ const routes = [
     path: '/waiting',
     name: 'waiting',
     component: WaitingPage,
+    props: true,
     beforeEnter: requireAuth()
   },
   {

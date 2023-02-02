@@ -1,7 +1,5 @@
 <template>
-  <p class="text-subtitle-1">
-    방 : {{ state.title }}
-  </p>
+  <p>세션 : {{ mySessionId }}</p>
   <div id="flex-container">
     <div class="flex-item">
       <UserInfo/>
@@ -108,11 +106,10 @@ export default {
 		UserVideo,
 		ChattingBox,
   },
-
   setup() {
     const router = useRouter()
     const store = useStore()
-
+	
     // == OpenVidu State ==
     const OV = computed(() => store.state.gameStore.OV)
     const session = computed(() => store.state.gameStore.session)
@@ -153,10 +150,10 @@ export default {
 
 	const sessionInfo = () => {
 		const session1 = store.getters['gameStore/getSession']
-    const sessionId1 = store.getters['gameStore/getSessionId']
-
+		const sessionId1 = store.getters['gameStore/getSessionId']
 		console.log('session클릭', session1)
-    console.log('sessionId', sessionId1)
+		console.log('sessionId', sessionId1)
+
 	}
 	
 

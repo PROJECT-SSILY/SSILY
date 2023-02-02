@@ -1,13 +1,4 @@
-// import {
-//     requestLogin,
-//     requestRegister,
-//     requestMe,
-//     requestId,
-//   } from "../common/api/accountAPI";
-
-import { makeRoomAction } from "@/common/api/gameAPI";
-
-
+// import { roomList } from "@/common/api/gameAPI";
 import { OpenVidu } from "openvidu-browser";
 import $axios from "axios";
 
@@ -21,11 +12,13 @@ const state = {
     teamorprivate: null,
     OV: undefined,
     session: undefined,
+    title: '',
     mainStreamManager: undefined,
     publisher: undefined,
     subscribers: [],
     mySessionId: '',
     myUserName: '',
+    isHost: true,
 }
 
 const getters = {
@@ -72,18 +65,20 @@ const actions = {
         state.commit("setTeam", null)
         console.log(state.getters.getTeam);
     },
-    roomAction: async (commit, formData) => {
-        try {
-            console.log(formData)
-            const response = await makeRoomAction(formData)
-            console.log(response);
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    },
+    // getRoomList: async() => {
+    //     // const res = await roomList()
+    //     const res = ''
+    //     console.log('room리스트 ', roomList());
+    //     console.log('getroomlist : ',res)
+    //     try {
+    //         return res
+    //     } catch (err) {
+    //         console.log(err);
+    //         throw err;
+    //     }
+    // },
     // ---------------openvidu-------------------
-    joinSession: ({dispatch, state, commit}) => {
+    joinSession: (context, sessionId) => {
       const OV = new OpenVidu();
       const session = OV.initSession();
       const subscribers = [];
@@ -105,8 +100,8 @@ const actions = {
         console.warn(exception);
       });
 
-      
-      dispatch("getToken", state.mySessionId).then(token => {
+      context.commit("setMySessionId", sessionId)
+      context.dispatch("getToken", state.mySessionId).then(token => {
         session
         .connect(token, { clientData: state.myUserName })
         .then(()=>{
@@ -121,10 +116,10 @@ const actions = {
             insertMode: 'APPEND',	
             mirror: false       
           });
-          commit("setOV", OV)
-          commit("setSession", session)
-          commit("setMainStreamManager", publisher)
-          commit("setPublisher", publisher)
+          context.commit("setOV", OV)
+          context.commit("setSession", session)
+          context.commit("setMainStreamManager", publisher)
+          context.commit("setPublisher", publisher)
 
           session.publish(publisher)
         })
@@ -142,55 +137,60 @@ const actions = {
       )
     },
     createToken: (context, mySessionId) => {
-      return new Promise((resolve, reject)=> {
+        const level = context.rootState.accountStore.level
+        const nickname = context.rootState.accountStore.nickname
+        // const rate = context.rootState.accountStore.rate
+        const isHost = state.isHost
+        console.log(level)
+        return new Promise((resolve, reject)=> {
         $axios
-					.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
+			.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
             // 하드코딩한 부분 나중에 수정 필요
-            "level" : 5,
-            "nickname" : "회원 닉네임",
-            "rate" : 0.5,
-            "isHost" : true,
-          }), {
-						auth: {
-							username: 'OPENVIDUAPP',
-							password: OPENVIDU_SERVER_SECRET,
-						},
-					})
-					.then(response => response.data)
-					.then(data => resolve(data.token))
-					.catch(error => reject(error.response));
+                "level" : level,
+                "nickname" : nickname,
+                "rate" : 0.1,
+                "isHost" : isHost,
+            }), {
+                auth: {
+                    username: 'OPENVIDUAPP',
+                    password: OPENVIDU_SERVER_SECRET,
+                },
+            })
+            .then(response => response.data)
+            .then(data => resolve(data.token))
+            .catch(error => reject(error.response));
       })
 
     },
     createSession: (context, sessionId) => {
       return new Promise((resolve, reject) => {
-				$axios
-					.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
-            // 하드코딩한 부분 나중에 수정 필요
-            "title" : "방제목",
-            "isSecret" : false,
-            "password" : "123",
-            "team" : "NONE"
-          }), {
-						auth: {
-							username: 'OPENVIDUAPP',
-							password: OPENVIDU_SERVER_SECRET,
-						},
-					})
-					.then(response => response.data)
-					.then(data => resolve(data.id))
-					.catch(error => {
-						if (error.response.status === 409) {
-							resolve(sessionId);
-						} else {
-							console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
-							if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
-								location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
-							}
-							reject(error.response);
-						}
-					});
-			});
+        $axios
+            .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+                // 하드코딩한 부분 나중에 수정 필요
+                "title" : "방제목",
+                "isSecret" : false,
+                "password" : "123",
+                "team" : "NONE"
+            }), {
+                auth: {
+                    username: 'OPENVIDUAPP',
+                    password: OPENVIDU_SERVER_SECRET,
+                },
+            })
+            .then(response => response.data)
+            .then(data => resolve(data.id))
+            .catch(error => {
+                if (error.response.status === 409) {
+                    resolve(sessionId);
+                } else {
+                    console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
+                    if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
+                        location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
+                    }
+                    reject(error.response);
+                }
+            });
+        });
     },
     leaveSession: (commit) => {
       if (state.session) state.session.disconnect();

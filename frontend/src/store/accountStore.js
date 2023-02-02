@@ -9,6 +9,9 @@ import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwActi
 
 const state = {
     token: localStorage.getItem('token') || null,
+    level: 1,
+    nickname: "test",
+    rate: 0.5,
 }
 
 const getters = {
