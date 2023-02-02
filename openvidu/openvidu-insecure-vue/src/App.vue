@@ -218,7 +218,7 @@ export default {
               title: "방제목2",
               isSecret: true,
               password: "1234",
-              isTeamBattle: false,
+              isTeamBattle: true,
               customSessionId: this.mySessionId,
             }),
             {
