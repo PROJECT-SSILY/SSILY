@@ -66,6 +66,7 @@ import io.openvidu.server.recording.Recording;
 import io.openvidu.server.recording.service.RecordingManager;
 import io.openvidu.server.utils.RecordingUtils;
 import io.openvidu.server.utils.RestUtils;
+import org.thymeleaf.util.StringUtils;
 
 import javax.ws.rs.Path;
 
@@ -300,10 +301,21 @@ public class SessionRestController {
 			return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
 		}
 
-		if(session.getSessionProperties().isPlaying()){
+		SessionProperties sessionProperties = session.getSessionProperties();
+		if(sessionProperties.isPlaying()){
 			log.info("[error] : {}", PLAYING_ROOM_MESSAGE);
 			ExceptionResponseBody body = new ExceptionResponseBody(PLAYING_ROOM, PLAYING_ROOM_MESSAGE);
 			return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
+		}
+
+		if(sessionProperties.isSecret()){
+			String password = (String) params.get("password");
+
+			if(password == null || !password.equals(sessionProperties.password())){
+				log.info("[error] : {}", WRONG_PASSWORD_MESSAGE);
+				ExceptionResponseBody body = new ExceptionResponseBody(WRONG_PASSWORD, WRONG_PASSWORD_MESSAGE);
+				return new ResponseEntity<>(body.toJson(), HttpStatus.BAD_REQUEST);
+			}
 		}
 
 		ConnectionProperties connectionProperties;

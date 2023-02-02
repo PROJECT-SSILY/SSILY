@@ -276,8 +276,9 @@ export default {
             {
               level: 1,
               nickname : "서영탁",
-              rate : 70.1,
-              isHost: false
+              rate : "70.1",
+              isHost: false,
+              password : "1234"
             },
             {
               auth: {
