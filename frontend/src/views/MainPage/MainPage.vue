@@ -4,6 +4,9 @@
         <v-row>
           <v-col>
             <h1>메인 화면</h1>
+            <v-btn @click="getMe">
+              getme
+            </v-btn>
           </v-col>
         </v-row>
         <v-row>
@@ -72,9 +75,13 @@ export default {
   setup() {
     const store = useStore()
     const isTeam = computed(()=> store.getters['gameStore/getTeam'])
+    function getMe () {
+      console.log(store.getters['accountStore/getUser'])
+    }
     return {
       store, 
-      isTeam
+      isTeam,
+      getMe
       }
     },
   components: {

@@ -9,6 +9,18 @@ import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwActi
 
 const state = {
     token: localStorage.getItem('token') || null,
+    user: {
+        email: "",
+        name: "",
+        nickname: "",
+        level: null,
+        exp: null,
+        record: {
+            plays: null,
+            wins: null,
+            draws: null,
+        }
+    }
 }
 
 const getters = {
@@ -21,6 +33,12 @@ const getters = {
     getCheckId: (state) => {
         return state.checkId;
     },
+    getRate: (state) => {
+        if (state.plays) {
+            return state.wins/(state.plays - state.draws - state.wins)
+        }
+        return parseFloat(0).toFixed(1)
+    }
 }
 
 const mutations = {
@@ -36,7 +54,7 @@ const mutations = {
 }
 
 const actions = {
-    loginAction: async ({ commit }, loginData) => {
+    loginAction: async ({ dispatch, commit }, loginData) => {
         // console.log("loginData : ", loginData);
         const response = await requestLogin(loginData);
         // console.log("response : ", response);
@@ -45,6 +63,7 @@ const actions = {
         }
         await commit("setToken", response.data.data.accessToken);
         localStorage.setItem('token', state.token)
+        dispatch("getMeAction", response.data.data.accessToken)
         // console.log('토큰: ', state.token)
     },
     logoutAction: async ({ commit }) => {
