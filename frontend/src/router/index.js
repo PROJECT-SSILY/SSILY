@@ -70,7 +70,7 @@ const routes = [
     path: '/main',
     name: 'main',
     component: MainPage,
-    beforeEnter: requireAuth()
+    // beforeEnter: requireAuth()
   },
   {
     path: '/ingame',
