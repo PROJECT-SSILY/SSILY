@@ -4,11 +4,14 @@
         <v-row>
           <v-col>
             <h1>메인 화면</h1>
+            <v-btn @click="getMe">
+              getme
+            </v-btn>
           </v-col>
         </v-row>
         <v-row>
           <v-col>
-            <room-list></room-list>
+            <room-list @sendValue="changeValue"></room-list>
           </v-col>
           <v-col>
             <v-row>
@@ -22,15 +25,22 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col>
+              <v-col v-if="state.isTeam">
                 <v-btn color="success"
+                @click="randomTeam"
                 >
-                게임 시작</v-btn>
+                팀 게임 시작</v-btn>
+              </v-col>
+              <v-col v-else>
+                <v-btn color="primary"
+                @click="randomPrivate"
+                >
+                개인 게임 시작</v-btn>
               </v-col>
             </v-row>
             <v-row>
               <v-col>
-                <v-btn>튜토리얼</v-btn>
+                <tutorial-dialog></tutorial-dialog>
               </v-col>
             </v-row>
           </v-col>
@@ -42,21 +52,53 @@
 <script>
 
 import MakeRoomDialog from './Components/MakeRoomDialog.vue';
+import TutorialDialog from './Components/TutorialDialog.vue';
 import ProfileBox from './Components/ProfileBox.vue';
 import RoomList from './Components/RoomList.vue';
+import { useStore } from "vuex"
+// import store from '@/store/gameStore';
+import { reactive } from "vue"
+// import { mapGetters } from 'vuex'
 
 export default {
-name: 'MainPage',
-data() {
-  return {
-  };
-},
-components: {
-  MakeRoomDialog,
-  ProfileBox,
-  RoomList
-},
+  name: 'MainPage',
+  setup() {
+    const store = useStore()
+    const state = reactive({
+      isTeam : null
+    })
+    function getMe () {
+      console.log(store.getters['accountStore/getUser'])
+    }
+    const changeValue = function (value) {
+      state.isTeam = value
+      console.log(value)
+    }
+
+    const randomTeam = function () {
+      console.log(state.isTeam)
+    }
+    const randomPrivate = function () {
+      console.log(state.isTeam)
+    }
+    return {
+      store, 
+      state,
+      getMe,
+      changeValue,
+      randomTeam,
+      randomPrivate,
+      }
+    },
+  components: {
+    MakeRoomDialog,
+    TutorialDialog,
+    ProfileBox,
+    RoomList,
+    
+  },
 }
+// }
 </script>
 
 <style scoped>

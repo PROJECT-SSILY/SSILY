@@ -6,8 +6,8 @@ import WaitingPage from '@/views/WaitingPage/WaitingPage.vue'
 import StartingPage from '../views/StartingPage/StartingPage.vue'
 import MainPage from '../views/MainPage/MainPage.vue'
 import FindPassword from '../views/Accounts/FindPassword.vue'
+import InGamePage from '../views/InGamePage/InGamePage.vue'
 import accountStore from '@/store/accountStore'
-
 
 const requireAuth = () => (to, from, next) => {
   const token = accountStore.state.token
@@ -24,14 +24,14 @@ const loginAuth = () => (to, from, next) => {
   if (token == null) {
     return next();
   }
-  router.go(-1);
+  router.push('main');
 };
 
 
 const routes = [
   {
     path: '/',
-    name: 'Starting',
+    name: 'starting',
     component: StartingPage,
     beforeEnter: loginAuth()
   },
@@ -57,19 +57,26 @@ const routes = [
     path: '/waiting',
     name: 'waiting',
     component: WaitingPage,
+    props: true,
     beforeEnter: requireAuth()
   },
   {
     path: '/findpw',
-    name: 'Findpw',
+    name: 'findpw',
     component: FindPassword,
     beforeEnter: loginAuth()
   },
   {
     path: '/main',
-    name: 'Main',
+    name: 'main',
     component: MainPage,
-    beforeEnter: requireAuth()
+    // beforeEnter: requireAuth()
+  },
+  {
+    path: '/ingame',
+    name: 'ingame',
+    component: InGamePage,
+    // beforeEnter: requireAuth()
   },
   // {
   //   path: '/about',

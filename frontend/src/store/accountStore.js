@@ -5,10 +5,22 @@
 //     requestId,
 //   } from "../common/api/accountAPI";
 
-import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction } from "@/common/api/accountAPI";
+import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe } from "@/common/api/accountAPI";
 
 const state = {
     token: localStorage.getItem('token') || null,
+    user: {
+        email: "",
+        name: "",
+        nickname: "",
+        level: null,
+        exp: null,
+        record: {
+            plays: null,
+            wins: null,
+            draws: null,
+        }
+    }
 }
 
 const getters = {
@@ -21,6 +33,12 @@ const getters = {
     getCheckId: (state) => {
         return state.checkId;
     },
+    getRate: (state) => {
+        if (state.plays) {
+            return parseFloat(state.wins/(state.plays - state.draws - state.wins)).toFixed(1)
+        }
+        return parseFloat(0).toFixed(1)
+    }
 }
 
 const mutations = {
@@ -36,7 +54,7 @@ const mutations = {
 }
 
 const actions = {
-    loginAction: async ({ commit }, loginData) => {
+    loginAction: async ({ dispatch, commit }, loginData) => {
         // console.log("loginData : ", loginData);
         const response = await requestLogin(loginData);
         // console.log("response : ", response);
@@ -45,11 +63,13 @@ const actions = {
         }
         await commit("setToken", response.data.data.accessToken);
         localStorage.setItem('token', state.token)
+        dispatch("getMeAction", response.data.data.accessToken)
         // console.log('토큰: ', state.token)
     },
-    // logoutAction: async ({ commit }) => {
-    //     commit("setToken", null);
-    // },
+    logoutAction: async ({ commit }) => {
+        commit("setToken", null);
+        localStorage.removeItem('token')
+    },
     // mountAction: async ({ commit }) => {
     //     const local = await localStorage.getItem("token");
     //     commit("setToken", local);
@@ -97,18 +117,17 @@ const actions = {
             console.log(err);
             throw err;
         }
-    }
-
-    // getMeAction: async ({ commit }, token) => {
-    //     try {
-    //         // console.log("token : ", token);
-    //         const response = await requestMe(token);
-    //         console.log("getMe : ", response);
-    //         await commit("setUser", response);
-    //     } catch (err) {
-    //         console.log("111");
-    //     }
-    // },
+    },
+    getMeAction: async ( context, token) => {
+        try {
+            const response = await requestMe(token);
+            console.log("getMe : ", response.data.data);
+            await context.commit("setUser", response.data.data);
+            return response.data.data
+        } catch (err) {
+            console.log(err);
+        }
+    },
     // idAction: async ({ commit }, idData) => {
     //     console.log(idData, "------axios------");
     //     const response = await requestId(idData.id);
