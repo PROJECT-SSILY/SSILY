@@ -1,5 +1,6 @@
 <template>
   <router-view/>
+  <img src="./assets/Splash.svg" alt="">
 </template>
 
 <style>
@@ -8,9 +9,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-
+  color: #2c3e50;
 }
-
+img {
+  width:auto
+}
 nav {
   padding: 30px;
 }
