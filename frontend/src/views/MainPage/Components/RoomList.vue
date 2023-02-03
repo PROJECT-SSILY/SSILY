@@ -1,45 +1,80 @@
 <template>
-  <div>
-    <h3>RoomList</h3>
-    <v-card class="mx-auto" max-width="500">
-      <v-toolbar color="deep-purple accent-4" dark>
-        <v-row>
-          <v-col class="title">
-            <h3>방 제목</h3>
-          </v-col>
-          <v-col>
-            <v-switch
-              v-model="state.switch1"
-              :label="`모드: ${state.switch1 ? '개인':'팀'}`"
-              @click="isTeamGame"
-              color="orange darken-3"
-              hide-details
-            ></v-switch>
-          </v-col>
-        </v-row>
-      </v-toolbar>
-      <v-list subheader>
-        <RoomListItem
-          v-for="room in state.roomlist"
-          :room="room"
-          :key="room.id"
-          @click="getInRoom(room)"
-          />
-      </v-list>
-    </v-card>
-  </div>
-</template>
+    <div>
+      <h3>
+        RoomList
+      </h3>
+      <v-card
+        class="mx-auto"
+        max-width="500"
+      >
+        <v-toolbar
+        :color="state.switch1 ? 'deep-purple accent-4' : 'success'"
+          dark
+        >
+          <v-row>
+            <v-col class="title">
+              <h3>방 제목</h3>
+            </v-col>
+            <v-col>
+                <v-switch
+                v-model="state.switch1"
+                :label="`모드: ${state.switch1 ? '개인':'팀'}`"
+                @click="isTeamGame(), sendValue()"
+                color="orange darken-3"
+                hide-details
+                ></v-switch>
+            </v-col>
+          </v-row>
+        </v-toolbar>
+        <v-list subheader v-if="state.switch1">
+          <v-list-item
+            v-for="room in state.privaterooms"
+            :key="room.id"
+            @click="getInRoom(room)"
+          >
+            <v-row class="d-flex justify-space-between">
+              <v-col cols="10"> 
+                <v-list-item-content>
+                  <RoomListItem :room="room"/>
+                </v-list-item-content>
+              </v-col>
+            </v-row>
+            <!-- <v-divider></v-divider> -->
+          </v-list-item>
+        </v-list>
+        <v-list subheader v-else>
+          <v-list-item
+            v-for="room in state.teamrooms"
+            :key="room.title"
+            @click="getInRoom(room)"
+          >
+          <v-row class="d-flex justify-space-between">
+            <v-col cols="10">
+              <v-list-item-content>
+                <RoomListItem :room="room"/>
+              </v-list-item-content>
+            </v-col>
+          </v-row>
+          <!-- <v-divider></v-divider> -->
+          </v-list-item>
+        </v-list>
+      </v-card>      
+    </div>
+  </template>
+  
 <script>
 import { reactive, onMounted } from "vue"
 import { roomList } from "@/common/api/gameAPI";
 import { useRouter } from "vue-router"
 import { useStore } from "vuex"
 import RoomListItem from '@/views/MainPage/Components/RoomListItem.vue'
+import { getCurrentInstance } from "vue";
 export default {
   name: "RoomList",
   components: {
     RoomListItem
   },
+  emits: ["sendValue"],
   setup() {
     const router = useRouter()
     const store = useStore()
@@ -69,6 +104,11 @@ export default {
         state.roomlist = state.teamrooms
       }
     }
+    const { emit } = getCurrentInstance();
+    const sendValue = function() {
+      emit('sendValue', state.switch1)
+      console.log(state.switch1);
+    }
 
     // 방 리스트 조회
     onMounted(async () => {
@@ -89,6 +129,7 @@ export default {
       state,
       getInRoom,
       isTeamGame,
+      sendValue
     }
   }
 }

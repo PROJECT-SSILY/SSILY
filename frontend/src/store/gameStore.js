@@ -13,6 +13,7 @@ const state = {
     isSecret: false,
     password: null,
     isTeamBattle: null,
+    isTeam: null,
     OV: undefined,
     session: undefined,
     mainStreamManager: undefined,
@@ -25,7 +26,7 @@ const state = {
 
 const getters = {
     getTeam: (state) => {
-        return state.isTeamBattle;
+        return state.isTeam;
     },
     getSession: (state) => {
         return state.session;
@@ -43,6 +44,7 @@ const mutations = {
 
     setTitle: (state, data) => {
         state.title = data
+        console.log('set적용되는지확인' + state.title);
     },
     setSecret: (state, payload) => {
         state.isSecret = payload
@@ -52,6 +54,7 @@ const mutations = {
     },
     setTeam: (state, payload) => {
         state.isTeamBattle = payload
+        console.log('set적용되는지확인' + state.isTeamBattle);
     },
     setOV: (state, data) => {
         state.OV = data;
@@ -74,11 +77,13 @@ const mutations = {
     setMyUserName: (state, name) => {
         state.myUserName = name;
     },
+    changeMode: (state) => {
+      state.isTeam = !state.isTeam
+    }
 }
-
 const actions = {
     isTeam: (state) => {
-        state.commit("setTeam", null)
+        state.commit("changeMode", null)
         console.log(state.getters.getTeam);
     },
     // getRoomList: async() => {
@@ -166,28 +171,48 @@ const actions = {
         console.log("nickname=",nickname);
         console.log("isHost=", isHost);
         console.log("rate=", rate);
-
-        $axios
-			.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
+        const isSecret = state.isSecret
+        if (isSecret) {
+          $axios
+					.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
+            "level" : level,
+            "nickname" : nickname,
+            "rate" : rate,
+            "isHost" : isHost,
+            "password" : state.password
+          }), {
+            auth: {
+              username: 'OPENVIDUAPP',
+							password: OPENVIDU_SERVER_SECRET,
+						},
+					}) 
+					.then(response => response.data)
+					.then(data => resolve(data.token))
+					.catch(error => reject(error.response));
+        } else {
+          $axios
+					.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
             "level" : level,
             "nickname" : nickname,
             "rate" : rate,
             "isHost" : isHost,
           }), {
-						auth: {
-							username: 'OPENVIDUAPP',
+            auth: {
+              username: 'OPENVIDUAPP',
 							password: OPENVIDU_SERVER_SECRET,
 						},
 					})
 					.then(response => response.data)
 					.then(data => resolve(data.token))
 					.catch(error => reject(error.response));
-      })
+        }
+        })
 
     },
     createSession: (context, sessionId) => {
       const myTitle= state.title;
       console.log("내 타이틀 이거임", myTitle);
+      console.log("createsession 팀 ", state.isTeamBattle);
       return new Promise((resolve, reject) => {
 			$axios
 			.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
@@ -196,7 +221,7 @@ const actions = {
             "title" : myTitle,
             "isSecret" : state.isSecret,
             "password" : state.password,
-            "team" : state.isTeamBattle
+            "isTeamBattle" : state.isTeamBattle
           }), {
 						auth: {
 							username: 'OPENVIDUAPP',

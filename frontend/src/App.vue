@@ -13,14 +13,14 @@
   text-align: center;
   color: #2c3e50;
 }
-<!-- .background{
+.background{
   height: 100vh;
   overflow: hidden;
   margin:0;  background-image: url("./assets/Splash.svg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-} -->
+}
 nav {
   padding: 30px;
 }
