@@ -221,7 +221,8 @@ const actions = {
             "title" : myTitle,
             "isSecret" : state.isSecret,
             "password" : state.password,
-            "isTeamBattle" : state.isTeamBattle
+            "isTeamBattle" : state.isTeamBattle,
+            "customSessionId" : sessionId,
           }), {
 						auth: {
 							username: 'OPENVIDUAPP',
