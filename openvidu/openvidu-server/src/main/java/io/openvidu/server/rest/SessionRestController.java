@@ -1624,13 +1624,4 @@ public class SessionRestController {
 		log.warn("REST API error response to path {} ({}): {}", path, status.value(), errorMessage);
 		return new ResponseEntity<>(responseJson.toString(), RestUtils.getResponseHeaders(), status);
 	}
-	@RequestMapping(value = "/test", method = RequestMethod.GET)
-	public ResponseEntity<?> test() {
-
-		log.info("test한다");
-		GameService gameService=new GameService();
-		gameService.allWords();
-		gameService.pickWords();
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
 }

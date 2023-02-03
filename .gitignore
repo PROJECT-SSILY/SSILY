@@ -1,3 +1,4 @@
 .DS_Store
 application.yml
 package-lock.json
+env.properties

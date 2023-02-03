@@ -2,9 +2,9 @@ package io.openvidu.server.game;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.openvidu.client.internal.ProtocolElements;
+import io.openvidu.server.config.PropertyConfig;
 import io.openvidu.server.core.Participant;
 import io.openvidu.server.rpc.RpcNotificationService;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,9 +21,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
-public class GameService {
+public class GameService   {
+
     static final int GET_TEAMS_SETTING = 0;
     static final int GET_PRESENTER_SETTING =1;
     static final int GAME_START = 2;
@@ -81,7 +80,7 @@ public class GameService {
      * @param data
      * @param notice
      */
-    private void gameStart(Participant participant, JsonObject message, String sessionId, Set<Participant> gameParticipants,
+    public void gameStart(Participant participant, JsonObject message, String sessionId, Set<Participant> gameParticipants,
                            JsonObject params, JsonObject data, RpcNotificationService notice) {
 
         //제시어 불러오기
@@ -100,29 +99,26 @@ public class GameService {
      * 김윤미
      * @return : 전체 단어 조회
      */
-    public List<String> allWords() {
-        //http 통신을 하기위한 객체 선언 실시
+    private List<String> allWords() {
         URL url = null;
         HttpURLConnection conn = null;
 
-        //메소드 호출 결과값을 반환하기 위한 변수
         String returnData = "";
         BufferedReader br=null;
 
         List<String> wordList=null;
 
         try {
-            //파라미터로 들어온 url을 사용해 connection 실시
-            url = new URL("http://localhost:8080/api/game/words");
+            String serverURL = PropertyConfig.getProperty("ssily.url");
+            log.info("serverURL = {}", serverURL);
+            url = new URL(serverURL+"/api/game/words");
             conn = (HttpURLConnection) url.openConnection();
 
-            //http 요청에 필요한 타입 정의 실시
             conn.setRequestProperty("Accept", "application/json");
             conn.setRequestMethod("GET");
 
             conn.setDoOutput(true);
 
-            //http 요청 실시
             conn.connect();
 
             StringBuffer sb = new StringBuffer();
@@ -139,7 +135,6 @@ public class GameService {
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         } finally {
-            //http 요청 및 응답 완료 후 BufferedReader를 닫아줍니다
             try {
                 if (br != null) {
                     br.close();
@@ -156,13 +151,13 @@ public class GameService {
      * 12개의 제시어 목록 반환
      * @return
      */
-    public List<String> pickWords() {
+    private List<String> pickWords() {
         if(allWords==null) return null;
 
         List<String> pickedWords=new ArrayList<>();
         ThreadLocalRandom.current().ints(0, allWords.size()).distinct().limit(12).forEach(index -> pickedWords.add(allWords.get(index).toString()));
-        System.out.println("출력테스트!!!");
-        System.out.println(pickedWords);
         return pickedWords;
     }
+
+
 }
