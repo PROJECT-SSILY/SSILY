@@ -11,7 +11,7 @@
         </v-row>
         <v-row>
           <v-col>
-            <room-list></room-list>
+            <room-list @sendValue="changeValue"></room-list>
           </v-col>
           <v-col>
             <v-row>
@@ -25,14 +25,15 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col v-if="isTeam">
+              <v-col v-if="state.isTeam">
                 <v-btn color="success"
+                @click="randomTeam"
                 >
                 팀 게임 시작</v-btn>
               </v-col>
               <v-col v-else>
                 <v-btn color="primary"
-                @click="cons"
+                @click="randomPrivate"
                 >
                 개인 게임 시작</v-btn>
               </v-col>
@@ -63,14 +64,30 @@ export default {
   name: 'MainPage',
   setup() {
     const store = useStore()
-    const isTeam = reactive(null)
+    const state = reactive({
+      isTeam : null
+    })
     function getMe () {
       console.log(store.getters['accountStore/getUser'])
     }
+    const changeValue = function (value) {
+      state.isTeam = value
+      console.log(value)
+    }
+
+    const randomTeam = function () {
+      console.log(state.isTeam)
+    }
+    const randomPrivate = function () {
+      console.log(state.isTeam)
+    }
     return {
       store, 
-      isTeam,
-      getMe
+      state,
+      getMe,
+      changeValue,
+      randomTeam,
+      randomPrivate,
       }
     },
   components: {
@@ -78,6 +95,7 @@ export default {
     TutorialDialog,
     ProfileBox,
     RoomList,
+    
   },
 }
 // }

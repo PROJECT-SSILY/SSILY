@@ -19,7 +19,7 @@
                 <v-switch
                 v-model="state.switch1"
                 :label="`모드: ${state.switch1 ? '개인':'팀'}`"
-                @click="isTeamGame"
+                @click="isTeamGame(), sendValue()"
                 color="orange darken-3"
                 hide-details
                 ></v-switch>
@@ -68,11 +68,13 @@ import { roomList } from "@/common/api/gameAPI";
 import { useRouter } from "vue-router"
 import { useStore } from "vuex"
 import RoomListItem from '@/views/MainPage/Components/RoomListItem.vue'
+import { getCurrentInstance } from "vue";
 export default {
   name: "RoomList",
   components: {
     RoomListItem
   },
+  emits: ["sendValue"],
   setup() {
     const router = useRouter()
     const store = useStore()
@@ -102,6 +104,11 @@ export default {
         state.roomlist = state.teamrooms
       }
     }
+    const { emit } = getCurrentInstance();
+    const sendValue = function() {
+      emit('sendValue', state.switch1)
+      console.log(state.switch1);
+    }
 
     // 방 리스트 조회
     onMounted(async () => {
@@ -122,6 +129,7 @@ export default {
       state,
       getInRoom,
       isTeamGame,
+      sendValue
     }
   }
 }
