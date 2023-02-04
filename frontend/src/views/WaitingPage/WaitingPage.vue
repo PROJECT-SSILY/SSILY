@@ -1,6 +1,6 @@
 <template>
-  <p>세션 : {{ mySessionId }}</p>
-  <p>세션 : {{ title }}</p>
+  <!-- <p>세션 : {{ mySessionId }}</p>
+  <p>세션 : {{ title }}</p> -->
   <div id="flex-container">
     <div class="flex-item">
       <UserInfo/>
@@ -85,7 +85,7 @@ import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
 import ChatBox from './components/ChatBox.vue';
 import $axios from "axios";
-import { computed } from 'vue'
+// import { computed } from 'vue'
 import { useStore } from 'vuex';
 
 //=================OpenVdue====================
@@ -106,20 +106,23 @@ export default {
 		UserVideo,
 		ChattingBox,
   },
-  setup() {
+  emits: [
+    'joinSession'
+],
+  setup(props, {emit}) {
     const router = useRouter()
     const store = useStore()
 
-    // == OpenVidu State ==
-    const OV = computed(() => store.state.gameStore.OV)
-    const session = computed(() => store.state.gameStore.session)
-    const title = computed(() => store.state.gameStore.title)
-    const mainStreamManager = computed(() => store.state.gameStore.mainStreamManager )
-    const publisher = computed(() => store.state.gameStore.publisher )
-    const subscribers = computed(() => store.state.gameStore.subscribers )
-    const mySessionId = computed(() => store.state.gameStore.mySessionId )
-    const myUserName = computed(() => store.state.gameStore.myUserName )
-    // =====================
+    // // == OpenVidu State ==
+    // const OV = computed(() => store.state.gameStore.OV)
+    // const session = computed(() => store.state.gameStore.session)
+    // const title = computed(() => store.state.gameStore.title)
+    // const mainStreamManager = computed(() => store.state.gameStore.mainStreamManager )
+    // const publisher = computed(() => store.state.gameStore.publisher )
+    // const subscribers = computed(() => store.state.gameStore.subscribers )
+    // const mySessionId = computed(() => store.state.gameStore.mySessionId )
+    // const myUserName = computed(() => store.state.gameStore.myUserName )
+    // // =====================
 
     const state = reactive({
       team: null,
@@ -136,13 +139,15 @@ export default {
     }
 
     const joinSession = async function() {
-		store.dispatch('gameStore/joinSession')
+      emit('joinSession')
+      // console.log("ready")
+		// store.dispatch('gameStore/joinSession')
 		}
 
-	const leaveSession = async function() {
-		store.dispatch('gameStore/leaveSession')
-		window.removeEventListener('beforeunload', leaveSession);
-	}
+	// const leaveSession = async function() {
+	// 	store.dispatch('gameStore/leaveSession')
+	// 	window.removeEventListener('beforeunload', leaveSession);
+	// }
 
 	const updateMainVideoStreamManager = async function(stream) {
 		store.dispatch('gameStore/updateMainVideoStreamManager',stream)
@@ -160,22 +165,22 @@ export default {
     return {
 		router,
 		state,
-		title,
+		// title,
 		clickExit,
 		clickReady,
 		joinSession,
-		leaveSession,
+		// leaveSession,
 		sessionInfo,
 		updateMainVideoStreamManager,
 
       // == OpenVidu State ==
-		OV,
-		session,
-		mainStreamManager,
-		publisher,
-		subscribers,
-		mySessionId,
-		myUserName,
+		// OV,
+		// session,
+		// mainStreamManager,
+		// publisher,
+		// subscribers,
+		// mySessionId,
+		// myUserName,
       // =====================
     }
   }
