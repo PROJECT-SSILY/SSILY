@@ -160,4 +160,37 @@ public class GameService   {
     }
 
 
+    /**
+     * 서영탁
+     * 라운드 종료
+     */
+    private void finishRound(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+
+        log.info("finishRound is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+        // 점수 증가
+        Player winner = participant.getPlayer();
+        winner.setScore(winner.getScore()+1);
+
+        int cnt = 0;
+        for (Participant p : participants) {
+            JsonObject player = new JsonObject();
+            player.addProperty("connectionId", p.getParticipantPublicId());
+            player.addProperty("score", p.getPlayer().getScore());
+            data.add(String.valueOf(cnt), player);
+            cnt++;
+        }
+
+        data.addProperty("cnt", cnt);
+        data.addProperty("winnerId", participant.getParticipantPublicId());
+        data.addProperty("winnerNickname", winner.getNickname());
+        params.add("data", data);
+
+        // 라운드 종료 알라기
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
 }
