@@ -13,4 +13,8 @@ public class ExceptionCode {
     public static final int WRONG_PASSWORD = -403;
     public static final String WRONG_PASSWORD_MESSAGE = "비밀번호가 틀렸습니다.";
 
+    public static final int NO_AVAILABLE_ROOM = -404;
+    public static final String NO_AVAILABLE_ROOM_MESSAGE = "입장 가능한 방이 없습니다.";
+
+
 }

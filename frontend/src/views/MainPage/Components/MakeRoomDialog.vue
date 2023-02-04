@@ -25,21 +25,16 @@
         >
           <div id="join" v-if="!state.session">
             <div id="join-dialog" class="jumbotron vertical-center">
-              <h1>Join a video session</h1>
               <div class="form-group">
-                <!-- <p>
-                  <label>Participant</label>
-                  <input v-model="state.myUserName" class="form-control" type="text" required>
-                </p> -->
-                <p>
-                  <label>Session</label>
-                  <input v-model="state.title" class="form-control" type="text" required>
-                </p>
-                
+                <v-text-field 
+                v-model="state.title" 
+                class="form-control"
+                label="방 제목" 
+                type="text" 
+                required></v-text-field>
               </div>
             </div>
           </div>
-        
           <v-radio-group
             :rules="[state.rules.required]"
             v-model="state.isTeamBattle"
@@ -71,7 +66,6 @@
               color="orange darken-3"
               value="radio-2"
             ></v-radio>
-
           </v-radio-group>
           <v-text-field 
             v-if="state.isSecret ==='radio-2'"
@@ -80,7 +74,6 @@
             v-model="state.password"
           ></v-text-field>
           <v-divider></v-divider>
-
           <v-card-actions>
             <v-spacer></v-spacer>
             <p class="text-center">
@@ -130,9 +123,10 @@
       const joinSession = async function() {
         
         if (state.isTeamBattle === "radio-1") {
-          state.isTeamBattle = false
-        } else {
+          console.log("team 적용됨")
           state.isTeamBattle = true
+        } else {
+          state.isTeamBattle = false
         }
         
         if (state.isSecret === "radio-1") {

@@ -19,6 +19,7 @@ package io.openvidu.server.cdr;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import io.openvidu.server.game.Player;
 
 public class CDREventSignal extends CDREvent {
 

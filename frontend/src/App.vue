@@ -1,5 +1,8 @@
 <template>
-  <router-view/>
+  <div class="background">
+    <router-view/>
+    <div></div>
+  </div>
 </template>
 
 <style>
@@ -10,7 +13,14 @@
   text-align: center;
   color: #2c3e50;
 }
-
+.background{
+  height: 100vh;
+  overflow: hidden;
+  margin:0;  background-image: url("./assets/Splash.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 nav {
   padding: 30px;
 }

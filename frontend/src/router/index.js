@@ -57,6 +57,7 @@ const routes = [
     path: '/waiting',
     name: 'waiting',
     component: WaitingPage,
+    props: true,
     beforeEnter: requireAuth()
   },
   {
@@ -69,7 +70,7 @@ const routes = [
     path: '/main',
     name: 'main',
     component: MainPage,
-    beforeEnter: requireAuth()
+    // beforeEnter: requireAuth()
   },
   {
     path: '/ingame',

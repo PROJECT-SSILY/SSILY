@@ -1,41 +1,15 @@
 import $axios from "axios";
+const OPENVIDU_SERVER_URL = "https://localhost:4443";
+const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
-
-const makeRoomAction = (payload) => {
-    return $axios.post("/api/rooms", payload)
-    .then(res => {
-        console.log(res.data.code)
-        return res.data
-    })
-    .catch(error => {
-        return error.response.data
-    });
-}
 const roomList = () => {
-    return $axios.get("/api/rooms", {
-        headers: {
-        username : "OPENVIDUAPP",
-        password : "MY_SECRET"
+    return $axios.get(`${OPENVIDU_SERVER_URL}/api/rooms`, {
+        auth: {
+            username: 'OPENVIDUAPP',
+            password: OPENVIDU_SERVER_SECRET,
         }
     })
-    .then(res => {
-        console.log(res.data.code)
-        return res.data
-    })
-    .catch(error => {
-        return error.response.data
-    });
-}
-const joinRoomAction = () => {
-    return $axios.get("/api/rooms/{room-id}")
-    .then(res => {
-        console.log(res.data.code)
-        return res.data
-    })
-    .catch(error => {
-        return error.response.data
-    });
 }
 
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { makeRoomAction, joinRoomAction, roomList };
+export { roomList };

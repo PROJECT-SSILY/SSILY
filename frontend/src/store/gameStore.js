@@ -1,13 +1,4 @@
-// import {
-//     requestLogin,
-//     requestRegister,
-//     requestMe,
-//     requestId,
-//   } from "../common/api/accountAPI";
-
-import { makeRoomAction } from "@/common/api/gameAPI";
-
-
+// import { roomList } from "@/common/api/gameAPI";
 import { OpenVidu } from "openvidu-browser";
 import $axios from "axios";
 
@@ -22,6 +13,7 @@ const state = {
     isSecret: false,
     password: null,
     isTeamBattle: null,
+    isTeam: null,
     OV: undefined,
     session: undefined,
     mainStreamManager: undefined,
@@ -29,12 +21,12 @@ const state = {
     subscribers: [],
     mySessionId: '',
     myUserName: '',
-    isHost: true
+    isHost: true,
 }
 
 const getters = {
     getTeam: (state) => {
-        return state.isTeamBattle;
+        return state.isTeam;
     },
     getSession: (state) => {
         return state.session;
@@ -45,13 +37,14 @@ const getters = {
     getTitle: (state) => {
       return state.title;
     },
-    
+
 }
 
 const mutations = {
-    
+
     setTitle: (state, data) => {
         state.title = data
+        console.log('set적용되는지확인' + state.title);
     },
     setSecret: (state, payload) => {
         state.isSecret = payload
@@ -61,6 +54,7 @@ const mutations = {
     },
     setTeam: (state, payload) => {
         state.isTeamBattle = payload
+        console.log('set적용되는지확인' + state.isTeamBattle);
     },
     setOV: (state, data) => {
         state.OV = data;
@@ -84,7 +78,7 @@ const mutations = {
         state.myUserName = name;
     },
     changeMode: (state) => {
-      state.isTeamBattle = !state.isTeamBattle
+      state.isTeam = !state.isTeam
     }
 }
 const actions = {
@@ -92,18 +86,20 @@ const actions = {
         state.commit("changeMode", null)
         console.log(state.getters.getTeam);
     },
-    roomAction: async (commit, formData) => {
-        try {
-            console.log(formData)
-            const response = await makeRoomAction(formData)
-            console.log(response);
-        } catch (err) {
-            console.log(err);
-            throw err;
-        }
-    },
+    // getRoomList: async() => {
+    //     // const res = await roomList()
+    //     const res = ''
+    //     console.log('room리스트 ', roomList());
+    //     console.log('getroomlist : ',res)
+    //     try {
+    //         return res
+    //     } catch (err) {
+    //         console.log(err);
+    //         throw err;
+    //     }
+    // },
     // ---------------openvidu-------------------
-    joinSession: ({dispatch, state, commit}) => {
+    joinSession: (context) => {
       const OV = new OpenVidu();
       const session = OV.initSession();
       const subscribers = [];
@@ -125,26 +121,27 @@ const actions = {
         console.warn(exception);
       });
 
-      
-      dispatch("getToken", state.mySessionId).then(token => {
+      context.commit("setMySessionId", state.mySessionId)
+      state.myUserName = context.rootState.accountStore.user.nickname;
+      context.dispatch("getToken", state.mySessionId).then(token => {
         session
         .connect(token, { clientData: state.myUserName })
         .then(()=>{
 
           let publisher = OV.initPublisher(undefined, {
-            audioSource: undefined, 
-            videoSource: undefined, 
-            publishAudio: true,  	
-            publishVideo: true, 
-            resolution: '640x480', 
-            frameRate: 30,			
-            insertMode: 'APPEND',	
-            mirror: false       
+            audioSource: undefined,
+            videoSource: undefined,
+            publishAudio: true,
+            publishVideo: true,
+            resolution: '640x480',
+            frameRate: 30,
+            insertMode: 'APPEND',
+            mirror: false
           });
-          commit("setOV", OV)
-          commit("setSession", session)
-          commit("setMainStreamManager", publisher)
-          commit("setPublisher", publisher)
+          context.commit("setOV", OV)
+          context.commit("setSession", session)
+          context.commit("setMainStreamManager", publisher)
+          context.commit("setPublisher", publisher)
 
           session.publish(publisher)
         })
@@ -174,37 +171,58 @@ const actions = {
         console.log("nickname=",nickname);
         console.log("isHost=", isHost);
         console.log("rate=", rate);
-
-        $axios
+        const isSecret = state.isSecret
+        if (isSecret) {
+          $axios
+					.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
+            "level" : level,
+            "nickname" : nickname,
+            "rate" : rate,
+            "isHost" : isHost,
+            "password" : state.password
+          }), {
+            auth: {
+              username: 'OPENVIDUAPP',
+							password: OPENVIDU_SERVER_SECRET,
+						},
+					}) 
+					.then(response => response.data)
+					.then(data => resolve(data.token))
+					.catch(error => reject(error.response));
+        } else {
+          $axios
 					.post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
             "level" : level,
             "nickname" : nickname,
             "rate" : rate,
             "isHost" : isHost,
           }), {
-						auth: {
-							username: 'OPENVIDUAPP',
+            auth: {
+              username: 'OPENVIDUAPP',
 							password: OPENVIDU_SERVER_SECRET,
 						},
 					})
 					.then(response => response.data)
 					.then(data => resolve(data.token))
 					.catch(error => reject(error.response));
-      })
+        }
+        })
 
     },
     createSession: (context, sessionId) => {
       const myTitle= state.title;
       console.log("내 타이틀 이거임", myTitle);
+      console.log("createsession 팀 ", state.isTeamBattle);
       return new Promise((resolve, reject) => {
-				$axios
-					.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+			$axios
+			.post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
             // 하드코딩한 부분 나중에 수정 필요
 
             "title" : myTitle,
             "isSecret" : state.isSecret,
             "password" : state.password,
-            "team" : state.isTeamBattle
+            "isTeamBattle" : state.isTeamBattle,
+            "customSessionId" : sessionId,
           }), {
 						auth: {
 							username: 'OPENVIDUAPP',
@@ -234,7 +252,7 @@ const actions = {
       commit("setSubscribers", [])
       commit("setOV", undefined)
     },
-    
+
     updateMainVideoStreamManager: (commit, stream) => {
       if (state.mainStreamManager === stream) return;
       commit("setMainStreamManager", stream)
