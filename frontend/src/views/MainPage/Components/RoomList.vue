@@ -33,7 +33,7 @@
             @click="getInRoom(room)"
           >
             <v-row class="d-flex justify-space-between">
-              <v-col cols="10"> 
+              <v-col cols="10">
                 <v-list-item-content>
                   <RoomListItem :room="room"/>
                 </v-list-item-content>
@@ -58,10 +58,10 @@
           <!-- <v-divider></v-divider> -->
           </v-list-item>
         </v-list>
-      </v-card>      
+      </v-card>
     </div>
   </template>
-  
+
 <script>
 import { reactive, onMounted } from "vue"
 import { roomList } from "@/common/api/gameAPI";
@@ -93,7 +93,7 @@ export default {
       store.commit('gameStore/setTitle', roominfo.title)
       store.commit('gameStore/setTeam', roominfo.isTeamBattle)
       // console.log('team')
-      router.push({name: 'waiting'})
+      router.push({name: 'gameroom'})
     }
 
     const isTeamGame = async function() {
