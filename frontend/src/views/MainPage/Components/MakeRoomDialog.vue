@@ -142,7 +142,7 @@
         store.commit('gameStore/setSecret', state.isSecret)
         store.commit('gameStore/setPassword', state.password)
         store.commit('gameStore/setTeam', state.isTeamBattle)
-        // await store.dispatch('gameStore/joinSession')
+        store.commit('gameStore/setMySessionId', '')
         router.push('gameroom')
       }
       return {
