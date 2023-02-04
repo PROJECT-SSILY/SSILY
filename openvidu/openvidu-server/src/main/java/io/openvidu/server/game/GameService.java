@@ -10,6 +10,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.parameters.P;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,12 +29,15 @@ public class GameService   {
     static final int GET_PRESENTER_SETTING =1;
     static final int GAME_START = 2;
 
+    //Tread 관리
+    public static ConcurrentHashMap<String, Thread> gameThread = new ConcurrentHashMap<>();
+
     /**
      * 김윤미
      * 게임에 쓰이는 static 변수 추가
      */
     public static ConcurrentHashMap<String, List<String>> words=new ConcurrentHashMap<>();
-    public static ConcurrentHashMap<String, ArrayList<Participant>> participants=new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, ArrayList<Participant>> participantList =new ConcurrentHashMap<>();
     public final List<String> allWords=allWords();
 
 
@@ -75,20 +79,20 @@ public class GameService   {
      * @param participant
      * @param message
      * @param sessionId
-     * @param gameParticipants
+     * @param participants
      * @param params
      * @param data
      * @param notice
      */
-    public void gameStart(Participant participant, JsonObject message, String sessionId, Set<Participant> gameParticipants,
+    public void gameStart(Participant participant, JsonObject message, String sessionId, Set<Participant> participants,
                            JsonObject params, JsonObject data, RpcNotificationService notice) {
 
         //제시어 불러오기
         words.putIfAbsent(sessionId, new ArrayList<>());
 
         //참여자 목록 생성
-        ArrayList<Participant> participantList=new ArrayList<>(gameParticipants);
-        participants.putIfAbsent(sessionId, participantList);
+        ArrayList<Participant> gameParticipants=new ArrayList<>(participants);
+        participantList.putIfAbsent(sessionId, gameParticipants);
 
         //설명자 부여
 
@@ -191,6 +195,118 @@ public class GameService   {
             rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
                     ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
         }
+    }
+
+    /**
+     * 서영탁
+     * 게임 종료
+     */
+    private void finishGame(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+
+        log.info("finishGame is called by {}", participant.getParticipantPublicId());
+
+        ArrayList<Participant> winner = new ArrayList<>();
+        int max = 0;
+
+        // 우승자 첮가
+        for (Participant p : participants) {
+            int score = p.getPlayer().getScore();
+            if(score >= max){
+                if(score > max) {
+                    winner = new ArrayList<>();
+                    max = score;
+                }
+                winner.add(p);
+            }
+        }
+
+        // 우승자 정보 json
+        JsonObject winnerJson = new JsonObject();
+        int winnerCnt = 0;
+        for (Participant p : winner) {
+            JsonObject player = new JsonObject();
+            player.addProperty("connectionId", p.getParticipantPublicId());
+            player.addProperty("nickname", p.getPlayer().getNickname());
+            winnerJson.add(String.valueOf(winnerCnt), player);
+        }
+
+        data.add("winner", winnerJson);
+        data.addProperty("winnerCnt", winnerCnt);
+
+        // 경험치 추가
+        // TODO : 백엔드 전송
+        JsonObject gameResult = new JsonObject();
+        int cnt = 0;
+        for (Participant p : participants) {
+            int extraExp = calcExp(p, winner);
+            p.getPlayer().addExp(extraExp);
+            boolean levelUp = isLevelUp(p);
+
+            JsonObject player = new JsonObject();
+            player.addProperty("connectionId", p.getParticipantPublicId());
+            player.addProperty("extraExp", extraExp);
+            player.addProperty("levelUp", levelUp);
+            gameResult.add(String.valueOf(cnt), player);
+        }
+
+        // 게임 결과
+        data.add("gameResult", gameResult);
+
+
+        Thread ssilyThread = gameThread.get(sessionId);
+
+
+        // TODO : 모든 자원 반납
+
+
+
+        if(ssilyThread != null){
+            ssilyThread.interrupt();
+        }
+
+
+        params.add("data", data);
+
+        //게임 종료 알리기
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
+    /**
+     * 서영탁
+     * 게임 결과에 따른 exp 설정
+     */
+    private int calcExp(Participant participant, ArrayList<Participant> winner){
+        boolean isWinner = false;
+
+        for (Participant p : winner) {
+            if(p.getParticipantPublicId().equals(participant.getParticipantPublicId())){
+                isWinner = true;
+                break;
+            }
+        }
+
+        if(isWinner) return participant.getPlayer().getScore()+20;
+        else return participant.getPlayer().getScore();
+    }
+
+    /**
+     * 서영탁
+     * 레벨업 유무 확인
+     * TODO : 레벨에 필요 경험치 증가량 수정
+     */
+    private boolean isLevelUp(Participant participant){
+        Player player = participant.getPlayer();
+        int level = player.getLevel();
+
+        int needExp = 100 * level;
+
+        if(player.getExp() >= needExp){
+            return true;
+        }
+        return false;
     }
 
 }
