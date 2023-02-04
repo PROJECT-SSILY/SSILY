@@ -8,7 +8,8 @@
     </v-col>
     <v-col>
       <v-list-item-icon>
-        <v-icon :color="room.isSecret ? 'deep-purple accent-4' : 'grey'">
+        <v-icon v-if="room.isSecret"
+          color="blue-grey darken-2">
           mdi-lock-outline
         </v-icon>
       </v-list-item-icon>

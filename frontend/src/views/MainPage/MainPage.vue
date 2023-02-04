@@ -82,7 +82,7 @@ export default {
       }
       const result = await store.dispatch('gameStore/randomTeamAction', params)
       console.log(result)
-      router.push({name: 'waiting'})
+      router.push({name: 'gameroom'})
     }
     const randomPrivate = async function () {
       const params = {
@@ -90,7 +90,7 @@ export default {
       }
       const result = await store.dispatch('gameStore/randomPrivateAction', params)
       console.log(result)
-      router.push({name: 'waiting'})
+      router.push({name: 'gameroom'})
     }
     return {
       store, 
