@@ -18,6 +18,8 @@
     <div class="waiting_component">
         <WaitingPage
         @joinSession=joinSession
+        :sessionId="state.mySessionId"
+        :playerList="state.playerList"
         />
     </div>
     <div class="in_game_component">
@@ -64,6 +66,8 @@ const OPENVIDU_SERVER_URL = "https://localhost:4443";
 const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 //=============================================
+import {GetPlayerList} from "@/common/api/gameAPI";
+
 
 export default {
     name : "InGamePage",
@@ -92,7 +96,9 @@ export default {
             mySessionId: null,
             myUserName: '',
             isHost: true,
+            playerList: []
         })
+
 
         const status = toRefs(props).ready
         watch(status, () => {
@@ -140,6 +146,7 @@ export default {
 
             // 'getToken' method is simulating what your server-side should do.
             // 'token' parameter should be retrieved and returned by your own backend
+            state.playerList.push(requestPlayerList(store.state.gameStore.mySessionId))
 
             getToken(store.state.gameStore.mySessionId).then(token => {
                 console.log("token : ", token)
@@ -184,6 +191,7 @@ export default {
 
 
             store.commit('gameStore/setMySessionId', '')// 시험
+            store.commit('gameStore/setSession', state.session) // 시험 ---
 
             window.removeEventListener('beforeunload', state.leaveSession);
             }
@@ -285,7 +293,6 @@ export default {
                     console.log("nickname=",nickname);
                     console.log("isHost=", isHost);
                     console.log("rate=", rate);
-
                     $axios
                         .post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
                         "level" : level,
@@ -293,6 +300,9 @@ export default {
                         "rate" : rate,
                         "isHost" : isHost,
                         "password" : password,
+                        // 하드 코딩 ------------------------------
+                        "exp": 34,
+                        // -------------------------------------
                     }), {
                         auth: {
                             username: 'OPENVIDUAPP',
@@ -305,7 +315,18 @@ export default {
                 })
             }
 
-
+            const requestPlayerList = async (mySessionId) => {
+                console.log('requestPlayerList 시도 시작')
+                try {
+                    console.log('requestplayerList 내 세션 아이디 : ', mySessionId)
+                    const response = await GetPlayerList(mySessionId);
+                    console.log('requestplayerList 결과 값 : ', response.data)
+                    store.commit('gameStore/setPlayerList', response.data)
+                    return response.data
+                } catch(err) {
+                    console.log(err);
+                }
+            }
 
             // const createToken = (sessionId) => {
             // console.log("createtoken 시작")
