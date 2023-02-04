@@ -274,8 +274,9 @@ export default {
                 console.log('안됨?')
                 const level = store.state.accountStore.user.level || 1
                 const nickname = store.state.accountStore.user.nickname || ''
-                const isHost = store.state.isHost || true
+                const isHost = store.state.gameStore.isHost || true
                 const rate = store.getters['accountStore/getRate']
+                const password = store.state.gameStore.password || true
 
                 console.log('------------',rate)
 
@@ -291,6 +292,7 @@ export default {
                         "nickname" : nickname,
                         "rate" : rate,
                         "isHost" : isHost,
+                        "password" : password,
                     }), {
                         auth: {
                             username: 'OPENVIDUAPP',
