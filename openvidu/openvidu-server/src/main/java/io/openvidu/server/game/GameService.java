@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class GameService   {
 
-    static final int GET_TEAMS_SETTING = 0;
+    static final int SET_PRESENTER_SETTING = 0;
     static final int GET_PRESENTER_SETTING =1;
     static final int GAME_START = 2;
 
@@ -37,7 +37,8 @@ public class GameService   {
      * 게임에 쓰이는 static 변수 추가
      */
     public static ConcurrentHashMap<String, List<String>> words=new ConcurrentHashMap<>();
-    public static ConcurrentHashMap<String, ArrayList<Participant>> participantList =new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, ArrayList<Participant>> participantList=new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, Integer> presenterIndex=new ConcurrentHashMap<>();
     public final List<String> allWords=allWords();
 
 
@@ -60,18 +61,65 @@ public class GameService   {
 
         //타입은 game+gameStatus로 보내준다. 예시 : game2 or game3
         String type = message.get("type").getAsString();
-        params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_TYPE_PARAM, type);
+        params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_TYPE_PARAM, type); //params의 "type" 안에 저장
 
         switch (gameStatus) {
-            case GET_TEAMS_SETTING: // 사용자들의 팀 정보값 얻기. 0번
-//                getTeamsSetting(participant, sessionId, participants, params, data, notice);
+            case SET_PRESENTER_SETTING: // 사용자들의 팀 정보값 얻기. 0번
+                setPresenterSetting(participant, message, sessionId, participants, params, data, notice);
                 return;
             case GET_PRESENTER_SETTING: // 누가 설명자인지 얻기.
+                getPresenterSetting(participant, message, sessionId, participants, params, data, notice);
                 return;
             case GAME_START:
                 gameStart(participant, message, sessionId, participants, params, data, notice);
         }
     }
+
+    /**
+     * 신대득
+     * 설명자 변경 메서드
+     * 처음시작이라면 0번 참가자가 설명자
+     * @param participant
+     * @param message
+     * @param sessionId
+     * @param gameParticipants
+     * @param params
+     * @param data
+     * @param notice
+     */
+    public void setPresenterSetting(Participant participant, JsonObject message, String sessionId, Set<Participant> gameParticipants,
+                                    JsonObject params, JsonObject data, RpcNotificationService notice){
+        log.info("PrepareGame is called by {}", participant.getParticipantPublicId());
+
+        ArrayList<Participant> curParticipantList = participantList.get(sessionId);
+        String curPresenterId="";
+        if(presenterIndex.get(sessionId)==null){
+            presenterIndex.put(sessionId, 0);
+            curParticipantList.get(0).getPlayer().setPresenter(true);
+            curPresenterId=curParticipantList.get(0).getParticipantPrivateId();
+        } else{
+            int prePresenterIndex=presenterIndex.get(sessionId);
+            int curPresenterIndex=(prePresenterIndex+1)%4;
+            curParticipantList.get(prePresenterIndex).getPlayer().setPresenter(false);
+            presenterIndex.put(sessionId, curPresenterIndex);
+            curParticipantList.get(curPresenterIndex).getPlayer().setPresenter(true);
+            curPresenterId=curParticipantList.get(0).getParticipantPrivateId();
+        }
+        data.addProperty("curPresenterId", curPresenterId);
+        params.add("data", data);
+
+        //방 참여자들에게 바뀐 데이터 보내주기.
+        for (Participant p : gameParticipants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
+    public void getPresenterSetting(Participant participant, JsonObject message, String sessionId, Set<Participant> gameParticipants,
+                                    JsonObject params, JsonObject data, RpcNotificationService notice){
+
+    }
+
 
     /**
      * 김윤미
@@ -85,7 +133,7 @@ public class GameService   {
      * @param notice
      */
     public void gameStart(Participant participant, JsonObject message, String sessionId, Set<Participant> participants,
-                           JsonObject params, JsonObject data, RpcNotificationService notice) {
+                          JsonObject params, JsonObject data, RpcNotificationService notice) {
 
         //제시어 불러오기
         words.putIfAbsent(sessionId, new ArrayList<>());
