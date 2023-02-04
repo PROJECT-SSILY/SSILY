@@ -15,7 +15,7 @@
 }
 .background{
   height: 100vh;
-  overflow: hidden;
+  overflow: scroll;
   margin:0;  background-image: url("./assets/Splash.svg");
   background-size: cover;
   background-repeat: no-repeat;
