@@ -10,6 +10,40 @@ const roomList = () => {
         }
     })
 }
+const randomTeam = (payload) => {
+    console.log(payload);
+    return $axios.post(`${OPENVIDU_SERVER_URL}/api/rooms/random`, JSON.stringify(payload),
+    {
+        auth: {
+            username: 'OPENVIDUAPP',
+            password: OPENVIDU_SERVER_SECRET,
+        }
+    })
+    .then(res => {
+        console.log(res)
+        return res.data
+    })
+    .catch(error => {
+        return error.response.data
+    });
+}
+const randomPrivate = (payload) => {
+    console.log(payload);
+    return $axios.post(`${OPENVIDU_SERVER_URL}/api/rooms/random`, JSON.stringify(payload),
+    {
+        auth: {
+            username: 'OPENVIDUAPP',
+            password: OPENVIDU_SERVER_SECRET,
+        }
+    })
+    .then(res => {
+        console.log(res)
+        return res.data
+    })
+    .catch(error => {
+        return error.response.data
+    });
+}
 
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { roomList };
+export { roomList, randomTeam, randomPrivate };

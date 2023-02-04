@@ -6,7 +6,7 @@ $axios.defaults.headers.post['Content-Type'] = 'application/json';
 const OPENVIDU_SERVER_URL = "https://localhost:4443";
 const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
-
+import { randomTeam, randomPrivate } from "@/common/api/gameAPI";
 
 const state = {
     title: null,
@@ -256,9 +256,43 @@ const actions = {
     updateMainVideoStreamManager: (commit, stream) => {
       if (state.mainStreamManager === stream) return;
       commit("setMainStreamManager", stream)
-    }
-}
+    },
 
+    randomTeamAction: async (context, payload) => {
+      try{
+        console.log(payload);
+        const userInfo = {
+          "isTeamBattle": payload.isTeamBattle,
+          "level": context.rootState.accountStore.user.level,
+          "nickname": context.rootState.accountStore.user.nickname,
+          "rate": "0.0",
+        }
+        console.log(userInfo)
+        const response = await randomTeam(userInfo)
+        return response
+      } catch(err) {
+        console.log(err);
+        throw err
+      }
+    },
+    randomPrivateAction: async (context, payload) => {
+      try{
+        console.log(payload);
+        const userInfo = {
+          "isTeamBattle": payload.isTeamBattle,
+          "level": context.rootState.accountStore.user.level,
+          "nickname": context.rootState.accountStore.user.nickname,
+          "rate": "0.0",
+        }
+        console.log(userInfo)
+        const response = await randomPrivate(userInfo)
+        return response
+      } catch(err) {
+        console.log(err);
+        throw err
+      }
+    },
+}
 export default {
     namespaced: true,
     state,

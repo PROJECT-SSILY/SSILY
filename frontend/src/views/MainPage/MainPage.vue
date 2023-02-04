@@ -56,6 +56,7 @@ import TutorialDialog from './Components/TutorialDialog.vue';
 import ProfileBox from './Components/ProfileBox.vue';
 import RoomList from './Components/RoomList.vue';
 import { useStore } from "vuex"
+import { useRouter } from "vue-router"
 // import store from '@/store/gameStore';
 import { reactive } from "vue"
 // import { mapGetters } from 'vuex'
@@ -64,6 +65,7 @@ export default {
   name: 'MainPage',
   setup() {
     const store = useStore()
+    const router = useRouter()
     const state = reactive({
       isTeam : null
     })
@@ -74,15 +76,25 @@ export default {
       state.isTeam = value
       console.log(value)
     }
-
-    const randomTeam = function () {
-      console.log(state.isTeam)
+    const randomTeam = async function () {
+      const params = {
+        isTeamBattle: state.isTeam
+      }
+      const result = await store.dispatch('gameStore/randomTeamAction', params)
+      console.log(result)
+      router.push({name: 'waiting'})
     }
-    const randomPrivate = function () {
-      console.log(state.isTeam)
+    const randomPrivate = async function () {
+      const params = {
+        isTeamBattle: state.isTeam
+      }
+      const result = await store.dispatch('gameStore/randomPrivateAction', params)
+      console.log(result)
+      router.push({name: 'waiting'})
     }
     return {
       store, 
+      router, 
       state,
       getMe,
       changeValue,
