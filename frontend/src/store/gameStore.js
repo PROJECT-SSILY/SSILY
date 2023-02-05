@@ -272,6 +272,7 @@ const actions = {
           "level": context.rootState.accountStore.user.level,
           "nickname": context.rootState.accountStore.user.nickname,
           "rate": "0.0",
+          "exp" : context.rootState.accountStore.user.exp
         }
         console.log(userInfo)
         const response = await randomTeam(userInfo)
@@ -289,6 +290,7 @@ const actions = {
           "level": context.rootState.accountStore.user.level,
           "nickname": context.rootState.accountStore.user.nickname,
           "rate": "0.0",
+          "exp" : context.rootState.accountStore.user.exp
         }
         console.log(userInfo)
         const response = await randomPrivate(userInfo)

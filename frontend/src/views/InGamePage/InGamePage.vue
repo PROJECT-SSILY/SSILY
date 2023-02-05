@@ -258,7 +258,7 @@ export default {
                     "title" : store.state.gameStore.title,
                     "isSecret" : store.state.gameStore.isSecret,
                     "password" : store.state.gameStore.password,
-                    "team" : store.state.gameStore.isTeamBattle
+                    "isTeamBattle" : store.state.gameStore.isTeamBattle
                     }), {
                         auth: {
                             username: 'OPENVIDUAPP',
