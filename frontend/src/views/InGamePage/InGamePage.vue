@@ -10,6 +10,9 @@
         :sessionId="state.sessionId"
         :playerList="playerList"
         />
+        <ChattingBox
+        :session="state.session"
+        />
     </div>
     <div class="in_game_component" v-else>
         <GameTimer date="August 15, 2016"/>
@@ -79,6 +82,8 @@ const OPENVIDU_SERVER_URL = "https://localhost:4443";
 const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 //=============================================
+import ChattingBox from '@/views/WaitingPage/components/ChattingBox.vue';
+
 
 
 export default {
@@ -87,7 +92,9 @@ export default {
         GameTimer,
 		UserVideo,
         MyCanvasBox,
-        WaitingPage
+        WaitingPage,
+        ChattingBox
+
     },
     props:{
         ready: Boolean
@@ -95,6 +102,7 @@ export default {
     setup(props) {
         const store = useStore()
         const playerList = ref([])
+        const sessionVal = ref([])
         const state = reactive({
             title: null,
             isSecret: false,
@@ -142,6 +150,8 @@ export default {
             }
             state.myTeam = tmpMyTeam
             state.opponentTeam = tmpOpponentTeam
+            console.log("onupdated", playerList.value, document.querySelector(".waiting_component").innerHTML)
+            console.log("onupdated", state.session,  document.querySelector(".waiting_component").innerHTML)
         })
         onMounted(() => {
             console.log('join start');
@@ -176,6 +186,9 @@ export default {
                 console.warn(exception);
             });
 
+
+
+
             // --- Connect to the session with a valid user token ---
             // 'getToken' method is simulating what your server-side should do.
             // 'token' parameter should be retrieved and returned by your own backend
@@ -187,6 +200,11 @@ export default {
                 requestPlayerList(state.sessionId).then(response => {
                 console.log('requestPlayerlist response', response)
                 playerList.value.push(response)
+
+                store.commit('gameStore/setSession', state.session)
+                sessionVal.value.push(state.session) // 시험 ---
+                console.log('@@@@@@@@@@state.session:', state.session)
+                console.log('@@@@@@@@@@sessionVal:', sessionVal.value)
             })
             .then(() => {
                 console.log("gettoken - connect - then")

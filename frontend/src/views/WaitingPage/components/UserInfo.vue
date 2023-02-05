@@ -19,9 +19,6 @@ import { useStore } from "vuex"
 import { ref } from '@vue/reactivity'
 
 
-// import UserInfoItem from './UserInfoItem.vue';
-
-
 
 
 export default {
