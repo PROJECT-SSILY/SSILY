@@ -270,6 +270,10 @@ public class GameService   {
         data.addProperty("winnerNickname", winner.getNickname());
         params.add("data", data);
 
+        // 라운드 증가
+        Integer nowRound = round.get(sessionId);
+        round.put(sessionId, nowRound+1);
+
         // 라운드 종료 알라기
         for (Participant p : participants) {
             rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
