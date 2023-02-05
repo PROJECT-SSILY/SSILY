@@ -22,6 +22,7 @@ const state = {
     mySessionId: '',
     myUserName: '',
     isHost: true,
+    playerList: undefined,
 }
 
 const getters = {
@@ -79,7 +80,11 @@ const mutations = {
     },
     changeMode: (state) => {
       state.isTeam = !state.isTeam
-    }
+    },
+    setPlayerList: (state, data) => {
+        state.playerList = data
+      },
+  
 }
 const actions = {
     isTeam: (state) => {

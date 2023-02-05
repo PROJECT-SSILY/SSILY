@@ -332,13 +332,14 @@ public class SessionRestController {
 		String rateString = (String) params.get("rate");
 		double rate = Double.parseDouble(rateString);
 		boolean isHost = (boolean) params.get("isHost");
+		int exp = (int)params.get("exp");
 		Team team = Team.NONE;
 
 		if(sessionProperties.isTeamBattle()){
 			team = setPlayerTeam(session);
 		}
 
-		Player player = new Player(level,nickname, rate, isHost, team);
+		Player player = new Player(level,nickname, rate, isHost, team, exp);
 
 		switch (connectionProperties.getType()) {
 		case WEBRTC:
@@ -408,13 +409,14 @@ public class SessionRestController {
 		String nickname = (String) params.get("nickname");
 		String rateString = (String) params.get("rate");
 		double rate = Double.parseDouble(rateString);
+		int exp = (int)params.get("exp");
 		Team team = Team.NONE;
 
 		if(sessionProperties.isTeamBattle()){
 			team = setPlayerTeam(session);
 		}
 
-		Player player = new Player(level,nickname, rate, false, team);
+		Player player = new Player(level,nickname, rate, false, team, exp);
 
 		switch (connectionProperties.getType()) {
 			case WEBRTC:
