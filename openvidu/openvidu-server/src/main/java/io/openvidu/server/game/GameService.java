@@ -29,6 +29,9 @@ public class GameService   {
     //Tread 관리
     public static ConcurrentHashMap<String, Thread> gameThread = new ConcurrentHashMap<>();
 
+    // 게임 라운드 관리
+    public static ConcurrentHashMap<String, Integer> round = new ConcurrentHashMap<>();
+
     /**
      * 김윤미
      * 게임에 쓰이는 static 변수 추가
@@ -133,7 +136,11 @@ public class GameService   {
                           JsonObject params, JsonObject data, RpcNotificationService notice) {
 
         //제시어 불러오기
-        words.putIfAbsent(sessionId, new ArrayList<>());
+//        words.putIfAbsent(sessionId, new ArrayList<>());
+        words.put(sessionId, pickWords());
+
+        // 라운드 설정 : (1라운드)
+        round.put(sessionId, 1);
 
         //참여자 목록 생성
         ArrayList<Participant> gameParticipants=new ArrayList<>(participants);
@@ -206,6 +213,32 @@ public class GameService   {
         List<String> pickedWords=new ArrayList<>();
         ThreadLocalRandom.current().ints(0, allWords.size()).distinct().limit(12).forEach(index -> pickedWords.add(allWords.get(index).toString()));
         return pickedWords;
+    }
+
+    /**
+     * 서영탁
+     * 답안 제출
+     */
+    private void submitAnswer(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data, String playerAnswer){
+
+        log.info("submitAnswer is called by {}", participant.getParticipantPublicId());
+
+        Integer nowRound = round.get(sessionId);
+        String answer = words.get(sessionId).get(nowRound);
+
+        // 플레이어가 제출한 답안이 정답이라면
+        if(answer.equals(playerAnswer)){
+            data.addProperty("answer", answer);
+            data.addProperty("winnerId", participant.getParticipantPublicId());
+            data.addProperty("winnerNickname", participant.getPlayer().getNickname());
+
+            params.add("data", data);
+
+            for (Participant p : participants) {
+                rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                        ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+            }
+        }
     }
 
 
