@@ -5,15 +5,20 @@
     height="500"
     width="auto"
   >
-  <h1> player </h1>
-  <!-- {{ props.player }} -->
-    <!-- <UserInfoItem
-    :playerList="playerList"/> -->
+
+    <h1>회원 정보</h1>
+    <p>닉네임: {{ playerInfo.nickname }}</p>
+    <p>레벨: {{ playerInfo.level }}</p>
+    <p>팀: {{ playerInfo.team }}</p>
+    <p>방장여부: {{ playerInfo.isHost }}</p>
   </v-sheet>
 </template>
 
 <script>
 import { useStore } from "vuex"
+import { ref } from '@vue/reactivity'
+
+
 // import UserInfoItem from './UserInfoItem.vue';
 
 
@@ -27,9 +32,10 @@ export default {
   props: {
     player: Object
   },
-  setup() {
+  setup(props) {
     const store = useStore()
-    return { store }
+    const playerInfo = ref(props.player.content[0].player)
+    return { store, playerInfo }
   }
 
 }

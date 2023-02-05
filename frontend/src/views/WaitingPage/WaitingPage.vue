@@ -4,11 +4,13 @@
   <div id="flex-container">
     <div class="flex-item">
       <h1>userInfo ----</h1>
-      {{ playerList }}
-      <UserInfo
-      v-for="player in playerList"
-      :player="player"
-      :key="player.id"/>
+      <div class="userinfo-component">
+        <UserInfo
+        v-for="player in PlayerList"
+        :player="player"
+        :key="player.id"/>
+      </div>
+
     </div>
     <div id="flex-container">
       <div class="flex-item">
@@ -85,12 +87,12 @@
 	</div>
 </template>
 <script>
-import { reactive } from '@vue/reactivity'
+import { reactive, ref } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
 import ChatBox from './components/ChatBox.vue';
 import $axios from "axios";
-import { computed } from 'vue'
+import { computed, onUpdated } from 'vue'
 import { useStore } from 'vuex';
 
 //=================OpenVdue====================
@@ -120,7 +122,11 @@ export default {
     const router = useRouter()
     const store = useStore()
     const session = computed(() => store.state.gameStore.session)
-    const PlayerList = computed(() => props.playerList)
+    const PlayerList = ref(props.playerList)
+
+    onUpdated(() => {
+      console.log("onupdated", PlayerList.value, document.querySelector(".userinfo-component").innerHTML)
+    })
     // // == OpenVidu State ==
     // const OV = computed(() => store.state.gameStore.OV)
     // const session = computed(() => store.state.gameStore.session)
