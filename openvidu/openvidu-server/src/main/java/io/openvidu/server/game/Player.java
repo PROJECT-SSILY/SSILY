@@ -56,6 +56,12 @@ public class Player {
         this.exp = exp;
     }
 
+    public void initPlayerState(){
+        this.score = 0;
+        this.isPresenter = false;
+        this.isReady = false;
+    }
+
     public void addExp(int exp){
         this.exp += exp;
     }
