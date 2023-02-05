@@ -45,5 +45,14 @@ const randomPrivate = (payload) => {
     });
 }
 
-// export { requestLogin, requestRegister, requestId, requestMe };
-export { roomList, randomTeam, randomPrivate };
+const GetPlayerList = (mySessionId) => {
+    return $axios.get(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}/players`, {
+        auth: {
+            username: 'OPENVIDUAPP',
+            password: OPENVIDU_SERVER_SECRET,
+        }
+    })
+}
+
+
+export { roomList, GetPlayerList, randomTeam, randomPrivate };
