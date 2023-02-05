@@ -36,6 +36,9 @@
             <v-btn class="ma-2" @click="main">
                 MAIN
             </v-btn>
+            <v-btn 
+            @click="deleteAccount"
+            color="error">회원 탈퇴</v-btn>
         </div>
     </div>
 </template>
@@ -96,11 +99,17 @@ export default {
             router.push('/')
         }
         const main = function() {router.push('main')}
+        const deleteAccount = async function() {
+            await store.dispatch('accountStore/deleteAction')
+            await router.push('/')
+        
+        }
 
         return {
             userinfo,
             logOut,
             main,
+            deleteAccount
         }
     },
 }

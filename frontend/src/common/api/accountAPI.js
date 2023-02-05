@@ -68,6 +68,18 @@ const changeNickname = (token, payload) => {
         return error.response.data.code
     });
 }
-
+const deleteAccount = (token) => {
+    console.log(token);
+    return $axios.delete("/api/member", {
+        headers: {Authorization: `Bearer ${token}`}
+    })
+    .then(res => {
+        console.log(res.data.code)
+        return res.data.code
+    })
+    .catch(error => {
+        return error.response.data.code
+    });
+}
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname };
+export { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname, deleteAccount };

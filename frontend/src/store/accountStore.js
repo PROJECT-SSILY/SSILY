@@ -5,7 +5,7 @@
 //     requestId,
 //   } from "../common/api/accountAPI";
 
-import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe,  changeNickname } from "@/common/api/accountAPI";
+import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname, deleteAccount } from "@/common/api/accountAPI";
 
 const state = {
     token: localStorage.getItem('token') || null,
@@ -142,7 +142,18 @@ const actions = {
             throw err;
         }
     },
-
+    deleteAction: async (context) => {
+        try {
+            console.log(context);
+            const response = await deleteAccount(context.state.token)
+            await context.commit("setToken", null);
+            localStorage.removeItem('token')
+            return response
+        } catch(err) {
+            console.log(err);
+            throw err
+        }
+    }
     // idAction: async ({ commit }, idData) => {
     //     console.log(idData, "------axios------");
     //     const response = await requestId(idData.id);
