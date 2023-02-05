@@ -19,7 +19,6 @@
         <v-radio label="RED" value="RED" color="red" class="ma-2"></v-radio>
         <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2"></v-radio>
       </v-radio-group>
-      <ChatBox/>
     </div>
     </div>
   </div>
@@ -89,9 +88,8 @@
 import { reactive, ref } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
-import ChatBox from './components/ChatBox.vue';
 import $axios from "axios";
-import { computed, onUpdated } from 'vue'
+import { onUpdated } from 'vue'
 import { useStore } from 'vuex';
 
 //=================OpenVdue====================
@@ -108,11 +106,10 @@ export default {
   name: 'WaitingPage',
   components: {
     UserInfo,
-    ChatBox,
     // UserVideo,
 },
   props: {
-    playerList: Object
+    playerList: Object,
   },
   emits: [
     'joinSession',
@@ -120,7 +117,6 @@ export default {
   setup(props, {emit}) {
     const router = useRouter()
     const store = useStore()
-    const session = computed(() => store.state.gameStore.session)
     const PlayerList = ref(props.playerList)
 
     onUpdated(() => {
@@ -188,8 +184,7 @@ export default {
 		sessionInfo,
 		// updateMainVideoStreamManager,
     PlayerList,
-    session
-      // == OpenVidu State ==
+    // == OpenVidu State ==
 		// OV,
 		// session,
 		// mainStreamManager,
