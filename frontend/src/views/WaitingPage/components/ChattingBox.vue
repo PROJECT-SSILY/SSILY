@@ -2,6 +2,7 @@
     <div>
     <div id='chat-area'>
         <div v-for="val in chat" v-bind:key="val.id">
+            {{ props.session }}
                 <div v-if="val.user === myUserNick" class="mychat">
                     {{ val.text }}
                 </div>
@@ -33,15 +34,15 @@ export default {
     watch: {
 
     chat() {
-   setTimeout(() => {
-   var chatDiv = document.getElementById("chat-area");
-   chatDiv.scrollTo({
-      // document.body.scrollTop = document.body.scrollHeight;
-      top: chatDiv.scrollHeight - chatDiv.clientHeight,
-      behavior: 'smooth'
-          })
-      }, 50);
-    },
+        setTimeout(() => {
+        var chatDiv = document.getElementById("chat-area");
+        chatDiv.scrollTo({
+            // document.body.scrollTop = document.body.scrollHeight;
+            top: chatDiv.scrollHeight - chatDiv.clientHeight,
+            behavior: 'smooth'
+                })
+            }, 50);
+            },
     },
     created: function(){
         this.myUserNick = '내 이름'
@@ -76,7 +77,7 @@ export default {
                });
             }
               });
-        
+
     },
     methods:{
         sendMessage() {
