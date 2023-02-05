@@ -47,6 +47,27 @@ const sendNewPwAction = (payload) => {
         return error.response.data.code
     });
 }
+const changeNickname = (token, payload) => {
+    console.log("뭐지?");
+    console.log(payload);
+    const params = { nickname: payload }
+    console.log(JSON.stringify(params));
+    return $axios.put("/api/member/nickname", 
+    JSON.stringify(params),
+    {
+        headers: {Authorization: `Bearer ${token}`}
+    }).then(res =>{
+        console.log(res.data.code);
+    }
+    )
+    // .then(res => {
+    //     console.log(res.data.code)
+    //     return res.data.code
+    // })
+    .catch(error => {
+        return error.response.data.code
+    });
+}
 
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe };
+export { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname };

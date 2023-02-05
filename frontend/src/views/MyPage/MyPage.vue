@@ -6,7 +6,9 @@
         <div class="main">
             <div class="section1">
                 <div class="inner_section1_left">
-                    <img src="" alt="">
+                    <div>
+                        <img class="robot" :src="userinfo.robot" alt="">
+                    </div>
                 </div>
                 <div class="inner_section1_right">
                     <h2>{{ userinfo.nickname }}님</h2>
@@ -58,6 +60,7 @@ export default {
             nickname: "",
             level: 0,
             exp: 0,
+            robot: null,
             record: {
                 plays: 0,
                 wins: 0,
@@ -75,11 +78,17 @@ export default {
             userinfo.record.plays = res.record.plays
             userinfo.record.wins = res.record.wins
             userinfo.record.draws = res.record.draws
-
             if (res.record.plays == 0) {
                 userinfo.record.winrate =  0
             } else {
                 userinfo.record.winrate =  res.record.wins/res.record.plays*100
+            }
+            if (res.level > -1 && res.level < 6)  {
+                userinfo.robot = "./robotface1.svg"
+            } else if (res.level > 5 && res.level < 11) {
+                userinfo.robot = "./robotface2.svg"
+            } else {
+                userinfo.robot = "./robotface3.svg"
             }
         })
         const logOut = async function() {
@@ -98,9 +107,7 @@ export default {
 </script>
 
 <style>
-img {
-    width:100%;
-    background-image: url("../../assets/robotface1.svg");
-    background-size: contain;
+.robot {
+    height: 5rem;
 }
 </style>

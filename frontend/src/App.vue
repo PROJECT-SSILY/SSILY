@@ -21,7 +21,7 @@
   background: linear-gradient(rgba(12,111,202,1), rgba(38,0,111,1));
   opacity: 1;
   height: 100vh;
-  overflow: scroll;
+  overflow: hidden;
   background-size: cover;
   background-position: center;
   position: relative;
@@ -32,7 +32,7 @@
   margin:0;  background-image: url("./assets/stars3.svg");
   background-size: contain;
   background-position: center;
-  overflow:hidden;
+  overflow: hidden;
 }
 @-webkit-keyframes rotating /* Safari and Chrome */ {
   from {

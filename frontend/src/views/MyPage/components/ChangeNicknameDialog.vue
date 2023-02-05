@@ -71,7 +71,7 @@
             nicknameRules: value => (2 <= value.length && value.length <= 10) || '닉네임은 2자 이상 10자 이내로 작성해주세요',
           }
         })
-        const changeNickname = function () {
+        const changeNickname = async function () {
             if (!state.form.nickname.status){
                 alert("닉네임 중복확인이 필요합니다.")
                 return
@@ -79,8 +79,8 @@
             const formData = {
                 nickname: state.form.nickname.value,
                 }
-                store.dispatch('accountStore/changeNicknameAction',formData.nickname)
-                router.push('mypage')
+                await store.dispatch('accountStore/changeNicknameAction', formData.nickname)
+                await router.push('mypage')
             }
         }
         const checkNickname = async function () {
