@@ -222,16 +222,18 @@ public class GameService   {
 
         // 점수 증가
         Player winner = participant.getPlayer();
-        winner.setScore(winner.getScore()+1);
+        winner.setScore(winner.getScore() + 2);
 
         int cnt = 0;
+        JsonObject playerJson = new JsonObject();
         for (Participant p : participants) {
             JsonObject player = new JsonObject();
             player.addProperty("connectionId", p.getParticipantPublicId());
             player.addProperty("score", p.getPlayer().getScore());
-            data.add(String.valueOf(cnt), player);
+            playerJson.add(String.valueOf(cnt), player);
             cnt++;
         }
+        data.add("player", playerJson);
 
         data.addProperty("cnt", cnt);
         data.addProperty("winnerId", participant.getParticipantPublicId());
