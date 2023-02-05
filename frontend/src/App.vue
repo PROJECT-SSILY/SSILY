@@ -1,9 +1,9 @@
 <template>
   <div class="background">
     <div id="stars" class="rotating">
-      <div id="contents">
-        <router-view/>
-      </div>
+    </div>
+    <div id="contents">
+      <router-view/>
     </div>
   </div>
 </template>
@@ -27,8 +27,9 @@
   position: relative;
 }
 #stars{
+  position: relative;
   height: 100vh;
-  margin:0;  background-image: url("./assets/stars5.svg");
+  margin:0;  background-image: url("./assets/stars3.svg");
   background-size: contain;
   background-position: center;
   overflow:hidden;
@@ -71,6 +72,13 @@
   animation: rotating 10s linear infinite;
 }
 
+#contents {
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+}
 
 nav {
   padding: 30px;
