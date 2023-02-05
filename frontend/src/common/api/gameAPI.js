@@ -11,5 +11,15 @@ const roomList = () => {
     })
 }
 
+const GetPlayerList = (mySessionId) => {
+    return $axios.get(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}/players`, {
+        auth: {
+            username: 'OPENVIDUAPP',
+            password: OPENVIDU_SERVER_SECRET,
+        }
+    })
+}
+
+
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { roomList };
+export { roomList, GetPlayerList };

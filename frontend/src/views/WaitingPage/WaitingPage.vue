@@ -3,7 +3,14 @@
   <p>세션 : {{ title }}</p> -->
   <div id="flex-container">
     <div class="flex-item">
-      <UserInfo/>
+      <h1>userInfo ----</h1>
+      <div class="userinfo-component">
+        <UserInfo
+        v-for="player in PlayerList"
+        :player="player"
+        :key="player.id"/>
+      </div>
+
     </div>
     <div id="flex-container">
       <div class="flex-item">
@@ -73,25 +80,25 @@
 				<user-video :stream-manager="publisher" @click="updateMainVideoStreamManager(publisher)"/>
 				<user-video v-for="sub in subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click="updateMainVideoStreamManager(sub)"/>
 			</div>
-			<div id="chat-head" class="col-md-6">
+			<!-- <div id="chat-head" class="col-md-6">
 				<chatting-box :session="session"/>
-			</div>
+			</div> -->
 		</div>
 	</div>
 </template>
 <script>
-import { reactive } from '@vue/reactivity'
+import { reactive, ref } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
 import ChatBox from './components/ChatBox.vue';
 import $axios from "axios";
-// import { computed } from 'vue'
+import { computed, onUpdated } from 'vue'
 import { useStore } from 'vuex';
 
 //=================OpenVdue====================
 
 import UserVideo from './components/UserVideo.vue';
-import ChattingBox from './components/ChattingBox.vue';
+// import ChattingBox from './components/ChattingBox.vue';
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -103,16 +110,23 @@ export default {
   components: {
     UserInfo,
     ChatBox,
-		UserVideo,
-		ChattingBox,
+    UserVideo,
+},
+  props: {
+    playerList: Object
   },
   emits: [
-    'joinSession'
-],
+    'joinSession',
+  ],
   setup(props, {emit}) {
     const router = useRouter()
     const store = useStore()
+    const session = computed(() => store.state.gameStore.session)
+    const PlayerList = ref(props.playerList)
 
+    onUpdated(() => {
+      console.log("onupdated", PlayerList.value, document.querySelector(".userinfo-component").innerHTML)
+    })
     // // == OpenVidu State ==
     // const OV = computed(() => store.state.gameStore.OV)
     // const session = computed(() => store.state.gameStore.session)
@@ -128,6 +142,8 @@ export default {
       team: null,
       ready: false,
     })
+
+
 
     const clickExit = () => {
       router.push({
@@ -172,7 +188,8 @@ export default {
 		// leaveSession,
 		sessionInfo,
 		updateMainVideoStreamManager,
-
+    PlayerList,
+    session
       // == OpenVidu State ==
 		// OV,
 		// session,

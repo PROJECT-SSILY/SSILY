@@ -18,6 +18,8 @@
     <div class="waiting_component">
         <WaitingPage
         @joinSession=joinSession
+        :sessionId="state.mySessionId"
+        :playerList="playerList"
         />
     </div>
     <div class="in_game_component">
@@ -52,7 +54,7 @@ import PrivateGame from './components/PrivateGame.vue';
 import TeamGame from './components/TeamGame.vue';
 import WaitingPage from '@/views/WaitingPage/WaitingPage.vue';
 import { useStore } from 'vuex';
-import { watch, onMounted } from 'vue';
+import { ref, watch, onMounted, onUpdated } from 'vue';
 import { OpenVidu } from "openvidu-browser";
 //=================OpenVdue====================
 
@@ -64,6 +66,8 @@ const OPENVIDU_SERVER_URL = "https://localhost:4443";
 const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 //=============================================
+import {GetPlayerList} from "@/common/api/gameAPI";
+
 
 export default {
     name : "InGamePage",
@@ -79,6 +83,7 @@ export default {
     },
     setup(props) {
         const store = useStore()
+        const playerList = ref([])
         const state = reactive({
             title: null,
             isSecret: false,
@@ -94,11 +99,14 @@ export default {
             isHost: true,
         })
 
+
         const status = toRefs(props).ready
         watch(status, () => {
             console.log("start입니다.")
         })
-
+        onUpdated(() => {
+            console.log("onupdated", playerList.value, document.querySelector(".waiting_component").innerHTML)
+        })
         onMounted(() => {
             console.log('join start');
             joinSession()
@@ -141,9 +149,17 @@ export default {
             // 'getToken' method is simulating what your server-side should do.
             // 'token' parameter should be retrieved and returned by your own backend
 
+            
             getToken(store.state.gameStore.mySessionId).then(token => {
                 console.log("token : ", token)
                 state.session.connect(token, { clientData: state.myUserName })
+
+                requestPlayerList(store.state.gameStore.mySessionId).then(response => {
+                console.log('requestPlayerlist response', response)
+                playerList.value.push(response)
+            })
+
+
                 .then(() => {
                 console.log("gettoken - connect - then")
                 // --- Get your own camera stream with the desired properties ---
@@ -184,6 +200,7 @@ export default {
 
 
             store.commit('gameStore/setMySessionId', '')// 시험
+            store.commit('gameStore/setSession', state.session) // 시험 ---
 
             window.removeEventListener('beforeunload', state.leaveSession);
             }
@@ -238,8 +255,6 @@ export default {
                 return new Promise((resolve, reject) => {
                     $axios
                     .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
-                    // 하드코딩한 부분 나중에 수정 필요
-
                     "title" : store.state.gameStore.title,
                     "isSecret" : store.state.gameStore.isSecret,
                     "password" : store.state.gameStore.password,
@@ -285,7 +300,6 @@ export default {
                     console.log("nickname=",nickname);
                     console.log("isHost=", isHost);
                     console.log("rate=", rate);
-
                     $axios
                         .post(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}`, JSON.stringify({
                         "level" : level,
@@ -293,6 +307,9 @@ export default {
                         "rate" : rate,
                         "isHost" : isHost,
                         "password" : password,
+                        // 하드 코딩 -----------------API 변경된 것?? -------------
+                        "exp": 34,
+                        // -----------------------------------------------------
                     }), {
                         auth: {
                             username: 'OPENVIDUAPP',
@@ -305,7 +322,32 @@ export default {
                 })
             }
 
+            const requestPlayerList = async (mySessionId) => {
+                // 되는 코드
+                console.log('requestPlayerList 시도 시작')
+                try {
+                    console.log('requestplayerList 내 세션 아이디 : ', mySessionId)
+                    const response = await GetPlayerList(mySessionId);
+                    console.log('requestplayerList 결과 값 : ', response.data)
+                    store.commit('gameStore/setPlayerList', response.data)
+                    return response.data
+                } catch(err) {
+                    console.log(err);
+                }
+                // 변경 시도
+                // console.log('requestPlayerList 시도 시작')
+                // try {
+                //     console.log('requestplayerList 내 세션 아이디 : ', mySessionId)
+                //     const response = await GetPlayerList(mySessionId);
+                //     console.log('requestplayerList 결과 값 : ', response.data)
+                //     store.commit('gameStore/setPlayerList', response.data)
+                //     return response.data
+                // } catch(err) {
+                //     console.log(err);
+                // }
 
+
+            }
 
             // const createToken = (sessionId) => {
             // console.log("createtoken 시작")
@@ -336,6 +378,7 @@ export default {
 
         return {
             state,
+            playerList,
             changeMode,
             joinSession,
             getToken,
