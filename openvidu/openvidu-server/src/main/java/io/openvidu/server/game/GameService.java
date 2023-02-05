@@ -258,6 +258,7 @@ public class GameService   {
         // 우승자 첮가
         for (Participant p : participants) {
             int score = p.getPlayer().getScore();
+            p.getPlayer().initPlayerState();  // 상태 초기화 (다시 대기방으로 돌아가기 위해)
             if(score >= max){
                 if(score > max) {
                     winner = new ArrayList<>();
