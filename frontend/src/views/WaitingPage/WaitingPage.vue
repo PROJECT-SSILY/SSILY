@@ -10,16 +10,14 @@
         :player="player"
         :key="player.id"/>
       </div>
-
     </div>
     <div id="flex-container">
       <div class="flex-item">
       <p>{{ state.team  || '팀 선택' }}</p>
       <v-radio-group inline v-model="state.team" justify-content="center">
-        <v-radio label="RED" value="RED" color="red" class="ma-2"></v-radio>
-        <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2"></v-radio>
+        <v-radio label="RED" value="RED" color="red" class="ma-2" @click="ClickTeam('RED')"></v-radio>
+        <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2" @click="ClickTeam('BLUE')"></v-radio>
       </v-radio-group>
-      <ChatBox/>
     </div>
     </div>
   </div>
@@ -49,7 +47,6 @@
 
   <div id="main-container" class="container">
 		<div id="join" v-if="!session">
-			<div id="img-div"><img src="resources/images/openvidu_grey_bg_transp_cropped.png" /></div>
 			<div id="join-dialog" class="jumbotron vertical-center">
 				<h1>Join a video session</h1>
 				<div class="form-group">
@@ -68,7 +65,7 @@
 			</div>
 		</div>
 
-		<div id="session" v-if="session">
+		<!-- <div id="session" v-if="session">
 			<div id="session-header">
 				<h1 id="session-title"> {{ mySessionId }}</h1>
 				<input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="Leave session">
@@ -79,25 +76,24 @@
 			<div id="video-container" class="col-md-6">
 				<user-video :stream-manager="publisher" @click="updateMainVideoStreamManager(publisher)"/>
 				<user-video v-for="sub in subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click="updateMainVideoStreamManager(sub)"/>
-			</div>
+			</div> -->
 			<!-- <div id="chat-head" class="col-md-6">
 				<chatting-box :session="session"/>
 			</div> -->
-		</div>
+		<!-- </div> -->
 	</div>
 </template>
 <script>
 import { reactive, ref } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
-import ChatBox from './components/ChatBox.vue';
 import $axios from "axios";
-import { computed, onUpdated } from 'vue'
+import { onUpdated } from 'vue'
 import { useStore } from 'vuex';
-
+import { changeReady } from "@/common/api/gameAPI";
 //=================OpenVdue====================
 
-import UserVideo from './components/UserVideo.vue';
+// import UserVideo from './components/UserVideo.vue';
 // import ChattingBox from './components/ChattingBox.vue';
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
@@ -109,11 +105,13 @@ export default {
   name: 'WaitingPage',
   components: {
     UserInfo,
-    ChatBox,
-    UserVideo,
+    // UserVideo,
 },
   props: {
-    playerList: Object
+    playerList: Object,
+    session: Object,
+    connectionId: String,
+    sessionId: String,
   },
   emits: [
     'joinSession',
@@ -121,7 +119,6 @@ export default {
   setup(props, {emit}) {
     const router = useRouter()
     const store = useStore()
-    const session = computed(() => store.state.gameStore.session)
     const PlayerList = ref(props.playerList)
 
     onUpdated(() => {
@@ -150,9 +147,29 @@ export default {
         name: 'main'
       })
     }
-    const clickReady = () => {
-      state.ready = !state.ready
+
+    const clickReady = async () => {
+      console.log('clickready 시작')
+      console.log(props.sessionId, props.connectionId)
+      try { 
+        const response = await changeReady(props.sessionId, props.connectionId)
+        console.log('clickready - response : ', response)
+        state.ready = response.data.player.isReady
+      } catch(err) {
+        console.log(err);
+      }
     }
+
+    // const ClickTeam = async function(color) {
+    //   console.log(color, '선택~')
+    //   try {
+
+    //   } catch(err) {
+    //     console.log(err);
+    //   }
+    // }
+
+
 
     const joinSession = async function() {
       emit('joinSession')
@@ -165,9 +182,9 @@ export default {
 	// 	window.removeEventListener('beforeunload', leaveSession);
 	// }
 
-	const updateMainVideoStreamManager = async function(stream) {
-		store.dispatch('gameStore/updateMainVideoStreamManager',stream)
-	}
+	// const updateMainVideoStreamManager = async function(stream) {
+	// 	store.dispatch('gameStore/updateMainVideoStreamManager',stream)
+	// }
 
 	const sessionInfo = () => {
 		const session1 = store.getters['gameStore/getSession']
@@ -184,13 +201,13 @@ export default {
 		// title,
 		clickExit,
 		clickReady,
+    // ClickTeam,
 		joinSession,
 		// leaveSession,
 		sessionInfo,
-		updateMainVideoStreamManager,
+		// updateMainVideoStreamManager,
     PlayerList,
-    session
-      // == OpenVidu State ==
+    // == OpenVidu State ==
 		// OV,
 		// session,
 		// mainStreamManager,

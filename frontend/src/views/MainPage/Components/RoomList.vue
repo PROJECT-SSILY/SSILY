@@ -87,13 +87,9 @@ export default {
 
     const getInRoom = function (params) {
       const roominfo = JSON.parse(JSON.stringify(params));
-      console.log('roominfo : ', roominfo)
-      store.commit('gameStore/setMySessionId', roominfo.sessionId)
-      console.log(roominfo.sessionId)
       store.commit('gameStore/setTitle', roominfo.title)
       store.commit('gameStore/setTeam', roominfo.isTeamBattle)
-      // console.log('team')
-      router.push({name: 'gameroom'})
+      router.push({name: 'gameroom', params: { sessionId: roominfo.sessionId }})
     }
 
     const isTeamGame = async function() {
