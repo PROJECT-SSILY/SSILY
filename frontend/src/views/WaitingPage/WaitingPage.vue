@@ -10,14 +10,13 @@
         :player="player"
         :key="player.id"/>
       </div>
-
     </div>
     <div id="flex-container">
       <div class="flex-item">
       <p>{{ state.team  || '팀 선택' }}</p>
       <v-radio-group inline v-model="state.team" justify-content="center">
-        <v-radio label="RED" value="RED" color="red" class="ma-2"></v-radio>
-        <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2"></v-radio>
+        <v-radio label="RED" value="RED" color="red" class="ma-2" @click="ClickTeam('RED')"></v-radio>
+        <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2" @click="ClickTeam('BLUE')"></v-radio>
       </v-radio-group>
     </div>
     </div>
@@ -91,7 +90,7 @@ import UserInfo from './components/UserInfo.vue';
 import $axios from "axios";
 import { onUpdated } from 'vue'
 import { useStore } from 'vuex';
-
+import { changeReady } from "@/common/api/gameAPI";
 //=================OpenVdue====================
 
 // import UserVideo from './components/UserVideo.vue';
@@ -110,6 +109,9 @@ export default {
 },
   props: {
     playerList: Object,
+    session: Object,
+    connectionId: String,
+    sessionId: String,
   },
   emits: [
     'joinSession',
@@ -145,9 +147,29 @@ export default {
         name: 'main'
       })
     }
-    const clickReady = () => {
-      state.ready = !state.ready
+
+    const clickReady = async () => {
+      console.log('clickready 시작')
+      console.log(props.sessionId, props.connectionId)
+      try { 
+        const response = await changeReady(props.sessionId, props.connectionId)
+        console.log('clickready - response : ', response)
+        state.ready = response.data.player.isReady
+      } catch(err) {
+        console.log(err);
+      }
     }
+
+    // const ClickTeam = async function(color) {
+    //   console.log(color, '선택~')
+    //   try {
+
+    //   } catch(err) {
+    //     console.log(err);
+    //   }
+    // }
+
+
 
     const joinSession = async function() {
       emit('joinSession')
@@ -179,6 +201,7 @@ export default {
 		// title,
 		clickExit,
 		clickReady,
+    // ClickTeam,
 		joinSession,
 		// leaveSession,
 		sessionInfo,

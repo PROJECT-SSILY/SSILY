@@ -20,6 +20,26 @@ const GetPlayerList = (mySessionId) => {
     })
 }
 
+const changeReady = (mySessionId, connectionId) => {
+    return $axios.put(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}/players/${connectionId}/ready`, JSON.stringify({"body" : "body"}), {
+        auth: {
+            username: 'OPENVIDUAPP',
+            password: OPENVIDU_SERVER_SECRET,
+        }
+    })
+}
+
+// 개인전만 진행하므로 잠시 보류
+// const changeTeam = (mySessionId, connectionId, color) => {
+//     return $axios.put(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}/players/${connectionId}/team`, 
+//     JSON.stringify({"team" : color}),{
+//         auth: {
+//             username: 'OPENVIDUAPP',
+//             password: OPENVIDU_SERVER_SECRET,
+//         }
+//     })
+// }
+
 
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { roomList, GetPlayerList };
+export { roomList, GetPlayerList, changeReady };

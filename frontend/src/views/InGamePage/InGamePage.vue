@@ -9,6 +9,8 @@
         @joinSession=joinSession
         :sessionId="state.sessionId"
         :playerList="playerList"
+        :session="state.session"
+        :connectionId="state.connectionId"
         />
         <ChattingBox
         :session="state.session"
@@ -104,6 +106,7 @@ export default {
             myUserName: '',
             isHost: true,
             readyAll: false,
+            connectionId: null,
 
             // 팀 분류
             myTeam: null,
@@ -253,8 +256,11 @@ export default {
         const getToken = async (sessionId) => {
         console.log("gettoken 시작")
         console.log('gettoken, sessionid : ', sessionId)
-        return await createToken(sessionId)
-        }
+        const response = await createToken(sessionId)
+        state.connectionId = response.connectionId
+        console.log('connectionId ===>', state.connectionId)
+        return response.token
+    }
 
 
         // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-connection
@@ -288,8 +294,7 @@ export default {
                         password: OPENVIDU_SERVER_SECRET,
                     },
                 })
-                .then(response => response.data)
-                .then(data => resolve(data.token))
+                .then(response => resolve(response.data))
                 .catch(error => reject(error.response));
             })
         }
