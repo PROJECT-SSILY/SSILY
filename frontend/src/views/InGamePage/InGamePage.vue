@@ -16,19 +16,6 @@
     </div>
     <div class="in_game_component" v-else>
         <GameTimer date="August 15, 2016"/>
-        <!-- <div id="session-header">
-            <h1 id="session-title"> {{ state.sessionId }}</h1>
-            <input class="btn btn-large btn-danger" type="button" id="buttonLeaveSession" @click="leaveSession" value="Leave session">
-        </div>
-        <div id="main-video" class="col-md-6">
-            <h1>main video</h1>
-            <user-video :stream-manager="state.mainStreamManager"/>
-        </div>
-        <div id="video-container" class="col-md-6">
-            <h1>video container</h1>
-            <user-video :stream-manager="state.publisher" @click="updateMainVideoStreamManager(state.publisher)"/>
-            <user-video v-for="sub in state.subscribers" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click="updateMainVideoStreamManager(sub)"/>
-        </div> -->
         <v-container>
             <v-row>
                 <v-col>
@@ -136,6 +123,8 @@ export default {
         onUpdated(() => {
             if (!state.readyAll) {
                 document.querySelector(".waiting_component").innerHTML
+                console.log("onupdated", playerList.value, document.querySelector(".waiting_component").innerHTML)
+                console.log("onupdated", state.session,  document.querySelector(".waiting_component").innerHTML)
             }
 
             // 팀 분류하여 리스트에 추가
@@ -150,8 +139,6 @@ export default {
             }
             state.myTeam = tmpMyTeam
             state.opponentTeam = tmpOpponentTeam
-            console.log("onupdated", playerList.value, document.querySelector(".waiting_component").innerHTML)
-            console.log("onupdated", state.session,  document.querySelector(".waiting_component").innerHTML)
         })
         onMounted(() => {
             console.log('join start');
