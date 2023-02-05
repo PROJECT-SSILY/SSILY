@@ -10,11 +10,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.parameters.P;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -272,20 +269,23 @@ public class GameService   {
 
         // 우승자 정보 json
         JsonObject winnerJson = new JsonObject();
+        ArrayList<String> winnerNicknames = new ArrayList<>();
         int winnerCnt = 0;
         for (Participant p : winner) {
             JsonObject player = new JsonObject();
             player.addProperty("connectionId", p.getParticipantPublicId());
             player.addProperty("nickname", p.getPlayer().getNickname());
             winnerJson.add(String.valueOf(winnerCnt), player);
+
+            winnerNicknames.add(p.getPlayer().getNickname());
         }
 
         data.add("winner", winnerJson);
         data.addProperty("winnerCnt", winnerCnt);
 
         // 경험치 추가
-        // TODO : 백엔드 전송
         JsonObject gameResult = new JsonObject();
+        ArrayList<JsonObject> playerList = new ArrayList<>();
         int cnt = 0;
         for (Participant p : participants) {
             int extraExp = calcExp(p, winner);
@@ -296,8 +296,15 @@ public class GameService   {
             player.addProperty("connectionId", p.getParticipantPublicId());
             player.addProperty("extraExp", extraExp);
             player.addProperty("levelUp", levelUp);
+            player.addProperty("nickname", p.getPlayer().getNickname());
+
             gameResult.add(String.valueOf(cnt), player);
+            playerList.add(player);
         }
+
+        // 백엔드 전송
+        updateMemberState(winnerNicknames, playerList);
+
 
         // 게임 결과
         data.add("gameResult", gameResult);
@@ -357,6 +364,42 @@ public class GameService   {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 서영탁
+     * 게임 결과 백엔드 DB에 반영
+     */
+    private void updateMemberState(ArrayList<String> winnerNicknames, ArrayList<JsonObject> playerList){
+        BufferedWriter bw = null;
+
+        try{
+            String serverURL = PropertyConfig.getProperty("ssily.url");
+            URL url = new URL(serverURL+"/api/member/state");
+
+            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            conn.setRequestMethod("POST"); // http 메서드
+            conn.setRequestProperty("Content-Type", "application/json"); // header Content-Type 정보
+            conn.setDoInput(true); // 서버에 전달할 값이 있다면 true
+            conn.setDoOutput(false); // 서버로부터 받는 값이 있다면 true
+
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("winner", winnerNicknames);
+            requestBody.put("player", playerList);
+
+            bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8"));
+            bw.write(requestBody.toJSONString()); // 버퍼에 담기
+            bw.flush(); // 버퍼에 담긴 데이터 전달
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try{
+                if(bw != null) bw.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }
