@@ -5,13 +5,13 @@
         width="500"
       >
         <template v-slot:activator="{ attrs }">
-          <v-btn
-            dark
-            v-bind="attrs"
-            @click.stop="state.dialog = true"
+          <v-img 
+          v-bind="attrs"
+          @click.stop="state.dialog = true" 
+          class="tutorial-planet" 
+          src="../../../../public/planet-13.svg"
           >
-            튜토리얼
-          </v-btn>
+          Tutorial</v-img>
         </template>
         <v-card>
           <v-card-title class="text-h5 grey lighten-2">
@@ -52,3 +52,15 @@
       // }
     }
   </script>
+
+<style scoped>
+.tutorial-planet {
+  font-family: 'Akronim', cursive;
+  font-size: 2rem;
+  height: 6rem;
+  display : flex;
+  justify-content : center;
+  align-items : center;
+  color:white
+}
+</style>

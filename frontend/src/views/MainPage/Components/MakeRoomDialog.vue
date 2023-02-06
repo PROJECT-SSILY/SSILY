@@ -5,15 +5,15 @@
       width="500"
     >
       <template v-slot:activator="{ attrs }">
-        <v-btn
-          dark
-          v-bind="attrs"
-          @click.stop="state.dialog = true"
+        <v-img 
+        v-bind="attrs"
+        @click.stop="state.dialog = true" 
+        class="make-planet" 
+        @click="randomTeam" 
+        src="../../../../public/planet-09.svg"
         >
-          방 만들기
-        </v-btn>
+        Room</v-img>
       </template>
-
       <v-card>
         <v-card-title class="text-h5 grey lighten-2">
           방 만들기
@@ -184,3 +184,15 @@
     }
   }
 </script>
+
+<style scoped>
+.make-planet {
+  font-family: 'Akronim', cursive;
+  font-size: 3rem;
+  height: 7rem;
+  display : flex;
+  justify-content : center;
+  align-items : center;
+  color:white
+}
+</style>

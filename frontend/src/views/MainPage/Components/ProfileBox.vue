@@ -4,31 +4,38 @@
         <v-row>
           <v-col col="9" id="proleft">
             <v-row>
-              <v-col>어서오세요, {{state.nickname}}님!</v-col>
+              <v-col>
+                <h3 class="welcome">
+                  어서오세요, {{state.nickname}}님!
+                </h3>
+              </v-col>
             </v-row>
             <v-row justify="center">
               <v-col id="btnbox">
-                <v-btn>Setting</v-btn>
+                <SettingDialog></SettingDialog>
               </v-col>
             </v-row>
           </v-col>
           <v-col col="2">
-            <v-avatar size="64">
               <v-img @click="toMyPage" :src="state.robot"></v-img>
-            </v-avatar>
-          </v-col>
-        </v-row>
+            </v-col>
+            <v-btn @click="toMyPage">Profile</v-btn>
+          </v-row>
       </v-container>
     </div>
   </template>
 
 <script>
+import SettingDialog from '../../SettingDialog.vue';
 import { reactive, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 
 export default {
   name: 'ProfileBox',
+  components: {
+    SettingDialog,
+  },
   setup() {
     const route = useRouter()
     const store = useStore()
@@ -37,9 +44,9 @@ export default {
       robot: 0,
     })
     onBeforeMount(async ()=> {
-          const token = store.getters['accountStore/getToken']
+          const token = await store.getters['accountStore/getToken']
           const res = await store.dispatch('accountStore/getMeAction', token)
-          state.nickname = res.nickname
+          state.nickname = res.nickname || undefined
           if (res.level > -1 && res.level < 6)  {
                 state.robot = "./robotface1.svg"
             } else if (res.level > 5 && res.level < 11) {
@@ -69,5 +76,10 @@ export default {
 }
 #proright {
   display: flex;
+}
+.welcome {
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
 }
 </style>
