@@ -271,14 +271,14 @@ export default {
             const isHost = store.state.gameStore.isHost || true
             const rate = store.getters['accountStore/getRate']
             const password = store.state.gameStore.password || true
-
-            console.log('------------',rate)
+            const exp = store.state.accountStore.user.exp || 0
 
             return new Promise((resolve, reject)=> {
                 console.log("level=",level);
                 console.log("nickname=",nickname);
                 console.log("isHost=", isHost);
                 console.log("rate=", rate);
+                console.log("exp", exp)
                 $axios
                     .post(`${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`, JSON.stringify({
                     "level" : level,
@@ -286,9 +286,7 @@ export default {
                     "rate" : rate,
                     "isHost" : isHost,
                     "password" : password,
-                    // 하드 코딩 -----------------API 변경된 것?? -------------
-                    "exp": 34,
-                    // -----------------------------------------------------
+                    "exp": exp,
                 }), {
                     auth: {
                         username: 'OPENVIDUAPP',

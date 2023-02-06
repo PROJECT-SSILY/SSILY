@@ -5,11 +5,11 @@
     height="500"
     width="auto"
   >
-    <h1>닉네임: {{ player.player.nickname }}</h1>
-      <p>레벨: {{ player.player.level }}</p>
-      <p>팀: {{ player.player.team }}</p>
-      <p>방장여부: {{ player.player.isHost }}</p>
-      <p>경험치: {{ player.player.exp }}</p>
+    <h1>닉네임: {{ state.nickname }}</h1>
+      <p>레벨: {{ state.level }}</p>
+      <p>팀: {{ state.team }}</p>
+      <p>방장여부: {{ state.isHost }}</p>
+      <p>경험치: {{ state.exp }}</p>
   </v-sheet>
 </template>
 
@@ -25,9 +25,16 @@ export default {
   props: {
     player: Object
   },
-  setup() {
+  setup(props) {
     const store = useStore()
-    return { store }
+    const state ={
+      nickname: props.player.player.nickname,
+      level: props.player.player.level,
+      team: props.player.player.team,
+      isHost: props.player.player.isHost,
+      exp: props.player.player.exp,
+    }
+    return { store, state }
   }
 
 }
