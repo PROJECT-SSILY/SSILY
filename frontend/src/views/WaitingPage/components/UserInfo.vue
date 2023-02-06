@@ -68,6 +68,7 @@ export default {
   display: inline-block;
   box-sizing: content-box;
   padding: 3px;
+  margin: 20px 0px;
   border: 1px solid rgb(185, 185, 185);
   border-radius: 100%;
 }

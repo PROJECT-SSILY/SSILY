@@ -118,6 +118,7 @@
         const titlelist = ['함께 즐겨요', '재미있는 게임 합시다', '매너있는 게임하실 분 구해요!', '스겜합시다!']
         state.title = titlelist[Math.floor(Math.random() * titlelist.length)]
       })
+
       const joinSession = async function() {
         console.log("state.title : ", state.title);
         console.log("state.isSecret : ", state.isSecret);
@@ -150,7 +151,6 @@
               })
               .then(response => response.data)
               .then(data => {
-                  console.log("data : ", data)
                   resolve(data.id)
               })
               .catch(error => {

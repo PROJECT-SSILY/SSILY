@@ -204,18 +204,18 @@ export default {
                 console.warn(exception);
             });
 
-            state.session.on("signal:chat", (event)=>{
-                const { message } = JSON.parse(event.data);
-                const { user, chatMessage } = message
-                const data = user + " : " + chatMessage
-                store.commit('gameStore/SET_MESSAGES', data)
-            });
+            // state.session.on("signal:chat", (event)=>{
+            //     const { message } = JSON.parse(event.data);
+            //     const { user, chatMessage } = message
+            //     const data = user + " : " + chatMessage
+            //     store.commit('gameStore/SET_MESSAGES', data)
+            // });
 
             // --- Connect to the session with a valid user token ---
             // 'getToken' method is simulating what your server-side should do.
             // 'token' parameter should be retrieved and returned by your own backend
 
-
+            console.log(state.sessionId)
             getToken(state.sessionId).then(token => {
                 // console.log("token : ", token)
                 state.session.connect(token, { clientData: state.myUserName })
