@@ -119,19 +119,6 @@
         state.title = titlelist[Math.floor(Math.random() * titlelist.length)]
       })
       const joinSession = async function() {
-
-        if (state.isTeamBattle === "radio-1") {
-          console.log("team 적용됨")
-          state.isTeamBattle = true
-        } else {
-          state.isTeamBattle = false
-        }
-
-        if (state.isSecret === "radio-1") {
-          state.isSecret = false
-        } else {
-          state.isSecret = true
-        }
         console.log("state.title : ", state.title);
         console.log("state.isSecret : ", state.isSecret);
         console.log("state.password : ", state.password);
