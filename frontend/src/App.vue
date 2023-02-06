@@ -15,6 +15,13 @@
 </script>
 
 <style>
+@font-face {
+  font-family: 'MaplestoryOTFBold';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/MaplestoryOTFBold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -38,7 +45,7 @@
   margin:0;  background-image: url("./assets/stars3.svg");
   background-size: contain;
   background-position: center;
-  overflow:hidden;
+  overflow: hidden;
 }
 @-webkit-keyframes rotating /* Safari and Chrome */ {
   from {

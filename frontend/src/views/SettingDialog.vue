@@ -5,7 +5,7 @@
           color="primary"
           @click="clickDialog"
         >
-          설정
+        <v-icon>mdi-cog</v-icon>
         </v-btn>
         <v-dialog
           v-model="state.dialog"

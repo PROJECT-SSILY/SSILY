@@ -125,9 +125,6 @@ export default {
                 userinfo.robot = "./robotface3.svg"
             }
         })
-        const con = function() {
-            console.log('왜 안눌림');
-        }
         const logOut = async function() {
             await store.dispatch('accountStore/logoutAction')
             router.push('/')
@@ -143,7 +140,6 @@ export default {
             logOut,
             main,
             deleteAccount,
-            con
         }
     },
 }

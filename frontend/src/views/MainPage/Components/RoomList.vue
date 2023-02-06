@@ -1,8 +1,5 @@
 <template>
     <div>
-      <h3>
-        RoomList
-      </h3>
       <v-card
         class="mx-auto"
         max-width="500"
@@ -138,6 +135,9 @@ export default {
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
 }
 
 </style>
