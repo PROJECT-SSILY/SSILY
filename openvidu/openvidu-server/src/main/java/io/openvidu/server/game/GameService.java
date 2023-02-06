@@ -89,6 +89,9 @@ public class GameService   {
      * 게임 접속 시 참여자들의 Ready 상태를 알려줌
      */
     public void getReadyState(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+
+        log.info("getReadyState is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
         // 해당 방에서 관리되는게 없으면 빈 map 생성
         readyState.putIfAbsent(sessionId, new HashMap<>());
 
@@ -129,7 +132,7 @@ public class GameService   {
      */
     public void setPresenterSetting(Participant participant, JsonObject message, String sessionId, Set<Participant> gameParticipants,
                                     JsonObject params, JsonObject data, RpcNotificationService notice){
-        log.info("PrepareGame is called by {}", participant.getParticipantPublicId());
+        log.info("setPresenterSetting is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         ArrayList<Participant> curParticipantList = participantList.get(sessionId);
         String curPresenterId="";
@@ -174,6 +177,9 @@ public class GameService   {
      */
     public void gameStart(Participant participant, JsonObject message, String sessionId, Set<Participant> participants,
                           JsonObject params, JsonObject data, RpcNotificationService notice) {
+
+        log.info("gameStart is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
 
         //제시어 불러오기
 //        words.putIfAbsent(sessionId, new ArrayList<>());
@@ -261,7 +267,7 @@ public class GameService   {
      */
     private void submitAnswer(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data, String playerAnswer){
 
-        log.info("submitAnswer is called by {}", participant.getParticipantPublicId());
+        log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         Integer nowRound = round.get(sessionId);
         String answer = words.get(sessionId).get(nowRound);
@@ -327,7 +333,7 @@ public class GameService   {
      */
     private void finishGame(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
-        log.info("finishGame is called by {}", participant.getParticipantPublicId());
+        log.info("finishGame is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         ArrayList<Participant> winner = new ArrayList<>();
         int max = 0;
