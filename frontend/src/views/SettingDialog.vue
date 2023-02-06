@@ -5,7 +5,7 @@
           color="primary"
           @click="dialog=!dialog"
         >
-          Open Dialog
+          설정
         </v-btn>
         <audio id="audioContainer" src="https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3" volume="0.5" loop></audio>
         <v-btn
