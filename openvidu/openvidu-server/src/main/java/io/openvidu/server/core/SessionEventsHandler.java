@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import io.openvidu.server.game.GameService;
+import io.openvidu.server.game.Player;
 import org.kurento.client.GenericMediaEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +56,9 @@ public class SessionEventsHandler {
 
     @Autowired
     protected RpcNotificationService rpcNotificationService;
+
+    @Autowired
+    protected GameService gameService;
 
     @Autowired
     protected CallDetailRecord CDR;
@@ -389,63 +394,65 @@ public class SessionEventsHandler {
             }
         }
 
+        if(message.has("type") && message.get("type").getAsString().contains("signal:game")){
+            gameService.gameNavigator(participant, message, participants, sessionId, rpcNotificationService);
+        } else {
+            String from = null;
+            String type = null;
+            String data = null;
 
-        String from = null;
-        String type = null;
-        String data = null;
+            JsonObject params = new JsonObject();
+            if (message.has("data")) {
+                data = message.get("data").getAsString();
+                params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_DATA_PARAM, data);
+            }
+            if (message.has("type")) {
+                type = message.get("type").getAsString();
+                params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_TYPE_PARAM, type);
+            }
+            if (participant != null) {
+                from = participant.getParticipantPublicId();
+                params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_FROM_PARAM, from);
+            }
 
-        JsonObject params = new JsonObject();
-        if (message.has("data")) {
-            data = message.get("data").getAsString();
-            params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_DATA_PARAM, data);
-        }
-        if (message.has("type")) {
-            type = message.get("type").getAsString();
-            params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_TYPE_PARAM, type);
-        }
-        if (participant != null) {
-            from = participant.getParticipantPublicId();
-            params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_FROM_PARAM, from);
-        }
+            Set<String> toSet = new HashSet<String>();
 
-        Set<String> toSet = new HashSet<String>();
+            if (message.has("to")) {
 
-        if (message.has("to")) {
-
-            JsonArray toJson = message.get("to").getAsJsonArray();
-            for (int i = 0; i < toJson.size(); i++) {
-                JsonElement el = toJson.get(i);
-                if (el.isJsonNull()) {
-                    throw new OpenViduException(Code.SIGNAL_TO_INVALID_ERROR_CODE,
-                            "Signal \"to\" field invalid format: null");
+                JsonArray toJson = message.get("to").getAsJsonArray();
+                for (int i = 0; i < toJson.size(); i++) {
+                    JsonElement el = toJson.get(i);
+                    if (el.isJsonNull()) {
+                        throw new OpenViduException(Code.SIGNAL_TO_INVALID_ERROR_CODE,
+                                "Signal \"to\" field invalid format: null");
+                    }
                 }
             }
-        }
 
-        if (toSet.isEmpty()) {
-            for (Participant p : participants) {
-                toSet.add(p.getParticipantPublicId());
-                rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
-                        ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
-            }
-        } else {
-            Set<String> participantPublicIds = participants.stream().map(Participant::getParticipantPublicId)
-                    .collect(Collectors.toSet());
-            if (participantPublicIds.containsAll(toSet)) {
-                for (String to : toSet) {
-                    Optional<Participant> p = participants.stream().filter(x -> to.equals(x.getParticipantPublicId()))
-                            .findFirst();
-                    rpcNotificationService.sendNotification(p.get().getParticipantPrivateId(),
+            if (toSet.isEmpty()) {
+                for (Participant p : participants) {
+                    toSet.add(p.getParticipantPublicId());
+                    rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
                             ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
                 }
             } else {
-                throw new OpenViduException(Code.SIGNAL_TO_INVALID_ERROR_CODE,
-                        "Signal \"to\" field invalid format: some connectionId does not exist in this session");
+                Set<String> participantPublicIds = participants.stream().map(Participant::getParticipantPublicId)
+                        .collect(Collectors.toSet());
+                if (participantPublicIds.containsAll(toSet)) {
+                    for (String to : toSet) {
+                        Optional<Participant> p = participants.stream().filter(x -> to.equals(x.getParticipantPublicId()))
+                                .findFirst();
+                        rpcNotificationService.sendNotification(p.get().getParticipantPrivateId(),
+                                ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+                    }
+                } else {
+                    throw new OpenViduException(Code.SIGNAL_TO_INVALID_ERROR_CODE,
+                            "Signal \"to\" field invalid format: some connectionId does not exist in this session");
+                }
             }
+
+            CDR.recordSignalSent(sessionId, uniqueSessionId, from, toSet.toArray(new String[toSet.size()]), type, data);
         }
-
-        CDR.recordSignalSent(sessionId, uniqueSessionId, from, toSet.toArray(new String[toSet.size()]), type, data);
-
         if (isRpcCall) {
             rpcNotificationService.sendResponse(participant.getParticipantPrivateId(), transactionId, new JsonObject());
         }

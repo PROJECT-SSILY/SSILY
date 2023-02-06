@@ -47,4 +47,11 @@ public class Member extends BaseEntity {
         this.password = password;
         return this;
     }
+
+    public Member updateState(int extraExp, boolean isLevelUp, boolean isWin){
+        this.exp += extraExp;
+        if(isLevelUp) this.level += 1;
+        this.getRecord().updateRecord(isWin);
+        return this;
+    }
 }

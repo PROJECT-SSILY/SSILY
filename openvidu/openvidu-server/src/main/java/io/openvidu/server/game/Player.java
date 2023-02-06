@@ -25,6 +25,9 @@ public class Player {
 
     // 참여자 레벨
     private int level;
+
+    // 참여자 경험치
+    private int exp;
     
     // 참여자 닉네임
     private String nickname;
@@ -41,15 +44,34 @@ public class Player {
         this.isHost = false;
     }
 
-    public Player(int level, String nickname, double rate, boolean isHost) {
+    public Player(int level, String nickname, double rate, boolean isHost, Team team, int exp) {
         this.score = 0;
-        this.team = Team.NONE;
+        this.team = team;
         this.isPresenter = false;
         this.isReady = false;
         this.isHost = isHost;
         this.level = level;
         this.nickname = nickname;
         this.rate = rate;
+        this.exp = exp;
+    }
+
+    public void initPlayerState(){
+        this.score = 0;
+        this.isPresenter = false;
+        this.isReady = false;
+    }
+
+    public void addExp(int exp){
+        this.exp += exp;
+    }
+
+    public int getExp() {
+        return exp;
+    }
+
+    public void setExp(int exp) {
+        this.exp = exp;
     }
 
     public int getScore() {
@@ -126,6 +148,7 @@ public class Player {
         json.addProperty("level", this.getLevel());
         json.addProperty("nickname", this.getNickname());
         json.addProperty("rate", this.getRate());
+        json.addProperty("exp", this.getExp());
         return json;
     }
 }

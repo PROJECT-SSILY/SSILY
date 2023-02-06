@@ -680,7 +680,7 @@ public class Session {
 						.title(properties.title())
 						.isSecret(properties.isSecret())
 						.password(properties.password())
-						.team(properties.team())
+						.isTeamBattle(properties.isTeamBattle())
 						.isPlaying(properties.isPlaying()).build();
 
 				this.properties = responseProperties;

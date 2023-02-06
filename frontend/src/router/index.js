@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginPage from '../views/Accounts/LoginPage.vue'
 import MyPage from '../views/MyPage.vue'
 import SignupPage from '../views/Accounts/SignupPage.vue'
-import WaitingPage from '@/views/WaitingPage/WaitingPage.vue'
+// import WaitingPage from '@/views/WaitingPage/WaitingPage.vue'
 import StartingPage from '../views/StartingPage/StartingPage.vue'
 import MainPage from '../views/MainPage/MainPage.vue'
 import FindPassword from '../views/Accounts/FindPassword.vue'
@@ -53,12 +53,13 @@ const routes = [
     component: SignupPage,
     beforeEnter: loginAuth()
   },
-  {
-    path: '/waiting',
-    name: 'waiting',
-    component: WaitingPage,
-    beforeEnter: requireAuth()
-  },
+  // {
+  //   path: '/waiting',
+  //   name: 'waiting',
+  //   component: WaitingPage,
+  //   props: true,
+  //   beforeEnter: requireAuth()
+  // },
   {
     path: '/findpw',
     name: 'findpw',
@@ -72,10 +73,10 @@ const routes = [
     beforeEnter: requireAuth()
   },
   {
-    path: '/ingame',
-    name: 'ingame',
+    path: '/gameroom/:sessionId',
+    name: 'gameroom',
     component: InGamePage,
-    // beforeEnter: requireAuth()
+    beforeEnter: requireAuth()
   },
   // {
   //   path: '/about',

@@ -1,0 +1,7 @@
+ant
+apple
+axe
+banana
+bird
+book
+bucket

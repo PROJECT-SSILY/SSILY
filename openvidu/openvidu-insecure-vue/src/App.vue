@@ -16,6 +16,7 @@
 					<p class="text-center">
 						<button class="btn btn-lg btn-success" @click="createTest()">방생성!</button>
             <button class="btn btn-lg btn-success" @click="joinSession()">Join!</button>
+            <button class="btn btn-lg btn-success" @click="hostJoinSession()">호스트로입장</button>
 					</p>
 				</div>
 			</div>
@@ -178,6 +179,12 @@ export default {
       );
     },
 
+    getHostToken(mySessionId) {
+      return this.createSession(mySessionId).then((sessionId) =>
+        this.createHostToken(sessionId)
+      );
+    },
+
     // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-session
     createSession(sessionId) {
       console.log("보내는 값");
@@ -185,7 +192,8 @@ export default {
         JSON.stringify({
           title: "안녕하세용",
           isSecret: true,
-          password: "1234"
+          password: "1234",
+          isHost: false,
         }),
         {
           auth: {
@@ -200,7 +208,7 @@ export default {
           username: "OPENVIDUAPP",
           password: OPENVIDU_SERVER_SECRET,
         },
-      })
+      });
 
       return new Promise((resolve, reject) => {
         axios
@@ -210,7 +218,8 @@ export default {
               title: "방제목2",
               isSecret: true,
               password: "1234",
-              team:"NONE"
+              isTeamBattle: true,
+              customSessionId: this.mySessionId,
             }),
             {
               auth: {
@@ -242,14 +251,12 @@ export default {
     },
 
     createTest() {
-      axios
-          .post(
+      axios.post(
             `${OPENVIDU_SERVER_URL}/api/rooms`,
             JSON.stringify({
               title: "방제목2",
               isSecret: true,
               password: "1234",
-              team:"NONE",
             }),
             {
               auth: {
@@ -269,7 +276,9 @@ export default {
             {
               level: 1,
               nickname : "서영탁",
-              rate : 70.1
+              rate : "70.1",
+              isHost: false,
+              password : "1234"
             },
             {
               auth: {
@@ -282,6 +291,98 @@ export default {
           .then((data) => resolve(data.token))
           .catch((error) => reject(error.response));
       });
+    },
+
+    createHostToken(sessionId) {
+      return new Promise((resolve, reject) => {
+        axios
+          .post(
+            `${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`,
+            {
+              level: 1,
+              nickname : "신대득",
+              rate : 70.1,
+              isHost : true
+            },
+            {
+              auth: {
+                username: "OPENVIDUAPP",
+                password: OPENVIDU_SERVER_SECRET,
+              },
+            }
+          )
+          .then((response) => response.data)
+          .then((data) => resolve(data.token))
+          .catch((error) => reject(error.response));
+      });
+    },
+
+    hostJoinSession() {
+      // --- Get an OpenVidu object ---
+      this.OV = new OpenVidu();
+
+      // --- Init a session ---
+      this.session = this.OV.initSession();
+
+      // --- Specify the actions when events take place in the session ---
+
+      // On every new Stream received...
+      this.session.on("streamCreated", ({ stream }) => {
+        const subscriber = this.session.subscribe(stream);
+        this.subscribers.push(subscriber);
+      });
+
+      // On every Stream destroyed...
+      this.session.on("streamDestroyed", ({ stream }) => {
+        const index = this.subscribers.indexOf(stream.streamManager, 0);
+        if (index >= 0) {
+          this.subscribers.splice(index, 1);
+        }
+      });
+
+      // On every asynchronous exception...
+      this.session.on("exception", ({ exception }) => {
+        console.warn(exception);
+      });
+
+      // --- Connect to the session with a valid user token ---
+
+      // 'getToken' method is simulating what your server-side should do.
+      // 'token' parameter should be retrieved and returned by your own backend
+      this.getHostToken(this.mySessionId).then((token) => {
+        this.session
+          .connect(token, { clientData: this.myUserName })
+          .then(() => {
+            // --- Get your own camera stream with the desired properties ---
+
+            let publisher = this.OV.initPublisher(undefined, {
+              audioSource: undefined, // The source of audio. If undefined default microphone
+              videoSource: undefined, // The source of video. If undefined default webcam
+              publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
+              publishVideo: true, // Whether you want to start publishing with your video enabled or not
+              resolution: "640x480", // The resolution of your video
+              frameRate: 30, // The frame rate of your video
+              insertMode: "APPEND", // How the video is inserted in the target element 'video-container'
+              mirror: false, // Whether to mirror your local video or not
+            });
+
+            this.mainStreamManager = publisher;
+            this.publisher = publisher;
+
+            // --- Publish your stream ---
+
+            this.session.publish(this.publisher);
+          })
+          .catch((error) => {
+            console.log(
+              "There was an error connecting to the session:",
+              error.code,
+              error.message
+            );
+          });
+      });
+
+      window.addEventListener("beforeunload", this.leaveSession);
     },
   },
 };
