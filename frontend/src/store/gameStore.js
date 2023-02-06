@@ -23,6 +23,9 @@ const state = {
     myUserName: '',
     isHost: true,
     playerList: undefined,
+    media: 0.5,
+    alarm: 0.5,
+    audio: new Audio('https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3')
 }
 
 const getters = {
@@ -39,7 +42,8 @@ const getters = {
       return state.title;
     },
 
-}
+} 
+
 
 const mutations = {
 
@@ -84,6 +88,13 @@ const mutations = {
     setPlayerList: (state, data) => {
         state.playerList = data
       },
+    setVolume1: (state, volume) => {
+        state.media = volume
+
+    },
+    setVolume2: (state, volume) => {
+        state.alarm = volume
+    }
   
 }
 const actions = {
@@ -298,6 +309,22 @@ const actions = {
         throw err
       }
     },
+    playBgm: () => {
+        state.audio.volume = state.media
+        state.audio.loop = true
+        state.audio.play()
+    },
+
+    changeVolume1: (context, volume) => {
+        context.commit("setVolume1", volume)
+        state.audio.volume = volume
+    },
+
+    changeVolume2: (context, volume) => {
+        context.commit("setVolume2", volume)
+        // 아직 효과음 없어서 볼륨 조절 코드 없음 효과음 추가 이후 작성 예정
+        console.log('alarm 볼륨 조절')
+    }
 }
 export default {
     namespaced: true,
