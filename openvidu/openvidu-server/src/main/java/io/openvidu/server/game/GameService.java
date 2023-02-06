@@ -27,6 +27,7 @@ public class GameService   {
     static final int GET_PRESENTER_SETTING =1;
     static final int GAME_START = 2;
     static final int GET_READY_STATE = 3;
+    static final int CHANGE_READY_STATE = 4;
 
     //Tread 관리
     public static ConcurrentHashMap<String, Thread> gameThread = new ConcurrentHashMap<>();
@@ -81,6 +82,9 @@ public class GameService   {
             case GET_READY_STATE:
                 getReadyState(participant, sessionId, participants, params, data);
                 return;
+            case CHANGE_READY_STATE:
+                changeReadyState(participant, sessionId, participants, params, data);
+                return;
         }
     }
 
@@ -115,6 +119,38 @@ public class GameService   {
 
         rpcNotificationService.sendNotification(participant.getParticipantPrivateId(),
                 ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+    }
+
+    /**
+     * 서영탁
+     * 참여자의 Ready 상태 변경
+     */
+    private void changeReadyState(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+
+        log.info("changeReadyState is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+        HashMap<String, Boolean> nowReadyState = readyState.get(sessionId);
+        
+        // 현재 READY 상태를 반대로 변경
+        nowReadyState.compute(participant.getParticipantPublicId(), (k, v) -> v = !v);
+
+        readyState.computeIfPresent(sessionId, (k, v) -> v = nowReadyState);
+
+        int cnt = 0;
+        for (String id : nowReadyState.keySet()) {
+            data.addProperty(id, nowReadyState.get(id));
+            if(nowReadyState.get(id)) cnt++;
+        }
+
+        if(cnt == 4) data.addProperty("isAllReady", true);
+        else data.addProperty("isAllReady", false);
+
+        params.add("data", data);
+
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
     }
 
 
