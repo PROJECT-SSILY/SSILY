@@ -18,7 +18,7 @@ public class Player {
     private boolean isPresenter = false;
 
     // 준비 상태
-    private boolean isReady = false;
+//    private boolean isReady = false;
 
     // 방장 여부
     private boolean isHost = false;
@@ -40,7 +40,7 @@ public class Player {
         this.score = 0;
         this.team = Team.NONE;
         this.isPresenter = false;
-        this.isReady = false;
+//        this.isReady = false;
         this.isHost = false;
     }
 
@@ -48,12 +48,18 @@ public class Player {
         this.score = 0;
         this.team = team;
         this.isPresenter = false;
-        this.isReady = false;
+//        this.isReady = false;
         this.isHost = isHost;
         this.level = level;
         this.nickname = nickname;
         this.rate = rate;
         this.exp = exp;
+    }
+
+    public void initPlayerState(){
+        this.score = 0;
+        this.isPresenter = false;
+//        this.isReady = false;
     }
 
     public void addExp(int exp){
@@ -92,13 +98,13 @@ public class Player {
         isPresenter = presenter;
     }
 
-    public boolean isReady() {
-        return isReady;
-    }
-
-    public void setReady(boolean ready) {
-        isReady = ready;
-    }
+//    public boolean isReady() {
+//        return isReady;
+//    }
+//
+//    public void setReady(boolean ready) {
+//        isReady = ready;
+//    }
 
     public boolean isHost() {
         return isHost;
@@ -137,7 +143,7 @@ public class Player {
         json.addProperty("score", this.getScore());
         json.addProperty("team", this.getTeam().toString());
         json.addProperty("isPresenter", this.isPresenter());
-        json.addProperty("isReady", this.isReady());
+//        json.addProperty("isReady", this.isReady());
         json.addProperty("isHost", this.isHost());
         json.addProperty("level", this.getLevel());
         json.addProperty("nickname", this.getNickname());

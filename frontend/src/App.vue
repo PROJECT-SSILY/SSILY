@@ -8,6 +8,12 @@
   </div>
 </template>
 
+
+<script>
+
+
+</script>
+
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -21,7 +27,7 @@
   background: linear-gradient(rgba(12,111,202,1), rgba(38,0,111,1));
   opacity: 1;
   height: 100vh;
-  overflow: scroll;
+  overflow: hidden;
   background-size: cover;
   background-position: center;
   position: relative;

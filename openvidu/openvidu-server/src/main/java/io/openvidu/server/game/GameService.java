@@ -10,14 +10,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.parameters.P;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,9 +26,17 @@ public class GameService   {
     static final int SET_PRESENTER_SETTING = 0;
     static final int GET_PRESENTER_SETTING =1;
     static final int GAME_START = 2;
+    static final int GET_READY_STATE = 3;
+    static final int CHANGE_READY_STATE = 4;
 
     //Tread 관리
     public static ConcurrentHashMap<String, Thread> gameThread = new ConcurrentHashMap<>();
+
+    // 게임 라운드 관리
+    public static ConcurrentHashMap<String, Integer> round = new ConcurrentHashMap<>();
+
+    // 참여자들 Ready 상태 현황
+    public static ConcurrentHashMap<String, HashMap<String, Boolean>> readyState = new ConcurrentHashMap<>();
 
     /**
      * 김윤미
@@ -72,8 +78,81 @@ public class GameService   {
                 return;
             case GAME_START:
                 gameStart(participant, message, sessionId, participants, params, data, notice);
+                return;
+            case GET_READY_STATE:
+                getReadyState(participant, sessionId, participants, params, data);
+                return;
+            case CHANGE_READY_STATE:
+                changeReadyState(participant, sessionId, participants, params, data);
+                return;
         }
     }
+
+    /**
+     * 서영탁
+     * 게임 접속 시 참여자들의 Ready 상태를 알려줌
+     */
+    public void getReadyState(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+
+        log.info("getReadyState is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+        // 해당 방에서 관리되는게 없으면 빈 map 생성
+        readyState.putIfAbsent(sessionId, new HashMap<>());
+
+        // 이전에 관리되고 있던 세션별 레디 상태
+        HashMap<String, Boolean> preReadyState = readyState.get(sessionId);
+        HashMap<String, Boolean> nowReadyState = new HashMap<>();
+
+        // 현재 방에 있지 않는 참여자 제외
+        for (Participant p : participants) {
+            String id = p.getParticipantPublicId();
+            nowReadyState.put(id, preReadyState.getOrDefault(id, false));
+        }
+
+        readyState.computeIfPresent(sessionId, (k, v) -> v = nowReadyState);
+
+        for (String id : nowReadyState.keySet()) {
+            data.addProperty(id, nowReadyState.get(id));
+        }
+
+        params.add("data", data);
+
+        rpcNotificationService.sendNotification(participant.getParticipantPrivateId(),
+                ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+    }
+
+    /**
+     * 서영탁
+     * 참여자의 Ready 상태 변경
+     */
+    private void changeReadyState(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+
+        log.info("changeReadyState is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+        HashMap<String, Boolean> nowReadyState = readyState.get(sessionId);
+        
+        // 현재 READY 상태를 반대로 변경
+        nowReadyState.compute(participant.getParticipantPublicId(), (k, v) -> v = !v);
+
+        readyState.computeIfPresent(sessionId, (k, v) -> v = nowReadyState);
+
+        int cnt = 0;
+        for (String id : nowReadyState.keySet()) {
+            data.addProperty(id, nowReadyState.get(id));
+            if(nowReadyState.get(id)) cnt++;
+        }
+
+        if(cnt == 4) data.addProperty("isAllReady", true);
+        else data.addProperty("isAllReady", false);
+
+        params.add("data", data);
+
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
 
     /**
      * 신대득
@@ -89,7 +168,7 @@ public class GameService   {
      */
     public void setPresenterSetting(Participant participant, JsonObject message, String sessionId, Set<Participant> gameParticipants,
                                     JsonObject params, JsonObject data, RpcNotificationService notice){
-        log.info("PrepareGame is called by {}", participant.getParticipantPublicId());
+        log.info("setPresenterSetting is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         ArrayList<Participant> curParticipantList = participantList.get(sessionId);
         String curPresenterId="";
@@ -135,8 +214,15 @@ public class GameService   {
     public void gameStart(Participant participant, JsonObject message, String sessionId, Set<Participant> participants,
                           JsonObject params, JsonObject data, RpcNotificationService notice) {
 
+        log.info("gameStart is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+
         //제시어 불러오기
-        words.putIfAbsent(sessionId, new ArrayList<>());
+//        words.putIfAbsent(sessionId, new ArrayList<>());
+        words.put(sessionId, pickWords());
+
+        // 라운드 설정 : (1라운드)
+        round.put(sessionId, 1);
 
         //참여자 목록 생성
         ArrayList<Participant> gameParticipants=new ArrayList<>(participants);
@@ -211,6 +297,32 @@ public class GameService   {
         return pickedWords;
     }
 
+    /**
+     * 서영탁
+     * 답안 제출
+     */
+    private void submitAnswer(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data, String playerAnswer){
+
+        log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+        Integer nowRound = round.get(sessionId);
+        String answer = words.get(sessionId).get(nowRound);
+
+        // 플레이어가 제출한 답안이 정답이라면
+        if(answer.equals(playerAnswer)){
+            data.addProperty("answer", answer);
+            data.addProperty("winnerId", participant.getParticipantPublicId());
+            data.addProperty("winnerNickname", participant.getPlayer().getNickname());
+
+            params.add("data", data);
+
+            for (Participant p : participants) {
+                rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                        ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+            }
+        }
+    }
+
 
     /**
      * 서영탁
@@ -240,6 +352,10 @@ public class GameService   {
         data.addProperty("winnerNickname", winner.getNickname());
         params.add("data", data);
 
+        // 라운드 증가
+        Integer nowRound = round.get(sessionId);
+        round.put(sessionId, nowRound+1);
+
         // 라운드 종료 알라기
         for (Participant p : participants) {
             rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
@@ -253,7 +369,7 @@ public class GameService   {
      */
     private void finishGame(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
-        log.info("finishGame is called by {}", participant.getParticipantPublicId());
+        log.info("finishGame is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         ArrayList<Participant> winner = new ArrayList<>();
         int max = 0;
@@ -261,6 +377,7 @@ public class GameService   {
         // 우승자 첮가
         for (Participant p : participants) {
             int score = p.getPlayer().getScore();
+            p.getPlayer().initPlayerState();  // 상태 초기화 (다시 대기방으로 돌아가기 위해)
             if(score >= max){
                 if(score > max) {
                     winner = new ArrayList<>();
@@ -272,20 +389,23 @@ public class GameService   {
 
         // 우승자 정보 json
         JsonObject winnerJson = new JsonObject();
+        ArrayList<String> winnerNicknames = new ArrayList<>();
         int winnerCnt = 0;
         for (Participant p : winner) {
             JsonObject player = new JsonObject();
             player.addProperty("connectionId", p.getParticipantPublicId());
             player.addProperty("nickname", p.getPlayer().getNickname());
             winnerJson.add(String.valueOf(winnerCnt), player);
+
+            winnerNicknames.add(p.getPlayer().getNickname());
         }
 
         data.add("winner", winnerJson);
         data.addProperty("winnerCnt", winnerCnt);
 
         // 경험치 추가
-        // TODO : 백엔드 전송
         JsonObject gameResult = new JsonObject();
+        ArrayList<JsonObject> playerList = new ArrayList<>();
         int cnt = 0;
         for (Participant p : participants) {
             int extraExp = calcExp(p, winner);
@@ -296,8 +416,15 @@ public class GameService   {
             player.addProperty("connectionId", p.getParticipantPublicId());
             player.addProperty("extraExp", extraExp);
             player.addProperty("levelUp", levelUp);
+            player.addProperty("nickname", p.getPlayer().getNickname());
+
             gameResult.add(String.valueOf(cnt), player);
+            playerList.add(player);
         }
+
+        // 백엔드 전송
+        updateMemberState(winnerNicknames, playerList);
+
 
         // 게임 결과
         data.add("gameResult", gameResult);
@@ -357,6 +484,42 @@ public class GameService   {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 서영탁
+     * 게임 결과 백엔드 DB에 반영
+     */
+    private void updateMemberState(ArrayList<String> winnerNicknames, ArrayList<JsonObject> playerList){
+        BufferedWriter bw = null;
+
+        try{
+            String serverURL = PropertyConfig.getProperty("ssily.url");
+            URL url = new URL(serverURL+"/api/member/state");
+
+            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+            conn.setRequestMethod("POST"); // http 메서드
+            conn.setRequestProperty("Content-Type", "application/json"); // header Content-Type 정보
+            conn.setDoInput(true); // 서버에 전달할 값이 있다면 true
+            conn.setDoOutput(false); // 서버로부터 받는 값이 있다면 true
+
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("winner", winnerNicknames);
+            requestBody.put("player", playerList);
+
+            bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8"));
+            bw.write(requestBody.toJSONString()); // 버퍼에 담기
+            bw.flush(); // 버퍼에 담긴 데이터 전달
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try{
+                if(bw != null) bw.close();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
     }
 
 }
