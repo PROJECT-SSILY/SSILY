@@ -141,7 +141,7 @@
               "title" : state.title,
               "isSecret" : state.isSecret,
               "password" : state.password,
-              "team" : state.isTeamBattle
+              "isTeamBattle" : state.isTeamBattle
               }), {
                   auth: {
                       username: 'OPENVIDUAPP',
@@ -150,6 +150,7 @@
               })
               .then(response => response.data)
               .then(data => {
+                  console.log("data : ", data)
                   resolve(data.id)
               })
               .catch(error => {

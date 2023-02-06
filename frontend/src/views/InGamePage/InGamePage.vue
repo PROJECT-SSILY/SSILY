@@ -213,16 +213,16 @@ export default {
 
 
             getToken(state.sessionId).then(token => {
-                console.log("token : ", token)
+                // console.log("token : ", token)
                 state.session.connect(token, { clientData: state.myUserName })
                 requestPlayerList(state.sessionId).then(response => {
-                console.log('requestPlayerlist response', response)
+                // console.log('requestPlayerlist response', response)
                 playerList.value.push(response.content)
-                console.log('response:::::::::::::::::::0-09i023', response.content)
+                // console.log('response:::::::::::::::::::0-09i023', response.content)
                 store.commit('gameStore/setSession', state.session)
                 sessionVal.value.push(state.session) // 시험 ---
-                console.log('state.session : ', state.session)
-                console.log('sessionVal : ', sessionVal.value)
+                // console.log('state.session : ', state.session)
+                // console.log('sessionVal : ', sessionVal.value)
             })
             .then(() => {
                 console.log("gettoken - connect - then")
@@ -253,7 +253,7 @@ export default {
         const clickExit = () => {
             router.push({
                 name: 'main'
-        })
+            })
         }
 
         const clickReady = async () => {
@@ -267,22 +267,22 @@ export default {
             }
         }
         const leaveSession = () => {
-        // --- Leave the session by calling 'disconnect' method over the Session object ---
-        if (state.session) state.session.disconnect();
+            // --- Leave the session by calling 'disconnect' method over the Session object ---
+            if (state.session) state.session.disconnect();
 
-        state.session = undefined;
-        state.mainStreamManager = undefined;
-        state.publisher = undefined;
-        state.subscribers = [];
-        state.OV = undefined;
+            state.session = undefined;
+            state.mainStreamManager = undefined;
+            state.publisher = undefined;
+            state.subscribers = [];
+            state.OV = undefined;
 
-        window.removeEventListener('beforeunload', leaveSession);
+            window.removeEventListener('beforeunload', leaveSession);
         }
 
         const updateMainVideoStreamManager = (stream) => {
-        if (state.mainStreamManager === stream) return;
-        state.mainStreamManager = stream;
-        }
+            if (state.mainStreamManager === stream) return;
+            state.mainStreamManager = stream;
+            }
 
         /**
         * --------------------------
@@ -297,13 +297,13 @@ export default {
         */
 
         const getToken = async (sessionId) => {
-        console.log("gettoken 시작")
-        console.log('gettoken, sessionid : ', sessionId)
-        const response = await createToken(sessionId)
-        state.connectionId = response.connectionId
-        console.log('connectionId ===>', state.connectionId)
-        return response.token
-    }
+            console.log("gettoken 시작")
+            console.log('gettoken, sessionid : ', sessionId)
+            const response = await createToken(sessionId)
+            state.connectionId = response.connectionId
+            console.log('connectionId ===>', state.connectionId)
+            return response.token
+        }
 
 
         // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-connection
@@ -314,9 +314,7 @@ export default {
             const rate = store.getters['accountStore/getRate']
             const password = store.state.gameStore.password || true
             const exp = store.state.accountStore.user.exp || 0
-            state.myUserName=nickname;
-
-
+            state.myUserName=store.state.accountStore.user.nickname || ''
 
             return new Promise((resolve, reject)=> {
                 console.log("level=",level);

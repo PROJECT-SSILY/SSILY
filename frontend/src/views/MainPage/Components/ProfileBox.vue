@@ -36,8 +36,9 @@ export default {
       nickname: null
     })
     onBeforeMount(async ()=> {
-          const token = store.getters['accountStore/getToken']
+          const token = await store.getters['accountStore/getToken']
           const res = await store.dispatch('accountStore/getMeAction', token)
+          console.log(res)
           state.nickname = res.nickname
       })
     const toMyPage = function() {
