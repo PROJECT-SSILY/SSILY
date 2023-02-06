@@ -586,7 +586,7 @@ public class SessionRestController {
 	 * 서영탁
 	 * 참여자(플레이어) 준비 상태 변경
 	 */
-	@PutMapping("/rooms/{room-id}/players/{player-id}/ready")
+	/*@PutMapping("/rooms/{room-id}/players/{player-id}/ready")
 	public ResponseEntity<?> changeReadyState(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId) {
 
 		log.info("REST API: PUT {}/rooms/{}/players/{}/ready", "/api", roomId, playerId);
@@ -610,13 +610,13 @@ public class SessionRestController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-	}
+	}*/
 
 	/**
 	 * 서영탁
 	 * 참여자(플레이어) 팀 변경
 	 */
-	@PutMapping("/rooms/{room-id}/players/{player-id}/team")
+	/*@PutMapping("/rooms/{room-id}/players/{player-id}/team")
 	public ResponseEntity<?> changeTeam(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId,
 										@RequestBody Map<?, ?> params){
 
@@ -650,7 +650,7 @@ public class SessionRestController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-	}
+	}*/
 
 	/**
 	 * 김윤미

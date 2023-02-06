@@ -6,9 +6,10 @@
       <h1>userInfo ----</h1>
       <div class="userinfo-component">
         <UserInfo
-        v-for="player in PlayerList"
+        v-for="player in playerList"
         :player="player"
-        :key="player.id"/>
+        :key="player.id"
+        />
       </div>
     </div>
     <div id="flex-container">
@@ -64,7 +65,6 @@
 				</div>
 			</div>
 		</div>
-
 		<!-- <div id="session" v-if="session">
 			<div id="session-header">
 				<h1 id="session-title"> {{ mySessionId }}</h1>

@@ -20,13 +20,12 @@
                             <changePasswordDialog/>
                         </v-col>
                     </v-row>
-                    
                     <p>승률 : {{ userinfo.record.winrate }}%</p>
                 </div>
             </div>
             <div class="section2">
                 <h5>나의 경험치 : <span>{{ userinfo.exp }} exp</span></h5>
-                <h5>나의 레벨 : <span>{{ userinfo.exp }} level</span></h5>
+                <h5>나의 레벨 : <span>{{ userinfo.level }} level</span></h5>
             </div>
         </div>
         <div class="footer">
@@ -36,10 +35,41 @@
             <v-btn class="ma-2" @click="main">
                 MAIN
             </v-btn>
-            <v-btn 
-            @click="deleteAccount"
-            color="error">회원 탈퇴</v-btn>
-        </div>
+                <v-btn
+                  color="error"
+                  dark
+                  @click.stop="userinfo.dialog = true"
+                >
+                  회원 탈퇴
+                </v-btn>
+                <v-dialog
+                  v-model="userinfo.dialog"
+                  max-width="290"
+                >
+                  <v-card>
+                    <v-card-text class="text-h5">
+                      정말 탈퇴하시렵니까?
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        color="error"
+                        text
+                        @click="deleteAccount"
+                      >
+                        탈퇴
+                      </v-btn>
+                      <v-btn
+                        color="success"
+                        text
+                        @click="userinfo.dialog = false"
+                      >
+                        취소
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+            </div>
     </div>
 </template>
 
@@ -59,6 +89,7 @@ export default {
         const store = useStore()
         const router = useRouter()
         const userinfo = reactive({
+            dialog: false,
             name: "",
             nickname: "",
             level: 0,
@@ -101,15 +132,14 @@ export default {
         const main = function() {router.push('main')}
         const deleteAccount = async function() {
             await store.dispatch('accountStore/deleteAction')
+            // await router.push('/')
             await router.push('/')
-        
         }
-
         return {
             userinfo,
             logOut,
             main,
-            deleteAccount
+            deleteAccount,
         }
     },
 }
