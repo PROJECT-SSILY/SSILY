@@ -273,6 +273,7 @@ export default {
             const password = store.state.gameStore.password || true
             const exp = store.state.accountStore.user.exp || 0
 
+
             return new Promise((resolve, reject)=> {
                 console.log("level=",level);
                 console.log("nickname=",nickname);
