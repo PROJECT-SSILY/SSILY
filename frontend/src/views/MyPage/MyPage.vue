@@ -52,20 +52,8 @@
                     </v-card-text>
                     <v-card-actions>
                       <v-spacer></v-spacer>
-                      <v-btn
-                        color="error"
-                        text
-                        @click="deleteAccount"
-                      >
-                        탈퇴
-                      </v-btn>
-                      <v-btn
-                        color="success"
-                        text
-                        @click="userinfo.dialog = false"
-                      >
-                        취소
-                      </v-btn>
+                      <v-btn color="error" text @click="deleteAccount">탈퇴</v-btn>
+                      <v-btn color="success" text @click="userinfo.dialog = false">취소</v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
