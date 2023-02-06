@@ -29,9 +29,13 @@
                 />
             </div>
             <div class="side_footer">
-                <v-btn class="ma-2" v-if="!state.ready" @Click="clickReady">READY</v-btn>
-                <v-btn class="ma-2" v-if="state.ready" @Click="clickReady">CANCEL READY</v-btn>
-                <v-btn class="ma-2" @click="clickExit">EXIT</v-btn>
+                <div class="sidebtn">
+                    <v-btn class="readybtn" v-if="!state.ready" @Click="clickReady">READY</v-btn>
+                    <v-btn class="readybtn" v-if="state.ready" @Click="clickReady">CANCEL READY</v-btn>
+                </div>
+                <div class="sidebtn">
+                    <v-btn class="exitbtn" @click="clickExit">EXIT</v-btn>
+                </div>
             </div>
         </div>
     </div>
@@ -391,19 +395,48 @@ export default {
 }
 .select_team {
     display: flex;
-  border-radius: 30px;
-  background-color: white;
+    border-radius: 30px;
+    background-color: #ffffffeb;
     justify-content: center;
     margin-bottom: 10px;
 }
 .chat_box {
     border-radius: 30px;
     height: 500px;
-    background-color: white;
+    background-color: #ffffffeb;
     display: flex;
     flex-direction: column-reverse;
     justify-content: space-between;
-    padding: 20px 10px;
+    padding: 20px 30px;
 }
 
+.sidebtn {
+    display: inline-block;
+    width: 50%;
+    padding: 10px 0px;
+}
+.sidebtn:first-child {
+    padding-right: 5px; 
+}
+.sidebtn:last-child {
+    padding-left: 5px; 
+}
+.sidebtn>button {
+    width:100%;
+    margin: 0px;
+    border-radius: 20px;
+    height: 70px;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    font-weight: 900;
+    font-size: 25px;
+    border: 7px solid #ffffffeb;
+}
+.readybtn {
+    background: linear-gradient(342deg, rgba(198,255,0,1) 0%, rgba(108,204,55,1) 100%);
+}
+.exitbtn {
+    background: rgb(224,61,61);
+background: linear-gradient(133deg, rgba(224,61,61,1) 0%, rgba(255,93,93,1) 100%);
+}
 </style>

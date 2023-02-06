@@ -71,11 +71,11 @@
   }
 }
 .rotating {
-  -webkit-animation: rotating 10s linear infinite;
-  -moz-animation: rotating 10s linear infinite;
-  -ms-animation: rotating 10s linear infinite;
-  -o-animation: rotating 10s linear infinite;
-  animation: rotating 10s linear infinite;
+  -webkit-animation: rotating 200s linear infinite;
+  -moz-animation: rotating 200s linear infinite;
+  -ms-animation: rotating 200s linear infinite;
+  -o-animation: rotating 200s linear infinite;
+  animation: rotating 200s linear infinite;
 }
 
 #contents {

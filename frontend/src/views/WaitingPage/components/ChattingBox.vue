@@ -3,11 +3,11 @@
     <div id='chat-area'>
         <div v-for="val in state.chat" v-bind:key="val.id">
             <div v-if="val.user === nickname" class="mychat">
-                    {{ val.text }}
-                </div>
-                <div v-else class="otherchat">
-                    {{ val.user }} : {{ val.text }}
-                </div>
+                <div>{{ val.text }}</div>
+            </div>
+            <div v-else class="otherchat">
+                <div>{{ val.user }} : {{ val.text }}</div>
+            </div>
             </div>
         </div>
     <div class='chat_input'>
@@ -127,4 +127,34 @@ export default {
 
 <style>
 
+.mychat {
+    border-radius: 10px;
+    text-align: right;
+    margin: 4px 0;
+    display: flex;
+    flex-direction: row-reverse;
+}
+.mychat>div {
+    background: rgb(255, 217, 0);
+    padding: 2px 10px;
+    border-radius: 10px 10px 0 10px;
+}
+.otherchat {
+    border-radius: 10px;
+    text-align: left;
+    margin: 4px 0;
+    display: flex;
+    flex-direction: row;
+}
+.otherchat>div {
+    background: rgb(2, 2, 2);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 0 10px 10px 10px;
+}
+.chat_input {
+    border-top: 1px solid gray;
+    padding-top: 10px;
+    margin-top: 10px;
+}
 </style>
