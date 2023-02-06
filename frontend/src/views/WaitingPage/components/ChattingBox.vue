@@ -19,9 +19,10 @@
 
 <script>
 import { useStore } from 'vuex';
+import { computed, onMounted, onUpdated } from 'vue';
 import { reactive } from '@vue/reactivity'
-import { computed, onMounted, onUpdated } from '@vue/runtime-core';
 import { watch } from 'vue'
+
 // watch,
 export default {
     name:'ChattingBox',
@@ -29,13 +30,58 @@ export default {
     props:{
         session: Object,
     },
-    setup(props) {
+    setup(props, {emit}) {
+        onMounted(()=>{
+            console.log("props Mounted언제냐", props.session);
+            
+            props.session.on('signal:my-chat', (event) => {
+            console.log('-----------------------------------------')
+            console.log('event : ', event)
+            console.log('event.data : ', event.data)
+            console.log('event.player : ', event.from.data); // Message
+            console.log("myData", event.from.data);
+            console.log('event.from : ', event.from)
+            // const chatting_user = nickname
+            const stringData=JSON.stringify(event.from.data)
+            state.userNick=stringData.slice(19,stringData.length-4);
+
+            state.sendData  = JSON.parse(event.data)
+            // if (aa.correct) {
+            //     state.chat.push({
+            //        user: chatting_user,
+            //        text: `정답은 ${aa.answer}입니다.`
+            //    });
+            // } else{
+ 
+            // }
+
+            state.chat.push({
+                    user : state.userNick,
+                    text : state.sendData,
+                    id : event.from.connectionId,
+                });
+                emit("update:session", props.session);
+            })
+        })
+        onUpdated(()=>{
+            console.log("userNick은?", (state.userNick));
+        })
+
         const store = useStore()
-        const nickname = computed(() => store.getters['accountStore/getUser'].nickname);
+        // 시도
+        const session1 = computed(() => props.session)
+
+        // const nickname = computed(() => store.getters['accountStore/getUser'].nickname);
         const state = reactive({
             chattings:'',
             chat: [] ,
+            userNick:'',
+            sendData:'',
         })
+        
+        const nickname = store.state.accountStore.user.nickname || '';
+        console.log("chattingBox nick", nickname);
+
         watch(() => state.chat, (newValue, oldValue) => {
             console.log('chat변화감지', {newValue, oldValue })
             setTimeout(() => {
@@ -47,18 +93,21 @@ export default {
             }, 50);
         })
         const sendMessage = () => {
-            props.session.signal({
+            console.log("sendMessage 몇번 찍냐?");
+            session1.value.signal({
                     data: JSON.stringify(state.chattings),
-                    type: 'my-chat'
+                    type: 'my-chat',
                 })
                 .then(() => {
-                    state.chat.push({ user: nickname, text: state.chattings})
+                    // state.chat.push({ user: nickname, text: state.chattings})
                     state.chattings = '';
-                    console.log('Message success');
+                    emit("update:session", session1.value);
+                    console.log('Message success', state.chat);
                 })
                 .catch(error => {
                     console.log(error);
                 })
+            
         }
         console.log("store.state.gameStore.messages : ", store.state.gameStore.messages)
         onMounted(() => {
@@ -70,7 +119,7 @@ export default {
         watch(()=>store.state.gameStore.messages, () => {
             console.log(store.state.gameStore.messages)
         });
-        return {store, state, nickname, onUpdated, sendMessage}
+        return {store, state, nickname, session1, onMounted, sendMessage}
     },
 
 }

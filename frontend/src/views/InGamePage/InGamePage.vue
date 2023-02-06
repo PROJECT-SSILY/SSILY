@@ -83,7 +83,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { OpenVidu } from "openvidu-browser";
 import { reactive } from '@vue/reactivity'
 import { GetPlayerList, changeReady } from "@/common/api/gameAPI";
-import { ref, onMounted, onUpdated } from 'vue';
+import { ref, onUpdated, onBeforeMount } from 'vue';
+
 //=================OpenVdue====================
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
@@ -166,12 +167,12 @@ export default {
             state.opponentTeam = tmpOpponentTeam
         })
 
-        onMounted(() => {
+        onBeforeMount(() => {
             console.log('join start');
             joinSession()
         })
 
-        const joinSession = () => {
+        const joinSession = async () => {
             console.log("joinsession 시작")
             // --- Get an OpenVidu object ---
             state.OV = new OpenVidu();
@@ -313,6 +314,7 @@ export default {
             const rate = store.getters['accountStore/getRate']
             const password = store.state.gameStore.password || true
             const exp = store.state.accountStore.user.exp || 0
+            state.myUserName=nickname;
 
 
 
