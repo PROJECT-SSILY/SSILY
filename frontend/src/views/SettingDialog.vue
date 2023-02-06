@@ -1,9 +1,9 @@
 <template>
     <div>
-      <v-row justify="center">
         <v-btn
-          color="primary"
+          color="blue-grey"
           @click="clickDialog"
+          rounded
         >
         <v-icon>mdi-cog</v-icon>
         </v-btn>
@@ -32,7 +32,6 @@
           ></v-slider>
         </v-card>
         </v-dialog>
-      </v-row>
     </div>
   </template>
   

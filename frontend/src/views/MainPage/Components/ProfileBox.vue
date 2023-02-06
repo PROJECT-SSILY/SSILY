@@ -10,17 +10,29 @@
                 </h3>
               </v-col>
             </v-row>
-            <v-row justify="center">
-              <v-col id="btnbox">
-                <SettingDialog></SettingDialog>
-              </v-col>
-            </v-row>
-          </v-col>
-          <v-col col="2">
-              <v-img @click="toMyPage" :src="state.robot"></v-img>
+            <v-row class="d-flex justify-space-between mb-6">
+              <v-col col="2"  class="btnbox">
+                <v-btn 
+                rounded
+                color="success" 
+                @click="toMyPage">
+                <v-icon>mdi-account</v-icon>
+              </v-btn>
             </v-col>
-            <v-btn @click="toMyPage">Profile</v-btn>
-          </v-row>
+            <v-col col="2"  class="btnbox">
+              <v-btn rounded color="warning" @click="logOut">
+                <v-icon>mdi-logout-variant</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col col="2" class="btnbox">
+              <SettingDialog></SettingDialog>
+            </v-col>
+            </v-row>
+            </v-col>
+          <v-col col="2">
+            <v-img @click="toMyPage" :src="state.robot"></v-img>
+          </v-col>
+        </v-row>
       </v-container>
     </div>
   </template>
@@ -58,10 +70,15 @@ export default {
     const toMyPage = function() {
       route.push('mypage')
     }
+    const logOut = async function() {
+            await store.dispatch('accountStore/logoutAction')
+            route.push('/')
+        }
     return {
       store,
       state,
       route,
+      logOut,
       toMyPage
       }
   }
@@ -71,10 +88,7 @@ export default {
 </script>
 
 <style scoped>
-#btnbox {
-  display: flex;
-}
-#proright {
+.btnbox {
   display: flex;
 }
 .welcome {

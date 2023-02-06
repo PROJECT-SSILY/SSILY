@@ -193,6 +193,17 @@
   display : flex;
   justify-content : center;
   align-items : center;
-  color:white
+  color:white;
+  transform: translate(-9px, -15px);
+}
+@keyframes shake-make-planet {
+  0% { transform: translate(-8px, -14px); }
+  33% { transform: translate(-10px, -14px); }
+  66% { transform: translate(-10px, -16px); }
+  100% { transform: translate(-8px, -16px); }
+}
+
+.make-planet:hover {
+  animation: shake-make-planet .1s infinite alternate;
 }
 </style>

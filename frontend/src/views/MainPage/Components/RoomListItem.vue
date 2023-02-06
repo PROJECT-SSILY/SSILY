@@ -3,7 +3,7 @@
   <v-row class="d-flex justify-space-between">
     <v-col cols="10">
       <v-list-item-content>
-        <h3>{{ room.title }}</h3>
+        <h3 class="title">{{ room.title }}</h3>
       </v-list-item-content>
     </v-col>
     <v-col>
@@ -26,5 +26,15 @@ export default {
 </script>
 
 <style>
+
+.title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
 
 </style>

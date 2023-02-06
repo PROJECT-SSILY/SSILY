@@ -13,7 +13,7 @@
               <h3>방 제목</h3>
             </v-col>
             <v-col>
-                <v-switch
+                <v-switch class="title"
                 v-model="state.switch1"
                 :label="`모드: ${state.switch1 ? '개인':'팀'}`"
                 @click="isTeamGame(), sendValue()"
@@ -108,6 +108,7 @@ export default {
       const res = await roomList()
       const response = res.data
       console.log(response)
+      console.log(response.numberOfElements)
       for (let i=0; i<response.content.length; i++) {
         if (response.content[i].isTeamBattle) {
           state.teamrooms.push(response.content[i])

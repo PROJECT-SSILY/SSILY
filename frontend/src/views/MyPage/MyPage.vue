@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div class="header">
+        <div class="profile">
             <h1>마이 페이지</h1>
         </div>
-        <div class="main">
+        <div class="profile">
             <div class="section1">
                 <div class="inner_section1_left">
                     <div>
@@ -148,5 +148,14 @@ export default {
 <style>
 .robot {
     height: 5rem;
+}
+.profile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
 }
 </style>

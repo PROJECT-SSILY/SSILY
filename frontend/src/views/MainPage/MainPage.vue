@@ -110,5 +110,17 @@ export default {
   justify-content : center;
   align-items : center;
   color:white;
+  transform: translate(-9px, -15px);
+}
+
+@keyframes shake-start-planet {
+  0% { transform: translate(-8px, -14px); }
+  33% { transform: translate(-10px, -14px); }
+  66% { transform: translate(-10px, -16px); }
+  100% { transform: translate(-8px, -16px); }
+}
+
+.start-planet:hover {
+  animation: shake-start-planet .1s infinite alternate;
 }
 </style>
