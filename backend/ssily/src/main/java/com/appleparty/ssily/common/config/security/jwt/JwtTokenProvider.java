@@ -24,7 +24,8 @@ public class JwtTokenProvider implements InitializingBean {
     @Value("${spring.jwt.secretKey}")
     private String secretKey;
 
-    public static final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 30;  // 30분
+//    public static final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 30;  // 30분
+    public static final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 21;  // 3주
 //    public static final long ACCESS_TOKEN_VALID_TIME = 1000L * 10;  // 10초
 
     private Key key;
