@@ -15,6 +15,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,12 +26,17 @@ public class GameService   {
     static final int SET_PRESENTER_SETTING = 0;
     static final int GET_PRESENTER_SETTING =1;
     static final int GAME_START = 2;
+    static final int GET_READY_STATE = 3;
+    static final int CHANGE_READY_STATE = 4;
 
     //Tread 관리
     public static ConcurrentHashMap<String, Thread> gameThread = new ConcurrentHashMap<>();
 
     // 게임 라운드 관리
     public static ConcurrentHashMap<String, Integer> round = new ConcurrentHashMap<>();
+
+    // 참여자들 Ready 상태 현황
+    public static ConcurrentHashMap<String, HashMap<String, Boolean>> readyState = new ConcurrentHashMap<>();
 
     /**
      * 김윤미
@@ -72,8 +78,81 @@ public class GameService   {
                 return;
             case GAME_START:
                 gameStart(participant, message, sessionId, participants, params, data, notice);
+                return;
+            case GET_READY_STATE:
+                getReadyState(participant, sessionId, participants, params, data);
+                return;
+            case CHANGE_READY_STATE:
+                changeReadyState(participant, sessionId, participants, params, data);
+                return;
         }
     }
+
+    /**
+     * 서영탁
+     * 게임 접속 시 참여자들의 Ready 상태를 알려줌
+     */
+    public void getReadyState(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+
+        log.info("getReadyState is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+        // 해당 방에서 관리되는게 없으면 빈 map 생성
+        readyState.putIfAbsent(sessionId, new HashMap<>());
+
+        // 이전에 관리되고 있던 세션별 레디 상태
+        HashMap<String, Boolean> preReadyState = readyState.get(sessionId);
+        HashMap<String, Boolean> nowReadyState = new HashMap<>();
+
+        // 현재 방에 있지 않는 참여자 제외
+        for (Participant p : participants) {
+            String id = p.getParticipantPublicId();
+            nowReadyState.put(id, preReadyState.getOrDefault(id, false));
+        }
+
+        readyState.computeIfPresent(sessionId, (k, v) -> v = nowReadyState);
+
+        for (String id : nowReadyState.keySet()) {
+            data.addProperty(id, nowReadyState.get(id));
+        }
+
+        params.add("data", data);
+
+        rpcNotificationService.sendNotification(participant.getParticipantPrivateId(),
+                ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+    }
+
+    /**
+     * 서영탁
+     * 참여자의 Ready 상태 변경
+     */
+    private void changeReadyState(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+
+        log.info("changeReadyState is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+        HashMap<String, Boolean> nowReadyState = readyState.get(sessionId);
+        
+        // 현재 READY 상태를 반대로 변경
+        nowReadyState.compute(participant.getParticipantPublicId(), (k, v) -> v = !v);
+
+        readyState.computeIfPresent(sessionId, (k, v) -> v = nowReadyState);
+
+        int cnt = 0;
+        for (String id : nowReadyState.keySet()) {
+            data.addProperty(id, nowReadyState.get(id));
+            if(nowReadyState.get(id)) cnt++;
+        }
+
+        if(cnt == 4) data.addProperty("isAllReady", true);
+        else data.addProperty("isAllReady", false);
+
+        params.add("data", data);
+
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
 
     /**
      * 신대득
@@ -89,7 +168,7 @@ public class GameService   {
      */
     public void setPresenterSetting(Participant participant, JsonObject message, String sessionId, Set<Participant> gameParticipants,
                                     JsonObject params, JsonObject data, RpcNotificationService notice){
-        log.info("PrepareGame is called by {}", participant.getParticipantPublicId());
+        log.info("setPresenterSetting is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         ArrayList<Participant> curParticipantList = participantList.get(sessionId);
         String curPresenterId="";
@@ -134,6 +213,9 @@ public class GameService   {
      */
     public void gameStart(Participant participant, JsonObject message, String sessionId, Set<Participant> participants,
                           JsonObject params, JsonObject data, RpcNotificationService notice) {
+
+        log.info("gameStart is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
 
         //제시어 불러오기
 //        words.putIfAbsent(sessionId, new ArrayList<>());
@@ -221,7 +303,7 @@ public class GameService   {
      */
     private void submitAnswer(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data, String playerAnswer){
 
-        log.info("submitAnswer is called by {}", participant.getParticipantPublicId());
+        log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         Integer nowRound = round.get(sessionId);
         String answer = words.get(sessionId).get(nowRound);
@@ -287,7 +369,7 @@ public class GameService   {
      */
     private void finishGame(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
-        log.info("finishGame is called by {}", participant.getParticipantPublicId());
+        log.info("finishGame is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         ArrayList<Participant> winner = new ArrayList<>();
         int max = 0;

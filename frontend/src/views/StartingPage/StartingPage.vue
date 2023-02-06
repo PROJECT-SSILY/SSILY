@@ -3,7 +3,7 @@
         <div id="pageWrap">
     <svg version="1.1" x="0px" y="0px" width="307px" height="283px" id="rocket">
 
-        <g @click="toLogin" class="rocket_wrap">
+        <g @click="toLogin(), playBgm('https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3')" class="rocket_wrap">
 
             <circle cx="147.5" cy="138.6" r="105.5" class="icon_circle" />
 
@@ -68,14 +68,24 @@
 </template>
   
 <script>
+import { useRouter } from 'vue-router'
+
 
 export default {
-
     name: 'StartingPage',
-    methods: {
-        toLogin() {
-            this.$router.push({name: 'login'})
+    setup() {
+        const router = useRouter()
+        const toLogin = () => {
+            router.push({
+                name: 'login'
+            })
         }
+        const playBgm = (sound) => {
+            if (sound) {
+                var audio = new Audio(sound);
+                audio.play();}
+        }
+        return { router, toLogin, playBgm }
     }
 }
 </script>

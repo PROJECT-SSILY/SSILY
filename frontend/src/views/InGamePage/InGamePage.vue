@@ -12,9 +12,9 @@
             <WaitingPage
             @joinSession=joinSession
             :sessionId="state.sessionId"
-            :playerList="playerList"
+            :playerList="playerList[0]"
             :session="state.session"
-            :connectionId="state.connectionId"
+            :myConnectionId="state.connectionId"
             :team="state.team"
             />
         </div>
@@ -101,7 +101,6 @@ export default {
         MyCanvasBox,
         WaitingPage,
         ChattingBox
-
     },
     props:{
         ready: Boolean
@@ -120,7 +119,9 @@ export default {
             OV: undefined,
             session: undefined,
             mainStreamManager: undefined,
-            publisher: undefined,
+            publisher: {
+                team: null
+            },
             subscribers: [],
             sessionId: route.params.sessionId || null,
             myUserName: '',
@@ -154,7 +155,8 @@ export default {
             let tmpMyTeam = null
             const tmpOpponentTeam = []
             for(let i=0; i<state.subscribers.length; i++) {
-                if(state.subscribers[i].team==state.publisher.team) {
+                console.log("state.publisher : ", state.publisher)
+                if(state.subscribers[i].team === state.publisher.team) {
                     tmpMyTeam = state.subscribers[i]
                 } else {
                     tmpOpponentTeam.push(state.subscribers[i])
@@ -213,9 +215,9 @@ export default {
                 console.log("token : ", token)
                 state.session.connect(token, { clientData: state.myUserName })
                 requestPlayerList(state.sessionId).then(response => {
-                console.log('requestPlayerlist response : ', response)
-                playerList.value.push(response)
-
+                console.log('requestPlayerlist response', response)
+                playerList.value.push(response.content)
+                console.log('response:::::::::::::::::::0-09i023', response.content)
                 store.commit('gameStore/setSession', state.session)
                 sessionVal.value.push(state.session) // 시험 ---
                 console.log('state.session : ', state.session)
@@ -310,14 +312,15 @@ export default {
             const isHost = store.state.gameStore.isHost || true
             const rate = store.getters['accountStore/getRate']
             const password = store.state.gameStore.password || true
+            const exp = store.state.accountStore.user.exp || 0
 
-            console.log('------------',rate)
 
             return new Promise((resolve, reject)=> {
                 console.log("level=",level);
                 console.log("nickname=",nickname);
                 console.log("isHost=", isHost);
                 console.log("rate=", rate);
+                console.log("exp", exp)
                 $axios
                     .post(`${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`, JSON.stringify({
                     "level" : level,
@@ -325,9 +328,7 @@ export default {
                     "rate" : rate,
                     "isHost" : isHost,
                     "password" : password,
-                    // 하드 코딩 -----------------API 변경된 것?? -------------
-                    "exp": 34,
-                    // -----------------------------------------------------
+                    "exp": exp,
                 }), {
                     auth: {
                         username: 'OPENVIDUAPP',

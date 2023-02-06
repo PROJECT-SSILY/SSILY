@@ -2,11 +2,12 @@
   <div id="flex-container">
       <div class="userinfo-component flex-item">
         <UserInfo
-        v-for="player in PlayerList"
+        v-for="player in playerList"
         :player="player"
-        :connectedId="Id"
+        :myConnectionId="myConnectionId"
         :myTeam="team"
         :key="player.id"/>
+
       </div>
     </div>
 </template>
@@ -30,7 +31,7 @@ export default {
   props: {
     playerList: Object,
     session: Object,
-    connectionId: String,
+    myConnectionId: String,
     sessionId: String,
     team: String,
   },
@@ -43,7 +44,7 @@ export default {
     const PlayerList = ref(props.playerList)
     const useritem = ref(null)
     const myTeam = ref(props.team)
-    const Id = ref(props.connectionId)
+    const Id = ref(props.myConnectionId)
     console.log(useritem.class)
     
     const state = reactive({
@@ -84,5 +85,12 @@ export default {
 <style>
 .userinfo-component {
   padding: 30px;
+  max-width: 800px;
+  min-width: 700px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 </style>

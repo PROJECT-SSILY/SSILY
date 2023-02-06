@@ -8,7 +8,7 @@
         max-width="500"
       >
         <v-toolbar
-        :color="state.switch1 ? 'deep-purple accent-4' : 'success'"
+        :color="state.switch1 ? 'primary' : 'success'"
           dark
         >
           <v-row>
@@ -33,7 +33,7 @@
             @click="getInRoom(room)"
           >
             <v-row class="d-flex justify-space-between">
-              <v-col cols="10">
+              <v-col cols="10"> 
                 <v-list-item-content>
                   <RoomListItem :room="room"/>
                 </v-list-item-content>
@@ -58,10 +58,10 @@
           <!-- <v-divider></v-divider> -->
           </v-list-item>
         </v-list>
-      </v-card>
+      </v-card>      
     </div>
   </template>
-
+  
 <script>
 import { reactive, onMounted } from "vue"
 import { roomList } from "@/common/api/gameAPI";
