@@ -20,7 +20,7 @@
 <script>
 import { useStore } from 'vuex';
 import { reactive } from '@vue/reactivity'
-import { computed, onUpdated } from '@vue/runtime-core';
+import { computed, onMounted, onUpdated } from '@vue/runtime-core';
 import { watch } from 'vue'
 // watch,
 export default {
@@ -60,28 +60,16 @@ export default {
                     console.log(error);
                 })
         }
-        // 정답 체크
-        onUpdated(async () => {
-            props.session.on('signal:my-chat', (event) => {
-            console.log('-----------------------------------------')
-            console.log('event : ', event)
-            console.log('event.data : ', event.data)
-            console.log('event.player : ', event.player); // Message
-            console.log('event.from : ', event.from)
-
-            const chatting_user = nickname
-
-            const aa = JSON.parse(event.data)
-            console.log('aa')
-            console.log(aa)
-            if (aa.correct) {
-                state.chat.push({
-                   user: chatting_user,
-                   text: `정답은 ${aa.answer}입니다.`
-               });
-            }
-              });
-    })
+        console.log("store.state.gameStore.messages : ", store.state.gameStore.messages)
+        onMounted(() => {
+            console.log(store.state.gameStore.messages)
+        })
+        onUpdated(() => {
+            console.log(store.state.gameStore.messages)
+        })
+        watch(()=>store.state.gameStore.messages, () => {
+            console.log(store.state.gameStore.messages)
+        });
         return {store, state, nickname, onUpdated, sendMessage}
     },
 

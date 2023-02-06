@@ -23,6 +23,7 @@ const state = {
     myUserName: '',
     isHost: true,
     playerList: undefined,
+    messages: []
 }
 
 const getters = {
@@ -83,7 +84,10 @@ const mutations = {
     },
     setPlayerList: (state, data) => {
         state.playerList = data
-      },
+    },
+    SET_MESSAGES: (state, data) => {
+        state.messages = data
+    }
   
 }
 const actions = {
