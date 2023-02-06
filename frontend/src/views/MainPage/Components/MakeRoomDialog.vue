@@ -43,12 +43,12 @@
             <v-radio
               label="팀전"
               color="orange darken-3"
-              value="radio-1"
+              :value="true"
             ></v-radio>
             <v-radio
               label="개인전"
               color="orange darken-3"
-              value="radio-2"
+              :value="false"
             ></v-radio>
           </v-radio-group>
           <v-radio-group
@@ -59,12 +59,12 @@
             <v-radio
               label="공개"
               color="orange darken-3"
-              value="radio-1"
+              :value="false"
             ></v-radio>
             <v-radio
               label="비공개"
               color="orange darken-3"
-              value="radio-2"
+              :value="true"
             ></v-radio>
           </v-radio-group>
           <v-text-field
@@ -89,10 +89,11 @@
 
 <script>
   import { useRouter } from 'vue-router'
-  import { reactive } from 'vue'
+  import { onUpdated, reactive } from 'vue'
   import { useStore } from 'vuex'
   // import { computed } from 'vue'
   import $axios from "axios";
+// import { on } from 'events';
 
   $axios.defaults.headers.post['Content-Type'] = 'application/json';
   const OPENVIDU_SERVER_URL = "https://localhost:4443";
@@ -112,6 +113,11 @@
           required: value => !!value || '필수',
         }
       })
+      onUpdated(() => {
+        // 방 타이틀 랜덤 생성
+        const titlelist = ['함께 즐겨요', '재미있는 게임 합시다', '매너있는 게임하실 분 구해요!', '스겜합시다!']
+        state.title = titlelist[Math.floor(Math.random() * titlelist.length)]
+      })
       const joinSession = async function() {
 
         if (state.isTeamBattle === "radio-1") {
@@ -126,10 +132,10 @@
         } else {
           state.isSecret = true
         }
-        console.log(state.title);
-        console.log(state.isSecret);
-        console.log(state.password);
-        console.log(state.isTeamBattle);
+        console.log("state.title : ", state.title);
+        console.log("state.isSecret : ", state.isSecret);
+        console.log("state.password : ", state.password);
+        console.log("state.isTeamBattle : ", state.isTeamBattle);
         store.commit('gameStore/setTitle', state.title)
         store.commit('gameStore/setSecret', state.isSecret)
         store.commit('gameStore/setPassword', state.password)
