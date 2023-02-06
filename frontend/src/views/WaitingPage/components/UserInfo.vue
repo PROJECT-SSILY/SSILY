@@ -82,10 +82,10 @@ export default {
   border-color: inherit;
 }
 .userinfo-item-wrapper.BLUE {
-  border-color: #00E0FF;
+  border-color: #09c4ff;
 }
 .userinfo-item-wrapper.RED {
-  border-color: #FF0000;
+  border-color: #ff5f5f;
 }
 
 </style>
