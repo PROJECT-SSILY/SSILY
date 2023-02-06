@@ -177,7 +177,7 @@ public class GameService   {
 
         //제시어 불러오기
 //        words.putIfAbsent(sessionId, new ArrayList<>());
-        words.put   (sessionId, pickWords());
+        words.put(sessionId, pickWords());
 
         // 라운드 설정 : (1라운드)
         round.put(sessionId, 1);
