@@ -7,11 +7,6 @@
         >
           설정
         </v-btn>
-        <audio id="audioContainer" src="https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3" volume="0.5" loop></audio>
-        <v-btn
-          @click="play">
-          음악
-        </v-btn>
         <v-dialog
           v-model="state.dialog"
         ><v-card>
