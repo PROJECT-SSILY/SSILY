@@ -5,7 +5,7 @@
 //     requestId,
 //   } from "../common/api/accountAPI";
 
-import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname, deleteAccount } from "@/common/api/accountAPI";
+import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname, changePassword, deleteAccount } from "@/common/api/accountAPI";
 
 const state = {
     token: localStorage.getItem('token') || null,
@@ -133,9 +133,18 @@ const actions = {
     },
     changeNicknameAction: async (context, nickname) => {
         try {
-            console.log("1번")
             const response = await changeNickname(context.state.token, nickname)
-            console.log("2번")
+            return response
+        } catch (err) {
+            console.log(err)
+            throw err;
+        }
+    },
+    changePasswordAction: async (context, payload) => {
+        try {
+            console.log("비밀번호", payload)
+            const response = await changePassword(context.state.token, payload)
+            console.log("store에서 보냈다")
             return response
         } catch (err) {
             console.log(err)

@@ -63,6 +63,25 @@ const changeNickname = (token, payload) => {
         return error.response.data.code
     });
 }
+const changePassword = (token, payload) => {
+    console.log(token);
+    console.log(payload);
+    const params = { 
+        oldPassword : payload.oldPassword,
+        newPassword : payload.newPassword 
+    }
+    console.log(params);
+    $axios.put("/api/member/password", 
+        params, {headers: {Authorization: `Bearer ${token}`}})
+    .then(res => {
+    console.log('변경 완료');
+    console.log(res);
+    })
+    .catch(error => {
+        console.log(error)
+        return error.response.data.code
+    });
+}
 const deleteAccount = (token) => {
     console.log(token);
     return $axios.delete("/api/member", {
@@ -77,4 +96,4 @@ const deleteAccount = (token) => {
     });
 }
 // export { requestLogin, requestRegister, requestId, requestMe };
-export { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname, deleteAccount };
+export { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname, changePassword, deleteAccount };
