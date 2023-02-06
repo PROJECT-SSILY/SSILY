@@ -8,7 +8,7 @@
         <WaitingPage
         @joinSession=joinSession
         :sessionId="state.sessionId"
-        :playerList="playerList"
+        :playerList="playerList[0]"
         :session="state.session"
         :connectionId="state.connectionId"
         />
@@ -61,9 +61,9 @@ import $axios from "axios";
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router'
 import { OpenVidu } from "openvidu-browser";
-import { reactive, toRefs } from '@vue/reactivity'
+import { reactive } from '@vue/reactivity'
 import { GetPlayerList } from "@/common/api/gameAPI";
-import { ref, watch, onMounted, onUpdated } from 'vue';
+import { ref, onMounted, onUpdated } from 'vue';
 //=================OpenVdue====================
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
@@ -85,10 +85,10 @@ export default {
         ChattingBox
 
     },
-    props:{
-        ready: Boolean
-    },
-    setup(props) {
+    // props:{
+    //     ready: Boolean
+    // },
+    setup() {
         const store = useStore()
         const playerList = ref([])
         const sessionVal = ref([])
@@ -118,11 +118,11 @@ export default {
         const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         state.sessionId = route.params.sessionId
 
-        const status = toRefs(props).ready
+        // const status = toRefs(props).ready
 
-        watch(status, () => {
-            console.log("start입니다.")
-        })
+        // watch(status, () => {
+        //     console.log("start입니다.")
+        // })
         onUpdated(() => {
             if (!state.readyAll) {
                 document.querySelector(".waiting_component").innerHTML
@@ -189,7 +189,8 @@ export default {
                 state.session.connect(token, { clientData: state.myUserName })
                 requestPlayerList(state.sessionId).then(response => {
                 console.log('requestPlayerlist response', response)
-                playerList.value.push(response)
+                playerList.value.push(response.content)
+                console.log('response:::::::::::::::::::0-09i023', response.content)
 
                 store.commit('gameStore/setSession', state.session)
                 sessionVal.value.push(state.session) // 시험 ---
