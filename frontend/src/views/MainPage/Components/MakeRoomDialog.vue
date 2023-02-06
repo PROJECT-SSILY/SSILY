@@ -113,7 +113,7 @@
         }
       })
       const joinSession = async function() {
-
+        store.commit('gameStore/setMySessionId', '')// 시험
         if (state.isTeamBattle === "radio-1") {
           console.log("team 적용됨")
           state.isTeamBattle = true

@@ -273,6 +273,7 @@ export default {
 
             console.log('------------',rate)
 
+
             return new Promise((resolve, reject)=> {
                 console.log("level=",level);
                 console.log("nickname=",nickname);
