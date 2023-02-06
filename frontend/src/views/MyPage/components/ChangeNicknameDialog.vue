@@ -19,7 +19,7 @@
           </v-card-title>
           <v-form
           ref="form"
-          v-model="valid"
+          v-model="state.valid"
           lazy-validation
           >
               <div id="join-dialog" class="jumbotron vertical-center">
@@ -30,7 +30,7 @@
                     type="text"
                     label="변경할 닉네임을 입력하세요."   
                     ref="nicknameform"
-                    :rules="[state.rules.required, state.rules.nicknameRules, state.rules.nicknameCheckRules]"
+                    :rules="[state.rules.required, state.rules.nicknameRules, state.rules.nicknameRules1]"
                     ></v-text-field>
                 </div>
               </div>
@@ -42,6 +42,7 @@
                 @click="checkNickname">
                 중복 확인</v-btn>
                 <v-btn
+                :disabled="!state.valid"
                 @click="changeNickname">변경</v-btn>
               </p>
             </v-card-actions>
@@ -53,7 +54,7 @@
   
   <script>
     import { useRouter } from 'vue-router'
-    import { reactive } from 'vue'
+    import { reactive, watch } from 'vue'
     import { useStore } from 'vuex'
     // import { computed } from 'vue'
 
@@ -63,6 +64,7 @@
         const store = useStore()  
         const state = reactive({
           dialog: false,
+          valid: true,
           form: {
               nickname: { value: "", valid: true, status: false }
           },
@@ -71,18 +73,20 @@
             nicknameRules: value => (2 <= value.length && value.length <= 10) || '닉네임은 2자 이상 10자 이내로 작성해주세요',
           }
         })
+        watch(() => state.form.nickname.value, (newValue, oldValue) => {
+          state.form.nickname.status = false
+          console.log('변화 감지', {newValue, oldValue})
+        })
         const changeNickname = async function () {
             if (!state.form.nickname.status){
                 alert("닉네임 중복확인이 필요합니다.")
                 return
             } else {
                 await store.dispatch('accountStore/changeNicknameAction', state.form.nickname.value)
-
-                await router.push('mypage')
+                await router.go(0)
             }
         }
         const checkNickname = async function () {
-            console.log(state.form.nickname.status)
             const result = await store.dispatch('accountStore/checkNicknameAction', state.form.nickname.value )
             if (result.data.data) {
                 state.form.nickname.status = true
