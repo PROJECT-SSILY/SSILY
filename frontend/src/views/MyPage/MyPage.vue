@@ -25,7 +25,7 @@
             </div>
             <div class="section2">
                 <h5>나의 경험치 : <span>{{ userinfo.exp }} exp</span></h5>
-                <h5>나의 레벨 : <span>{{ userinfo.exp }} level</span></h5>
+                <h5>나의 레벨 : <span>{{ userinfo.level }} level</span></h5>
             </div>
         </div>
         <div class="footer">
