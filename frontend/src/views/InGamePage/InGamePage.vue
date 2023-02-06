@@ -1,20 +1,39 @@
 <template>
+<!----------------------------------- 개발용 버튼 -------------------------------------->
     <p>
         <v-btn @click="state.readyAll=!state.readyAll">게임 시작</v-btn> |
         <v-btn @click="state.isTeamBattle = !state.isTeamBattle">팀/개인전 변경</v-btn> |
         <v-btn @click="state.amIDescriber = !state.amIDescriber">게임 순서 변경</v-btn>
     </p>
+<!------------------------------------------------------------------------------------->
+<div class="wrap_component">
     <div class="waiting_component" v-if="!state.readyAll">
-        <WaitingPage
-        @joinSession=joinSession
-        :sessionId="state.sessionId"
-        :playerList="playerList[0]"
-        :session="state.session"
-        :connectionId="state.connectionId"
-        />
-        <ChattingBox
-        :session="state.session"
-        />
+        <div class="users_component">
+            <WaitingPage
+            @joinSession=joinSession
+            :sessionId="state.sessionId"
+            :playerList="playerList[0]"
+            :session="state.session"
+            :myConnectionId="state.connectionId"
+            :team="state.team"
+            />
+        </div>
+        <div class="side_component flex-item">
+            <v-radio-group class="select_team" inline v-model="state.team" justify-content="center">
+                <v-radio label="RED" value="RED" color="red" class="ma-2"></v-radio>
+                <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2"></v-radio>
+            </v-radio-group>
+            <div class="chat_box">
+                <ChattingBox
+                :session="state.session"
+                />
+            </div>
+            <div class="side_footer">
+                <v-btn class="ma-2" v-if="!state.ready" @Click="clickReady">READY</v-btn>
+                <v-btn class="ma-2" v-if="state.ready" @Click="clickReady">CANCEL READY</v-btn>
+                <v-btn class="ma-2" @click="clickExit">EXIT</v-btn>
+            </div>
+        </div>
     </div>
     <div class="in_game_component" v-else>
         <GameTimer date="August 15, 2016"/>
@@ -51,6 +70,7 @@
             </v-row>
         </v-container>
     </div>
+</div>
 </template>
 <script>
 import GameTimer from './components/GameTimer.vue';
@@ -59,10 +79,10 @@ import MyCanvasBox from './components/MyCanvasBox.vue'
 import WaitingPage from '@/views/WaitingPage/WaitingPage.vue';
 import $axios from "axios";
 import { useStore } from 'vuex';
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { OpenVidu } from "openvidu-browser";
 import { reactive } from '@vue/reactivity'
-import { GetPlayerList } from "@/common/api/gameAPI";
+import { GetPlayerList, changeReady } from "@/common/api/gameAPI";
 import { ref, onMounted, onUpdated } from 'vue';
 //=================OpenVdue====================
 
@@ -73,8 +93,6 @@ const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 //=============================================
 import ChattingBox from '@/views/WaitingPage/components/ChattingBox.vue';
 
-
-
 export default {
     name : "InGamePage",
     components: {
@@ -83,13 +101,14 @@ export default {
         MyCanvasBox,
         WaitingPage,
         ChattingBox
-
     },
-    // props:{
-    //     ready: Boolean
-    // },
+    props:{
+        ready: Boolean
+    },
     setup() {
         const store = useStore()
+        const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
+        const router = useRouter()
         const playerList = ref([])
         const sessionVal = ref([])
         const state = reactive({
@@ -100,9 +119,11 @@ export default {
             OV: undefined,
             session: undefined,
             mainStreamManager: undefined,
-            publisher: undefined,
+            publisher: {
+                team: null
+            },
             subscribers: [],
-            sessionId: null,
+            sessionId: route.params.sessionId || null,
             myUserName: '',
             isHost: true,
             readyAll: false,
@@ -114,27 +135,28 @@ export default {
 
             // 게임 순서 관련
             amIDescriber: false, // false : 내가 그리는 차례, true : 내가 설명할 차례
+            
+            ready: false,
+            team: null,
         })
-        const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
-        state.sessionId = route.params.sessionId
 
-        // const status = toRefs(props).ready
-
-        // watch(status, () => {
-        //     console.log("start입니다.")
-        // })
         onUpdated(() => {
             if (!state.readyAll) {
                 document.querySelector(".waiting_component").innerHTML
-                console.log("onupdated", playerList.value, document.querySelector(".waiting_component").innerHTML)
-                console.log("onupdated", state.session,  document.querySelector(".waiting_component").innerHTML)
+                playerList.value
+                document.querySelector(".waiting_component").innerHTML
+                state.session
+                document.querySelector(".waiting_component").innerHTML
+                state.team
+                console.log(state.team)
             }
 
             // 팀 분류하여 리스트에 추가
             let tmpMyTeam = null
             const tmpOpponentTeam = []
             for(let i=0; i<state.subscribers.length; i++) {
-                if(state.subscribers[i].team==state.publisher.team) {
+                console.log("state.publisher : ", state.publisher)
+                if(state.subscribers[i].team === state.publisher.team) {
                     tmpMyTeam = state.subscribers[i]
                 } else {
                     tmpOpponentTeam.push(state.subscribers[i])
@@ -143,6 +165,7 @@ export default {
             state.myTeam = tmpMyTeam
             state.opponentTeam = tmpOpponentTeam
         })
+
         onMounted(() => {
             console.log('join start');
             joinSession()
@@ -176,8 +199,12 @@ export default {
                 console.warn(exception);
             });
 
-
-
+            state.session.on("signal:chat", (event)=>{
+                const { message } = JSON.parse(event.data);
+                const { user, chatMessage } = message
+                const data = user + " : " + chatMessage
+                store.commit('gameStore/SET_MESSAGES', data)
+            });
 
             // --- Connect to the session with a valid user token ---
             // 'getToken' method is simulating what your server-side should do.
@@ -191,11 +218,10 @@ export default {
                 console.log('requestPlayerlist response', response)
                 playerList.value.push(response.content)
                 console.log('response:::::::::::::::::::0-09i023', response.content)
-
                 store.commit('gameStore/setSession', state.session)
                 sessionVal.value.push(state.session) // 시험 ---
-                console.log('@@@@@@@@@@state.session:', state.session)
-                console.log('@@@@@@@@@@sessionVal:', sessionVal.value)
+                console.log('state.session : ', state.session)
+                console.log('sessionVal : ', sessionVal.value)
             })
             .then(() => {
                 console.log("gettoken - connect - then")
@@ -223,7 +249,22 @@ export default {
             window.addEventListener('beforeunload', leaveSession)
         }
 
+        const clickExit = () => {
+            router.push({
+                name: 'main'
+        })
+        }
 
+        const clickReady = async () => {
+            console.log('clickready 시작')
+            try { 
+                const response = await changeReady(state.sessionId, state.connectionId)
+                console.log('clickready - response : ', response)
+                state.ready = response.data.player.isReady
+            } catch(err) {
+                console.log(err);
+            }
+        }
         const leaveSession = () => {
         // --- Leave the session by calling 'disconnect' method over the Session object ---
         if (state.session) state.session.disconnect();
@@ -234,7 +275,7 @@ export default {
         state.subscribers = [];
         state.OV = undefined;
 
-        window.removeEventListener('beforeunload', state.leaveSession);
+        window.removeEventListener('beforeunload', leaveSession);
         }
 
         const updateMainVideoStreamManager = (stream) => {
@@ -321,6 +362,8 @@ export default {
             getToken,
             createToken,
             leaveSession,
+            clickReady,
+            clickExit,
             updateMainVideoStreamManager
         }
     }
@@ -328,5 +371,39 @@ export default {
 </script>
 
 <style scoped>
+.wrap_component {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.waiting_component {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    max-width: 1200px;
+    min-width: 800px;
+    width: 100%;
+    justify-content: space-between;
+}
+.side_component {
+    width: 300px;    
+}
+.select_team {
+    display: flex;
+  border-radius: 30px;
+  background-color: white;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.chat_box {
+    border-radius: 30px;
+    height: 500px;
+    background-color: white;
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    padding: 20px 10px;
+}
 
 </style>

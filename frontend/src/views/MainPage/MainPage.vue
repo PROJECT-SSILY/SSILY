@@ -43,6 +43,11 @@
                 <tutorial-dialog></tutorial-dialog>
               </v-col>
             </v-row>
+            <v-row>
+              <v-col>
+                <SettingDialog></SettingDialog>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-container>
@@ -52,6 +57,7 @@
 <script>
 
 import MakeRoomDialog from './Components/MakeRoomDialog.vue';
+import SettingDialog from '../SettingDialog.vue';
 import TutorialDialog from './Components/TutorialDialog.vue';
 import ProfileBox from './Components/ProfileBox.vue';
 import RoomList from './Components/RoomList.vue';
@@ -107,6 +113,7 @@ export default {
     TutorialDialog,
     ProfileBox,
     RoomList,
+    SettingDialog,
     
   },
 }
