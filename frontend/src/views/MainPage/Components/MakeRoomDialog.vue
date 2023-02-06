@@ -105,9 +105,9 @@
       const state = reactive({
         dialog: false,
         title: null,
-        isSecret : null,
+        isSecret : false,
         password : null,
-        isTeamBattle : null,
+        isTeamBattle : true,
         rules: {
           required: value => !!value || '필수',
         }
