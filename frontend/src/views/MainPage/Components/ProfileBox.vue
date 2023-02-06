@@ -14,7 +14,7 @@
           </v-col>
           <v-col col="2">
             <v-avatar size="64">
-              <v-img @click="toMyPage" src="https://cdn.vuetifyjs.com/images/lists/2.jpg"></v-img>
+              <v-img @click="toMyPage" :src="state.robot"></v-img>
             </v-avatar>
           </v-col>
         </v-row>
@@ -33,12 +33,20 @@ export default {
     const route = useRouter()
     const store = useStore()
     const state = reactive({
-      nickname: null
+      nickname: null,
+      robot: 0,
     })
     onBeforeMount(async ()=> {
           const token = store.getters['accountStore/getToken']
           const res = await store.dispatch('accountStore/getMeAction', token)
           state.nickname = res.nickname
+          if (res.level > -1 && res.level < 6)  {
+                state.robot = "./robotface1.svg"
+            } else if (res.level > 5 && res.level < 11) {
+                state.robot = "./robotface2.svg"
+            } else {
+                state.robot = "./robotface3.svg"
+          }
       })
     const toMyPage = function() {
       route.push('mypage')
