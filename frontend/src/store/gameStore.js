@@ -50,6 +50,29 @@ const getters = {
     },
     getChat: (state) => {
       return state.chat
+    },
+    // 우리편 팀원들을 골라서 뽑아내는 메서드
+    getMyTeams: (state) => {
+        const myTeamColor = state.publisher.team
+        const res = []
+        state.subscribers.forEach(sub => {
+            if(sub.team == myTeamColor) {
+                res.push(sub)
+            }
+        });
+        return res;
+    },
+
+    // 상대편 팀원들을 골라서 뽑아내는 메서드
+    getOpponents: (state) => {
+        const myTeamColor = state.publisher.team
+        const res = []
+        state.subscribers.forEach(sub => {
+            if(sub.team != myTeamColor) {
+                res.push(sub)
+            }
+        });
+        return res;
     }
 
 }
@@ -77,11 +100,11 @@ const mutations = {
     setSession: (state, data) => {
         state.session = data;
     },
+    SET_PUBLISHER (state, data) {
+        state.publisher = data
+    },
     setMainStreamManager: (state, data) => {
         state.mainStreamManager = data;
-    },
-    setPublisher: (state, data) => {
-        state.publisher = data;
     },
     setSubscribers: (state, data) => {
         state.subscribers = data;
@@ -111,6 +134,8 @@ const mutations = {
       state.chat.push(data)
     }
 
+    //==============================
+
 }
 const actions = {
     joinSession : (context) => {
@@ -123,6 +148,9 @@ const actions = {
 
         // --- Specify the actions when events take place in the session ---
         // On every new Stream received...
+
+        // stream = 영상 송출과 관련된 정보들
+        // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직
         session.on('streamCreated', ({ stream }) => {
             const subscriber = state.session.subscribe(stream);
             state.subscribers.push(subscriber);
@@ -141,25 +169,7 @@ const actions = {
             console.warn(exception);
         });
 
-                // const sendMessage = () => {
-        //     console.log("sendMessage 몇번 찍냐?");
-        //     session1.value.signal({
-        //             data: JSON.stringify(state.chattings),
-        //             type: 'my-chat',
-        //         })
-        //         .then(() => {
-        //             // state.chat.push({ user: nickname, text: state.chattings})
-        //             state.chattings = '';
-        //             emit("update:session", session1.value);
-        //             console.log('Message success', state.chat);
-        //         })
-        //         .catch(error => {
-        //             console.log(error);
-        //         })
 
-            //         user : state.userNick,
-            //         text : state.sendData,
-            //         id : event.from.connectionId,
         session.on("signal:my-chat", (event)=> {
           const chatMessage = event.data
           const chatUser = event.from.connectionId
@@ -175,7 +185,6 @@ const actions = {
           
 
         })
-
 
   
         // 게임 시그널 관리
@@ -223,6 +232,9 @@ const actions = {
 
 
 
+        // session.on의 첫번째 인자 = event(String), 두번째 인자 = 앞의 event를 받아서 실행하는 함수(Function)
+        // event.data에 채팅 input에서 받은 내용을 parsing해서 state의 messages에 반영
+
         // state.session.on("signal:chat", (event)=>{
         //     const { message } = JSON.parse(event.data);
         //     const { user, chatMessage } = message
@@ -255,7 +267,7 @@ const actions = {
                 context.commit("setOV", OV)
                 context.commit("setSession", session)
                 context.commit("setMainStreamManager", publisher)
-                context.commit("setPublisher", publisher)
+                context.commit('SET_PUBLISHER', publisher)
                 // --- Publish your stream ---
                 // 입장할 때 참여자 정보 가져오기
                 session.signal({
@@ -366,13 +378,13 @@ const actions = {
         .then((sessionId) => dispatch('createToken', sessionId));
     },
 
-    leaveSession: (commit) => {
+    leaveSession: (context) => {
         if (state.session) state.session.disconnect();
-        commit("setSession", undefined)
-        commit("setMainStreamManager", undefined)
-        commit("setPublisher", undefined)
-        commit("setSubscribers", [])
-        commit("setOV", undefined)
+        context.commit("setSession", undefined)
+        context.commit("setMainStreamManager", undefined)
+        context.commit("setSubscribers", [])
+        context.commit("setOV", undefined)
+        context.commit('SET_PUBLISHER', undefined)
     },
 
     updateMainVideoStreamManager: (commit, stream) => {

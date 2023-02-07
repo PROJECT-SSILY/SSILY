@@ -53,7 +53,7 @@
       </v-container>
     </div>
   </template>
-  
+
 <script>
 
 import MakeRoomDialog from './Components/MakeRoomDialog.vue';
@@ -99,8 +99,8 @@ export default {
       router.push({name: 'gameroom'})
     }
     return {
-      store, 
-      router, 
+      store,
+      router,
       state,
       getMe,
       changeValue,
@@ -114,7 +114,7 @@ export default {
     ProfileBox,
     RoomList,
     SettingDialog,
-    
+
   },
 }
 // }
