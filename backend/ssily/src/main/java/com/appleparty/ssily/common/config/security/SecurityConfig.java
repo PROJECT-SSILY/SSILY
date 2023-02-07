@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         web.ignoring()
-                .antMatchers("/favicon.ico", "/model.json");
+                .antMatchers("/favicon.ico", "/*.json", "/*.bin");
     }
 
     @Override
