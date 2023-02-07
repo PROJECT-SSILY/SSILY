@@ -141,6 +141,8 @@ const actions = {
         // 'token' parameter should be retrieved and returned by your own backend
 
         context.dispatch("getToken", state.mySessionId).then(token => {
+            console.log("여기까지 완료, token :", token, "state.myUserName :", state.myUserName )
+            console.log("session : ", session )
             session.connect(token, { clientData: state.myUserName })
             .then(() => {
                 // --- Get your own camera stream with the desired properties ---
@@ -158,22 +160,22 @@ const actions = {
                 context.commit("setSession", session)
                 context.commit("setMainStreamManager", publisher)
                 context.commit("setPublisher", publisher)
-
-
                 // --- Publish your stream ---
                 session.publish(state.publisher);
-                })
-                .catch(error => {
-                    console.log('There was an error connecting to the session:', error.code, error.message);
-                });
+            })
+            .catch(error => {
+                console.log('There was an error connecting to the session:', error.code, error.message);
+            });
         });
         // window.addEventListener('beforeunload', this.leaveSession)
     },
 
-    createSession : (context, sessionId) => {
+    createSession : (context, sessionId) => { // => 세션 생성 후 세션ID 발급됨
         if (sessionId) {
+            console.log("토큰 이미 존재");
             return sessionId
         } else {
+            console.log("토큰 존재하지 않음");
             return new Promise((resolve, reject) => {
                 $axios
                 .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
@@ -189,6 +191,7 @@ const actions = {
                 })
                 .then(response => response.data)
                 .then(data => {
+                    console.log("세션ID :", data.id)
                     resolve(data.id)
                 })
                 .catch(error => {
@@ -224,11 +227,12 @@ const actions = {
 
 
         return new Promise((resolve, reject)=> {
-            // console.log("level=",level);
-            // console.log("nickname=",nickname);
-            // console.log("isHost=", isHost);
-            // console.log("rate=", rate);
-            // console.log("exp", exp)
+            console.log("level=",level);
+            console.log("nickname=",nickname);
+            console.log("isHost=", isHost);
+            console.log("rate=", rate);
+            console.log("password=", password);
+            console.log("exp", exp)
             $axios
                 .post(`${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`, JSON.stringify({
                 "level" : level,
@@ -243,18 +247,17 @@ const actions = {
                     password: OPENVIDU_SERVER_SECRET,
                 },
             })
-            .then(response => resolve(response.data))
+            .then(response => response.data)
+            .then(data => resolve(data.token))
             .catch(error => reject(error.response));
         })
     },
 
     getToken: ({dispatch}, mySessionId) => {
-          console.log('gettoken 진입')
-          return dispatch("createSession", mySessionId)
-          .then((mySessionId) =>
-            dispatch("createToken", mySessionId)
-          )
-        },
+        console.log('gettoken 진입')
+        return dispatch('createSession', mySessionId) // createsession 반환값 => sessionId
+        .then((sessionId) => dispatch('createToken', sessionId));
+    },
 
     leaveSession: (commit) => {
         if (state.session) state.session.disconnect();
