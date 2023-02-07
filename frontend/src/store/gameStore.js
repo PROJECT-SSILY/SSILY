@@ -26,7 +26,10 @@ const state = {
     messages: [],
     media: 0.5,
     alarm: 0.5,
-    audio: new Audio('https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3')
+    audio: new Audio('https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3'),
+    isAllReady: false,
+    userList: [],
+    chat: []
 }
 
 const getters = {
@@ -42,6 +45,12 @@ const getters = {
     getTitle: (state) => {
       return state.title;
     },
+    getUserList: (state) => {
+      return state.userList;
+    },
+    getChat: (state) => {
+      return state.chat
+    }
 
 }
 
@@ -98,6 +107,9 @@ const mutations = {
     SET_MESSAGES: (state, data) => {
         state.messages = data
     },
+    setChat: (state, data) => {
+      state.chat.push(data)
+    }
 
 }
 const actions = {
@@ -128,17 +140,86 @@ const actions = {
         session.on('exception', ({ exception }) => {
             console.warn(exception);
         });
-        
-        // 시그널 관리
+
+                // const sendMessage = () => {
+        //     console.log("sendMessage 몇번 찍냐?");
+        //     session1.value.signal({
+        //             data: JSON.stringify(state.chattings),
+        //             type: 'my-chat',
+        //         })
+        //         .then(() => {
+        //             // state.chat.push({ user: nickname, text: state.chattings})
+        //             state.chattings = '';
+        //             emit("update:session", session1.value);
+        //             console.log('Message success', state.chat);
+        //         })
+        //         .catch(error => {
+        //             console.log(error);
+        //         })
+
+            //         user : state.userNick,
+            //         text : state.sendData,
+            //         id : event.from.connectionId,
+        session.on("signal:my-chat", (event)=> {
+          const chatMessage = event.data
+          const chatUser = event.from.connectionId
+          var nickname = ''
+          state.userList.forEach(user => {
+            if (user.conectionId == chatUser) {
+              nickname = user.nickname
+            }
+          })
+          const data = {user : nickname, text: chatMessage, id: chatUser}
+          console.log('채팅 신호 받음')
+          context.commit('setChat', data)
+          
+
+        })
+
+
+  
+        // 게임 시그널 관리
         session.on("signal:game", (event)=>{
           switch(event.data.gameStatus) {
             // 3. 참여자들 정보 받기
               case 3: {
-                  console.log('ready 정보 받아왔음? ')
-                  console.log(event.data.playerState)
+                  var data = event.data.playerState
+                  var keys = Object.keys(data)
+                  for (var i=0; i<keys.length; i++) {
+                    var key = keys[i];
+                    var user = {}
+                    user.conectionId = key
+                    user.isReady = data[key].isReady     
+                    user.exp = data[key].player.exp
+                    user.isHost = data[key].player.isHost
+                    user.isPresenter = data[key].player.isPresenter
+                    user.level = data[key].player.level
+                    user.nickname = data[key].player.nickname
+                    user.rate = data[key].player.rate
+                    user.score = data[key].player.rate
+                    user.team = data[key].player.rate
+                    state.userList.push(user)
+                    console.log('유저리스트 : ', state.userList)
+                  }
+                  break
               }
+              // 4. 참여자 ready 정보 경신
+              case 4: {
+                state.isAllReady = event.data.isAllReady
+                var readyUser = Object.keys(event.data)[1]
+                state.userList.forEach(user => {
+                  if (user.conectionId == readyUser) {
+                    user.isReady = !user.isReady
+                    console.log('user', user.nickname, '의 ready', user.isReady)
+                    console.log(state.isAllReady)
+                    console.log(state.userList)
+                  }
+                })
+                break
+            }
           }
       });
+
 
 
 
@@ -176,7 +257,14 @@ const actions = {
                 context.commit("setMainStreamManager", publisher)
                 context.commit("setPublisher", publisher)
                 // --- Publish your stream ---
-
+                // 입장할 때 참여자 정보 가져오기
+                session.signal({
+                  type: 'game',
+                  data: {
+                    gameStatus: 3,
+                  },
+                  to: [],
+                })
                 session.publish(state.publisher);
             })
             .catch(error => {
@@ -292,8 +380,25 @@ const actions = {
         commit("setMainStreamManager", stream)
     },
 
-   
+    // 참여자 레디 상태 변경 - ingamePage에서 clickReady 했을 때 호출
+    changeReady: () => {
+      state.session.signal({
+        type: 'game',
+        data: {
+          gameStatus: 4,
+        },
+        to: [],
+      })
+    },
 
+    // 채팅
+    sendMessage: (context, chattings) => {
+      state.session.signal({
+        data: JSON.stringify(chattings),
+        type: 'my-chat'
+      })
+    },
+  
     isTeam: (state) => {
         state.commit("changeMode", null)
         console.log(state.getters.getTeam);
@@ -361,6 +466,7 @@ const actions = {
         // 아직 효과음 없어서 볼륨 조절 코드 없음 효과음 추가 이후 작성 예정
         console.log('alarm 볼륨 조절')
     }
+
 }
 export default {
     namespaced: true,

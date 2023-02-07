@@ -232,16 +232,10 @@ export default {
             })
         }
 
-        // const clickReady = async () => {
-        //     // console.log('clickready 시작')
-        //     try {
-        //         const response = await changeReady(state.sessionId, state.connectionId)
-        //         // console.log('clickready - response : ', response)
-        //         state.ready = response.data.player.isReady
-        //     } catch(err) {
-        //         console.log(err);
-        //     }
-        // }
+        const clickReady = () => {
+            store.dispatch('gameStore/changeReady')
+        }
+
         // const leaveSession = () => {
         //     // --- Leave the session by calling 'disconnect' method over the Session object ---
         //     if (state.session) state.session.disconnect();
@@ -322,7 +316,7 @@ export default {
             // getToken,
             // createToken,
             // leaveSession,
-            // clickReady,
+            clickReady,
             clickExit,
             // updateMainVideoStreamManager
         }
