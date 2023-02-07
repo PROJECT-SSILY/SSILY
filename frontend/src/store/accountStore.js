@@ -10,10 +10,10 @@ import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwActi
 const state = {
     token: localStorage.getItem('token') || null,
     user: {
-        email: "",
-        name: "",
-        nickname: "",
-        level: null,
+        email: "test@example.com",
+        name: "이름",
+        nickname: "닉네임",
+        level: 0,
         exp: null,
         record: {
             plays: null,
