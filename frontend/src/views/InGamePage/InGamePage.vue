@@ -84,14 +84,14 @@ import { useStore } from 'vuex';
 import {  useRouter } from 'vue-router'
 // import { OpenVidu } from "openvidu-browser";
 import { reactive } from '@vue/reactivity'
-import { GetPlayerList } from "@/common/api/gameAPI";
-import { ref, onUpdated, onBeforeMount } from 'vue';
+// import { GetPlayerList } from "@/common/api/gameAPI";
+import { onUpdated, onBeforeMount } from 'vue';
 
 //=================OpenVdue====================
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
-const OPENVIDU_SERVER_URL = "https://localhost:4443";
-const OPENVIDU_SERVER_SECRET = "MY_SECRET";
+// const OPENVIDU_SERVER_URL = "https://localhost:4443";
+// const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 //=============================================
 import ChattingBox from '@/views/WaitingPage/components/ChattingBox.vue';
@@ -139,7 +139,7 @@ export default {
 
             // 게임 순서 관련
             amIDescriber: false, // false : 내가 그리는 차례, true : 내가 설명할 차례
-            
+
             ready: false,
             team: null,
         })
@@ -215,7 +215,7 @@ export default {
 
         //     await getToken(state.sessionId).then(token => {
         //         state.session.connect(token, { clientData: state.myUserName })
-                
+
         //         requestPlayerList(state.sessionId).then(response => {
         //         const resLength= response.content.length;
         //         // console.log("res 찍자", response.content);
@@ -257,16 +257,16 @@ export default {
             })
         }
 
-        const clickReady = async () => {
-            // console.log('clickready 시작')
-            try { 
-                const response = await changeReady(state.sessionId, state.connectionId)
-                // console.log('clickready - response : ', response)
-                state.ready = response.data.player.isReady
-            } catch(err) {
-                console.log(err);
-            }
-        }
+        // const clickReady = async () => {
+        //     // console.log('clickready 시작')
+        //     try {
+        //         const response = await changeReady(state.sessionId, state.connectionId)
+        //         // console.log('clickready - response : ', response)
+        //         state.ready = response.data.player.isReady
+        //     } catch(err) {
+        //         console.log(err);
+        //     }
+        // }
         // const leaveSession = () => {
         //     // --- Leave the session by calling 'disconnect' method over the Session object ---
         //     if (state.session) state.session.disconnect();
@@ -305,39 +305,39 @@ export default {
         // }
 
         // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-connection
-        const createToken = (sessionId) => {
-            const level = store.state.accountStore.user.level || 1
-            const nickname = store.state.accountStore.user.nickname || ''
-            const isHost = store.state.gameStore.isHost || true
-            const rate = store.getters['accountStore/getRate']
-            const password = store.state.gameStore.password || true
-            const exp = store.state.accountStore.user.exp || 0
-            state.myUserName=store.state.accountStore.user.nickname || ''
+        // const createToken = (sessionId) => {
+        //     const level = store.state.accountStore.user.level || 1
+        //     const nickname = store.state.accountStore.user.nickname || ''
+        //     const isHost = store.state.gameStore.isHost || true
+        //     const rate = store.getters['accountStore/getRate']
+        //     const password = store.state.gameStore.password || true
+        //     const exp = store.state.accountStore.user.exp || 0
+        //     state.myUserName=store.state.accountStore.user.nickname || ''
 
-            return new Promise((resolve, reject)=> {
-                // console.log("level=",level);
-                // console.log("nickname=",nickname);
-                // console.log("isHost=", isHost);
-                // console.log("rate=", rate);
-                // console.log("exp", exp)
-                $axios
-                    .post(`${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`, JSON.stringify({
-                    "level" : level,
-                    "nickname" : nickname,
-                    "rate" : rate,
-                    "isHost" : isHost,
-                    "password" : password,
-                    "exp": exp,
-                }), {
-                    auth: {
-                        username: 'OPENVIDUAPP',
-                        password: OPENVIDU_SERVER_SECRET,
-                    },
-                })
-                .then(response => resolve(response.data))
-                .catch(error => reject(error.response));
-            })
-        }
+        //     return new Promise((resolve, reject)=> {
+        //         // console.log("level=",level);
+        //         // console.log("nickname=",nickname);
+        //         // console.log("isHost=", isHost);
+        //         // console.log("rate=", rate);
+        //         // console.log("exp", exp)
+        //         $axios
+        //             .post(`${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`, JSON.stringify({
+        //             "level" : level,
+        //             "nickname" : nickname,
+        //             "rate" : rate,
+        //             "isHost" : isHost,
+        //             "password" : password,
+        //             "exp": exp,
+        //         }), {
+        //             auth: {
+        //                 username: 'OPENVIDUAPP',
+        //                 password: OPENVIDU_SERVER_SECRET,
+        //             },
+        //         })
+        //         .then(response => resolve(response.data))
+        //         .catch(error => reject(error.response));
+        //     })
+        // }
 
         // const requestPlayerList = async (sessionId) => {
         //     try {
@@ -354,9 +354,9 @@ export default {
             // playerList,
             // joinSession,
             // getToken,
-            createToken,
+            // createToken,
             // leaveSession,
-            clickReady,
+            // clickReady,
             clickExit,
             // updateMainVideoStreamManager
         }
@@ -411,10 +411,10 @@ export default {
     padding-top: 10px;
 }
 .sidebtn:first-child {
-    padding-right: 5px; 
+    padding-right: 5px;
 }
 .sidebtn:last-child {
-    padding-left: 5px; 
+    padding-left: 5px;
 }
 .sidebtn>button {
     width:100%;

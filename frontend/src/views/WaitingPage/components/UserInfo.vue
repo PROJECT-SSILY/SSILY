@@ -1,20 +1,19 @@
 <template>
-
-<div class="userinfo-item-wrapper" v-bind:class="team">
-  <div class="userinfo-item">
+<div class="userinfo-item-wrapper">
+  <!-- <div class="userinfo-item">
     <p>{{ team }}, {{ connectionId }}, {{ myConnectionId }}</p>
     <h1>닉네임: {{ player.nickname }}</h1>
       <p>레벨: {{ player.level }}</p>
       <p>팀: {{ player.team }}</p>
       <p>방장여부: {{ player.isHost }}</p>
       <p>경험치: {{ player.exp }}</p>
-    </div>
+    </div> -->
 </div>
 </template>
 
 <script>
 // import { useStore } from "vuex"
-import { computed, watch } from '@vue/runtime-core'
+// import { computed, watch } from '@vue/runtime-core'
 
 // import { play } from "@tensorflow/tfjs-core/dist/test_util"
 
@@ -23,12 +22,12 @@ export default {
   name: 'UserInfo',
   components: {
   },
-  props: {
-    player: Object,
-    myConnectionId: String,
-    myTeam: String
-  },
-  setup(props) {
+  // props: {
+  //   player: Object,
+  //   myConnectionId: String,
+  //   myTeam: String
+  // },
+  setup() {
     // const store = useStore()
     // const state ={
     //   nickname: props.player.nickname,
@@ -38,24 +37,24 @@ export default {
     //   exp: props.player.exp,
     //   connectionId: props.myConnectionId,
     // }
-    const team = computed(() => props.connectionId == props.myConnectionId)
-    watch(props.myTeam, () => {
-      () => {
-        console.log("팀선택");
-        console.log("state.connectedId : ", props.connectionId)
-        if(props.connectionId == props.myConnectionId) {
-          team.value = props.myTeam
-        } else {
-          team.value = props.team
-        }
-      }
-    })
+    // const team = computed(() => props.connectionId == props.myConnectionId)
+    // watch(props.myTeam, () => {
+    //   () => {
+    //     console.log("팀선택");
+    //     console.log("state.connectedId : ", props.connectionId)
+    //     if(props.connectionId == props.myConnectionId) {
+    //       team.value = props.myTeam
+    //     } else {
+    //       team.value = props.team
+    //     }
+    //   }
+    // })
 
     // console.log(toRaw(props.player))
 
 
-    return { 
-      team
+    return {
+      // team
     }
   }
 }

@@ -43,7 +43,7 @@ const getters = {
       return state.title;
     },
 
-} 
+}
 
 
 const mutations = {
@@ -90,7 +90,7 @@ const mutations = {
         state.playerList = data
     },
     setVolume1: (state, volume) => {
-      state.media = volume 
+      state.media = volume
     },
     setVolume2: (state, volume) => {
       state.alarm = volume
@@ -98,7 +98,7 @@ const mutations = {
     SET_MESSAGES: (state, data) => {
         state.messages = data
     },
-  
+
 }
 const actions = {
     joinSession : (context) => {
@@ -169,7 +169,7 @@ const actions = {
         });
         // window.addEventListener('beforeunload', this.leaveSession)
     },
-    
+
     createSession : (context, sessionId) => {
         if (sessionId) {
             return sessionId
@@ -206,6 +206,48 @@ const actions = {
         }
     },
 
+    createToken : (context, sessionId) => {
+        // const level = store.state.accountStore.user.level || 1
+        // const nickname = store.state.accountStore.user.nickname || ''
+        // const isHost = store.state.gameStore.isHost || true
+        // const rate = store.getters['accountStore/getRate']
+        // const password = store.state.gameStore.password || true
+        // const exp = store.state.accountStore.user.exp || 0
+        // state.myUserName=store.state.accountStore.user.nickname || ''
+        const level = context.rootState.accountStore.user.level
+        const nickname = context.rootState.accountStore.user.nickname
+        const isHost = state.isHost
+        const rate = context.rootGetters['accountStore/getRate']
+        const password = state.password || true
+        const exp = context.rootState.accountStore.user.exp || 0
+        state.myUserName=context.rootState.accountStore.user.nickname || ''
+
+
+        return new Promise((resolve, reject)=> {
+            // console.log("level=",level);
+            // console.log("nickname=",nickname);
+            // console.log("isHost=", isHost);
+            // console.log("rate=", rate);
+            // console.log("exp", exp)
+            $axios
+                .post(`${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`, JSON.stringify({
+                "level" : level,
+                "nickname" : nickname,
+                "rate" : rate,
+                "isHost" : isHost,
+                "password" : password,
+                "exp": exp,
+            }), {
+                auth: {
+                    username: 'OPENVIDUAPP',
+                    password: OPENVIDU_SERVER_SECRET,
+                },
+            })
+            .then(response => resolve(response.data))
+            .catch(error => reject(error.response));
+        })
+    },
+
     getToken: ({dispatch}, mySessionId) => {
           console.log('gettoken 진입')
           return dispatch("createSession", mySessionId)
@@ -213,7 +255,7 @@ const actions = {
             dispatch("createToken", mySessionId)
           )
         },
-    
+
     leaveSession: (commit) => {
         if (state.session) state.session.disconnect();
         commit("setSession", undefined)
@@ -227,7 +269,7 @@ const actions = {
         if (state.mainStreamManager === stream) return;
         commit("setMainStreamManager", stream)
     },
-    
+
 
     isTeam: (state) => {
         state.commit("changeMode", null)
