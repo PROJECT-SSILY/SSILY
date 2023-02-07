@@ -41,7 +41,7 @@
 }
 #stars{
   position: relative;
-  left: -50%;
+  left: -30%;
   bottom: 100%;
   height: 300%;
   margin:0;  background-image: url("./assets/stars3.svg");

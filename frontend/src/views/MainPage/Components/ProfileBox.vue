@@ -2,7 +2,7 @@
     <div>
       <v-container>
         <v-row>
-          <v-col col="9" id="proleft">
+          <v-col col="9">
             <v-row>
               <v-col>
                 <h3 class="welcome">
@@ -10,8 +10,8 @@
                 </h3>
               </v-col>
             </v-row>
-            <v-row class="d-flex justify-space-between mb-6">
-              <v-col col="2"  class="btnbox">
+            <v-row class="d-flex justify-space-between">
+              <v-col col="1"  class="btnbox">
                 <v-btn 
                 rounded
                 color="success" 
@@ -19,17 +19,17 @@
                 <v-icon>mdi-account</v-icon>
               </v-btn>
             </v-col>
-            <v-col col="2"  class="btnbox">
+            <v-col col="1"  class="btnbox">
               <v-btn rounded color="warning" @click="logOut">
                 <v-icon>mdi-logout-variant</v-icon>
               </v-btn>
             </v-col>
-            <v-col col="2" class="btnbox">
+            <v-col col="1" class="btnbox">
               <SettingDialog></SettingDialog>
             </v-col>
             </v-row>
             </v-col>
-          <v-col col="2">
+          <v-col col="3">
             <v-img @click="toMyPage" :src="state.robot"></v-img>
           </v-col>
         </v-row>

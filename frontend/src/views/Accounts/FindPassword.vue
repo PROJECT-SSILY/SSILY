@@ -5,7 +5,9 @@
     v-model="state.valid"
     lazy-validation
     >
-      <v-container>
+      <v-container class="formbox">
+        <h1 class="title">비밀번호 찾기</h1>
+        <br>
         <v-row>
           <v-col cols="12">
             <v-text-field
@@ -34,14 +36,12 @@
             @click="sendNewPw"
             >
             비밀번호 찾기
+            <Jawn v-if="state.isLoading"></Jawn>
             </v-btn>
           </v-col>
         </v-row>
       </v-container>
     </v-form>
-  <v-overlay :value=state.overlay>
-    <Jawn v-if="state.isLoading"></Jawn>
-  </v-overlay>
   </div>
 </template>
   
@@ -85,8 +85,7 @@ export default {
       
       if (result == 0) {
         state.isLoading = false
-        state.overlay = !state.overlay
-        alert("성공")
+        alert("임시 비밀번호 전송 완료!")
         router.push('login')
       } else {
         state.isLoading = false
@@ -101,3 +100,22 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.title {
+  background: linear-gradient(rgba(12,111,202,1), rgba(38,0,111,1));
+	background-clip: text;
+	-webkit-background-clip: text;
+  color: transparent;
+}
+.formbox {
+  margin-top: 10%;
+  background-color: aliceblue;
+  width: 50%;
+  border-radius: 20px;
+  opacity: 90%;
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
+</style>

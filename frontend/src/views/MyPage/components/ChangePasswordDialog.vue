@@ -6,6 +6,7 @@
       >
         <template v-slot:activator="{ attrs }">
           <v-btn
+            block
             dark
             v-bind="attrs"
             @click.stop="state.dialog = true"
