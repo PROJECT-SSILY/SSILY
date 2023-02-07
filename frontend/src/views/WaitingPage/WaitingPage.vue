@@ -7,7 +7,10 @@
         :myConnectionId="myConnectionId"
         :myTeam="team"
         :key="player.id"/>
-
+        <div class="userinfo_empty" 
+        v-for="p in emptyUser" 
+        :key="p"
+        ></div>
       </div>
     </div>
 </template>
@@ -16,7 +19,7 @@ import { reactive, ref } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
 import $axios from "axios";
-import { onUpdated } from 'vue'
+import { computed, onUpdated } from 'vue'
 import { useStore } from 'vuex';
 
 
@@ -46,9 +49,11 @@ export default {
     const myTeam = ref(props.team)
     const Id = ref(props.myConnectionId)
     console.log(useritem.class)
-    
     const state = reactive({
       team: null,
+    })
+    const emptyUser = computed(() => {
+      return 4-PlayerList.value.length
     })
 
     onUpdated(() => {
@@ -72,6 +77,7 @@ export default {
     return {
 		router,
 		state,
+    emptyUser,
 		joinSession,
 		sessionInfo,
     PlayerList,
@@ -84,8 +90,8 @@ export default {
 
 <style>
 .userinfo-component {
-  padding: 30px;
-  max-width: 800px;
+  padding: 0px 30px;
+  max-width: 750px;
   min-width: 700px;
   box-sizing: border-box;
   display: flex;
@@ -93,4 +99,16 @@ export default {
   justify-content: space-between;
   flex-wrap: wrap;
 }
+
+/* ------------------- */
+
+.userinfo_empty {
+  height: 297px;
+  width: 297px;
+  border-radius: 100%;
+  box-sizing: content-box;
+  display: inline-block;
+  border: 5px dashed #ffffffa3;
+}
+
 </style>
