@@ -2,26 +2,28 @@
   <div id="flex-container">
       <div class="userinfo-component flex-item">
         <UserInfo
-        v-for="player in playerList"
-        :player="player"
-        :myConnectionId="myConnectionId"
-        :myTeam="team"
-        :key="player.id"/>
-        <div class="userinfo_empty" 
-        v-for="p in emptyUser" 
-        :key="p"
-        ></div>
+        v-for="one in PlayerList"
+        :player="one.player"
+        :myConnectionId="one.connectionId"
+        :myTeam="one.player.team"
+        :key="one.id"/>
+        
+        <BlankBox
+        v-for="index in emptyUser"
+        :key="index.id"
+        />
       </div>
     </div>
 </template>
 <script>
 import { reactive, ref } from '@vue/reactivity'
+import { isProxy, toRaw } from 'vue';
 import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
 import $axios from "axios";
-import { computed, onUpdated } from 'vue'
+import { onUpdated, onMounted } from 'vue'
 import { useStore } from 'vuex';
-
+import BlankBox from './components/BlankBox.vue'
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -30,6 +32,7 @@ export default {
   name: 'WaitingPage',
   components: {
     UserInfo,
+    BlankBox,
   },  
   props: {
     playerList: Object,
@@ -38,13 +41,15 @@ export default {
     sessionId: String,
     team: String,
   },
-  emits: [
-    'joinSession',
-  ],
-  setup(props, {emit}) {
+  // emits: [
+  //   'joinSession',
+  // ],
+  setup(props) {
     const router = useRouter()
     const store = useStore()
+    // const PlayerList = computed(() => props.playerList)
     const PlayerList = ref(props.playerList)
+    const emptyUser = [];
     const useritem = ref(null)
     const myTeam = ref(props.team)
     const Id = ref(props.myConnectionId)
@@ -52,20 +57,37 @@ export default {
     const state = reactive({
       team: null,
     })
-    const emptyUser = computed(() => {
-      return 4-PlayerList.value.length
+
+    onMounted(() =>{
+      let rawData= props.playerList;
+      if(isProxy(props.playerList)){
+        rawData = toRaw(props.playerList);
+      }
+      console.log("testing", rawData);
+      
+      for(var i=0;i<4;i++){
+        const myValue={id : i };
+        emptyUser.push(myValue);
+      }
+      for(let one in rawData){
+        console.log(one);
+        // emptyUser.value pop();
+      }
+      console.log("emptyUser is ", emptyUser);
     })
+
+    // console.log("emptyUser.value@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ : ", emptyUser.value)
 
     onUpdated(() => {
       state
       state.team = props.team
-      PlayerList.value
+      // PlayerList.value
       document.querySelector(".userinfo-component").innerHTML
     })
 
-    const joinSession = async function() {
-      emit('joinSession')
-		}
+    // const joinSession = async function() {
+    //   emit('joinSession')
+		// }
 
     const sessionInfo = () => {
       const session1 = store.getters['gameStore/getSession']
@@ -77,8 +99,8 @@ export default {
     return {
 		router,
 		state,
-    emptyUser,
-		joinSession,
+    // emptyUser,
+		// joinSession,
 		sessionInfo,
     PlayerList,
     Id,
@@ -101,14 +123,5 @@ export default {
 }
 
 /* ------------------- */
-
-.userinfo_empty {
-  height: 297px;
-  width: 297px;
-  border-radius: 100%;
-  box-sizing: content-box;
-  display: inline-block;
-  border: 5px dashed #ffffffa3;
-}
 
 </style>

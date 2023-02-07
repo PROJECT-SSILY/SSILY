@@ -1,5 +1,5 @@
 <template>
-    <div class="wrap_component">
+<div class="wrap_component">
     <!----------------------------------- 개발용 버튼 -------------------------------------->
         <p>
             <v-btn @click="state.readyAll=!state.readyAll">게임 시작</v-btn> |
@@ -10,9 +10,8 @@
     <div class="waiting_component" v-if="!state.readyAll">
         <div class="users_component">
             <WaitingPage
-            @joinSession=joinSession
             :sessionId="state.sessionId"
-            :playerList="playerList[0]"
+            :playerList="state.playerList"
             :session="state.session"
             :myConnectionId="state.connectionId"
             :team="state.team"
@@ -114,7 +113,7 @@ export default {
         const store = useStore()
         const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         const router = useRouter()
-        const playerList = ref([])
+        // const playerList = ref([])
         const sessionVal = ref([])
         const state = reactive({
             title: null,
@@ -133,6 +132,7 @@ export default {
             isHost: true,
             readyAll: false,
             connectionId: null,
+            playerList: [],
 
             // 팀 분류
             myTeam: null,
@@ -147,11 +147,9 @@ export default {
 
         onUpdated(() => {
             if (!state.readyAll) {
-                document.querySelector(".waiting_component").innerHTML
-                playerList.value
-                document.querySelector(".waiting_component").innerHTML
+                // document.querySelector(".waiting_component").innerHTML
+                // playerList.value
                 state.session
-                document.querySelector(".waiting_component").innerHTML
                 state.team
                 console.log(state.team)
             }
@@ -160,13 +158,14 @@ export default {
             let tmpMyTeam = null
             const tmpOpponentTeam = []
             for(let i=0; i<state.subscribers.length; i++) {
-                console.log("state.publisher : ", state.publisher)
+                // console.log("state.publisher : ", state.publisher)
                 if(state.subscribers[i].team === state.publisher.team) {
                     tmpMyTeam = state.subscribers[i]
                 } else {
                     tmpOpponentTeam.push(state.subscribers[i])
                 }
             }
+            // console.log("playerList.value.length::::::::::", playerList.value.length)
             state.myTeam = tmpMyTeam
             state.opponentTeam = tmpOpponentTeam
         })
@@ -215,21 +214,18 @@ export default {
             // 'getToken' method is simulating what your server-side should do.
             // 'token' parameter should be retrieved and returned by your own backend
 
-            console.log(state.sessionId)
-            getToken(state.sessionId).then(token => {
-                // console.log("token : ", token)
+            await getToken(state.sessionId).then(token => {
                 state.session.connect(token, { clientData: state.myUserName })
                 requestPlayerList(state.sessionId).then(response => {
-                // console.log('requestPlayerlist response', response)
-                playerList.value.push(response.content)
-                // console.log('response:::::::::::::::::::0-09i023', response.content)
+                const resLength= response.content.length;
+                console.log("res 찍자", response.content);
+                for(let i=0;i<resLength;i++){
+                    state.playerList.push(response.content[i]);
+                }
                 store.commit('gameStore/setSession', state.session)
-                sessionVal.value.push(state.session) // 시험 ---
-                // console.log('state.session : ', state.session)
-                // console.log('sessionVal : ', sessionVal.value)
+                sessionVal.value.push(state.session)
             })
             .then(() => {
-                console.log("gettoken - connect - then")
                 // --- Get your own camera stream with the desired properties ---
                 let publisher = state.OV.initPublisher(undefined, {
                     audioSource: undefined, // The source of audio. If undefined default microphone
@@ -250,6 +246,7 @@ export default {
                 .catch(error => {
                     console.log('There was an error connecting to the session:', error.code, error.message);
                 });
+                console.log("진짜 playerlist는 : ", state.playerList);
             });
             window.addEventListener('beforeunload', leaveSession)
         }
@@ -261,10 +258,10 @@ export default {
         }
 
         const clickReady = async () => {
-            console.log('clickready 시작')
+            // console.log('clickready 시작')
             try { 
                 const response = await changeReady(state.sessionId, state.connectionId)
-                console.log('clickready - response : ', response)
+                // console.log('clickready - response : ', response)
                 state.ready = response.data.player.isReady
             } catch(err) {
                 console.log(err);
@@ -301,14 +298,11 @@ export default {
         */
 
         const getToken = async (sessionId) => {
-            console.log("gettoken 시작")
-            console.log('gettoken, sessionid : ', sessionId)
             const response = await createToken(sessionId)
             state.connectionId = response.connectionId
-            console.log('connectionId ===>', state.connectionId)
+            // console.log('connectionId ===>', state.connectionId)
             return response.token
         }
-
 
         // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-connection
         const createToken = (sessionId) => {
@@ -321,11 +315,11 @@ export default {
             state.myUserName=store.state.accountStore.user.nickname || ''
 
             return new Promise((resolve, reject)=> {
-                console.log("level=",level);
-                console.log("nickname=",nickname);
-                console.log("isHost=", isHost);
-                console.log("rate=", rate);
-                console.log("exp", exp)
+                // console.log("level=",level);
+                // console.log("nickname=",nickname);
+                // console.log("isHost=", isHost);
+                // console.log("rate=", rate);
+                // console.log("exp", exp)
                 $axios
                     .post(`${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`, JSON.stringify({
                     "level" : level,
@@ -346,12 +340,8 @@ export default {
         }
 
         const requestPlayerList = async (sessionId) => {
-            // 되는 코드
-            console.log('requestPlayerList 시도 시작')
             try {
-                console.log('requestplayerList 내 세션 아이디 : ', sessionId)
                 const response = await GetPlayerList(sessionId);
-                console.log('requestplayerList 결과 값 : ', response.data)
                 store.commit('gameStore/setPlayerList', response.data)
                 return response.data
             } catch(err) {
@@ -361,7 +351,7 @@ export default {
 
         return {
             state,
-            playerList,
+            // playerList,
             joinSession,
             getToken,
             createToken,

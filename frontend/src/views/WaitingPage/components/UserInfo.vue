@@ -28,16 +28,16 @@ export default {
   setup(props) {
     const store = useStore()
     const state ={
-      nickname: props.player.player.nickname,
-      level: props.player.player.level,
-      team: props.player.player.team,
-      isHost: props.player.player.isHost,
-      exp: props.player.player.exp,
-      connectionId: props.player.connectionId,
+      nickname: props.player.nickname,
+      level: props.player.level,
+      team: props.player.team,
+      isHost: props.player.isHost,
+      exp: props.player.exp,
+      connectionId: props.myConnectionId,
     }
     const team = computed(() => {
-        console.log("팀선택");
-        console.log("state.connectedId : ", props.player.connectionId)
+        // console.log("팀선택");
+        // console.log("state.connectedId : ", props.player.connectionId)
         if(state.connectionId == props.myConnectionId) {
           return props.myTeam
         } else {
@@ -48,8 +48,8 @@ export default {
     // console.log(toRaw(props.player))
     watch(props.myTeam, () => {
       () => {
-        console.log("팀선택");
-        console.log("state.connectedId : ", state.connectionId)
+        // console.log("팀선택");
+        // console.log("state.connectedId : ", state.connectionId)
         if(state.connectionId == props.myConnectionId) {
           team.value = props.myTeam
         } else {

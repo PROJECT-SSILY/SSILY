@@ -120,10 +120,10 @@
       })
 
       const joinSession = async function() {
-        console.log("state.title : ", state.title);
-        console.log("state.isSecret : ", state.isSecret);
-        console.log("state.password : ", state.password);
-        console.log("state.isTeamBattle : ", state.isTeamBattle);
+        // console.log("state.title : ", state.title);
+        // console.log("state.isSecret : ", state.isSecret);
+        // console.log("state.password : ", state.password);
+        // console.log("state.isTeamBattle : ", state.isTeamBattle);
         store.commit('gameStore/setTitle', state.title)
         store.commit('gameStore/setSecret', state.isSecret)
         store.commit('gameStore/setPassword', state.password)
