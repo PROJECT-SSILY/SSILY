@@ -5,7 +5,7 @@
       <p>레벨: {{ state.level }}</p>
       <p>팀: {{ state.team }}</p>
       <p>방장여부: {{ state.isHost }}</p>
-      <p>경험치: {{ state.exp }}</p>
+      <p>경험치: {{ state.exp }}</p>      
     </div>
 </div>
 </template>
@@ -34,6 +34,7 @@ export default {
       isHost: props.player.player.isHost,
       exp: props.player.player.exp,
       connectionId: props.player.connectionId,
+      isReady: false,
     }
     const team = computed(() => {
         console.log("팀선택");
