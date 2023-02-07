@@ -146,7 +146,7 @@ const actions = {
             session.connect(token, { clientData: state.myUserName })
             .then(() => {
                 // --- Get your own camera stream with the desired properties ---
-                let publisher = state.OV.initPublisher(undefined, {
+                let publisher = OV.initPublisher(undefined, {
                     audioSource: undefined, // The source of audio. If undefined default microphone
                     videoSource: undefined, // The source of video. If undefined default webcam
                     publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
@@ -156,11 +156,13 @@ const actions = {
                     insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
                     mirror: false       	// Whether to mirror your local video or not
                 });
+                console.log("아싸")
                 context.commit("setOV", OV)
                 context.commit("setSession", session)
                 context.commit("setMainStreamManager", publisher)
                 context.commit("setPublisher", publisher)
                 // --- Publish your stream ---
+
                 session.publish(state.publisher);
             })
             .catch(error => {
@@ -247,7 +249,10 @@ const actions = {
                     password: OPENVIDU_SERVER_SECRET,
                 },
             })
-            .then(response => response.data)
+            .then(response => {
+                console.log(response)
+                return response.data
+            })
             .then(data => resolve(data.token))
             .catch(error => reject(error.response));
         })
