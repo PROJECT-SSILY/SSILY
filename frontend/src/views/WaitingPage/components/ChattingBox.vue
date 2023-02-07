@@ -94,6 +94,7 @@ export default {
         })
         const sendMessage = () => {
             console.log("sendMessage 몇번 찍냐?");
+            console.log('sendMessage 내 세션= ', session1.value)
             session1.value.signal({
                     data: JSON.stringify(state.chattings),
                     type: 'my-chat',
