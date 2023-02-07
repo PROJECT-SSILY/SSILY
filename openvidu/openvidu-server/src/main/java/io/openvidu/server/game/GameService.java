@@ -26,7 +26,7 @@ public class GameService   {
     static final int SET_PRESENTER_SETTING = 0;
     static final int GET_PRESENTER_SETTING =1;
     static final int GAME_START = 2;
-    static final int GET_READY_STATE = 3;
+    static final int JOIN_ROOM = 3;
     static final int CHANGE_READY_STATE = 4;
 
     //Tread 관리
@@ -79,8 +79,8 @@ public class GameService   {
             case GAME_START:
                 gameStart(participant, message, sessionId, participants, params, data, notice);
                 return;
-            case GET_READY_STATE:
-                getReadyState(participant, sessionId, participants, params, data);
+            case JOIN_ROOM:
+                joinRoom(participant, sessionId, participants, params, data);
                 return;
             case CHANGE_READY_STATE:
                 changeReadyState(participant, sessionId, participants, params, data);
@@ -90,11 +90,11 @@ public class GameService   {
 
     /**
      * 서영탁
-     * 게임 접속 시 참여자들의 Ready 상태를 알려줌
+     * 게임 접속 시 참여자들의 정보와 Ready 상태를 알려줌
      */
-    public void getReadyState(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+    public void joinRoom(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
-        log.info("getReadyState is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+        log.info("joinRoom is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         // 해당 방에서 관리되는게 없으면 빈 map 생성
         readyState.putIfAbsent(sessionId, new HashMap<>());
@@ -111,14 +111,21 @@ public class GameService   {
 
         readyState.computeIfPresent(sessionId, (k, v) -> v = nowReadyState);
 
-        for (String id : nowReadyState.keySet()) {
-            data.addProperty(id, nowReadyState.get(id));
+        JsonObject playerState  = new JsonObject();
+        for (Participant p : participants) {
+            String id = p.getParticipantPublicId();
+            JsonObject jsonObject = p.toJson();
+            jsonObject.addProperty("isReady", nowReadyState.get(id));
+            playerState.add(id, jsonObject);
         }
 
+        data.add("playerState", playerState);
         params.add("data", data);
 
-        rpcNotificationService.sendNotification(participant.getParticipantPrivateId(),
-                ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
     }
 
     /**
