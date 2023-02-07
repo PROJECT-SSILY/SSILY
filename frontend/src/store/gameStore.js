@@ -128,6 +128,19 @@ const actions = {
         session.on('exception', ({ exception }) => {
             console.warn(exception);
         });
+        
+        // 시그널 관리
+        session.on("signal:game", (event)=>{
+          switch(event.data.gameStatus) {
+            // 3. 참여자들 정보 받기
+              case 3: {
+                  console.log('ready 정보 받아왔음? ')
+                  console.log(event.data.playerState)
+              }
+          }
+      });
+
+
 
         // state.session.on("signal:chat", (event)=>{
         //     const { message } = JSON.parse(event.data);
@@ -154,6 +167,8 @@ const actions = {
                     insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
                     mirror: false       	// Whether to mirror your local video or not
                 });
+
+                
                 context.commit("setOV", OV)
                 context.commit("setSession", session)
                 context.commit("setMainStreamManager", publisher)
@@ -270,6 +285,7 @@ const actions = {
         commit("setMainStreamManager", stream)
     },
 
+   
 
     isTeam: (state) => {
         state.commit("changeMode", null)

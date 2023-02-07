@@ -103,7 +103,7 @@ export default {
 		UserVideo,
         MyCanvasBox,
         WaitingPage,
-        ChattingBox
+        ChattingBox,
     },
     props:{
         ready: Boolean
@@ -112,8 +112,6 @@ export default {
         const store = useStore()
         // const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         const router = useRouter()
-        // const playerList = ref([])
-        // const sessionVal = ref([])
         const state = reactive({
             title: null,
             isSecret: false,
@@ -131,7 +129,7 @@ export default {
             isHost: true,
             readyAll: false,
             connectionId: null,
-            playerList: [],
+            
 
             // 팀 분류
             myTeam: null,
@@ -182,20 +180,6 @@ export default {
         //     // --- Init a session ---
         //     state.session = state.OV.initSession();
 
-        //     // --- Specify the actions when events take place in the session ---
-        //     // On every new Stream received...
-        //     state.session.on('streamCreated', ({ stream }) => {
-        //         const subscriber = state.session.subscribe(stream);
-        //         state.subscribers.push(subscriber);
-        //     });
-
-        //     // On every Stream destroyed...
-        //     state.session.on('streamDestroyed', ({ stream }) => {
-        //         const index = state.subscribers.indexOf(stream.streamManager, 0);
-        //         if (index >= 0) {
-        //         state.subscribers.splice(index, 1);
-        //         }
-        //     });
 
         //     // On every asynchronous exception...
         //     state.session.on('exception', ({ exception }) => {
@@ -240,16 +224,7 @@ export default {
         //             state.mainStreamManager = publisher;
         //             state.publisher = publisher;
 
-        //             // --- Publish your stream ---
-        //             state.session.publish(state.publisher);
-        //             })
-        //             .catch(error => {
-        //                 console.log('There was an error connecting to the session:', error.code, error.message);
-        //             });
-        //             console.log("진짜 playerlist는 : ", state.playerList);
-        //     });
-        //     window.addEventListener('beforeunload', leaveSession)
-        // }
+
 
         const clickExit = () => {
             router.push({
@@ -339,15 +314,6 @@ export default {
         //     })
         // }
 
-        // const requestPlayerList = async (sessionId) => {
-        //     try {
-        //         const response = await GetPlayerList(sessionId);
-        //         store.commit('gameStore/setPlayerList', response.data)
-        //         return response.data
-        //     } catch(err) {
-        //         console.log(err);
-        //     }
-        // }
 
         return {
             state,
