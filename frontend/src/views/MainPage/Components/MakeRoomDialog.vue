@@ -2,20 +2,21 @@
   <div class="text-center">
     <v-dialog
       v-model="state.dialog"
+      class="dialog"
       width="500"
     >
       <template v-slot:activator="{ attrs }">
-        <v-btn
-          dark
-          v-bind="attrs"
-          @click.stop="state.dialog = true"
+        <v-img 
+        v-bind="attrs"
+        @click.stop="state.dialog = true" 
+        class="make-planet" 
+        @click="randomTeam" 
+        src="../../../../public/planet-08.svg"
         >
-          방 만들기
-        </v-btn>
+        Room</v-img>
       </template>
-
       <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
+        <v-card-title class="card-title">
           방 만들기
         </v-card-title>
         <v-form
@@ -79,6 +80,7 @@
             <p class="text-center">
               <v-btn
               @click="joinSession()">Join!</v-btn>
+              <rotate-square2 v-if="isLoading"></rotate-square2>
             </p>
           </v-card-actions>
       </v-form>
@@ -94,16 +96,21 @@
   // import { computed } from 'vue'
   import $axios from "axios";
 // import { on } from 'events';
+  import {RotateSquare2} from 'vue-loading-spinner'
 
   $axios.defaults.headers.post['Content-Type'] = 'application/json';
   const OPENVIDU_SERVER_URL = "https://localhost:4443";
   const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
   export default {
+    components: {
+      RotateSquare2
+    },
     setup() {
       const router = useRouter()
       const store = useStore()
       const state = reactive({
+        isLoading: false,
         dialog: false,
         title: null,
         isSecret : false,
@@ -135,6 +142,7 @@
       }
 
       const createSession = () => {
+          state.isLoading = true
           let sessionId = null
           return new Promise((resolve, reject) => {
               $axios
@@ -149,8 +157,14 @@
                       password: OPENVIDU_SERVER_SECRET,
                   },
               })
+              
               .then(response => response.data)
               .then(data => {
+<<<<<<< HEAD
+=======
+                  state.isLoading = false
+                  console.log("data : ", data)
+>>>>>>> 502bea9945b219a6b3b8d7bac0a716a2c3ef972f
                   resolve(data.id)
               })
               .catch(error => {
@@ -185,3 +199,36 @@
     }
   }
 </script>
+
+<style scoped>
+.dialog {
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
+.card-title {
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
+.make-planet {
+  font-family: 'Akronim', cursive;
+  font-size: 3rem;
+  height: 7rem;
+  display : flex;
+  justify-content : center;
+  align-items : center;
+  color:white;
+  transform: translate(-9px, -15px);
+}
+@keyframes shake-make-planet {
+  0% { transform: translate(-8px, -14px); }
+  33% { transform: translate(-10px, -14px); }
+  66% { transform: translate(-10px, -16px); }
+  100% { transform: translate(-8px, -16px); }
+}
+
+.make-planet:hover {
+  animation: shake-make-planet .1s infinite alternate;
+}
+</style>

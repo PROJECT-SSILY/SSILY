@@ -86,7 +86,7 @@ import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router'
 import { OpenVidu } from "openvidu-browser";
 import { reactive } from '@vue/reactivity'
-import { GetPlayerList, changeReady } from "@/common/api/gameAPI";
+import { GetPlayerList } from "@/common/api/gameAPI";
 import { ref, onUpdated, onBeforeMount } from 'vue';
 
 //=================OpenVdue====================
@@ -184,6 +184,7 @@ export default {
             // --- Init a session ---
             state.session = state.OV.initSession();
 
+
             // --- Specify the actions when events take place in the session ---
             // On every new Stream received...
             state.session.on('streamCreated', ({ stream }) => {
@@ -211,6 +212,20 @@ export default {
             //     store.commit('gameStore/SET_MESSAGES', data)
             // });
 
+
+            // New signal: {"type":"signal:game","data":{"gameStatus":3,"con_U8n1OlFKYx":false,"con_RgCANyJOsq":false}}
+
+
+
+            // state.session.on("signal:game", (event)=>{
+            //     switch(event.data.gameStatus) {
+            //         case 3: {
+                        
+            //         }
+            //     }
+            // });
+
+
             // --- Connect to the session with a valid user token ---
             // 'getToken' method is simulating what your server-side should do.
             // 'token' parameter should be retrieved and returned by your own backend
@@ -227,6 +242,16 @@ export default {
                 sessionVal.value.push(state.session) // 시험 ---
                 // console.log('state.session : ', state.session)
                 // console.log('sessionVal : ', sessionVal.value)
+                // ready 정보 수신
+                console.log('ready 정보 수신 !!!')
+                state.session.signal({
+                    type: 'game',
+                    data: {
+                        gameStatus: 3
+                },
+                to: []
+                })
+                
             })
             .then(() => {
                 console.log("gettoken - connect - then")
@@ -260,15 +285,29 @@ export default {
             })
         }
 
-        const clickReady = async () => {
-            console.log('clickready 시작')
-            try { 
-                const response = await changeReady(state.sessionId, state.connectionId)
-                console.log('clickready - response : ', response)
-                state.ready = response.data.player.isReady
-            } catch(err) {
-                console.log(err);
-            }
+        const clickReady = () => {
+            console.log('clickReady 시작')
+            const session = store.getters['gameStore/getSession']
+            console.log('clickReady session 정보 : ', session)
+            try {
+                session.signal({
+                type: 'game',
+                data: {
+                    gameStatus: 4
+                },
+                to: []
+            })} catch(err) {
+                console.log('err : ', err)
+            }   
+
+            // console.log('clickready 시작')
+            // try { 
+            //     const response = await changeReady(state.sessionId, state.connectionId)
+            //     console.log('clickready - response : ', response)
+            //     state.ready = response.data.player.isReady
+            // } catch(err) {
+            //     console.log(err);
+            // }
         }
         const leaveSession = () => {
             // --- Leave the session by calling 'disconnect' method over the Session object ---

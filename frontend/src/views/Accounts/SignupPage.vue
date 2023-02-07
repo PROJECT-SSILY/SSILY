@@ -4,9 +4,11 @@
     lazy-validation
     v-model="state.valid"
   >
-  <v-container>
+  <v-container class="formbox">
+    <h1 class="title">회원 가입</h1>
+    <br>
     <v-row>
-      <v-col cols="10">
+      <v-col cols="9">
         <v-text-field
           v-model="state.form.email.value"
           ref="emailform"
@@ -14,22 +16,22 @@
           label="이메일"
         ></v-text-field>
       </v-col>
-      <v-col cols="2">
+      <v-col cols="3">
         <v-btn
-          class="mr-4"
+          class="my-2"
           @click="checkEmail"
         >
-        이메일 중복 확인
+        중복 확인
         </v-btn>
       </v-col>
-      <v-col cols="12">
+      <v-col class="pr-13" cols="12">
         <v-text-field
           v-model="state.form.name"
           :rules="[state.rules.required, state.rules.nameRules]"
           label="이름"
         ></v-text-field>
       </v-col>
-      <v-col cols="10">
+      <v-col cols="9">
         <v-text-field
           v-model="state.form.nickname.value"
           ref="nicknameform"
@@ -37,12 +39,12 @@
           label="닉네임"
           ></v-text-field>
       </v-col>
-      <v-col cols="2">
+      <v-col class="button" cols="3">
         <v-btn
-          class="mr-4"
+          class="my-2"
           @click="checkNickname"
         >
-        닉네임 중복 확인
+        중복 확인
         </v-btn>
       </v-col>
       <v-col cols="12">
@@ -179,8 +181,25 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
+.title {
+  background: linear-gradient(rgba(12,111,202,1), rgba(38,0,111,1));
+	background-clip: text;
+	-webkit-background-clip: text;
+  color: transparent;
+}
+.formbox {
+  padding: 2rem;
+  margin-top: 10%;
+  background-color: aliceblue;
+  width: 60%;
+  border-radius: 20px;
+  opacity: 90%;
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
 </style>
 
 
