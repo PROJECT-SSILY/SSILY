@@ -43,7 +43,7 @@
             <v-row>
                 <v-col>
                     <h1>상대 팀</h1>
-                    <user-video v-for="sub in state.opponentTeam" :key="sub.stream.connection.connectionId" :stream-manager="sub" @click="updateMainVideoStreamManager(sub)"/>
+                    <user-video v-for="sub in opponents" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
                 </v-col>
                 <v-col>
                     <div id="video-container" class="col-md-6">
@@ -51,20 +51,20 @@
                             <h1>나</h1>
                             <div class="drawing_sec" v-if="!state.amIDescriber">
                                 <MyCanvasBox/>
-                                <user-video :stream-manager="state.publisher" @click="updateMainVideoStreamManager(state.publisher)"/>
+                                <user-video :stream-manager="publisher"/>
                             </div>
                             <div class="displaying_sec" v-else>
-                                <user-video :stream-manager="state.publisher" @click="updateMainVideoStreamManager(state.publisher)"/>
+                                <user-video :stream-manager="publisher"/>
                             </div>
                         </div>
                         <div class="our_team">
                             <h1>우리 팀</h1>
                             <div class="drawing_sec" v-if="state.amIDescriber">
-                                <user-video :stream-manager="state.myTeam" @click="updateMainVideoStreamManager(state.myTeam)"/>
+                                <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
                                 <MyCanvasBox/>
                             </div>
                             <div class="displaying_sec" v-else>
-                                <user-video :stream-manager="state.myTeam" @click="updateMainVideoStreamManager(state.myTeam)"/>
+                                <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
                             </div>
                         </div>
                     </div>
@@ -79,13 +79,16 @@ import GameTimer from './components/GameTimer.vue';
 import UserVideo from './components/UserVideo.vue';
 import MyCanvasBox from './components/MyCanvasBox.vue'
 import WaitingPage from '@/views/WaitingPage/WaitingPage.vue';
+import ChattingBox from '@/views/WaitingPage/components/ChattingBox.vue';
 import $axios from "axios";
 import { useStore } from 'vuex';
 import {  useRouter } from 'vue-router'
+
 // import { OpenVidu } from "openvidu-browser";
 import { reactive } from '@vue/reactivity'
 // import { GetPlayerList } from "@/common/api/gameAPI";
-import { onUpdated, onBeforeMount } from 'vue';
+import { onUpdated, onBeforeMount, computed } from 'vue';
+// import { forEach } from 'vega-lite/build/src/encoding';
 
 //=================OpenVdue====================
 
@@ -94,7 +97,6 @@ $axios.defaults.headers.post['Content-Type'] = 'application/json';
 // const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 //=============================================
-import ChattingBox from '@/views/WaitingPage/components/ChattingBox.vue';
 
 export default {
     name : "InGamePage",
@@ -119,15 +121,13 @@ export default {
             isSecret: false,
             password: null,
             isTeamBattle: null,
-            OV: undefined,
-            session: undefined,
+            // OV: undefined,
+            // session: undefined,
             mainStreamManager: undefined,
-            publisher: {
-                team: null
-            },
-            subscribers: [],
+            // publisher: null,
+            // subscribers: [],
             // sessionId: route.params.sessionId || null,
-            myUserName: '',
+            // myUserName: '',
             isHost: true,
             readyAll: false,
             connectionId: null,
@@ -144,34 +144,92 @@ export default {
             team: null,
         })
 
+
+        // == OpenVidu State ==
+        // const OV = computed(() => store.state.gameStore.OV)
+        // const session = computed(() => store.state.gameStore.session)
+        // const title = computed(() => store.state.gameStore.title)
+        // const mainStreamManager = computed(() => store.state.gameStore.mainStreamManager )
+        const publisher = computed(() => store.state.gameStore.publisher )
+        const myTeams = computed(() => store.getters['gameStore/getMyTeams'])
+        const opponents = computed(() => store.getters['gameStore/getOpponents'])
+        // const subscribers = computed(() => store.state.gameStore.subscribers )
+        // const myTeams = computed(() => {
+        //     const tmp = reactive([])
+        //     console.log("여기까지도 하맣맣맣", subscribers.value)
+        //     subscribers.forEach((subscriber) => {
+        //         console.log("subscriber : ", subscriber)
+        //         if(subscriber.team === publisher.value.team) {
+        //             tmp.push(subscriber)
+        //         }
+        //     })
+        //     return tmp
+        // })
+        // onMounted(() => {
+        //     console.log(myTeams.value)
+        // })
+        // const mySessionId = computed(() => store.state.gameStore.mySessionId )
+        // const myUserName = computed(() => store.state.gameStore.myUserName )
+        // =====================
+
+
+        const clickReady = () => {
+        state.ready = !state.ready
+        }
+
+        const joinSession = async function() {
+            store.dispatch('gameStore/joinSession')
+            }
+
+        const leaveSession = async function() {
+            store.dispatch('gameStore/leaveSession')
+            window.removeEventListener('beforeunload', leaveSession);
+        }
+
+        const updateMainVideoStreamManager = async function(stream) {
+            store.dispatch('gameStore/updateMainVideoStreamManager',stream)
+        }
+
+        const sessionInfo = () => {
+            const session1 = store.getters['gameStore/getSession']
+            const sessionId1 = store.getters['gameStore/getSessionId']
+            console.log('session클릭', session1)
+            console.log('sessionId', sessionId1)
+        }
         onBeforeMount(() => {
             console.log('join start');
             store.dispatch('gameStore/joinSession')
         })
 
+        const clickExit = () => {
+            router.push({
+                name: 'main'
+            })
+        }
+
         onUpdated(() => {
-            if (!state.readyAll) {
+            // if (!state.readyAll) {
                 // document.querySelector(".waiting_component").innerHTML
                 // playerList.value
-                state.session
-                state.team
-                console.log(state.team)
-            }
+                // state.session
+                // state.team
+                // console.log(state.team)
+            // }
 
             // 팀 분류하여 리스트에 추가
-            let tmpMyTeam = null
-            const tmpOpponentTeam = []
-            for(let i=0; i<state.subscribers.length; i++) {
-                // console.log("state.publisher : ", state.publisher)
-                if(state.subscribers[i].team === state.publisher.team) {
-                    tmpMyTeam = state.subscribers[i]
-                } else {
-                    tmpOpponentTeam.push(state.subscribers[i])
-                }
-            }
+            // let tmpMyTeam = null
+            // const tmpOpponentTeam = []
+            // for(let i=0; i<state.subscribers.length; i++) {
+            //     // console.log("state.publisher : ", state.publisher)
+            //     if(state.subscribers[i].team === state.publisher.team) {
+            //         tmpMyTeam = state.subscribers[i]
+            //     } else {
+            //         tmpOpponentTeam.push(state.subscribers[i])
+            //     }
+            // }
             // console.log("playerList.value.length::::::::::", playerList.value.length)
-            state.myTeam = tmpMyTeam
-            state.opponentTeam = tmpOpponentTeam
+            // state.myTeam = tmpMyTeam
+            // state.opponentTeam = tmpOpponentTeam
         })
 
         // const joinSession = async () => {
@@ -251,11 +309,7 @@ export default {
         //     window.addEventListener('beforeunload', leaveSession)
         // }
 
-        const clickExit = () => {
-            router.push({
-                name: 'main'
-            })
-        }
+
 
         // const clickReady = async () => {
         //     // console.log('clickready 시작')
@@ -350,15 +404,20 @@ export default {
         // }
 
         return {
+            router,
             state,
-            // playerList,
-            // joinSession,
-            // getToken,
-            // createToken,
-            // leaveSession,
-            // clickReady,
+            // team,
+            // title,
+            publisher,
+            myTeams,
+            opponents,
+            // subscribers,
             clickExit,
-            // updateMainVideoStreamManager
+            clickReady,
+            joinSession,
+            leaveSession,
+            sessionInfo,
+            updateMainVideoStreamManager,
         }
     }
 }
