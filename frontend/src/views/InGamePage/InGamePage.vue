@@ -1,8 +1,6 @@
 <template>
 <!----------------------------------- 개발용 버튼 -------------------------------------->
     <p>
-        {{ playerList }}
-        <br>
         <v-btn @click="state.readyAll=!state.readyAll">게임 시작</v-btn> |
         <v-btn @click="state.isTeamBattle = !state.isTeamBattle">팀/개인전 변경</v-btn> |
         <v-btn @click="state.amIDescriber = !state.amIDescriber">게임 순서 변경</v-btn>
@@ -216,6 +214,7 @@ export default {
 
 
             // New signal: {"type":"signal:game","data":{"gameStatus":3,"con_U8n1OlFKYx":false,"con_RgCANyJOsq":false}}
+
 
 
             // state.session.on("signal:game", (event)=>{
