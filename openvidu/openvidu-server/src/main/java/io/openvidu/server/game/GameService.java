@@ -4,12 +4,14 @@ import com.google.gson.JsonParser;
 import io.openvidu.client.internal.ProtocolElements;
 import io.openvidu.server.config.PropertyConfig;
 import io.openvidu.server.core.Participant;
+import io.openvidu.server.core.SessionManager;
 import io.openvidu.server.rpc.RpcNotificationService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -22,6 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GameService   {
+
+    @Autowired
+    private SessionManager sessionManager;
 
     static final int SET_PRESENTER_SETTING = 0;
     static final int GET_PRESENTER_SETTING =1;
@@ -131,6 +136,7 @@ public class GameService   {
     /**
      * 서영탁
      * 참여자의 Ready 상태 변경
+     * 팀전일 경우에 RED 팀 2명, BLUE 팀 2명이 모두 준비해야 실행 가능
      */
     private void changeReadyState(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
@@ -144,12 +150,30 @@ public class GameService   {
         readyState.computeIfPresent(sessionId, (k, v) -> v = nowReadyState);
 
         int cnt = 0;
-        for (String id : nowReadyState.keySet()) {
-            data.addProperty(id, nowReadyState.get(id));
-            if(nowReadyState.get(id)) cnt++;
+        int red = 0;
+        int blue = 0;
+
+        HashMap<String, Team> teamState = new HashMap<>();
+        for (Participant p : participants) {
+            teamState.put(p.getParticipantPublicId(), p.getPlayer().getTeam());
         }
 
-        if(cnt == 4) data.addProperty("isAllReady", true);
+        for (String id : nowReadyState.keySet()) {
+            data.addProperty(id, nowReadyState.get(id));
+            if(nowReadyState.get(id)) {
+                cnt++;
+
+                if(teamState.get(id) == Team.RED) red++;
+                else if(teamState.get(id) == Team.BLUE) blue++;
+            }
+        }
+
+        boolean isTeamBattle = sessionManager.getSessionNotActive(sessionId).getSessionProperties().isTeamBattle();
+
+        if(cnt == 4) {
+            if(isTeamBattle) data.addProperty("isAllReady", (red == 2 && blue == 2));
+            else data.addProperty("isAllReady", true);
+        }
         else data.addProperty("isAllReady", false);
 
         params.add("data", data);
