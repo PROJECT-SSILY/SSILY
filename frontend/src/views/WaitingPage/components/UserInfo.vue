@@ -1,4 +1,5 @@
 <template>
+
 <div class="userinfo-item-wrapper" v-bind:class="team">
   <div class="userinfo-item">
     <p>{{ team }}, {{ connectionId }}, {{ myConnectionId }}</p>

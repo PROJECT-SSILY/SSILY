@@ -84,8 +84,8 @@ import { useStore } from 'vuex';
 import {  useRouter } from 'vue-router'
 // import { OpenVidu } from "openvidu-browser";
 import { reactive } from '@vue/reactivity'
-import { changeReady } from "@/common/api/gameAPI";
-import { onUpdated, onBeforeMount } from 'vue';
+import { GetPlayerList } from "@/common/api/gameAPI";
+import { ref, onUpdated, onBeforeMount } from 'vue';
 
 //=================OpenVdue====================
 
