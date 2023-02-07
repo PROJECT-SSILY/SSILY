@@ -43,6 +43,30 @@ const getters = {
       return state.title;
     },
 
+    // 우리편 팀원들을 골라서 뽑아내는 메서드
+    getMyTeams: (state) => {
+        const myTeamColor = state.publisher.team
+        const res = []
+        state.subscribers.forEach(sub => {
+            if(sub.team == myTeamColor) {
+                res.push(sub)
+            }
+        });
+        return res;
+    },
+
+    // 상대편 팀원들을 골라서 뽑아내는 메서드
+    getOpponents: (state) => {
+        const myTeamColor = state.publisher.team
+        const res = []
+        state.subscribers.forEach(sub => {
+            if(sub.team != myTeamColor) {
+                res.push(sub)
+            }
+        });
+        return res;
+    }
+
 }
 
 
@@ -68,11 +92,11 @@ const mutations = {
     setSession: (state, data) => {
         state.session = data;
     },
+    SET_PUBLISHER (state, data) {
+        state.publisher = data
+    },
     setMainStreamManager: (state, data) => {
         state.mainStreamManager = data;
-    },
-    setPublisher: (state, data) => {
-        state.publisher = data;
     },
     setSubscribers: (state, data) => {
         state.subscribers = data;
@@ -99,6 +123,8 @@ const mutations = {
         state.messages = data
     },
 
+    //==============================
+
 }
 const actions = {
     joinSession : (context) => {
@@ -111,6 +137,9 @@ const actions = {
 
         // --- Specify the actions when events take place in the session ---
         // On every new Stream received...
+
+        // stream = 영상 송출과 관련된 정보들
+        // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직
         session.on('streamCreated', ({ stream }) => {
             const subscriber = state.session.subscribe(stream);
             state.subscribers.push(subscriber);
@@ -128,6 +157,10 @@ const actions = {
         session.on('exception', ({ exception }) => {
             console.warn(exception);
         });
+
+
+        // session.on의 첫번째 인자 = event(String), 두번째 인자 = 앞의 event를 받아서 실행하는 함수(Function)
+        // event.data에 채팅 input에서 받은 내용을 parsing해서 state의 messages에 반영
 
         // state.session.on("signal:chat", (event)=>{
         //     const { message } = JSON.parse(event.data);
@@ -160,7 +193,7 @@ const actions = {
                 context.commit("setOV", OV)
                 context.commit("setSession", session)
                 context.commit("setMainStreamManager", publisher)
-                context.commit("setPublisher", publisher)
+                context.commit('SET_PUBLISHER', publisher)
                 // --- Publish your stream ---
 
                 session.publish(state.publisher);
@@ -264,13 +297,13 @@ const actions = {
         .then((sessionId) => dispatch('createToken', sessionId));
     },
 
-    leaveSession: (commit) => {
+    leaveSession: (context) => {
         if (state.session) state.session.disconnect();
-        commit("setSession", undefined)
-        commit("setMainStreamManager", undefined)
-        commit("setPublisher", undefined)
-        commit("setSubscribers", [])
-        commit("setOV", undefined)
+        context.commit("setSession", undefined)
+        context.commit("setMainStreamManager", undefined)
+        context.commit("setSubscribers", [])
+        context.commit("setOV", undefined)
+        context.commit('SET_PUBLISHER', undefined)
     },
 
     updateMainVideoStreamManager: (commit, stream) => {
