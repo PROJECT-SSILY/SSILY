@@ -1,19 +1,12 @@
 <template>
     <div>
+      <rotate-square2 v-if="isLoading"></rotate-square2>
       <v-container>
         <v-row>
-          <v-col>
-            <h1>메인 화면</h1>
-            <v-btn @click="getMe">
-              getme
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
+          <v-col class="room-list">
             <room-list @sendValue="changeValue"></room-list>
           </v-col>
-          <v-col>
+          <v-col class="console">
             <v-row>
               <v-col>
                 <profile-box></profile-box>
@@ -26,16 +19,10 @@
             </v-row>
             <v-row>
               <v-col v-if="state.isTeam">
-                <v-btn color="success"
-                @click="randomTeam"
-                >
-                팀 게임 시작</v-btn>
+                <v-img class="start-planet" @click="randomTeam" src="../../../public/planet-09.svg">Start</v-img>
               </v-col>
               <v-col v-else>
-                <v-btn color="primary"
-                @click="randomPrivate"
-                >
-                개인 게임 시작</v-btn>
+                <v-img class="start-planet" @click="randomPrivate" src="../../../public/planet-01.svg">Start</v-img>
               </v-col>
             </v-row>
             <v-row>
@@ -45,7 +32,6 @@
             </v-row>
             <v-row>
               <v-col>
-                <SettingDialog></SettingDialog>
               </v-col>
             </v-row>
           </v-col>
@@ -57,7 +43,7 @@
 <script>
 
 import MakeRoomDialog from './Components/MakeRoomDialog.vue';
-import SettingDialog from '../SettingDialog.vue';
+
 import TutorialDialog from './Components/TutorialDialog.vue';
 import ProfileBox from './Components/ProfileBox.vue';
 import RoomList from './Components/RoomList.vue';
@@ -65,7 +51,7 @@ import { useStore } from "vuex"
 import { useRouter } from "vue-router"
 // import store from '@/store/gameStore';
 import { reactive } from "vue"
-// import { mapGetters } from 'vuex'
+import {RotateSquare2} from 'vue-loading-spinner'
 
 export default {
   name: 'MainPage',
@@ -73,39 +59,36 @@ export default {
     const store = useStore()
     const router = useRouter()
     const state = reactive({
-      isTeam : null
+      isTeam : null,
+      isLoading: false
     })
-    function getMe () {
-      console.log(store.getters['accountStore/getUser'])
-    }
     const changeValue = function (value) {
       state.isTeam = value
-      console.log(value)
+      // console.log(value)
     }
-    const randomTeam = async function () {
-      const params = {
-        isTeamBattle: state.isTeam
-      }
-      const result = await store.dispatch('gameStore/randomTeamAction', params)
-      console.log(result)
-      router.push({name: 'gameroom'})
-    }
-    const randomPrivate = async function () {
-      const params = {
-        isTeamBattle: state.isTeam
-      }
-      const result = await store.dispatch('gameStore/randomPrivateAction', params)
-      console.log(result)
-      router.push({name: 'gameroom'})
-    }
+    // const randomTeam = async function () {
+    //   const params = {
+    //     isTeamBattle: state.isTeam
+    //   }
+    //   const result = await store.dispatch('gameStore/randomTeamAction', params)
+    //   console.log(result)
+    //   router.push({name: 'gameroom'})
+    // }
+    // const randomPrivate = async function () {
+    //   const params = {
+    //     isTeamBattle: state.isTeam
+    //   }
+    //   const result = await store.dispatch('gameStore/randomPrivateAction', params)
+    //   console.log(result)
+    //   router.push({name: 'gameroom'})
+    // }
     return {
       store, 
       router, 
       state,
-      getMe,
       changeValue,
-      randomTeam,
-      randomPrivate,
+      // randomTeam,
+      // randomPrivate,
       }
     },
   components: {
@@ -113,8 +96,7 @@ export default {
     TutorialDialog,
     ProfileBox,
     RoomList,
-    SettingDialog,
-    
+    RotateSquare2    
   },
 }
 // }
@@ -122,4 +104,33 @@ export default {
 
 <style scoped>
 
+.start-planet {
+  font-family: 'Akronim', cursive;
+  font-size: 4rem;
+  height: 10rem;
+  display : flex;
+  justify-content : center;
+  align-items : center;
+  color:white;
+  transform: translate(-9px, -15px);
+}
+
+@keyframes shake-start-planet {
+  0% { transform: translate(-8px, -14px); }
+  33% { transform: translate(-10px, -14px); }
+  66% { transform: translate(-10px, -16px); }
+  100% { transform: translate(-8px, -16px); }
+}
+
+.start-planet:hover {
+  animation: shake-start-planet .1s infinite alternate;
+}
+
+.room-list {
+  padding-top: 10rem;
+}
+
+.console {
+  padding-top: 10rem;
+}
 </style>
