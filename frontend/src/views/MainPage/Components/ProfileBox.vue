@@ -58,6 +58,7 @@ export default {
     onBeforeMount(async ()=> {
           const token = await store.getters['accountStore/getToken']
           const res = await store.dispatch('accountStore/getMeAction', token)
+          console.log(res)
           state.nickname = res.nickname
           if (res.level > -1 && res.level < 6)  {
                 state.robot = "./robotface1.svg"
