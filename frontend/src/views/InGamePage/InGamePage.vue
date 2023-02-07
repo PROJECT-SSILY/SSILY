@@ -1,18 +1,17 @@
 <template>
-<!----------------------------------- 개발용 버튼 -------------------------------------->
-    <p>
-        <v-btn @click="state.readyAll=!state.readyAll">게임 시작</v-btn> |
-        <v-btn @click="state.isTeamBattle = !state.isTeamBattle">팀/개인전 변경</v-btn> |
-        <v-btn @click="state.amIDescriber = !state.amIDescriber">게임 순서 변경</v-btn>
-    </p>
-<!------------------------------------------------------------------------------------->
 <div class="wrap_component">
+    <!----------------------------------- 개발용 버튼 -------------------------------------->
+        <p>
+            <v-btn @click="state.readyAll=!state.readyAll">게임 시작</v-btn> |
+            <v-btn @click="state.isTeamBattle = !state.isTeamBattle">팀/개인전 변경</v-btn> |
+            <v-btn @click="state.amIDescriber = !state.amIDescriber">게임 순서 변경</v-btn>
+        </p>
+    <!------------------------------------------------------------------------------------->
     <div class="waiting_component" v-if="!state.readyAll">
         <div class="users_component">
             <WaitingPage
-            @joinSession=joinSession
             :sessionId="state.sessionId"
-            :playerList="playerList[0]"
+            :playerList="state.playerList"
             :session="state.session"
             :myConnectionId="state.connectionId"
             :team="state.team"
@@ -25,7 +24,6 @@
             </v-radio-group>
             <div class="chat_box">
                 <ChattingBox
-                :session="state.session"
                 />
             </div>
             <div class="side_footer">
@@ -83,8 +81,8 @@ import MyCanvasBox from './components/MyCanvasBox.vue'
 import WaitingPage from '@/views/WaitingPage/WaitingPage.vue';
 import $axios from "axios";
 import { useStore } from 'vuex';
-import { useRoute, useRouter } from 'vue-router'
-import { OpenVidu } from "openvidu-browser";
+import {  useRouter } from 'vue-router'
+// import { OpenVidu } from "openvidu-browser";
 import { reactive } from '@vue/reactivity'
 import { GetPlayerList } from "@/common/api/gameAPI";
 import { ref, onUpdated, onBeforeMount } from 'vue';
@@ -112,10 +110,10 @@ export default {
     },
     setup() {
         const store = useStore()
-        const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
+        // const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         const router = useRouter()
-        const playerList = ref([])
-        const sessionVal = ref([])
+        // const playerList = ref([])
+        // const sessionVal = ref([])
         const state = reactive({
             title: null,
             isSecret: false,
@@ -128,11 +126,12 @@ export default {
                 team: null
             },
             subscribers: [],
-            sessionId: route.params.sessionId || null,
+            // sessionId: route.params.sessionId || null,
             myUserName: '',
             isHost: true,
             readyAll: false,
             connectionId: null,
+            playerList: [],
 
             // 팀 분류
             myTeam: null,
@@ -145,13 +144,16 @@ export default {
             team: null,
         })
 
+        onBeforeMount(() => {
+            console.log('join start');
+            store.dispatch('gameStore/joinSession')
+        })
+
         onUpdated(() => {
             if (!state.readyAll) {
-                document.querySelector(".waiting_component").innerHTML
-                playerList.value
-                document.querySelector(".waiting_component").innerHTML
+                // document.querySelector(".waiting_component").innerHTML
+                // playerList.value
                 state.session
-                document.querySelector(".waiting_component").innerHTML
                 state.team
                 console.log(state.team)
             }
@@ -160,124 +162,94 @@ export default {
             let tmpMyTeam = null
             const tmpOpponentTeam = []
             for(let i=0; i<state.subscribers.length; i++) {
-                console.log("state.publisher : ", state.publisher)
+                // console.log("state.publisher : ", state.publisher)
                 if(state.subscribers[i].team === state.publisher.team) {
                     tmpMyTeam = state.subscribers[i]
                 } else {
                     tmpOpponentTeam.push(state.subscribers[i])
                 }
             }
+            // console.log("playerList.value.length::::::::::", playerList.value.length)
             state.myTeam = tmpMyTeam
             state.opponentTeam = tmpOpponentTeam
         })
 
-        onBeforeMount(() => {
-            console.log('join start');
-            joinSession()
-        })
+        // const joinSession = async () => {
+        //     console.log("joinsession 시작")
+        //     // --- Get an OpenVidu object ---
+        //     state.OV = new OpenVidu();
 
-        const joinSession = async () => {
-            console.log("joinsession 시작")
-            // --- Get an OpenVidu object ---
-            state.OV = new OpenVidu();
+        //     // --- Init a session ---
+        //     state.session = state.OV.initSession();
 
-            // --- Init a session ---
-            state.session = state.OV.initSession();
+        //     // --- Specify the actions when events take place in the session ---
+        //     // On every new Stream received...
+        //     state.session.on('streamCreated', ({ stream }) => {
+        //         const subscriber = state.session.subscribe(stream);
+        //         state.subscribers.push(subscriber);
+        //     });
 
+        //     // On every Stream destroyed...
+        //     state.session.on('streamDestroyed', ({ stream }) => {
+        //         const index = state.subscribers.indexOf(stream.streamManager, 0);
+        //         if (index >= 0) {
+        //         state.subscribers.splice(index, 1);
+        //         }
+        //     });
 
-            // --- Specify the actions when events take place in the session ---
-            // On every new Stream received...
-            state.session.on('streamCreated', ({ stream }) => {
-                const subscriber = state.session.subscribe(stream);
-                state.subscribers.push(subscriber);
-            });
+        //     // On every asynchronous exception...
+        //     state.session.on('exception', ({ exception }) => {
+        //         console.warn(exception);
+        //     });
 
-            // On every Stream destroyed...
-            state.session.on('streamDestroyed', ({ stream }) => {
-                const index = state.subscribers.indexOf(stream.streamManager, 0);
-                if (index >= 0) {
-                state.subscribers.splice(index, 1);
-                }
-            });
+        //     // state.session.on("signal:chat", (event)=>{
+        //     //     const { message } = JSON.parse(event.data);
+        //     //     const { user, chatMessage } = message
+        //     //     const data = user + " : " + chatMessage
+        //     //     store.commit('gameStore/SET_MESSAGES', data)
+        //     // });
 
-            // On every asynchronous exception...
-            state.session.on('exception', ({ exception }) => {
-                console.warn(exception);
-            });
+        //     // --- Connect to the session with a valid user token ---
+        //     // 'getToken' method is simulating what your server-side should do.
+        //     // 'token' parameter should be retrieved and returned by your own backend
 
-            state.session.on("signal:chat", (event)=>{
-                const { message } = JSON.parse(event.data);
-                const { user, chatMessage } = message
-                const data = user + " : " + chatMessage
-                store.commit('gameStore/SET_MESSAGES', data)
-            });
-
-
-            // New signal: {"type":"signal:game","data":{"gameStatus":3,"con_U8n1OlFKYx":false,"con_RgCANyJOsq":false}}
-
-
-
-            // state.session.on("signal:game", (event)=>{
-            //     switch(event.data.gameStatus) {
-            //         case 3: {
-                        
-            //         }
-            //     }
-            // });
-
-
-            // --- Connect to the session with a valid user token ---
-            // 'getToken' method is simulating what your server-side should do.
-            // 'token' parameter should be retrieved and returned by your own backend
-
-
-            getToken(state.sessionId).then(token => {
-                // console.log("token : ", token)
-                state.session.connect(token, { clientData: state.myUserName })
-                requestPlayerList(state.sessionId).then(response => {
-                // console.log('requestPlayerlist response', response)
-                playerList.value.push(response.content)
-                // console.log('response:::::::::::::::::::0-09i023', response.content)
-                store.commit('gameStore/setSession', state.session)
-                sessionVal.value.push(state.session) // 시험 ---
-                // console.log('state.session : ', state.session)
-                // console.log('sessionVal : ', sessionVal.value)
-                // ready 정보 수신
-                console.log('ready 정보 수신 !!!')
-                state.session.signal({
-                    type: 'game',
-                    data: {
-                        gameStatus: 3
-                },
-                to: []
-                })
+        //     await getToken(state.sessionId).then(token => {
+        //         state.session.connect(token, { clientData: state.myUserName })
                 
-            })
-            .then(() => {
-                console.log("gettoken - connect - then")
-                // --- Get your own camera stream with the desired properties ---
-                let publisher = state.OV.initPublisher(undefined, {
-                    audioSource: undefined, // The source of audio. If undefined default microphone
-                    videoSource: undefined, // The source of video. If undefined default webcam
-                    publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
-                    publishVideo: true,  	// Whether you want to start publishing with your video enabled or not
-                    resolution: '640x480',  // The resolution of your video
-                    frameRate: 30,			// The frame rate of your video
-                    insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
-                    mirror: false       	// Whether to mirror your local video or not
-                });
-                state.mainStreamManager = publisher;
-                state.publisher = publisher;
+        //         requestPlayerList(state.sessionId).then(response => {
+        //         const resLength= response.content.length;
+        //         // console.log("res 찍자", response.content);
+        //         for(let i=0;i<resLength;i++){
+        //             state.playerList.push(response.content[i]);
+        //         }
+        //         store.commit('gameStore/setSession', state.session)
+        //         sessionVal.value.push(state.session)
+        //         })
+        //         .then(() => {
+        //             // --- Get your own camera stream with the desired properties ---
+        //             let publisher = state.OV.initPublisher(undefined, {
+        //                 audioSource: undefined, // The source of audio. If undefined default microphone
+        //                 videoSource: undefined, // The source of video. If undefined default webcam
+        //                 publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
+        //                 publishVideo: true,  	// Whether you want to start publishing with your video enabled or not
+        //                 resolution: '640x480',  // The resolution of your video
+        //                 frameRate: 30,			// The frame rate of your video
+        //                 insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
+        //                 mirror: false       	// Whether to mirror your local video or not
+        //             });
+        //             state.mainStreamManager = publisher;
+        //             state.publisher = publisher;
 
-                // --- Publish your stream ---
-                state.session.publish(state.publisher);
-                })
-                .catch(error => {
-                    console.log('There was an error connecting to the session:', error.code, error.message);
-                });
-            });
-            window.addEventListener('beforeunload', leaveSession)
-        }
+        //             // --- Publish your stream ---
+        //             state.session.publish(state.publisher);
+        //             })
+        //             .catch(error => {
+        //                 console.log('There was an error connecting to the session:', error.code, error.message);
+        //             });
+        //             console.log("진짜 playerlist는 : ", state.playerList);
+        //     });
+        //     window.addEventListener('beforeunload', leaveSession)
+        // }
 
         const clickExit = () => {
             router.push({
@@ -285,47 +257,33 @@ export default {
             })
         }
 
-        const clickReady = () => {
-            console.log('clickReady 시작')
-            const session = store.getters['gameStore/getSession']
-            console.log('clickReady session 정보 : ', session)
-            try {
-                session.signal({
-                type: 'game',
-                data: {
-                    gameStatus: 4
-                },
-                to: []
-            })} catch(err) {
-                console.log('err : ', err)
-            }   
-
+        const clickReady = async () => {
             // console.log('clickready 시작')
-            // try { 
-            //     const response = await changeReady(state.sessionId, state.connectionId)
-            //     console.log('clickready - response : ', response)
-            //     state.ready = response.data.player.isReady
-            // } catch(err) {
-            //     console.log(err);
-            // }
-        }
-        const leaveSession = () => {
-            // --- Leave the session by calling 'disconnect' method over the Session object ---
-            if (state.session) state.session.disconnect();
-
-            state.session = undefined;
-            state.mainStreamManager = undefined;
-            state.publisher = undefined;
-            state.subscribers = [];
-            state.OV = undefined;
-
-            window.removeEventListener('beforeunload', leaveSession);
-        }
-
-        const updateMainVideoStreamManager = (stream) => {
-            if (state.mainStreamManager === stream) return;
-            state.mainStreamManager = stream;
+            try { 
+                const response = await changeReady(state.sessionId, state.connectionId)
+                // console.log('clickready - response : ', response)
+                state.ready = response.data.player.isReady
+            } catch(err) {
+                console.log(err);
             }
+        }
+        // const leaveSession = () => {
+        //     // --- Leave the session by calling 'disconnect' method over the Session object ---
+        //     if (state.session) state.session.disconnect();
+
+        //     state.session = undefined;
+        //     state.mainStreamManager = undefined;
+        //     state.publisher = undefined;
+        //     state.subscribers = [];
+        //     state.OV = undefined;
+
+        //     window.removeEventListener('beforeunload', leaveSession);
+        // }
+
+        // const updateMainVideoStreamManager = (stream) => {
+        //     if (state.mainStreamManager === stream) return;
+        //     state.mainStreamManager = stream;
+        //     }
 
         /**
         * --------------------------
@@ -339,15 +297,12 @@ export default {
         *   3) The Connection.token must be consumed in Session.connect() method
         */
 
-        const getToken = async (sessionId) => {
-            console.log("gettoken 시작")
-            console.log('gettoken, sessionid : ', sessionId)
-            const response = await createToken(sessionId)
-            state.connectionId = response.connectionId
-            console.log('connectionId ===>', state.connectionId)
-            return response.token
-        }
-
+        // const getToken = async (sessionId) => {
+        //     const response = await createToken(sessionId)
+        //     state.connectionId = response.connectionId
+        //     // console.log('connectionId ===>', state.connectionId)
+        //     return response.token
+        // }
 
         // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-connection
         const createToken = (sessionId) => {
@@ -360,11 +315,11 @@ export default {
             state.myUserName=store.state.accountStore.user.nickname || ''
 
             return new Promise((resolve, reject)=> {
-                console.log("level=",level);
-                console.log("nickname=",nickname);
-                console.log("isHost=", isHost);
-                console.log("rate=", rate);
-                console.log("exp", exp)
+                // console.log("level=",level);
+                // console.log("nickname=",nickname);
+                // console.log("isHost=", isHost);
+                // console.log("rate=", rate);
+                // console.log("exp", exp)
                 $axios
                     .post(`${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`, JSON.stringify({
                     "level" : level,
@@ -384,30 +339,26 @@ export default {
             })
         }
 
-        const requestPlayerList = async (sessionId) => {
-            // 되는 코드
-            console.log('requestPlayerList 시도 시작')
-            try {
-                console.log('requestplayerList 내 세션 아이디 : ', sessionId)
-                const response = await GetPlayerList(sessionId);
-                console.log('requestplayerList 결과 값 : ', response.data)
-                store.commit('gameStore/setPlayerList', response.data)
-                return response.data
-            } catch(err) {
-                console.log(err);
-            }
-        }
+        // const requestPlayerList = async (sessionId) => {
+        //     try {
+        //         const response = await GetPlayerList(sessionId);
+        //         store.commit('gameStore/setPlayerList', response.data)
+        //         return response.data
+        //     } catch(err) {
+        //         console.log(err);
+        //     }
+        // }
 
         return {
             state,
-            playerList,
-            joinSession,
-            getToken,
+            // playerList,
+            // joinSession,
+            // getToken,
             createToken,
-            leaveSession,
+            // leaveSession,
             clickReady,
             clickExit,
-            updateMainVideoStreamManager
+            // updateMainVideoStreamManager
         }
     }
 }
@@ -430,7 +381,11 @@ export default {
     justify-content: space-between;
 }
 .side_component {
-    width: 300px;    
+    width: 300px;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 .select_team {
     display: flex;
@@ -440,6 +395,7 @@ export default {
     margin-bottom: 10px;
 }
 .chat_box {
+    flex: auto;
     border-radius: 30px;
     height: 500px;
     background-color: #ffffffeb;
@@ -452,7 +408,7 @@ export default {
 .sidebtn {
     display: inline-block;
     width: 50%;
-    padding: 10px 0px;
+    padding-top: 10px;
 }
 .sidebtn:first-child {
     padding-right: 5px; 

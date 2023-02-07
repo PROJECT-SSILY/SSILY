@@ -96,8 +96,8 @@
 // import { on } from 'events';
 
   $axios.defaults.headers.post['Content-Type'] = 'application/json';
-  const OPENVIDU_SERVER_URL = "https://localhost:4443";
-  const OPENVIDU_SERVER_SECRET = "MY_SECRET";
+  // const OPENVIDU_SERVER_URL = "https://localhost:4443";
+  // const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
   export default {
     setup() {
@@ -118,60 +118,62 @@
         const titlelist = ['함께 즐겨요', '재미있는 게임 합시다', '매너있는 게임하실 분 구해요!', '스겜합시다!']
         state.title = titlelist[Math.floor(Math.random() * titlelist.length)]
       })
+
       const joinSession = async function() {
-        console.log("state.title : ", state.title);
-        console.log("state.isSecret : ", state.isSecret);
-        console.log("state.password : ", state.password);
-        console.log("state.isTeamBattle : ", state.isTeamBattle);
+        // console.log("state.title : ", state.title);
+        // console.log("state.isSecret : ", state.isSecret);
+        // console.log("state.password : ", state.password);
+        // console.log("state.isTeamBattle : ", state.isTeamBattle);
         store.commit('gameStore/setTitle', state.title)
         store.commit('gameStore/setSecret', state.isSecret)
         store.commit('gameStore/setPassword', state.password)
         store.commit('gameStore/setTeam', state.isTeamBattle)
 
         // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
-        const sessionId = await createSession()
-        router.push({name: 'gameroom', params: { sessionId : sessionId }})
+        const sessionId = await store.dispatch('gameStore/createSession')
+        console.log("sessionId : ", sessionId)
+        // router.push({name: 'gameroom', params: { sessionId : sessionId }})
+        router.push({name: 'gameroom'})
       }
 
-      const createSession = () => {
-          let sessionId = null
-          return new Promise((resolve, reject) => {
-              $axios
-              .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
-              "title" : state.title,
-              "isSecret" : state.isSecret,
-              "password" : state.password,
-              "isTeamBattle" : state.isTeamBattle
-              }), {
-                  auth: {
-                      username: 'OPENVIDUAPP',
-                      password: OPENVIDU_SERVER_SECRET,
-                  },
-              })
-              .then(response => response.data)
-              .then(data => {
-                  console.log("data : ", data)
-                  resolve(data.id)
-              })
-              .catch(error => {
-                  if (error.response.status === 409) {
-                      resolve(sessionId);
-                  } else {
-                      console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
-                      if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
-                          location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
-                      }
-                      reject(error.response);
-                  }
-              });
-          });
-      }
+      // const createSession = () => {
+      //     let sessionId = null
+      //     return new Promise((resolve, reject) => {
+      //         $axios
+      //         .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+      //         "title" : state.title,
+      //         "isSecret" : state.isSecret,
+      //         "password" : state.password,
+      //         "isTeamBattle" : state.isTeamBattle
+      //         }), {
+      //             auth: {
+      //                 username: 'OPENVIDUAPP',
+      //                 password: OPENVIDU_SERVER_SECRET,
+      //             },
+      //         })
+      //         .then(response => response.data)
+      //         .then(data => {
+      //             resolve(data.id)
+      //         })
+      //         .catch(error => {
+      //             if (error.response.status === 409) {
+      //                 resolve(sessionId);
+      //             } else {
+      //                 console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
+      //                 if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
+      //                     location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
+      //                 }
+      //                 reject(error.response);
+      //             }
+      //         });
+      //     });
+      // }
 
       return {
         router,
         state,
         joinSession,
-        createSession,
+        // createSession,
         // == OpenVidu State ==
         // OV,
         // session,

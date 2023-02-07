@@ -1,18 +1,21 @@
 <template>
-<div class="userinfo-item-wrapper" :class="team">
-  <div class="userinfo-item" :class="team">
-    <h1>닉네임: {{ state.nickname }}</h1>
-      <p>레벨: {{ state.level }}</p>
-      <p>팀: {{ state.team }}</p>
-      <p>방장여부: {{ state.isHost }}</p>
-      <p>경험치: {{ state.exp }}</p>      
+
+<div class="userinfo-item-wrapper" v-bind:class="team">
+  <div class="userinfo-item">
+    <p>{{ team }}, {{ connectionId }}, {{ myConnectionId }}</p>
+    <h1>닉네임: {{ player.nickname }}</h1>
+      <p>레벨: {{ player.level }}</p>
+      <p>팀: {{ player.team }}</p>
+      <p>방장여부: {{ player.isHost }}</p>
+      <p>경험치: {{ player.exp }}</p>
     </div>
 </div>
 </template>
 
 <script>
-import { useStore } from "vuex"
+// import { useStore } from "vuex"
 import { computed, watch } from '@vue/runtime-core'
+
 // import { play } from "@tensorflow/tfjs-core/dist/test_util"
 
 
@@ -26,39 +29,34 @@ export default {
     myTeam: String
   },
   setup(props) {
-    const store = useStore()
-    const state ={
-      nickname: props.player.player.nickname,
-      level: props.player.player.level,
-      team: props.player.player.team,
-      isHost: props.player.player.isHost,
-      exp: props.player.player.exp,
-      connectionId: props.player.connectionId,
-      isReady: false,
-    }
-    const team = computed(() => {
-        console.log("팀선택");
-        console.log("state.connectedId : ", props.player.connectionId)
-        if(state.connectionId == props.myConnectionId) {
-          return props.myTeam
-        } else {
-           state.team
-        }
-    })
-
-    // console.log(toRaw(props.player))
+    // const store = useStore()
+    // const state ={
+    //   nickname: props.player.nickname,
+    //   level: props.player.level,
+    //   team: props.player.team,
+    //   isHost: props.player.isHost,
+    //   exp: props.player.exp,
+    //   connectionId: props.myConnectionId,
+    // }
+    const team = computed(() => props.connectionId == props.myConnectionId)
     watch(props.myTeam, () => {
       () => {
         console.log("팀선택");
-        console.log("state.connectedId : ", state.connectionId)
-        if(state.connectionId == props.myConnectionId) {
+        console.log("state.connectedId : ", props.connectionId)
+        if(props.connectionId == props.myConnectionId) {
           team.value = props.myTeam
         } else {
-          team.value = state.team
+          team.value = props.team
         }
       }
     })
-    return { store, state, team}
+
+    // console.log(toRaw(props.player))
+
+
+    return { 
+      team
+    }
   }
 }
 </script>
@@ -69,23 +67,24 @@ export default {
   display: inline-block;
   box-sizing: content-box;
   padding: 3px;
+  margin: 20px 0px;
   border: 1px solid rgb(185, 185, 185);
   border-radius: 100%;
 }
 .userinfo-item {
-  width: 180px;
-  height: 180px;
+  width: 300px;
+  height: 300px;
   padding: 30px;
-  box-sizing: content-box;
+  box-sizing: border-box;
   background-color: white;
   border-radius: 100%;
   border: 25px solid black;
   border-color: inherit;
 }
-.userinfo-item-wrapper.BLUE {
+.BLUE {
   border-color: #09c4ff;
 }
-.userinfo-item-wrapper.RED {
+.RED {
   border-color: #ff5f5f;
 }
 

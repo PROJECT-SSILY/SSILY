@@ -1,32 +1,37 @@
 <template>
   <div id="flex-container">
       <div class="userinfo-component flex-item">
-        <UserInfo
-        v-for="player in playerList"
-        :player="player"
-        :myConnectionId="myConnectionId"
-        :myTeam="team"
-        :key="player.id"/>
-
+        <!-- <p>{{ playerList }}</p> -->
+          <UserInfo
+          v-for="user in playerList"
+          :player="user.player"
+          :myConnectionId="myConnectionId"
+          :team="team"
+          :key="user.id"/>
+          <BlankBox
+          v-for="index in (4-playerList.length)"
+          :key="index.id"
+          />
       </div>
     </div>
 </template>
 <script>
-import { reactive, ref } from '@vue/reactivity'
+import { ref } from '@vue/reactivity'
+// import { isProxy, toRaw } from 'vue';
 import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
 import $axios from "axios";
-import { onUpdated } from 'vue'
+import { onUpdated, onMounted } from 'vue'
 import { useStore } from 'vuex';
-
+import BlankBox from './components/BlankBox.vue'
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
-
 
 export default {
   name: 'WaitingPage',
   components: {
     UserInfo,
+    BlankBox,
   },  
   props: {
     playerList: Object,
@@ -35,32 +40,46 @@ export default {
     sessionId: String,
     team: String,
   },
-  emits: [
-    'joinSession',
-  ],
-  setup(props, {emit}) {
+  // emits: [
+  //   'joinSession',
+  // ],
+  setup(props) {
     const router = useRouter()
     const store = useStore()
-    const PlayerList = ref(props.playerList)
+    
+    // const PlayerList = computed(() => props.playerList)
+    const emptyUser = [];
     const useritem = ref(null)
     const myTeam = ref(props.team)
     const Id = ref(props.myConnectionId)
     console.log(useritem.class)
-    
-    const state = reactive({
-      team: null,
+
+    onMounted(() =>{
+      // let rawData= props.playerList;
+      // if(isProxy(props.playerList)){
+      //   rawData = toRaw(props.playerList);
+      // }
+      // console.log("testing", rawData);
+      // console.log("PlayerList : ", props.playerList)
+      // for(var i=0;i<4;i++){
+      //   const myValue={id : i };
+      //   emptyUser.push(myValue);
+      // }
+      // for(let one in rawData){
+      //   console.log(one);
+      //   // emptyUser.value pop();
+      // }
+      // console.log("emptyUser is ", emptyUser);
+      // console.log("현재 남은 칸 : ", 4-PlayerList.value.length)
     })
+
+    console.log("emptyUser.length : ", emptyUser.length)
+    
 
     onUpdated(() => {
-      state
-      state.team = props.team
-      PlayerList.value
+      // console.log(props.team)
       document.querySelector(".userinfo-component").innerHTML
     })
-
-    const joinSession = async function() {
-      emit('joinSession')
-		}
 
     const sessionInfo = () => {
       const session1 = store.getters['gameStore/getSession']
@@ -71,10 +90,7 @@ export default {
 
     return {
 		router,
-		state,
-		joinSession,
 		sessionInfo,
-    PlayerList,
     Id,
     myTeam,
     }
@@ -84,8 +100,8 @@ export default {
 
 <style>
 .userinfo-component {
-  padding: 30px;
-  max-width: 800px;
+  padding: 0px 30px;
+  max-width: 750px;
   min-width: 700px;
   box-sizing: border-box;
   display: flex;
@@ -93,4 +109,7 @@ export default {
   justify-content: space-between;
   flex-wrap: wrap;
 }
+
+/* ------------------- */
+
 </style>
