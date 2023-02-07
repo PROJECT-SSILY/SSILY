@@ -2,16 +2,8 @@
   <div id="flex-container">
       <div class="userinfo-component flex-item">
         <!-- <p>{{ playerList }}</p> -->
-          <UserInfo
-          v-for="user in playerList"
-          :player="user.player"
-          :myConnectionId="myConnectionId"
-          :team="team"
-          :key="user.id"/>
-          <BlankBox
-          v-for="index in (4-playerList.length)"
-          :key="index.id"
-          />
+          <UserInfo/>
+          <BlankBox/>
       </div>
     </div>
 </template>
@@ -32,7 +24,7 @@ export default {
   components: {
     UserInfo,
     BlankBox,
-  },  
+  },
   props: {
     playerList: Object,
     session: Object,
@@ -46,13 +38,13 @@ export default {
   setup(props) {
     const router = useRouter()
     const store = useStore()
-    
+
     // const PlayerList = computed(() => props.playerList)
-    const emptyUser = [];
-    const useritem = ref(null)
+    // const emptyUser = [];
+    // const useritem = ref(null)
     const myTeam = ref(props.team)
     const Id = ref(props.myConnectionId)
-    console.log(useritem.class)
+    // console.log(useritem.class)
 
     onMounted(() =>{
       // let rawData= props.playerList;
@@ -73,8 +65,8 @@ export default {
       // console.log("현재 남은 칸 : ", 4-PlayerList.value.length)
     })
 
-    console.log("emptyUser.length : ", emptyUser.length)
-    
+    // console.log("emptyUser.length : ", emptyUser.length)
+
 
     onUpdated(() => {
       // console.log(props.team)
