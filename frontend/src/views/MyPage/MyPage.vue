@@ -133,11 +133,21 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .robot {
     height: 5rem;
 }
 .profile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+  color:white;
+}
+.footer {
   display: flex;
   flex-direction: row;
   align-items: center;

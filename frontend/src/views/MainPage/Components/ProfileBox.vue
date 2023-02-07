@@ -96,5 +96,6 @@ export default {
   font-family: 'MaplestoryOTFBold';
   font-weight: normal;
   font-style: normal;
+  color:white;
 }
 </style>

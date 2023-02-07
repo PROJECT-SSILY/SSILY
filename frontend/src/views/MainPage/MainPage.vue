@@ -1,11 +1,12 @@
 <template>
     <div>
+      <rotate-square2 v-if="isLoading"></rotate-square2>
       <v-container>
         <v-row>
-          <v-col>
+          <v-col class="room-list">
             <room-list @sendValue="changeValue"></room-list>
           </v-col>
-          <v-col>
+          <v-col class="console">
             <v-row>
               <v-col>
                 <profile-box></profile-box>
@@ -18,7 +19,7 @@
             </v-row>
             <v-row>
               <v-col v-if="state.isTeam">
-                <v-img class="start-planet" @click="randomTeam" src="../../../public/planet-08.svg">Start</v-img>
+                <v-img class="start-planet" @click="randomTeam" src="../../../public/planet-09.svg">Start</v-img>
               </v-col>
               <v-col v-else>
                 <v-img class="start-planet" @click="randomPrivate" src="../../../public/planet-01.svg">Start</v-img>
@@ -31,7 +32,6 @@
             </v-row>
             <v-row>
               <v-col>
-                
               </v-col>
             </v-row>
           </v-col>
@@ -51,7 +51,7 @@ import { useStore } from "vuex"
 import { useRouter } from "vue-router"
 // import store from '@/store/gameStore';
 import { reactive } from "vue"
-// import { mapGetters } from 'vuex'
+import {RotateSquare2} from 'vue-loading-spinner'
 
 export default {
   name: 'MainPage',
@@ -59,11 +59,12 @@ export default {
     const store = useStore()
     const router = useRouter()
     const state = reactive({
-      isTeam : null
+      isTeam : null,
+      isLoading: false
     })
     const changeValue = function (value) {
       state.isTeam = value
-      console.log(value)
+      // console.log(value)
     }
     // const randomTeam = async function () {
     //   const params = {
@@ -94,7 +95,8 @@ export default {
     MakeRoomDialog,
     TutorialDialog,
     ProfileBox,
-    RoomList,    
+    RoomList,
+    RotateSquare2    
   },
 }
 // }
@@ -122,5 +124,13 @@ export default {
 
 .start-planet:hover {
   animation: shake-start-planet .1s infinite alternate;
+}
+
+.room-list {
+  padding-top: 10rem;
+}
+
+.console {
+  padding-top: 10rem;
 }
 </style>

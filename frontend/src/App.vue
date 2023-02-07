@@ -41,48 +41,22 @@
 }
 #stars{
   position: relative;
-  height: 100vh;
+  left: -50%;
+  bottom: 100%;
+  height: 300%;
   margin:0;  background-image: url("./assets/stars3.svg");
   background-size: contain;
   background-position: center;
   overflow: hidden;
+  animation: rotation 20s infinite linear;
 }
-@-webkit-keyframes rotating /* Safari and Chrome */ {
+@keyframes rotation {
   from {
-    -webkit-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(360deg);
-    -o-transform: rotate(360deg);
     transform: rotate(360deg);
   }
-}
-@keyframes rotating {
-  from {
-    -ms-transform: rotate(0deg);
-    -moz-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    transform: rotate(0deg);
-    transform-origin: center;
-  }
   to {
-    -ms-transform: rotate(360deg);
-    -moz-transform: rotate(360deg);
-    -webkit-transform: rotate(360deg);
-    -o-transform: rotate(360deg);
-    transform: rotate(360deg);
-    transform-origin: center;
+    transform: rotate(0deg);
   }
-}
-.rotating {
-  -webkit-animation: rotating 200s linear infinite;
-  -moz-animation: rotating 200s linear infinite;
-  -ms-animation: rotating 200s linear infinite;
-  -o-animation: rotating 200s linear infinite;
-  animation: rotating 200s linear infinite;
 }
 
 #contents {

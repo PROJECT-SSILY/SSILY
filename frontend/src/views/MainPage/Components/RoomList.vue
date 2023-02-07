@@ -1,11 +1,11 @@
 <template>
     <div>
+      <rotate-square2 v-if="state.isLoading"></rotate-square2>
       <v-card
-        class="mx-auto"
         max-width="500"
       >
         <v-toolbar
-        :color="state.switch1 ? 'primary' : 'success'"
+        :color="state.switch1 ? 'red lighten-1' : 'amber darken-2'"
           dark
         >
           <v-row>
@@ -66,10 +66,13 @@ import { useRouter } from "vue-router"
 import { useStore } from "vuex"
 import RoomListItem from '@/views/MainPage/Components/RoomListItem.vue'
 import { getCurrentInstance } from "vue";
+import {RotateSquare2} from 'vue-loading-spinner'
+
 export default {
   name: "RoomList",
   components: {
-    RoomListItem
+    RoomListItem,
+    RotateSquare2
   },
   emits: ["sendValue"],
   setup() {
@@ -80,6 +83,7 @@ export default {
       teamrooms: [],
       roomlist: [],
       switch1: true,
+      isLoading: false
     })
 
     const getInRoom = function (params) {
@@ -105,18 +109,22 @@ export default {
 
     // 방 리스트 조회
     onMounted(async () => {
+      state.isLoading = true
       const res = await roomList()
       const response = res.data
       console.log(response)
-      console.log(response.numberOfElements)
       for (let i=0; i<response.content.length; i++) {
         if (response.content[i].isTeamBattle) {
+          if (response.content[i].isPlaying == false && response.content[i].connections.numberOfElements < 4) {
           state.teamrooms.push(response.content[i])
+          }
         } else {
+          if (response.content[i].isPlaying == false && response.content[i].connections.numberOfElements < 4) {
           state.privaterooms.push(response.content[i])
+          }
         }
       }
-      // response.data
+      state.isLoading = false
     })
 
     return {
