@@ -1,23 +1,23 @@
 <template>
   <div id="flex-container">
       <div class="userinfo-component flex-item">
-        <UserInfo
-        v-for="one in PlayerList"
-        :player="one.player"
-        :myConnectionId="one.connectionId"
-        :myTeam="one.player.team"
-        :key="one.id"/>
-        
-        <BlankBox
-        v-for="index in emptyUser"
-        :key="index.id"
-        />
+        <!-- <p>{{ playerList }}</p> -->
+          <UserInfo
+          v-for="user in playerList"
+          :player="user.player"
+          :myConnectionId="myConnectionId"
+          :team="team"
+          :key="user.id"/>
+          <BlankBox
+          v-for="index in (4-playerList.length)"
+          :key="index.id"
+          />
       </div>
     </div>
 </template>
 <script>
-import { reactive, ref } from '@vue/reactivity'
-import { isProxy, toRaw } from 'vue';
+import { ref } from '@vue/reactivity'
+// import { isProxy, toRaw } from 'vue';
 import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
 import $axios from "axios";
@@ -26,7 +26,6 @@ import { useStore } from 'vuex';
 import BlankBox from './components/BlankBox.vue'
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
-
 
 export default {
   name: 'WaitingPage',
@@ -47,47 +46,40 @@ export default {
   setup(props) {
     const router = useRouter()
     const store = useStore()
+    
     // const PlayerList = computed(() => props.playerList)
-    const PlayerList = ref(props.playerList)
     const emptyUser = [];
     const useritem = ref(null)
     const myTeam = ref(props.team)
     const Id = ref(props.myConnectionId)
     console.log(useritem.class)
-    const state = reactive({
-      team: null,
-    })
 
     onMounted(() =>{
-      let rawData= props.playerList;
-      if(isProxy(props.playerList)){
-        rawData = toRaw(props.playerList);
-      }
-      console.log("testing", rawData);
-      
-      for(var i=0;i<4;i++){
-        const myValue={id : i };
-        emptyUser.push(myValue);
-      }
-      for(let one in rawData){
-        console.log(one);
-        // emptyUser.value pop();
-      }
-      console.log("emptyUser is ", emptyUser);
+      // let rawData= props.playerList;
+      // if(isProxy(props.playerList)){
+      //   rawData = toRaw(props.playerList);
+      // }
+      // console.log("testing", rawData);
+      // console.log("PlayerList : ", props.playerList)
+      // for(var i=0;i<4;i++){
+      //   const myValue={id : i };
+      //   emptyUser.push(myValue);
+      // }
+      // for(let one in rawData){
+      //   console.log(one);
+      //   // emptyUser.value pop();
+      // }
+      // console.log("emptyUser is ", emptyUser);
+      // console.log("현재 남은 칸 : ", 4-PlayerList.value.length)
     })
 
-    // console.log("emptyUser.value@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ : ", emptyUser.value)
+    console.log("emptyUser.length : ", emptyUser.length)
+    
 
     onUpdated(() => {
-      state
-      state.team = props.team
-      // PlayerList.value
+      // console.log(props.team)
       document.querySelector(".userinfo-component").innerHTML
     })
-
-    // const joinSession = async function() {
-    //   emit('joinSession')
-		// }
 
     const sessionInfo = () => {
       const session1 = store.getters['gameStore/getSession']
@@ -98,11 +90,7 @@ export default {
 
     return {
 		router,
-		state,
-    // emptyUser,
-		// joinSession,
 		sessionInfo,
-    PlayerList,
     Id,
     myTeam,
     }

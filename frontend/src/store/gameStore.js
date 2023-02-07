@@ -1,10 +1,10 @@
 import { roomList } from "@/common/api/gameAPI";
-// import { OpenVidu } from "openvidu-browser";
+import { OpenVidu } from "openvidu-browser";
 import $axios from "axios";
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
-// const OPENVIDU_SERVER_URL = "https://localhost:4443";
-// const OPENVIDU_SERVER_SECRET = "MY_SECRET";
+const OPENVIDU_SERVER_URL = "https://localhost:4443";
+const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 import { randomTeam, randomPrivate } from "@/common/api/gameAPI";
 
@@ -101,6 +101,134 @@ const mutations = {
   
 }
 const actions = {
+    joinSession : (context) => {
+        console.log("joinsession 시작")
+        // --- Get an OpenVidu object ---
+        const OV = new OpenVidu();
+
+        // --- Init a session ---
+        const session = OV.initSession();
+
+        // --- Specify the actions when events take place in the session ---
+        // On every new Stream received...
+        session.on('streamCreated', ({ stream }) => {
+            const subscriber = state.session.subscribe(stream);
+            state.subscribers.push(subscriber);
+        });
+
+        // On every Stream destroyed...
+        session.on('streamDestroyed', ({ stream }) => {
+            const index = state.subscribers.indexOf(stream.streamManager, 0);
+            if (index >= 0) {
+            state.subscribers.splice(index, 1);
+            }
+        });
+
+        // On every asynchronous exception...
+        session.on('exception', ({ exception }) => {
+            console.warn(exception);
+        });
+
+        // state.session.on("signal:chat", (event)=>{
+        //     const { message } = JSON.parse(event.data);
+        //     const { user, chatMessage } = message
+        //     const data = user + " : " + chatMessage
+        //     store.commit('gameStore/SET_MESSAGES', data)
+        // });
+
+        // --- Connect to the session with a valid user token ---
+        // 'getToken' method is simulating what your server-side should do.
+        // 'token' parameter should be retrieved and returned by your own backend
+
+        context.dispatch("getToken", state.mySessionId).then(token => {
+            session.connect(token, { clientData: state.myUserName })
+            .then(() => {
+                // --- Get your own camera stream with the desired properties ---
+                let publisher = state.OV.initPublisher(undefined, {
+                    audioSource: undefined, // The source of audio. If undefined default microphone
+                    videoSource: undefined, // The source of video. If undefined default webcam
+                    publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
+                    publishVideo: true,  	// Whether you want to start publishing with your video enabled or not
+                    resolution: '640x480',  // The resolution of your video
+                    frameRate: 30,			// The frame rate of your video
+                    insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
+                    mirror: false       	// Whether to mirror your local video or not
+                });
+                context.commit("setOV", OV)
+                context.commit("setSession", session)
+                context.commit("setMainStreamManager", publisher)
+                context.commit("setPublisher", publisher)
+
+
+                // --- Publish your stream ---
+                session.publish(state.publisher);
+                })
+                .catch(error => {
+                    console.log('There was an error connecting to the session:', error.code, error.message);
+                });
+        });
+        // window.addEventListener('beforeunload', this.leaveSession)
+    },
+    
+    createSession : (context, sessionId) => {
+        if (sessionId) {
+            return sessionId
+        } else {
+            return new Promise((resolve, reject) => {
+                $axios
+                .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+                "title" : state.title,
+                "isSecret" : state.isSecret,
+                "password" : state.password,
+                "isTeamBattle" : state.isTeamBattle
+                }), {
+                    auth: {
+                        username: 'OPENVIDUAPP',
+                        password: OPENVIDU_SERVER_SECRET,
+                    },
+                })
+                .then(response => response.data)
+                .then(data => {
+                    resolve(data.id)
+                })
+                .catch(error => {
+                    if (error.response.status === 409) {
+                        resolve(sessionId);
+                    } else {
+                        console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
+                        if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
+                            location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
+                        }
+                        reject(error.response);
+                    }
+                });
+            });
+        }
+    },
+
+    getToken: ({dispatch}, mySessionId) => {
+          console.log('gettoken 진입')
+          return dispatch("createSession", mySessionId)
+          .then((mySessionId) =>
+            dispatch("createToken", mySessionId)
+          )
+        },
+    
+    leaveSession: (commit) => {
+        if (state.session) state.session.disconnect();
+        commit("setSession", undefined)
+        commit("setMainStreamManager", undefined)
+        commit("setPublisher", undefined)
+        commit("setSubscribers", [])
+        commit("setOV", undefined)
+    },
+
+    updateMainVideoStreamManager: (commit, stream) => {
+        if (state.mainStreamManager === stream) return;
+        commit("setMainStreamManager", stream)
+    },
+    
+
     isTeam: (state) => {
         state.commit("changeMode", null)
         console.log(state.getters.getTeam);
