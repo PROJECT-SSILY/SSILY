@@ -29,9 +29,13 @@
                 />
             </div>
             <div class="side_footer">
-                <v-btn class="ma-2" v-if="!state.ready" @Click="clickReady">READY</v-btn>
-                <v-btn class="ma-2" v-if="state.ready" @Click="clickReady">CANCEL READY</v-btn>
-                <v-btn class="ma-2" @click="clickExit">EXIT</v-btn>
+                <div class="sidebtn">
+                    <v-btn class="readybtn" v-if="!state.ready" @Click="clickReady">READY</v-btn>
+                    <v-btn class="readybtn" v-if="state.ready" @Click="clickReady">CANCEL READY</v-btn>
+                </div>
+                <div class="sidebtn">
+                    <v-btn class="exitbtn" @click="clickExit">EXIT</v-btn>
+                </div>
             </div>
         </div>
     </div>
@@ -213,16 +217,16 @@ export default {
 
 
             getToken(state.sessionId).then(token => {
-                console.log("token : ", token)
+                // console.log("token : ", token)
                 state.session.connect(token, { clientData: state.myUserName })
                 requestPlayerList(state.sessionId).then(response => {
-                console.log('requestPlayerlist response', response)
+                // console.log('requestPlayerlist response', response)
                 playerList.value.push(response.content)
-                console.log('response:::::::::::::::::::0-09i023', response.content)
+                // console.log('response:::::::::::::::::::0-09i023', response.content)
                 store.commit('gameStore/setSession', state.session)
                 sessionVal.value.push(state.session) // 시험 ---
-                console.log('state.session : ', state.session)
-                console.log('sessionVal : ', sessionVal.value)
+                // console.log('state.session : ', state.session)
+                // console.log('sessionVal : ', sessionVal.value)
             })
             .then(() => {
                 console.log("gettoken - connect - then")
@@ -253,7 +257,7 @@ export default {
         const clickExit = () => {
             router.push({
                 name: 'main'
-        })
+            })
         }
 
         const clickReady = async () => {
@@ -267,22 +271,22 @@ export default {
             }
         }
         const leaveSession = () => {
-        // --- Leave the session by calling 'disconnect' method over the Session object ---
-        if (state.session) state.session.disconnect();
+            // --- Leave the session by calling 'disconnect' method over the Session object ---
+            if (state.session) state.session.disconnect();
 
-        state.session = undefined;
-        state.mainStreamManager = undefined;
-        state.publisher = undefined;
-        state.subscribers = [];
-        state.OV = undefined;
+            state.session = undefined;
+            state.mainStreamManager = undefined;
+            state.publisher = undefined;
+            state.subscribers = [];
+            state.OV = undefined;
 
-        window.removeEventListener('beforeunload', leaveSession);
+            window.removeEventListener('beforeunload', leaveSession);
         }
 
         const updateMainVideoStreamManager = (stream) => {
-        if (state.mainStreamManager === stream) return;
-        state.mainStreamManager = stream;
-        }
+            if (state.mainStreamManager === stream) return;
+            state.mainStreamManager = stream;
+            }
 
         /**
         * --------------------------
@@ -297,13 +301,13 @@ export default {
         */
 
         const getToken = async (sessionId) => {
-        console.log("gettoken 시작")
-        console.log('gettoken, sessionid : ', sessionId)
-        const response = await createToken(sessionId)
-        state.connectionId = response.connectionId
-        console.log('connectionId ===>', state.connectionId)
-        return response.token
-    }
+            console.log("gettoken 시작")
+            console.log('gettoken, sessionid : ', sessionId)
+            const response = await createToken(sessionId)
+            state.connectionId = response.connectionId
+            console.log('connectionId ===>', state.connectionId)
+            return response.token
+        }
 
 
         // See https://docs.openvidu.io/en/stable/reference-docs/REST-API/#post-connection
@@ -314,8 +318,7 @@ export default {
             const rate = store.getters['accountStore/getRate']
             const password = store.state.gameStore.password || true
             const exp = store.state.accountStore.user.exp || 0
-            state.myUserName=nickname;
-
+            state.myUserName=store.state.accountStore.user.nickname || ''
 
 
             return new Promise((resolve, reject)=> {
@@ -393,19 +396,48 @@ export default {
 }
 .select_team {
     display: flex;
-  border-radius: 30px;
-  background-color: white;
+    border-radius: 30px;
+    background-color: #ffffffeb;
     justify-content: center;
     margin-bottom: 10px;
 }
 .chat_box {
     border-radius: 30px;
     height: 500px;
-    background-color: white;
+    background-color: #ffffffeb;
     display: flex;
     flex-direction: column-reverse;
     justify-content: space-between;
-    padding: 20px 10px;
+    padding: 20px 30px;
 }
 
+.sidebtn {
+    display: inline-block;
+    width: 50%;
+    padding: 10px 0px;
+}
+.sidebtn:first-child {
+    padding-right: 5px; 
+}
+.sidebtn:last-child {
+    padding-left: 5px; 
+}
+.sidebtn>button {
+    width:100%;
+    margin: 0px;
+    border-radius: 20px;
+    height: 70px;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    font-weight: 900;
+    font-size: 25px;
+    border: 7px solid #ffffffeb;
+}
+.readybtn {
+    background: linear-gradient(342deg, rgba(198,255,0,1) 0%, rgba(108,204,55,1) 100%);
+}
+.exitbtn {
+    background: rgb(224,61,61);
+background: linear-gradient(133deg, rgba(224,61,61,1) 0%, rgba(255,93,93,1) 100%);
+}
 </style>

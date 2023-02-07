@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 import accountStore from './accountStore'
 import gameStore from './gameStore'
-import createPersistedState from 'vuex-persistedstate'
+// import createPersistedState from 'vuex-persistedstate'
 
 
 
@@ -12,7 +12,7 @@ export default createStore({
     accountStore,
     gameStore
   },
-  plugins: [createPersistedState({
-    paths: ["gameStore"]
-  })],
+  // plugins: [createPersistedState({
+  //   paths: ["gameStore"]
+  // })],
 })
