@@ -73,7 +73,7 @@ const routes = [
     beforeEnter: requireAuth()
   },
   {
-    path: '/gameroom/',
+    path: '/gameroom/:sessionId',
     name: 'gameroom',
     component: InGamePage,
     beforeEnter: requireAuth()

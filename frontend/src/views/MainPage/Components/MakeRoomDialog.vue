@@ -1,28 +1,16 @@
 <template>
   <div class="text-center">
-    <v-dialog
-      v-model="state.dialog"
-      width="500"
-    >
+    <v-dialog v-model="state.dialog" width="500">
       <template v-slot:activator="{ attrs }">
-        <v-btn
-          dark
-          v-bind="attrs"
-          @click.stop="state.dialog = true"
-        >
+        <v-btn dark v-bind="attrs" @click.stop="state.dialog = true">
           방 만들기
         </v-btn>
       </template>
-
       <v-card>
         <v-card-title class="text-h5 grey lighten-2">
           방 만들기
         </v-card-title>
-        <v-form
-        ref="form"
-        v-model="valid"
-        lazy-validation
-        >
+        <v-form ref="form" v-model="valid" lazy-validation>
           <div id="join" v-if="!state.session">
             <div id="join-dialog" class="jumbotron vertical-center">
               <div class="form-group">
@@ -108,7 +96,7 @@
         title: null,
         isSecret : false,
         password : null,
-        isTeamBattle : true,
+        isTeamBattle : false,
         rules: {
           required: value => !!value || '필수',
         }
@@ -132,8 +120,8 @@
         // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
         const sessionId = await store.dispatch('gameStore/createSession')
         console.log("sessionId : ", sessionId)
-        // router.push({name: 'gameroom', params: { sessionId : sessionId }})
-        router.push({name: 'gameroom'})
+        router.push({name: 'gameroom', params: { sessionId : sessionId }})
+        // router.push({name: 'gameroom'})
       }
 
       // const createSession = () => {

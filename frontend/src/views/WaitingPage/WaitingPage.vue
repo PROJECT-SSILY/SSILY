@@ -5,7 +5,9 @@
           v-for="user in userList"
           :user="user"
           :key="user.id"/>
-          <BlankBox/>
+          <BlankBox
+          v-for="blank in 4-userList.length"
+          :key="blank"/>
       </div>
     </div>
 </template>
@@ -62,5 +64,6 @@ export default {
 }
 
 /* ------------------- */
+
 
 </style>
