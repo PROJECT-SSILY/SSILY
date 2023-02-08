@@ -189,6 +189,8 @@ const actions = {
 
     // 채팅 신호 관리 - 수연
     session.on("signal:my-chat", (event) => {
+      console.log('채팅 메시지 json', JSON.stringify(event.data))
+      // 채팅 메시지 json "\"aaaa\""      
       const chatMessage = event.data;
       const chatUser = event.from.connectionId;
       var nickname = '';
