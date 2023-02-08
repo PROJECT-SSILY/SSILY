@@ -163,8 +163,6 @@ const actions = {
     const session = OV.initSession();
 
 
-
-
     // --- Specify the actions when events take place in the session ---
     // On every new Stream received...
     // stream = 영상 송출과 관련된 정보들 | 이은혁
@@ -189,9 +187,7 @@ const actions = {
 
     // 채팅 신호 관리 - 수연
     session.on("signal:my-chat", (event) => {
-      console.log('채팅 메시지 json', JSON.stringify(event.data))
-      // 채팅 메시지 json "\"aaaa\""      
-      const chatMessage = event.data;
+      const chatMessage = JSON.parse(event.data);
       const chatUser = event.from.connectionId;
       var nickname = '';
       state.userList.forEach(user => {
@@ -200,7 +196,6 @@ const actions = {
         }
       });
       const data = { user: nickname, text: chatMessage, id: chatUser };
-      console.log('채팅 신호 받음');
       context.commit('setChat', data);
     });
 
@@ -236,7 +231,7 @@ const actions = {
           break;
         }
 
-        // 4. 참여자 ready 정보 경신
+        // 4. 참여자 ready 정보 경신 - 수연
         case 4: {
           context.commit('setIsAllReady', event.data.isAllReady)
           var readyData = event.data
@@ -249,18 +244,6 @@ const actions = {
 
 
 
-
-    // session.on의 첫번째 인자 = event(String), 두번째 인자 = 앞의 event를 받아서 실행하는 함수(Function)
-    // event.data에 채팅 input에서 받은 내용을 parsing해서 state의 messages에 반영
-    // state.session.on("signal:chat", (event)=>{
-    //     const { message } = JSON.parse(event.data);
-    //     const { user, chatMessage } = message
-    //     const data = user + " : " + chatMessage
-    //     store.commit('gameStore/SET_MESSAGES', data)
-    // });
-    // --- Connect to the session with a valid user token ---
-    // 'getToken' method is simulating what your server-side should do.
-    // 'token' parameter should be retrieved and returned by your own backend
     context.dispatch("getToken", sessionId).then(token => {
       console.log("여기까지 완료, token :", token, "state.myUserName :", state.myUserName);
       console.log("session : ", session);
@@ -286,7 +269,7 @@ const actions = {
           // --- Publish your stream ---
           session.publish(state.publisher);
 
-          // 입장할 때 참여자 정보 가져오기
+          // 입장할 때 참여자 정보 가져오기 - 수연
           session.signal({
             type: 'game',
             data: {
