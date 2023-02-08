@@ -222,8 +222,8 @@ const actions = {
             user.level = data[key].player.level;
             user.nickname = data[key].player.nickname;
             user.rate = data[key].player.rate;
-            user.score = data[key].player.rate;
-            user.team = data[key].player.rate;
+            user.score = data[key].player.score;
+            user.team = data[key].player.team;
             if (!(state.userKey).includes(user.conectionId)) {
               console.log('user.conectionId', user.conectionId)
               console.log('state.userKey: ', state.userKey)
