@@ -138,7 +138,7 @@ const mutations = {
 
 }
 const actions = {
-    joinSession : (context) => {
+    joinSession : (context, sessionId) => {
         console.log("joinsession 시작")
         // --- Get an OpenVidu object ---
         const OV = new OpenVidu();
@@ -149,8 +149,8 @@ const actions = {
         // --- Specify the actions when events take place in the session ---
         // On every new Stream received...
 
-        // stream = 영상 송출과 관련된 정보들
-        // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직
+        // stream = 영상 송출과 관련된 정보들 | 이은혁
+        // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직 | 이은혁
         session.on('streamCreated', ({ stream }) => {
             const subscriber = state.session.subscribe(stream);
             state.subscribers.push(subscriber);
@@ -246,7 +246,7 @@ const actions = {
         // 'getToken' method is simulating what your server-side should do.
         // 'token' parameter should be retrieved and returned by your own backend
 
-        context.dispatch("getToken", state.mySessionId).then(token => {
+        context.dispatch("getToken", sessionId).then(token => {
             console.log("여기까지 완료, token :", token, "state.myUserName :", state.myUserName )
             console.log("session : ", session )
             session.connect(token, { clientData: state.myUserName })

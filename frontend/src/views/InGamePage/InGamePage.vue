@@ -82,7 +82,7 @@ import WaitingPage from '@/views/WaitingPage/WaitingPage.vue';
 import ChattingBox from '@/views/WaitingPage/components/ChattingBox.vue';
 import $axios from "axios";
 import { useStore } from 'vuex';
-import {  useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 // import { OpenVidu } from "openvidu-browser";
 import { reactive } from '@vue/reactivity'
@@ -112,7 +112,7 @@ export default {
     },
     setup() {
         const store = useStore()
-        // const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
+        const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         const router = useRouter()
         const state = reactive({
             title: null,
@@ -124,7 +124,7 @@ export default {
             mainStreamManager: undefined,
             // publisher: null,
             // subscribers: [],
-            // sessionId: route.params.sessionId || null,
+            sessionId: route.params.sessionId || null,
             // myUserName: '',
             isHost: true,
             readyAll: false,
@@ -172,7 +172,8 @@ export default {
 
 
         const joinSession = async function() {
-            store.dispatch('gameStore/joinSession')
+            await store.commit('gameStore/setSessionId', state.sessionId) // 실행 전 세션id 저장 | 이은혁
+            await store.dispatch('gameStore/joinSession', state.sessionId)
             }
 
         const leaveSession = async function() {
