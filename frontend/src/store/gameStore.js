@@ -142,6 +142,12 @@ const mutations = {
     },
     setUserKey: (state, data) => {
       state.userKey.push(data)
+    },
+    setReady: (state, data) => {
+      console.log('data:', data)
+      var index = data.index
+      var ready = data.ready
+      state.userList[index].isReady = ready
     }
 
     //==============================
@@ -230,19 +236,14 @@ const actions = {
 
         // 4. 참여자 ready 정보 경신
         case 4: {
-          state.isAllReady = event.data.isAllReady;
-          var readyUser = Object.keys(event.data)[1];
-          state.userList.forEach(user => {
-            if (user.conectionId == readyUser) {
-              user.isReady = !user.isReady;
-              console.log('user', user.nickname, '의 ready', user.isReady);
-              context.commit('setIsAllReady', state.isAllReady);
-            }
-          });
+          context.commit('setIsAllReady', event.data.isAllReady)
+          var readyData = event.data
+          for (var k=0; k < state.userList.length; k++) {
+            context.commit('setReady', {index: k, ready: readyData[state.userList[k].conectionId]})
+          }}
           break;
-        }
-      }
-    });
+        }}
+    );
 
 
 
