@@ -23,8 +23,7 @@
                 <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2"></v-radio>
             </v-radio-group>
             <div class="chat_box">
-                <ChattingBox
-                />
+                <ChattingBox/>
             </div>
             <div class="side_footer">
                 <div class="sidebtn">
@@ -188,15 +187,10 @@ export default {
             store.dispatch('gameStore/updateMainVideoStreamManager',stream)
         }
 
-        const sessionInfo = () => {
-            const session1 = store.getters['gameStore/getSession']
-            const sessionId1 = store.getters['gameStore/getSessionId']
-            console.log('session클릭', session1)
-            console.log('sessionId', sessionId1)
-        }
+
         onBeforeMount(() => {
             console.log('join start');
-            store.dispatch('gameStore/joinSession')
+            joinSession()
         })
 
         const clickExit = () => {
@@ -376,7 +370,6 @@ export default {
             clickReady,
             joinSession,
             leaveSession,
-            sessionInfo,
             updateMainVideoStreamManager,
             userList
         }
