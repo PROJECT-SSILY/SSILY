@@ -60,12 +60,12 @@ export default {
     const router = useRouter()
     const state = reactive({
       isTeam : null,
-      isLoading: false
+      // isLoading: false
     })
-    const changeValue = function (value) {
-      state.isTeam = value
-      // console.log(value)
-    }
+    // const changeValue = function (value) {
+    //   state.isTeam = value
+    //   // console.log(value)
+    // }
     // const randomTeam = async function () {
     //   const params = {
     //     isTeamBattle: state.isTeam
@@ -86,7 +86,7 @@ export default {
       store, 
       router, 
       state,
-      changeValue,
+      // changeValue,
       // randomTeam,
       // randomPrivate,
       }
