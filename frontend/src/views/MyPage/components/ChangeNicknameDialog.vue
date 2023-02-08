@@ -1,57 +1,56 @@
 <template>
-    <div class="text-center">
-      <v-dialog
-        v-model="state.dialog"
-        width="500"
+<div class="text-center">
+  <v-dialog
+    v-model="state.dialog"
+    width="500"
+  >
+    <template v-slot:activator="{ attrs }">
+      <v-btn
+        block
+        dark
+        v-bind="attrs"
+        @click.stop="state.dialog = true"
       >
-        <template v-slot:activator="{ attrs }">
-          <v-btn
-            block
-            dark
-            v-bind="attrs"
-            @click.stop="state.dialog = true"
-          >
-            닉네임 변경
-          </v-btn>
-        </template>
-        <v-card>
-          <v-card-title class="text-h5 grey lighten-2">
-            닉네임 변경
-          </v-card-title>
-          <v-form
-          ref="form"
-          v-model="state.valid"
-          lazy-validation
-          >
-              <div id="join-dialog" class="jumbotron vertical-center">
-                <div class="form-group">
-                  <v-text-field
-                    class="form-control"  
-                    v-model="state.form.nickname.value"
-                    type="text"
-                    label="변경할 닉네임을 입력하세요."   
-                    ref="nicknameform"
-                    :rules="[state.rules.required, state.rules.nicknameRules, state.rules.nicknameRules1]"
-                    ></v-text-field>
-                </div>
-              </div>
+        닉네임 변경
+      </v-btn>
+    </template>
+    <v-card>
+      <v-card-title class="text-h5 grey lighten-2">
+        닉네임 변경
+      </v-card-title>
+      <v-form
+      ref="form"
+      v-model="state.valid"
+      lazy-validation
+      >
+          <div id="join-dialog" class="jumbotron vertical-center">
+            <div class="form-group">
+              <v-text-field
+                class="form-control"  
+                v-model="state.form.nickname.value"
+                type="text"
+                label="변경할 닉네임을 입력하세요."   
+                ref="nicknameform"
+                :rules="[state.rules.required, state.rules.nicknameRules, state.rules.nicknameRules1]"
+                ></v-text-field>
             </div>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <p class="text-center">
-              <v-btn
-              @click="checkNickname">
-              중복 확인</v-btn>
-              <v-btn
-              :disabled="!state.valid"
-              @click="changeNickname">변경</v-btn>
-            </p>
-          </v-card-actions>
+          </div>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <p class="text-center">
+            <v-btn
+            @click="checkNickname">
+            중복 확인</v-btn>
+            <v-btn
+            :disabled="!state.valid"
+            @click="changeNickname">변경</v-btn>
+          </p>
+        </v-card-actions>
       </v-form>
-      </v-card>
-    </v-dialog>
-  </div>
+    </v-card>
+  </v-dialog>
+</div>
 </template>
   
 <script>
