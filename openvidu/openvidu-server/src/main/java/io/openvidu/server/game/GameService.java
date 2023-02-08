@@ -74,7 +74,7 @@ public class GameService   {
         String type = message.get("type").getAsString();
         params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_TYPE_PARAM, type); //params의 "type" 안에 저장
 
-        boolean isTeamBattle = sessionManager.getSessionNotActive(sessionId).getSessionProperties().isTeamBattle();
+        boolean isTeamBattle = sessionManager.getSessionWithNotActive(sessionId).getSessionProperties().isTeamBattle();
 
         switch (gameStatus) {
             case SET_PRESENTER_SETTING: // 사용자들의 팀 정보값 얻기. 0번
