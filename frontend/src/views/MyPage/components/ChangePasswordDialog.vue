@@ -6,6 +6,7 @@
       >
         <template v-slot:activator="{ attrs }">
           <v-btn
+            block
             dark
             v-bind="attrs"
             @click.stop="state.dialog = true"
@@ -32,48 +33,24 @@
                       name="oldpassword"
                       label="기존 비밀번호"
                       hint=""
-                      @click:append="state.show = !state.show"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field
-                      v-model="state.form.password1"
-                      :append-icon="state.show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                      :type="state.show1 ? 'text' : 'password'"
-                      :rules="[state.rules.required, state.rules.passwordRules]"
-                      name="password1"
-                      label="변경할 비밀번호"
-                      hint=""
-                      @click:append="state.show1 = !state.show1"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field
-                        v-model="state.form.password2"
-                        :append-icon="state.show2 ? 'mdi-eye' : 'mdi-eye-off'"
-                        :type="state.show2 ? 'text' : 'password'"
-                        :rules="[state.rules.required, state.rules.passwordRules2]"
-                        name="password2"
-                        label="비밀번호 확인"
-                        hint=""
-                        @click:append="state.show2 = !state.show2"
-                    ></v-text-field>
-                  </v-col>
-                </div>
+                      @click:append="state.show2 = !state.show2"
+                  ></v-text-field>
+                </v-col>
               </div>
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <p class="text-center">
-                <v-btn
-                @click="changePassword()">변경</v-btn>
-              </p>
-            </v-card-actions>
-        </v-form>
-        </v-card>
-      </v-dialog>
-    </div>
-  </template>
+            </div>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <p class="text-center">
+              <v-btn
+              @click="changePassword()">변경</v-btn>
+            </p>
+          </v-card-actions>
+      </v-form>
+      </v-card>
+    </v-dialog>
+  </div>
+</template>
   
   <script>
     import { useRouter } from 'vue-router'

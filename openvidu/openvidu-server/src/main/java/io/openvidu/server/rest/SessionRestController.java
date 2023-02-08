@@ -616,7 +616,7 @@ public class SessionRestController {
 	 * 서영탁
 	 * 참여자(플레이어) 팀 변경
 	 */
-	/*@PutMapping("/rooms/{room-id}/players/{player-id}/team")
+	@PutMapping("/rooms/{room-id}/players/{player-id}/team")
 	public ResponseEntity<?> changeTeam(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId,
 										@RequestBody Map<?, ?> params){
 
@@ -650,7 +650,7 @@ public class SessionRestController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-	}*/
+	}
 
 	/**
 	 * 김윤미

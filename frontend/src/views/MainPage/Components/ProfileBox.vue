@@ -23,17 +23,22 @@
   </template>
 
 <script>
+import SettingDialog from '../../SettingDialog.vue';
 import { reactive, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 
 export default {
   name: 'ProfileBox',
+  components: {
+    SettingDialog,
+  },
   setup() {
     const route = useRouter()
     const store = useStore()
     const state = reactive({
-      nickname: null
+      nickname: null,
+      robot: 0,
     })
     onBeforeMount(async ()=> {
           const token = await store.getters['accountStore/getToken']
@@ -44,18 +49,21 @@ export default {
     const toMyPage = function() {
       route.push('mypage')
     }
+    const logOut = async function() {
+            await store.dispatch('accountStore/logoutAction')
+            route.push('/')
+        }
     return {
       store,
       state,
       route,
+      logOut,
       toMyPage
       }
   }
 }
 
-
 </script>
-
 <style scoped>
 #btnbox {
   display: flex;
