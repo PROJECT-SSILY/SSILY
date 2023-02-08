@@ -1,60 +1,29 @@
 <template>
 <div class="userinfo-item-wrapper">
-  <!-- <div class="userinfo-item">
-    <p>{{ team }}, {{ connectionId }}, {{ myConnectionId }}</p>
-    <h1>닉네임: {{ player.nickname }}</h1>
-      <p>레벨: {{ player.level }}</p>
-      <p>팀: {{ player.team }}</p>
-      <p>방장여부: {{ player.isHost }}</p>
-      <p>경험치: {{ player.exp }}</p>
-    </div> -->
+  <div id="userinfo-item">
+    <h1>닉네임: {{ user.nickname }}</h1>
+    <p>레벨: {{ user.level }}</p>
+    <p>팀: {{ user.team }}</p>
+    <p>방장여부: {{ user.isHost }}</p>
+    <p>경험치: {{ user.exp }}</p>
+  </div>
 </div>
 </template>
 
 <script>
-// import { useStore } from "vuex"
-// import { computed, watch } from '@vue/runtime-core'
+import { useStore } from "vuex"
 
-// import { play } from "@tensorflow/tfjs-core/dist/test_util"
 
 
 export default {
   name: 'UserInfo',
-  components: {
+  props: {
+    user: Object
   },
-  // props: {
-  //   player: Object,
-  //   myConnectionId: String,
-  //   myTeam: String
-  // },
   setup() {
-    // const store = useStore()
-    // const state ={
-    //   nickname: props.player.nickname,
-    //   level: props.player.level,
-    //   team: props.player.team,
-    //   isHost: props.player.isHost,
-    //   exp: props.player.exp,
-    //   connectionId: props.myConnectionId,
-    // }
-    // const team = computed(() => props.connectionId == props.myConnectionId)
-    // watch(props.myTeam, () => {
-    //   () => {
-    //     console.log("팀선택");
-    //     console.log("state.connectedId : ", props.connectionId)
-    //     if(props.connectionId == props.myConnectionId) {
-    //       team.value = props.myTeam
-    //     } else {
-    //       team.value = props.team
-    //     }
-    //   }
-    // })
-
-    // console.log(toRaw(props.player))
-
-
+    const store = useStore()
     return {
-      // team
+      store
     }
   }
 }

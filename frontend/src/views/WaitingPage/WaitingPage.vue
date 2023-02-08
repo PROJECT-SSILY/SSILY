@@ -1,8 +1,10 @@
 <template>
   <div id="flex-container">
       <div class="userinfo-component flex-item">
-        <!-- <p>{{ playerList }}</p> -->
-          <UserInfo/>
+          <UserInfo
+          v-for="user in userList"
+          :user="user"
+          :key="user.id"/>
           <BlankBox/>
       </div>
     </div>
@@ -13,7 +15,7 @@ import { ref } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
 import $axios from "axios";
-import { onUpdated } from 'vue'
+import { computed } from 'vue'
 import { useStore } from 'vuex';
 import BlankBox from './components/BlankBox.vue'
 
@@ -26,44 +28,22 @@ export default {
     BlankBox,
   },
   props: {
-    playerList: Object,
     session: Object,
     myConnectionId: String,
-    sessionId: String,
     team: String,
   },
-  // emits: [
-  //   'joinSession',
-  // ],
   setup(props) {
     const router = useRouter()
     const store = useStore()
-
-    // const PlayerList = computed(() => props.playerList)
-    // const emptyUser = [];
-    // const useritem = ref(null)
+    const userList = computed(() => store.state.gameStore.userList)
     const myTeam = ref(props.team)
     const Id = ref(props.myConnectionId)
-    // console.log("emptyUser.length : ", emptyUser.length)
-
-
-    onUpdated(() => {
-      // console.log(props.team)
-      document.querySelector(".userinfo-component").innerHTML
-    })
-
-    const sessionInfo = () => {
-      const session1 = store.getters['gameStore/getSession']
-      const sessionId1 = store.getters['gameStore/getSessionId']
-      console.log('session클릭', session1)
-      console.log('sessionId', sessionId1)
-    }
 
     return {
 		router,
-		sessionInfo,
     Id,
     myTeam,
+    userList
     }
   }
 }
