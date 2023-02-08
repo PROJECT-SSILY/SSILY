@@ -21,7 +21,7 @@ const state = {
     subscribers: [],
     sessionId: '',
     myUserName: '',
-    isHost: true,
+    isHost: false,
     playerList: undefined,
     messages: [],
     media: 0.5,
@@ -148,6 +148,9 @@ const mutations = {
       var index = data.index
       var ready = data.ready
       state.userList[index].isReady = ready
+    },
+    setIsHost: (state, data) => {
+      state.isHost = data
     }
 
     //==============================
@@ -296,6 +299,7 @@ const actions = {
             return sessionId
         } else {
             console.log("토큰 존재하지 않음");
+            context.commit('setIsHost', true)
             console.log("title", state.title, "isSecret",  state.isSecret,"password", state.password, "isTeamBattle", state.isTeamBattle)
             return new Promise((resolve, reject) => {
                 $axios
