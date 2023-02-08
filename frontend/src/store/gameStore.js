@@ -155,6 +155,11 @@ const mutations = {
     },
     setMyConnectionId: (state, data) => {
       state.myConnectionId = data
+    },
+    setIsPresenter: (state, data) => {
+      var index = data.index
+      var value = data.value
+      state.userList[index].isPresenter = value
     }
 
     //==============================
@@ -211,12 +216,23 @@ const actions = {
     session.on("signal:game", (event) => {
       switch (event.data.gameStatus) {
         // 3. 참여자들 정보 받기
+        case 0: {
+          console.log('0번 시그널 수신 완료')
+          var PresenterId = event.data.curPresenterId
+          console.log(event.data.curPresenterId)
+          for (var n=0; n < state.userList.length; n++ ) {
+            if (state.userList[n].conectionId == PresenterId) {
+              context.commit('setIsPresenter', {index: n, value: true})
+            } else {
+              context.commit('setIsPresenter', {index: n, value: false})}}
+          break
+        }
+
         case 3: {
           // 참여자 정보 정리
           var data = event.data.playerState;
           var keys = Object.keys(data);
           for (var i=0; i < keys.length; i++) {
-            console.log('state.myUserName : -> 닉네임인가? ', state.myUserName)
             var user = {};
             var key = keys[i]
             if (state.myUserName == data[key].player.nickname) {
@@ -245,17 +261,22 @@ const actions = {
 
         // 4. 참여자 ready 정보 경신 - 수연
         case 4: {
+          console.log('4번 시그널 받음', event.data)
           context.commit('setIsAllReady', event.data.isAllReady)
           var readyData = event.data
           for (var k=0; k < state.userList.length; k++) {
             context.commit('setReady', {index: k, ready: readyData[state.userList[k].conectionId]})
           }
+          // 모두 레디 했을 때, 게임 시작됨
+          if (event.data.isAllReady) {
+            context.dispatch('gameStart')
+          }
           break;
         }
 
         case 5: {
-          console.log('5번 시그널~~~')
-          console.log(event)
+          console.log('5번 시그널 수신 완료')
+          console.log(event.data)
         }
 
 
@@ -497,12 +518,10 @@ const actions = {
         state.audio.loop = true
         state.audio.play()
     },
-
     changeVolume1: (context, volume) => {
         context.commit("setVolume1", volume)
         state.audio.volume = volume
     },
-
     changeVolume2: (context, volume) => {
         context.commit("setVolume2", volume)
         // 아직 효과음 없어서 볼륨 조절 코드 없음 효과음 추가 이후 작성 예정
@@ -527,6 +546,7 @@ const actions = {
     //   });
     // },
 
+    // 정답 값 5개 보내는 시그널 - 수연
     sendTopFive: (context, topFive) => {
       try {
         console.log('5번 시그널 보냄')
@@ -541,10 +561,33 @@ const actions = {
         });
       } catch (err) {
         console.log(err)
-        console.log('?????')
       }
-
     },
+    // 게임 시작 시그널 - 수연
+    gameStart: () => {
+      try {
+        state.session.signal({
+          type: 'game',
+          data: {
+            gameStatus: 2,
+          },
+          to: [],
+        });
+      } catch (err) {
+        console.log(err)
+      }
+      try {
+        state.session.signal({
+          type: 'game',
+          data: {
+            gameStatus: 0,
+          },
+          to: [],
+        });
+      } catch (err) {
+        console.log(err)
+      }
+    }
     
 
 }
