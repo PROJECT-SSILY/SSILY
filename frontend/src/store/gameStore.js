@@ -31,6 +31,7 @@ const state = {
     userList: [],
     userKey: [],
     chat: [],
+    myConnectionId: '',
 }
 
 const getters = {
@@ -151,6 +152,9 @@ const mutations = {
     },
     setIsHost: (state, data) => {
       state.isHost = data
+    },
+    setMyConnectionId: (state, data) => {
+      state.myConnectionId = data
     }
 
     //==============================
@@ -212,8 +216,13 @@ const actions = {
           var data = event.data.playerState;
           var keys = Object.keys(data);
           for (var i=0; i < keys.length; i++) {
+            console.log('state.myUserName : -> 닉네임인가? ', state.myUserName)
             var user = {};
             var key = keys[i]
+            if (state.myUserName == data[key].player.nickname) {
+              context.commit('setMyConnectionId', key)
+            }
+
             user.conectionId = key;
             user.isReady = data[key].isReady;
             user.exp = data[key].player.exp;
@@ -222,8 +231,8 @@ const actions = {
             user.level = data[key].player.level;
             user.nickname = data[key].player.nickname;
             user.rate = data[key].player.rate;
-            user.score = data[key].player.rate;
-            user.team = data[key].player.rate;
+            user.score = data[key].player.score;
+            user.team = data[key].player.team;
             if (!(state.userKey).includes(user.conectionId)) {
               console.log('user.conectionId', user.conectionId)
               console.log('state.userKey: ', state.userKey)
@@ -240,8 +249,16 @@ const actions = {
           var readyData = event.data
           for (var k=0; k < state.userList.length; k++) {
             context.commit('setReady', {index: k, ready: readyData[state.userList[k].conectionId]})
-          }}
+          }
           break;
+        }
+
+        case 5: {
+          console.log('5번 시그널~~~')
+          console.log(event)
+        }
+
+
         }}
     );
 
@@ -473,6 +490,8 @@ const actions = {
         throw err
       }
     },
+
+    // Bgm 관련 코드 - 수연
     playBgm: () => {
         state.audio.volume = state.media
         state.audio.loop = true
@@ -488,7 +507,45 @@ const actions = {
         context.commit("setVolume2", volume)
         // 아직 효과음 없어서 볼륨 조절 코드 없음 효과음 추가 이후 작성 예정
         console.log('alarm 볼륨 조절')
-    }
+    },
+
+    // 팀전 할 때 사용할 코드, 지금은 안 씀 - 수연
+    // changeTeamAction: async (context, color) => {
+    //   try {
+    //     const response = await changeTeam(state.sessionId, state.myConnectionId, color)
+    //     console.log(response.data)
+    //   } catch (err) {
+    //     console.log(err)
+    //   }
+
+    //   state.session.signal({
+    //     type: 'game',
+    //     data: {
+    //       gameStatus: 3,
+    //     },
+    //     to: [],
+    //   });
+    // },
+
+    sendTopFive: (context, topFive) => {
+      try {
+        console.log('5번 시그널 보냄')
+        console.log('보낸 데이터 : ', topFive)
+        state.session.signal({
+          type: 'game',
+          data: {
+            gameStatus: 5,
+            answer: JSON.stringify(topFive)
+          },
+          to: [],
+        });
+      } catch (err) {
+        console.log(err)
+        console.log('?????')
+      }
+
+    },
+    
 
 }
 export default {

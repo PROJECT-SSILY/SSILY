@@ -19,8 +19,8 @@
         </div>
         <div class="side_component flex-item">
             <v-radio-group class="select_team" inline v-model="state.team" justify-content="center">
-                <v-radio label="RED" value="RED" color="red" class="ma-2"></v-radio>
-                <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2"></v-radio>
+                <v-radio label="RED" value="RED" color="red" class="ma-2" @click="clickTeam(RED)"></v-radio>
+                <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2" @click="clickTeam(BLUE)"></v-radio>
             </v-radio-group>
             <div class="chat_box">
                 <ChattingBox/>
@@ -206,6 +206,10 @@ export default {
             store.dispatch('gameStore/changeReady')
         }
 
+        const clickTeam = (color) => {
+            store.dispatch('gameStore/changeTeamAction', color)
+        }
+
         // onUpdated(() => {
             // if (!state.readyAll) {
                 // document.querySelector(".waiting_component").innerHTML
@@ -373,6 +377,7 @@ export default {
             // subscribers,
             clickExit,
             clickReady,
+            clickTeam,
             joinSession,
             leaveSession,
             updateMainVideoStreamManager,

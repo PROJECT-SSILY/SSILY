@@ -21,6 +21,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 import { fabric } from "fabric";
 import { disposeTFVariables, TFModel } from "@/utils/model";
 import { CLASS_NAMES } from "@/utils/class_names";
+import { useStore } from 'vuex';
 
 const MY_MODEL_URL="http://localhost:8080/api/model.json";
 
@@ -28,7 +29,8 @@ export default {
     name: 'MyCanvasBox',
     setup() {
         const fabricCanvas = ref({});
-        
+        const store = useStore()
+        const topFive = ref([])
         let mousePressed = false
         const classNames = []
         let coords = [] // 현재 그림의 좌표를 기록
@@ -120,7 +122,6 @@ export default {
             /**
              * Get indices of 5 classes with highest predicted probabilities
              */
-
             var outp = [];
             for (let i = 0; i < raw_predictions.length; i++) {
                 outp.push(i);
@@ -132,7 +133,6 @@ export default {
                     outp.pop();
                 }
             }
-
             return outp;
         };
 
@@ -140,21 +140,26 @@ export default {
             /**
              * Find classes for highest predicted indices from findIndicesOfMax
              */
-
             let outp = [];
             let indices = findIndicesOfMax();
 
             for (let i = 0; i < indices.length; i++) {
                 outp[i] = getClassNames()[indices[i]];
             }
-
             return outp;
         };
 
         const submitDrawing = function () {
             const winClass = getTopClassNames()[0];
+            topFive.value = []
+            for (var i=0; i < 5 ; i++) {
+                topFive.value.push((getTopClassNames()[i]))
+            }
             console.log("winClass = ", winClass);
+            console.log('그냥 : ', topFive)
+            store.dispatch('gameStore/sendTopFive', topFive.value)
         };
+
 
         const getClassNames = function () {
             return CLASS_NAMES;
@@ -225,6 +230,7 @@ export default {
             eraseAll,
             predictModel,
             success,
+            
         }
     },
 }

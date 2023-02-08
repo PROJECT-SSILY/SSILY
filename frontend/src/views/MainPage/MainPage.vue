@@ -50,7 +50,7 @@ import RoomList from './Components/RoomList.vue';
 import { useStore } from "vuex"
 import { useRouter } from "vue-router"
 // import store from '@/store/gameStore';
-import { reactive } from "vue"
+import { onMounted, reactive } from "vue"
 // import {RotateSquare2} from 'vue-loading-spinner'
 
 export default {
@@ -72,6 +72,9 @@ export default {
       state.isTeam = value
       // console.log(value)
     }
+    onMounted(() => 
+      store.dispatch('accountStore/getMeAction')
+    )
     // function getMe () {
     //   console.log(store.getters['accountStore/getUser'])
     // }
