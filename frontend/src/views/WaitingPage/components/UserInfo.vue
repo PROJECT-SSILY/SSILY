@@ -6,6 +6,7 @@
     <p>팀: {{ user.team }}</p>
     <p>방장여부: {{ user.isHost }}</p>
     <p>경험치: {{ user.exp }}</p>
+    <p>레디: {{ user.isReady }}</p>
   </div>
 </div>
 </template>

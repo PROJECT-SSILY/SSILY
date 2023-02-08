@@ -21,7 +21,7 @@ const state = {
     subscribers: [],
     sessionId: '',
     myUserName: '',
-    isHost: true,
+    isHost: false,
     playerList: undefined,
     messages: [],
     media: 0.5,
@@ -29,7 +29,8 @@ const state = {
     audio: new Audio('https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3'),
     isAllReady: false,
     userList: [],
-    chat: []
+    userKey: [],
+    chat: [],
 }
 
 const getters = {
@@ -134,166 +135,163 @@ const mutations = {
       state.chat.push(data)
     },
     setUserList: (state, data) => {
-      state.userList = []
       state.userList.push(data)
+    },
+    setIsAllReady: (state, data) => {
+      state.isAllReady = data
+    },
+    setUserKey: (state, data) => {
+      state.userKey.push(data)
+    },
+    setReady: (state, data) => {
+      console.log('data:', data)
+      var index = data.index
+      var ready = data.ready
+      state.userList[index].isReady = ready
+    },
+    setIsHost: (state, data) => {
+      state.isHost = data
     }
 
     //==============================
 
 }
 const actions = {
-    joinSession : (context, sessionId) => {
-        console.log("joinsession 시작")
-        // --- Get an OpenVidu object ---
-        const OV = new OpenVidu();
+  _joinSession: (context, sessionId) => {
+    console.log("joinsession 시작");
+    // --- Get an OpenVidu object ---
+    const OV = new OpenVidu();
 
-        // --- Init a session ---
-        const session = OV.initSession();
-
-        
+    // --- Init a session ---
+    const session = OV.initSession();
 
 
-        // --- Specify the actions when events take place in the session ---
-        // On every new Stream received...
+    // --- Specify the actions when events take place in the session ---
+    // On every new Stream received...
+    // stream = 영상 송출과 관련된 정보들 | 이은혁
+    // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직 | 이은혁
+    session.on('streamCreated', ({ stream }) => {
+      const subscriber = session.subscribe(stream);
+      state.subscribers.push(subscriber);
+    });
 
-        // stream = 영상 송출과 관련된 정보들 | 이은혁
-        // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직 | 이은혁
-        session.on('streamCreated', ({ stream }) => {
-            const subscriber = session.subscribe(stream);
-            state.subscribers.push(subscriber);
-        });
+    // On every Stream destroyed...
+    session.on('streamDestroyed', ({ stream }) => {
+      const index = state.subscribers.indexOf(stream.streamManager, 0);
+      if (index >= 0) {
+        state.subscribers.splice(index, 1);
+      }
+    });
 
-        // On every Stream destroyed...
-        session.on('streamDestroyed', ({ stream }) => {
-            const index = state.subscribers.indexOf(stream.streamManager, 0);
-            if (index >= 0) {
-            state.subscribers.splice(index, 1);
-            }
-        });
+    // On every asynchronous exception...
+    session.on('exception', ({ exception }) => {
+      console.warn(exception);
+    });
 
-        // On every asynchronous exception...
-        session.on('exception', ({ exception }) => {
-            console.warn(exception);
-        });
+    // 채팅 신호 관리 - 수연
+    session.on("signal:my-chat", (event) => {
+      const chatMessage = JSON.parse(event.data);
+      const chatUser = event.from.connectionId;
+      var nickname = '';
+      state.userList.forEach(user => {
+        if (user.conectionId == chatUser) {
+          nickname = user.nickname;
+        }
+      });
+      const data = { user: nickname, text: chatMessage, id: chatUser };
+      context.commit('setChat', data);
+    });
 
-        // 채팅 신호 관리 - 수연
-        session.on("signal:my-chat", (event)=> {
-          const chatMessage = event.data
-          const chatUser = event.from.connectionId
-          var nickname = ''
-          state.userList.forEach(user => {
-            if (user.conectionId == chatUser) {
-              nickname = user.nickname
-            }
-          })
-          const data = {user : nickname, text: chatMessage, id: chatUser}
-          console.log('채팅 신호 받음')
-          context.commit('setChat', data)
-        })
 
-  
-        // 게임 시그널 관리 - 수연
-        session.on("signal:game", (event)=>{
-          switch(event.data.gameStatus) {
-            // 3. 참여자들 정보 받기
-              case 3: {
-                  var data = event.data.playerState
-                  var keys = Object.keys(data)
-                  for (var i=0; i<keys.length; i++) {
-                    var key = keys[i];
-                    var user = {}
-                    user.conectionId = key
-                    user.isReady = data[key].isReady     
-                    user.exp = data[key].player.exp
-                    user.isHost = data[key].player.isHost
-                    user.isPresenter = data[key].player.isPresenter
-                    user.level = data[key].player.level
-                    user.nickname = data[key].player.nickname
-                    user.rate = data[key].player.rate
-                    user.score = data[key].player.rate
-                    user.team = data[key].player.rate
-                    context.commit('setUserList', user)
-                    console.log('유저 하나 : ', user)
-                  }
-                  break
-              }
-              // 4. 참여자 ready 정보 경신
-              case 4: {
-                state.isAllReady = event.data.isAllReady
-                var readyUser = Object.keys(event.data)[1]
-                state.userList.forEach(user => {
-                  if (user.conectionId == readyUser) {
-                    user.isReady = !user.isReady
-                    console.log('user', user.nickname, '의 ready', user.isReady)
-                    console.log(state.isAllReady)
-                    console.log(state.userList)
-                  }
-                })
-                break
+    // 게임 시그널 관리 - 수연
+    session.on("signal:game", (event) => {
+      switch (event.data.gameStatus) {
+        // 3. 참여자들 정보 받기
+        case 3: {
+          // 참여자 정보 정리
+          var data = event.data.playerState;
+          var keys = Object.keys(data);
+          for (var i=0; i < keys.length; i++) {
+            var user = {};
+            var key = keys[i]
+            user.conectionId = key;
+            user.isReady = data[key].isReady;
+            user.exp = data[key].player.exp;
+            user.isHost = data[key].player.isHost;
+            user.isPresenter = data[key].player.isPresenter;
+            user.level = data[key].player.level;
+            user.nickname = data[key].player.nickname;
+            user.rate = data[key].player.rate;
+            user.score = data[key].player.rate;
+            user.team = data[key].player.rate;
+            if (!(state.userKey).includes(user.conectionId)) {
+              console.log('user.conectionId', user.conectionId)
+              console.log('state.userKey: ', state.userKey)
+              context.commit('setUserKey', user.conectionId)
+              context.commit('setUserList', user)
             }
           }
-      });
+          break;
+        }
+
+        // 4. 참여자 ready 정보 경신 - 수연
+        case 4: {
+          context.commit('setIsAllReady', event.data.isAllReady)
+          var readyData = event.data
+          for (var k=0; k < state.userList.length; k++) {
+            context.commit('setReady', {index: k, ready: readyData[state.userList[k].conectionId]})
+          }}
+          break;
+        }}
+    );
 
 
 
+    context.dispatch("getToken", sessionId).then(token => {
+      console.log("여기까지 완료, token :", token, "state.myUserName :", state.myUserName);
+      console.log("session : ", session);
+      session.connect(token, { clientData: state.myUserName })
+        .then(() => {
+          // --- Get your own camera stream with the desired properties ---
+          let publisher = OV.initPublisher(undefined, {
+            audioSource: undefined,
+            videoSource: undefined,
+            publishAudio: true,
+            publishVideo: true,
+            resolution: '640x480',
+            frameRate: 30,
+            insertMode: 'APPEND',
+            mirror: false // Whether to mirror your local video or not
+          });
+          // .catch((error)=> console.log(error));
+          console.log("아싸");
+          context.commit("setOV", OV);
+          context.commit("setSession", session);
+          context.commit("setMainStreamManager", publisher);
+          context.commit('SET_PUBLISHER', publisher);
+          // --- Publish your stream ---
+          session.publish(state.publisher);
 
-        // session.on의 첫번째 인자 = event(String), 두번째 인자 = 앞의 event를 받아서 실행하는 함수(Function)
-        // event.data에 채팅 input에서 받은 내용을 parsing해서 state의 messages에 반영
-
-        // state.session.on("signal:chat", (event)=>{
-        //     const { message } = JSON.parse(event.data);
-        //     const { user, chatMessage } = message
-        //     const data = user + " : " + chatMessage
-        //     store.commit('gameStore/SET_MESSAGES', data)
-        // });
-
-        // --- Connect to the session with a valid user token ---
-        // 'getToken' method is simulating what your server-side should do.
-        // 'token' parameter should be retrieved and returned by your own backend
-
-        context.dispatch("getToken", sessionId).then(token => {
-            console.log("여기까지 완료, token :", token, "state.myUserName :", state.myUserName )
-            console.log("session : ", session )
-            session.connect(token, { clientData: state.myUserName })
-            .then(() => {
-                // --- Get your own camera stream with the desired properties ---
-                let publisher = OV.initPublisher(undefined, {
-                    audioSource: undefined, // The source of audio. If undefined default microphone
-                    videoSource: undefined, // The source of video. If undefined default webcam
-                    publishAudio: true,  	// Whether you want to start publishing with your audio unmuted or not
-                    publishVideo: true,  	// Whether you want to start publishing with your video enabled or not
-                    resolution: '640x480',  // The resolution of your video
-                    frameRate: 30,			// The frame rate of your video
-                    insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
-                    mirror: false       	// Whether to mirror your local video or not
-                })
-                // .catch((error)=> console.log(error));
-
-
-                console.log("아싸")
-                context.commit("setOV", OV)
-                context.commit("setSession", session)
-                context.commit("setMainStreamManager", publisher)
-                context.commit('SET_PUBLISHER', publisher)
-                // --- Publish your stream ---
-
-                session.publish(state.publisher);
-
-                // 입장할 때 참여자 정보 가져오기
-                session.signal({
-                  type: 'game',
-                  data: {
-                    gameStatus: 3,
-                  },
-                  to: [],
-                })  
-            })
-            .catch(error => {
-                console.log('There was an error connecting to the session:', error.code, error.message);
-            });
+          // 입장할 때 참여자 정보 가져오기 - 수연
+          session.signal({
+            type: 'game',
+            data: {
+              gameStatus: 3,
+            },
+            to: [],
+          });
+        })
+        .catch(error => {
+          console.log('There was an error connecting to the session:', error.code, error.message);
         });
-        // window.addEventListener('beforeunload', this.leaveSession)
-    },
+    });
+  },
+  get joinSession() {
+    return this._joinSession;
+  },
+  set joinSession(value) {
+    this._joinSession = value;
+  },
 
     createSession : (context, sessionId) => { // => 세션 생성 후 세션ID 발급됨
         if (sessionId) {
@@ -301,6 +299,7 @@ const actions = {
             return sessionId
         } else {
             console.log("토큰 존재하지 않음");
+            context.commit('setIsHost', true)
             console.log("title", state.title, "isSecret",  state.isSecret,"password", state.password, "isTeamBattle", state.isTeamBattle)
             return new Promise((resolve, reject) => {
                 $axios
