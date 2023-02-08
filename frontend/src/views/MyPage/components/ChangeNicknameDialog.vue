@@ -7,6 +7,7 @@
         <template v-slot:activator="{ attrs }">
           <v-btn
             block
+            x-large
             dark
             v-bind="attrs"
             @click.stop="state.dialog = true"
@@ -14,8 +15,8 @@
             닉네임 변경
           </v-btn>
         </template>
-        <v-card>
-          <v-card-title class="text-h5 grey lighten-2">
+        <v-card class="formbox">
+          <v-card-title>
             닉네임 변경
           </v-card-title>
           <v-form
@@ -92,9 +93,11 @@
             if (result.data.data) {
                 state.form.nickname.status = true
                 alert("사용 가능한 닉네임입니다.")
+                return
             } else {
                 state.form.nickname.status = false
                 alert("이미 사용 중인 닉네임입니다.")
+                return
             }
             }
         return {
@@ -108,3 +111,16 @@
       }
     }
   </script>
+
+  <style scoped>
+  .formbox {
+  padding: 2rem;
+  margin-top: 10%;
+  width: 100%;
+  border-radius: 20px;
+  opacity: 100%;
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
+  </style>

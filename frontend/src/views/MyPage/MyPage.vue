@@ -14,13 +14,16 @@
                 <v-col>
                     <v-row>
                         <v-col>
-                            <h1>마이 페이지</h1>                                                                  
-                                <v-avatar
-                                size="128">
+                            <h1>마이 페이지</h1>                                                             
+                            <div class="robot-circle">
                                 <img class="robot" :src="userinfo.robot" alt="">
-                                </v-avatar>                                 
+                            </div>
+                            <div class="win-rate">    
+                                <apexchart width="380" type="donut" :options="donutchart.options" :series="donutchart.series"></apexchart>
+                            </div>
+                            <br>
                             <div class="inner_section1_right">
-                                <h2>{{ userinfo.nickname }}님</h2>
+                                <h2>{{ userinfo.nickname }}</h2>
                             </div>    
                         </v-col>
                     </v-row>
@@ -29,29 +32,33 @@
                     <v-row>
                         <v-col>                                
                             <v-card class="game-info">
-                                <h3>LV. {{ userinfo.level }}</h3>
-                                <h3>경험치</h3>
-                                <h3>{{ userinfo.exprate }} % </h3>
-                                <h3>승률 : {{ userinfo.record.winrate }} %</h3>
+                                <p align="left">LV. {{ userinfo.level }}</p>
+                                <p align="left">경험치</p>
+                                <p align="right">{{ userinfo.exprate }} % </p>
+                                <div class="win-rate">    
+                                    <apexchart class="chart" width="200" type="bar" :options="linechart.options" :series="linechart.series"></apexchart>
+                                </div>
                             </v-card>
                         </v-col> 
                     </v-row>
                     <v-row>
-                        <v-col cols="3">
+                        <v-col cols="6">
                             <changeNicknameDialog/>
                         </v-col>
-                        <v-col cols="3">
+                        <v-col cols="6">
                             <changePasswordDialog/>
                         </v-col>
-                        <v-col cols="3">
+                        <v-col cols="6">
                             <v-btn 
+                            x-large
                             block
                             @click="logOut">                                
                                 LOGOUT
                             </v-btn>
                         </v-col>
-                        <v-col cols="3">
+                        <v-col cols="6">
                             <v-btn
+                            x-large
                             block
                             color="error"
                             dark
@@ -63,8 +70,8 @@
                                 v-model="userinfo.dialog"
                                 max-width="290"
                                 >
-                                <v-card>
-                                    <v-card-text class="text-h5">
+                                <v-card class="formbox">
+                                    <v-card-text>
                                     정말 탈퇴하시렵니까?
                                     </v-card-text>
                                     <v-card-actions>
@@ -83,6 +90,7 @@
 </template>
 
 <script>
+import VueApexCharts from "vue3-apexcharts";
 import ChangeNicknameDialog from './components/ChangeNicknameDialog.vue';
 import ChangePasswordDialog from './components/ChangePasswordDialog.vue';
 import { reactive, onBeforeMount } from 'vue'
@@ -92,7 +100,9 @@ export default {
     name: 'MyPage',
     components: {
         ChangeNicknameDialog,
-        ChangePasswordDialog
+        ChangePasswordDialog,
+        apexchart: VueApexCharts,
+
     },
     setup() {
         const store = useStore()
@@ -111,6 +121,69 @@ export default {
                 draws: 0,
                 winrate: 0,
             }
+        })
+        const donutchart = reactive({
+            records: userinfo.record,
+            win : userinfo.record.wins,
+            lost: userinfo.record.plays - userinfo.record.wins - userinfo.record.draws,
+            options: {
+                chart: {
+                    type: "radialBar",
+                    height: 250,
+                    offsetX: 0
+                },
+                labels: ["승", "패"],
+                legend: {
+                    show: false,
+                },
+                fill: {
+                    colors: ['#8DFCAC', '#EAFFF0']
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                
+            },
+            series: []
+        })
+        const linechart = reactive({
+            options: {
+                chart: {
+                    height: 70,
+                    type: "bar",
+                    stacked: true,
+                    sparkline: {
+                    enabled: true
+                    }
+                },
+                labels: ["경험치"],
+                legend: {
+                    show: false,
+                },
+                fill: {
+                    colors: ['#8DFCAC']
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 4,
+                        horizontal: true,
+                        barHeight: "20%",
+                        colors: {
+                            backgroundBarColors: ["#EAFFF0"],
+                            backgroundBarRadius: 5,
+                        }
+                    }
+                },
+            },
+            series: [
+                {
+                name: "경험치",
+                data: []
+                }
+            ],
         })
         onBeforeMount(async ()=> {
             const token = store.getters['accountStore/getToken']
@@ -135,6 +208,12 @@ export default {
             } else {
                 userinfo.robot = "./robotface3.svg"
             }
+            donutchart.series.push(2)
+            // donutchart.series.push(donutchart.win)
+            donutchart.series.push(1)
+            // donutchart.series.push(donutchart.lost)
+            linechart.series[0].data.push(80)
+            // linechart.series[0].data.push(userinfo.exp)
         })
         const logOut = async function() {
             await store.dispatch('accountStore/logoutAction')
@@ -148,6 +227,8 @@ export default {
         }
         return {
             userinfo,
+            donutchart,
+            linechart,
             logOut,
             main,
             deleteAccount,
@@ -158,17 +239,61 @@ export default {
 
 <style scoped>
 .game-info {
-    padding: 1rem;
-    background-color: rgba(255, 255, 255, 0.7);
+    align-items: flex-start;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.11), 
+                0 2px 2px rgba(0,0,0,0.11), 
+                0 4px 4px rgba(0,0,0,0.11), 
+                0 8px 8px rgba(0,0,0,0.11), 
+                0 16px 16px rgba(0,0,0,0.11), 
+                0 32px 32px rgba(0,0,0,0.11);
 }
 #result .v-btn {
     min-width: 36px;
     width: 36px;
-    background-color: rgba(255, 255, 255, 0.7)
+    background-color: rgba(255, 255, 255, 0.);
+    box-shadow: 0 1px 1px rgba(0,0,0,0.11), 
+                0 2px 2px rgba(0,0,0,0.11), 
+                0 4px 4px rgba(0,0,0,0.11), 
+                0 8px 8px rgba(0,0,0,0.11), 
+                0 16px 16px rgba(0,0,0,0.11), 
+                0 32px 32px rgba(0,0,0,0.11);
   }
 .robot {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
     height: 5rem;
 }
+.robot-circle {
+    position: relative; 
+    z-index: 3;
+    right: 0rem;
+    top: 12rem;
+    
+}
+.win-rate {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    font-family: 'MaplestoryOTFBold';
+    font-weight: normal;
+    font-style: normal;
+
+}
+.game-info > p {
+    font-size: 2rem;
+    font-family: 'MaplestoryOTFBold';
+    font-weight: normal;
+    font-style: normal;
+
+}
+
 .profile {
   display: flex;
   flex-direction: row;
@@ -179,13 +304,21 @@ export default {
   font-style: normal;
   color:#ffffff;
 }
-.footer {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  font-family: 'MaplestoryOTFBold';
-  font-weight: normal;
-  font-style: normal;
+v-col > v-btn {
+    box-shadow: 0 1px 1px rgba(0,0,0,0.11), 
+                0 2px 2px rgba(0,0,0,0.11), 
+                0 4px 4px rgba(0,0,0,0.11), 
+                0 8px 8px rgba(0,0,0,0.11), 
+                0 16px 16px rgba(0,0,0,0.11), 
+                0 32px 32px rgba(0,0,0,0.11);
 }
+.formbox {
+    width: 100%;
+    border-radius: 20px;
+    opacity: 100%;
+    font-family: 'MaplestoryOTFBold';
+    font-weight: normal;
+    font-style: normal;
+  }
+
 </style>

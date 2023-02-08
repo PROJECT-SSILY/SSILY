@@ -38,7 +38,7 @@
   </template>
 
 <script>
-import SettingDialog from '../../SettingDialog.vue';
+import SettingDialog from '@/views/SettingDialog.vue';
 import { reactive, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
