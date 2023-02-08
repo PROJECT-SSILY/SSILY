@@ -1,12 +1,12 @@
 <template>
-<!----------------------------------- 개발용 버튼 -------------------------------------->
-    <p>
-        <v-btn @click="state.readyAll=!state.readyAll">게임 시작</v-btn> |
-        <v-btn @click="state.isTeamBattle = !state.isTeamBattle">팀/개인전 변경</v-btn> |
-        <v-btn @click="state.amIDescriber = !state.amIDescriber">게임 순서 변경</v-btn>
-    </p>
-<!------------------------------------------------------------------------------------->
-<div class="wrap_component">
+    <div class="wrap_component">
+    <!----------------------------------- 개발용 버튼 -------------------------------------->
+        <p>
+            <v-btn @click="state.readyAll=!state.readyAll">게임 시작</v-btn> |
+            <v-btn @click="state.isTeamBattle = !state.isTeamBattle">팀/개인전 변경</v-btn> |
+            <v-btn @click="state.amIDescriber = !state.amIDescriber">게임 순서 변경</v-btn>
+        </p>
+    <!------------------------------------------------------------------------------------->
     <div class="waiting_component" v-if="!state.readyAll">
         <div class="users_component">
             <WaitingPage
@@ -205,12 +205,12 @@ export default {
                 console.warn(exception);
             });
 
-            state.session.on("signal:chat", (event)=>{
-                const { message } = JSON.parse(event.data);
-                const { user, chatMessage } = message
-                const data = user + " : " + chatMessage
-                store.commit('gameStore/SET_MESSAGES', data)
-            });
+            // state.session.on("signal:chat", (event)=>{
+            //     const { message } = JSON.parse(event.data);
+            //     const { user, chatMessage } = message
+            //     const data = user + " : " + chatMessage
+            //     store.commit('gameStore/SET_MESSAGES', data)
+            // });
 
 
             // New signal: {"type":"signal:game","data":{"gameStatus":3,"con_U8n1OlFKYx":false,"con_RgCANyJOsq":false}}
@@ -230,7 +230,7 @@ export default {
             // 'getToken' method is simulating what your server-side should do.
             // 'token' parameter should be retrieved and returned by your own backend
 
-
+            console.log(state.sessionId)
             getToken(state.sessionId).then(token => {
                 // console.log("token : ", token)
                 state.session.connect(token, { clientData: state.myUserName })

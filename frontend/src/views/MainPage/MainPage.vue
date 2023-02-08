@@ -51,7 +51,7 @@ import { useStore } from "vuex"
 import { useRouter } from "vue-router"
 // import store from '@/store/gameStore';
 import { reactive } from "vue"
-import {RotateSquare2} from 'vue-loading-spinner'
+// import {RotateSquare2} from 'vue-loading-spinner'
 
 export default {
   name: 'MainPage',
@@ -60,12 +60,12 @@ export default {
     const router = useRouter()
     const state = reactive({
       isTeam : null,
-      isLoading: false
+      // isLoading: false
     })
-    const changeValue = function (value) {
-      state.isTeam = value
-      // console.log(value)
-    }
+    // const changeValue = function (value) {
+    //   state.isTeam = value
+    //   // console.log(value)
+    // }
     // const randomTeam = async function () {
     //   const params = {
     //     isTeamBattle: state.isTeam
@@ -86,7 +86,7 @@ export default {
       store, 
       router, 
       state,
-      changeValue,
+      // changeValue,
       // randomTeam,
       // randomPrivate,
       }
@@ -96,7 +96,7 @@ export default {
     TutorialDialog,
     ProfileBox,
     RoomList,
-    RotateSquare2    
+    // RotateSquare2    
   },
 }
 // }

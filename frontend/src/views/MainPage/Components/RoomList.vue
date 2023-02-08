@@ -1,6 +1,6 @@
 <template>
     <div>
-      <rotate-square2 v-if="state.isLoading"></rotate-square2>
+      <!-- <rotate-square2 v-if="state.isLoading"></rotate-square2> -->
       <v-card
         max-width="500"
       >
@@ -66,13 +66,13 @@ import { useRouter } from "vue-router"
 import { useStore } from "vuex"
 import RoomListItem from '@/views/MainPage/Components/RoomListItem.vue'
 import { getCurrentInstance } from "vue";
-import {RotateSquare2} from 'vue-loading-spinner'
+// import {RotateSquare2} from 'vue-loading-spinner'
 
 export default {
   name: "RoomList",
   components: {
     RoomListItem,
-    RotateSquare2
+    // RotateSquare2
   },
   emits: ["sendValue"],
   setup() {
@@ -83,7 +83,7 @@ export default {
       teamrooms: [],
       roomlist: [],
       switch1: true,
-      isLoading: false
+      // isLoading: false
     })
 
     const getInRoom = function (params) {
@@ -109,7 +109,7 @@ export default {
 
     // 방 리스트 조회
     onMounted(async () => {
-      state.isLoading = true
+      // state.isLoading = true
       const res = await roomList()
       const response = res.data
       console.log(response)
@@ -124,7 +124,7 @@ export default {
           }
         }
       }
-      state.isLoading = false
+      // state.isLoading = false
     })
 
     return {

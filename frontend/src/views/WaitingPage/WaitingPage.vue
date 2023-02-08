@@ -7,7 +7,10 @@
         :myConnectionId="myConnectionId"
         :myTeam="team"
         :key="player.id"/>
-
+        <div class="userinfo_empty" 
+        v-for="p in 4-playerList.length" 
+        :key="p"
+        ></div>
       </div>
     </div>
 </template>
@@ -46,7 +49,6 @@ export default {
     const myTeam = ref(props.team)
     const Id = ref(props.myConnectionId)
     console.log(useritem.class)
-    
     const state = reactive({
       team: null,
     })
@@ -84,8 +86,8 @@ export default {
 
 <style>
 .userinfo-component {
-  padding: 30px;
-  max-width: 800px;
+  padding: 0px 30px;
+  max-width: 750px;
   min-width: 700px;
   box-sizing: border-box;
   display: flex;
@@ -93,4 +95,16 @@ export default {
   justify-content: space-between;
   flex-wrap: wrap;
 }
+
+/* ------------------- */
+
+.userinfo_empty {
+  height: 297px;
+  width: 297px;
+  border-radius: 100%;
+  box-sizing: content-box;
+  display: inline-block;
+  border: 5px dashed #ffffffa3;
+}
+
 </style>
