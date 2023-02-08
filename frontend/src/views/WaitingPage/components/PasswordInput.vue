@@ -51,12 +51,10 @@
   import { useRouter } from 'vue-router'
   import { reactive } from 'vue'
   import { useStore } from 'vuex'
-  // import { computed } from 'vue'
   import $axios from "axios";
 
   $axios.defaults.headers.post['Content-Type'] = 'application/json';
-  // const OPENVIDU_SERVER_URL = "https://localhost:4443";
-  // const OPENVIDU_SERVER_SECRET = "MY_SECRET";
+
  
   export default {
     name: 'PasswordInput',
