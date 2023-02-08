@@ -37,6 +37,9 @@
                     <v-btn class="exitbtn" @click="clickExit">EXIT</v-btn>
                 </div>
             </div>
+            <div class="sidebtn">
+                    <v-btn class="exitbtn" @click="gameStart()">Game Start</v-btn>
+            </div>
         </div>
     </div>
     <div class="in_game_component" v-else>
@@ -176,6 +179,23 @@ export default {
             joinSession()
         })
 
+        const gameStart = async() =>{
+            await state.session.signal({
+                    type: 'game',
+                    data: {
+                        gameStatus: 2
+                },
+                to: []
+                })
+            await state.session.signal({
+                    type: 'game',
+                    data: {
+                        gameStatus: 0
+                },
+                to: []
+                })
+        }
+
         const joinSession = async () => {
             console.log("joinsession 시작")
             // --- Get an OpenVidu object ---
@@ -211,6 +231,43 @@ export default {
             //     const data = user + " : " + chatMessage
             //     store.commit('gameStore/SET_MESSAGES', data)
             // });
+
+            /**
+             * 신대득
+             * 게임 접속 시 게임 데이터 통신 부분 (GameNavigator 활용 되는..)
+             * 이 부분을 만들어줘야 session이 이벤트를 읽어옴. (백 => 프론트 부분)
+             */
+            state.session.on("signal:game", (event)=>{
+                // 게임 접속 시 데이터 받기
+                switch(event.data.gameStatus){
+                    // 설명자를 바꾸는 부분
+                    // "curPresenterId"에 설명자 번호가 전송되서 온다.
+                    case 0: {
+                        console.log(event.data);
+                        break;
+                    }
+                    case 1:{
+                        console.log(event.data);
+                        break;
+                    }
+                    case 2:{
+                        console.log(event.data);
+                        break;
+                    }
+                    case 3:{
+                        console.log(event.data);
+                        break;
+                    }
+                    case 4: {
+                        console.log("준비완료!!!", event.data);
+                        break;
+                    }
+                    case 5 :{
+                        console.log(event.data);
+                        break;
+                    }
+                }
+            })
 
 
             // New signal: {"type":"signal:game","data":{"gameStatus":3,"con_U8n1OlFKYx":false,"con_RgCANyJOsq":false}}
@@ -402,6 +459,7 @@ export default {
             state,
             playerList,
             joinSession,
+            gameStart,
             getToken,
             createToken,
             leaveSession,
