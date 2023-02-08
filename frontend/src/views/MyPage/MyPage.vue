@@ -103,6 +103,7 @@ export default {
             nickname: "",
             level: 0,
             exp: 0,
+            exprate: 0,
             robot: null,
             record: {
                 plays: 0,
@@ -118,6 +119,7 @@ export default {
             userinfo.nickname = res.nickname
             userinfo.level = res.level
             userinfo.exp = res.exp
+            userinfo.exprate = res.exp / res.level 
             userinfo.record.plays = res.record.plays
             userinfo.record.wins = res.record.wins
             userinfo.record.draws = res.record.draws
@@ -154,7 +156,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .game-info {
     padding: 1rem;
     background-color: rgba(255, 255, 255, 0.7);

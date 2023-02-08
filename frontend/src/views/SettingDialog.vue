@@ -1,11 +1,11 @@
 <template>
     <div>
-      <v-row>
         <v-btn
-          color="primary"
+          color="blue-grey"
           @click="clickDialog"
+          rounded
         >
-          설정
+        <v-icon>mdi-cog</v-icon>
         </v-btn>
         <v-dialog
           v-model="state.dialog"
@@ -32,7 +32,6 @@
           ></v-slider>
         </v-card>
         </v-dialog>
-      </v-row>
     </div>
   </template>
   

@@ -34,6 +34,9 @@
                     <v-btn class="exitbtn" @click="clickExit">EXIT</v-btn>
                 </div>
             </div>
+            <div class="sidebtn">
+                    <v-btn class="exitbtn" @click="gameStart()">Game Start</v-btn>
+            </div>
         </div>
     </div>
     <div class="in_game_component" v-else>

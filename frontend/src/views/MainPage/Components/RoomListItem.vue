@@ -53,4 +53,10 @@ export default {
 
 <style>
 
+.title {
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
+
 </style>

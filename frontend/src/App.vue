@@ -41,6 +41,7 @@
 }
 #stars{
   position: relative;
+  left: -30%;
   bottom: 100%;
   height: 300%;
   margin:0;  

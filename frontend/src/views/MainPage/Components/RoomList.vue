@@ -66,10 +66,13 @@ import { useRouter } from "vue-router"
 import { useStore } from "vuex"
 import RoomListItem from '@/views/MainPage/Components/RoomListItem.vue'
 import { getCurrentInstance } from "vue";
+// import {RotateSquare2} from 'vue-loading-spinner'
+
 export default {
   name: "RoomList",
   components: {
-    RoomListItem
+    RoomListItem,
+    // RotateSquare2
   },
   emits: ["sendValue"],
   setup() {
@@ -80,6 +83,7 @@ export default {
       teamrooms: [],
       roomlist: [],
       switch1: true,
+      // isLoading: false
     })
 
     const getInRoom = function (params) {
@@ -105,6 +109,7 @@ export default {
 
     // 방 리스트 조회
     onMounted(async () => {
+      // state.isLoading = true
       const res = await roomList()
       const response = res.data
       console.log(response)

@@ -157,7 +157,6 @@ const actions = {
             const response = await deleteAccount(context.state.token)
             await context.commit("setToken", null);
             localStorage.removeItem('token')
-
             return response
         } catch(err) {
             console.log(err);

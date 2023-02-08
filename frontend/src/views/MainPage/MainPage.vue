@@ -1,6 +1,5 @@
 <template>
   <div>
-    <rotate-square2 v-if="isLoading"></rotate-square2>
     <v-container>
       <v-row>
         <v-col class="room-list">
@@ -52,7 +51,7 @@ import { useStore } from "vuex"
 import { useRouter } from "vue-router"
 // import store from '@/store/gameStore';
 import { reactive } from "vue"
-// import { mapGetters } from 'vuex'
+// import {RotateSquare2} from 'vue-loading-spinner'
 
 export default {
   name: 'MainPage',
@@ -66,7 +65,8 @@ export default {
     const store = useStore()
     const router = useRouter()
     const state = reactive({
-      isTeam : null
+      isTeam : null,
+      // isLoading: false
     })
     const changeValue = function (value) {
       state.isTeam = value
@@ -105,7 +105,6 @@ export default {
       // randomPrivate,
       }
     },
-
 }
 // }
 </script>

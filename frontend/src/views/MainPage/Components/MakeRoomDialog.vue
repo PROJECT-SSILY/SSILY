@@ -6,12 +6,10 @@
       width="500"
     >
       <template v-slot:activator="{ attrs }">
-        <v-img 
-        v-bind="attrs"
-        @click.stop="state.dialog = true" 
-        class="make-planet" 
-        @click="randomTeam" 
-        src="@/assets/images/planet-08.svg"
+        <v-btn
+          dark
+          v-bind="attrs"
+          @click.stop="state.dialog = true"
         >
         Room</v-img>
       </template>
@@ -80,7 +78,6 @@
             <p class="text-center">
               <v-btn
               @click="joinSession()">Join!</v-btn>
-              <rotate-square2 v-if="isLoading"></rotate-square2>
             </p>
           </v-card-actions>
       </v-form>
@@ -96,16 +93,21 @@
   // import { computed } from 'vue'
   import $axios from "axios";
 // import { on } from 'events';
+  // import {RotateSquare2} from 'vue-loading-spinner'
 
   $axios.defaults.headers.post['Content-Type'] = 'application/json';
   // const OPENVIDU_SERVER_URL = "https://localhost:4443";
   // const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
   export default {
+    components: {
+      // RotateSquare2
+    },
     setup() {
       const router = useRouter()
       const store = useStore()
       const state = reactive({
+        // isLoading: false,
         dialog: false,
         title: null,
         isSecret : false,
@@ -138,38 +140,38 @@
         // router.push({name: 'gameroom'})
       }
 
-      // const createSession = () => {
-      //     let sessionId = null
-      //     return new Promise((resolve, reject) => {
-      //         $axios
-      //         .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
-      //         "title" : state.title,
-      //         "isSecret" : state.isSecret,
-      //         "password" : state.password,
-      //         "isTeamBattle" : state.isTeamBattle
-      //         }), {
-      //             auth: {
-      //                 username: 'OPENVIDUAPP',
-      //                 password: OPENVIDU_SERVER_SECRET,
-      //             },
-      //         })
-      //         .then(response => response.data)
-      //         .then(data => {
-      //             resolve(data.id)
-      //         })
-      //         .catch(error => {
-      //             if (error.response.status === 409) {
-      //                 resolve(sessionId);
-      //             } else {
-      //                 console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
-      //                 if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
-      //                     location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
-      //                 }
-      //                 reject(error.response);
-      //             }
-      //         });
-      //     });
-      // }
+      const createSession = () => {
+          let sessionId = null
+          return new Promise((resolve, reject) => {
+              $axios
+              .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+              "title" : state.title,
+              "isSecret" : state.isSecret,
+              "password" : state.password,
+              "isTeamBattle" : state.isTeamBattle
+              }), {
+                  auth: {
+                      username: 'OPENVIDUAPP',
+                      password: OPENVIDU_SERVER_SECRET,
+                  },
+              })
+              .then(response => response.data)
+              .then(data => {
+                  resolve(data.id)
+              })
+              .catch(error => {
+                  if (error.response.status === 409) {
+                      resolve(sessionId);
+                  } else {
+                      console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
+                      if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
+                          location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
+                      }
+                      reject(error.response);
+                  }
+              });
+          });
+      }
 
       return {
         router,
@@ -189,35 +191,3 @@
     }
   }
 </script>
-<style scoped>
-.dialog {
-  font-family: 'MaplestoryOTFBold';
-  font-weight: normal;
-  font-style: normal;
-}
-.card-title {
-  font-family: 'MaplestoryOTFBold';
-  font-weight: normal;
-  font-style: normal;
-}
-.make-planet {
-  font-family: 'Akronim', cursive;
-  font-size: 3rem;
-  height: 7rem;
-  display : flex;
-  justify-content : center;
-  align-items : center;
-  color:white;
-  transform: translate(-9px, -15px);
-}
-@keyframes shake-make-planet {
-  0% { transform: translate(-8px, -14px); }
-  33% { transform: translate(-10px, -14px); }
-  66% { transform: translate(-10px, -16px); }
-  100% { transform: translate(-8px, -16px); }
-}
-
-.make-planet:hover {
-  animation: shake-make-planet .1s infinite alternate;
-}
-</style>

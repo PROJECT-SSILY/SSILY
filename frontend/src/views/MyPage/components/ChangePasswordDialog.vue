@@ -1,61 +1,37 @@
 <template>
-  <div class="text-center">
-    <v-dialog
-      v-model="state.dialog"
-      width="500"
-    >
-      <template v-slot:activator="{ attrs }">
-        <v-btn
-          block
-          dark
-          v-bind="attrs"
-          @click.stop="state.dialog = true"
-        >
-          비밀번호 변경
-        </v-btn>
-      </template>
-      <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
-          비밀번호 변경
-        </v-card-title>
-        <v-form
-        ref="form"
-        v-model="state.valid"
-        lazy-validation
-        >
-            <div id="join-dialog" class="jumbotron vertical-center">
-              <div class="form-group">
-                <v-col cols="12">
-                  <v-text-field
-                    v-model="state.form.oldpassword"
-                    :append-icon="state.show ? 'mdi-eye' : 'mdi-eye-off'"
-                    :type="state.show ? 'text' : 'password'"
-                    name="oldpassword"
-                    label="기존 비밀번호"
-                    hint=""
-                    @click:append="state.show = !state.show"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12">
-                  <v-text-field
-                    v-model="state.form.password1"
-                    :append-icon="state.show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                    :type="state.show1 ? 'text' : 'password'"
-                    :rules="[state.rules.required, state.rules.passwordRules]"
-                    name="password1"
-                    label="변경할 비밀번호"
-                    hint=""
-                    @click:append="state.show1 = !state.show1"
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12">
-                  <v-text-field
-                      v-model="state.form.password2"
-                      :append-icon="state.show2 ? 'mdi-eye' : 'mdi-eye-off'"
-                      :type="state.show2 ? 'text' : 'password'"
-                      :rules="[state.rules.required, state.rules.passwordRules2]"
-                      name="password2"
-                      label="비밀번호 확인"
+    <div class="text-center">
+      <v-dialog
+        v-model="state.dialog"
+        width="500"
+      >
+        <template v-slot:activator="{ attrs }">
+          <v-btn
+            block
+            dark
+            v-bind="attrs"
+            @click.stop="state.dialog = true"
+          >
+            비밀번호 변경
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-title class="text-h5 grey lighten-2">
+            비밀번호 변경
+          </v-card-title>
+          <v-form
+          ref="form"
+          v-model="state.valid"
+          lazy-validation
+          >
+              <div id="join-dialog" class="jumbotron vertical-center">
+                <div class="form-group">
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="state.form.oldpassword"
+                      :append-icon="state.show ? 'mdi-eye' : 'mdi-eye-off'"
+                      :type="state.show ? 'text' : 'password'"
+                      name="oldpassword"
+                      label="기존 비밀번호"
                       hint=""
                       @click:append="state.show2 = !state.show2"
                   ></v-text-field>
