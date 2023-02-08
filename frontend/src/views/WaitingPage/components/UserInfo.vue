@@ -1,6 +1,6 @@
 <template>
-<div class="userinfo-item-wrapper">
-  <div id="userinfo-item">
+<div class="userinfo-item-wrapper ">
+  <div class="userinfo-item">
     <h1>닉네임: {{ user.nickname }}</h1>
     <p>레벨: {{ user.level }}</p>
     <p>팀: {{ user.team }}</p>
@@ -12,8 +12,6 @@
 
 <script>
 import { useStore } from "vuex"
-
-
 
 export default {
   name: 'UserInfo',
@@ -40,14 +38,14 @@ export default {
   border-radius: 100%;
 }
 .userinfo-item {
-  width: 300px;
-  height: 300px;
-  padding: 30px;
+  width: 297px;
+  height: 297px;
   box-sizing: border-box;
   background-color: white;
   border-radius: 100%;
-  border: 25px solid black;
+  border: 35px solid black;
   border-color: inherit;
+  box-shadow: inset 0px 0px 7px 1px;
 }
 .BLUE {
   border-color: #09c4ff;

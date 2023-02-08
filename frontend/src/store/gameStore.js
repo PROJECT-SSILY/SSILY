@@ -19,7 +19,7 @@ const state = {
     mainStreamManager: undefined,
     publisher: undefined,
     subscribers: [],
-    mySessionId: '',
+    sessionId: '',
     myUserName: '',
     isHost: true,
     playerList: undefined,
@@ -40,7 +40,7 @@ const getters = {
         return state.session;
     },
     getSessionId: (state) => {
-      return state.mySessionId;
+      return state.sessionId;
     },
     getTitle: (state) => {
       return state.title;
@@ -109,8 +109,8 @@ const mutations = {
     setSubscribers: (state, data) => {
         state.subscribers = data;
     },
-    setMySessionId: (state, id) => {
-        state.mySessionId = id;
+    setSessionId: (state, id) => {
+        state.sessionId = id;
     },
     setMyUserName: (state, name) => {
         state.myUserName = name;
@@ -134,6 +134,7 @@ const mutations = {
       state.chat.push(data)
     },
     setUserList: (state, data) => {
+      state.userList = []
       state.userList.push(data)
     }
 
@@ -141,7 +142,7 @@ const mutations = {
 
 }
 const actions = {
-    joinSession : (context) => {
+    joinSession : (context, sessionId) => {
         console.log("joinsession 시작")
         // --- Get an OpenVidu object ---
         const OV = new OpenVidu();
@@ -155,10 +156,10 @@ const actions = {
         // --- Specify the actions when events take place in the session ---
         // On every new Stream received...
 
-        // stream = 영상 송출과 관련된 정보들
-        // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직
+        // stream = 영상 송출과 관련된 정보들 | 이은혁
+        // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직 | 이은혁
         session.on('streamCreated', ({ stream }) => {
-            const subscriber = state.session.subscribe(stream);
+            const subscriber = session.subscribe(stream);
             state.subscribers.push(subscriber);
         });
 
@@ -188,8 +189,6 @@ const actions = {
           const data = {user : nickname, text: chatMessage, id: chatUser}
           console.log('채팅 신호 받음')
           context.commit('setChat', data)
-          
-
         })
 
   
@@ -214,7 +213,7 @@ const actions = {
                     user.score = data[key].player.rate
                     user.team = data[key].player.rate
                     context.commit('setUserList', user)
-                    console.log('유저리스트 : ', state.userList)
+                    console.log('유저 하나 : ', user)
                   }
                   break
               }
@@ -252,7 +251,7 @@ const actions = {
         // 'getToken' method is simulating what your server-side should do.
         // 'token' parameter should be retrieved and returned by your own backend
 
-        context.dispatch("getToken", state.mySessionId).then(token => {
+        context.dispatch("getToken", sessionId).then(token => {
             console.log("여기까지 완료, token :", token, "state.myUserName :", state.myUserName )
             console.log("session : ", session )
             session.connect(token, { clientData: state.myUserName })
@@ -267,7 +266,8 @@ const actions = {
                     frameRate: 30,			// The frame rate of your video
                     insertMode: 'APPEND',	// How the video is inserted in the target element 'video-container'
                     mirror: false       	// Whether to mirror your local video or not
-                });
+                })
+                // .catch((error)=> console.log(error));
 
 
                 console.log("아싸")
@@ -297,10 +297,11 @@ const actions = {
 
     createSession : (context, sessionId) => { // => 세션 생성 후 세션ID 발급됨
         if (sessionId) {
-            console.log("토큰 이미 존재");
+            console.log("세션ID 이미 존재");
             return sessionId
         } else {
             console.log("토큰 존재하지 않음");
+            console.log("title", state.title, "isSecret",  state.isSecret,"password", state.password, "isTeamBattle", state.isTeamBattle)
             return new Promise((resolve, reject) => {
                 $axios
                 .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
@@ -381,9 +382,9 @@ const actions = {
         })
     },
 
-    getToken: ({dispatch}, mySessionId) => {
+    getToken: ({dispatch}, sessionId) => {
         console.log('gettoken 진입')
-        return dispatch('createSession', mySessionId) // createsession 반환값 => sessionId
+        return dispatch('createSession', sessionId) // createsession 반환값 => sessionId
         .then((sessionId) => dispatch('createToken', sessionId));
     },
 

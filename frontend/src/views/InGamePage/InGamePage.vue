@@ -23,8 +23,7 @@
                 <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2"></v-radio>
             </v-radio-group>
             <div class="chat_box">
-                <ChattingBox
-                />
+                <ChattingBox/>
             </div>
             <div class="side_footer">
                 <div class="sidebtn">
@@ -82,7 +81,7 @@ import WaitingPage from '@/views/WaitingPage/WaitingPage.vue';
 import ChattingBox from '@/views/WaitingPage/components/ChattingBox.vue';
 import $axios from "axios";
 import { useStore } from 'vuex';
-import {  useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 // import { OpenVidu } from "openvidu-browser";
 import { reactive } from '@vue/reactivity'
@@ -112,6 +111,7 @@ export default {
     },
     setup() {
         const store = useStore()
+        const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         // const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         const userList = computed(() => store.state.gameStore.userList)
 
@@ -126,7 +126,7 @@ export default {
             mainStreamManager: undefined,
             // publisher: null,
             // subscribers: [],
-            // sessionId: route.params.sessionId || null,
+            sessionId: route.params.sessionId || null,
             // myUserName: '',
             isHost: true,
             readyAll: false,
@@ -174,7 +174,8 @@ export default {
 
 
         const joinSession = async function() {
-            store.dispatch('gameStore/joinSession')
+            await store.commit('gameStore/setSessionId', state.sessionId) // 실행 전 세션id 저장 | 이은혁
+            await store.dispatch('gameStore/joinSession', state.sessionId)
             }
 
         const leaveSession = async function() {
@@ -186,15 +187,10 @@ export default {
             store.dispatch('gameStore/updateMainVideoStreamManager',stream)
         }
 
-        const sessionInfo = () => {
-            const session1 = store.getters['gameStore/getSession']
-            const sessionId1 = store.getters['gameStore/getSessionId']
-            console.log('session클릭', session1)
-            console.log('sessionId', sessionId1)
-        }
+
         onBeforeMount(() => {
             console.log('join start');
-            store.dispatch('gameStore/joinSession')
+            joinSession()
         })
 
         const clickExit = () => {
@@ -374,7 +370,6 @@ export default {
             clickReady,
             joinSession,
             leaveSession,
-            sessionInfo,
             updateMainVideoStreamManager,
             userList
         }
