@@ -19,7 +19,22 @@ import { computed, watch } from '@vue/runtime-core'
 export default {
   name: 'UserInfo',
   components: {
+    // UserInfoItem
   },
+  /*
+  computed: {
+		clientData () {
+			const { clientData } = this.getConnectionData();
+			return clientData;
+		},
+	},
+  methods: {
+		getConnectionData () {
+			const { connection } = this.streamManager.stream;
+			return JSON.parse(connection.data);
+		},
+	},
+   */
   props: {
     player: Object,
     myConnectionId: String,
@@ -45,7 +60,10 @@ export default {
            state.team
         }
     })
-
+    // console.log("여기 좀 봐보자 player: ",props.player);
+    // const playerInfo = ref(props.player)
+    // return { store, playerInfo }
+    
     // console.log(toRaw(props.player))
     watch(props.myTeam, () => {
       () => {

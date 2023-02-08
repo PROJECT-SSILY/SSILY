@@ -180,7 +180,14 @@ export default {
         })
 
         const gameStart = async() =>{
-            state.session.signal({
+            await state.session.signal({
+                    type: 'game',
+                    data: {
+                        gameStatus: 2
+                },
+                to: []
+                })
+            await state.session.signal({
                     type: 'game',
                     data: {
                         gameStatus: 0
