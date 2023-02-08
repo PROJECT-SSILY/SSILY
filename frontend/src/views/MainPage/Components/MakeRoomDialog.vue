@@ -1,16 +1,29 @@
 <template>
   <div class="text-center">
-    <v-dialog v-model="state.dialog" width="500">
+    <v-dialog
+      v-model="state.dialog"
+      class="dialog"
+      width="500"
+    >
       <template v-slot:activator="{ attrs }">
-        <v-btn dark v-bind="attrs" @click.stop="state.dialog = true">
-          방 만들기
-        </v-btn>
+        <v-img 
+        v-bind="attrs"
+        @click.stop="state.dialog = true" 
+        class="make-planet" 
+        @click="randomTeam" 
+        src="@/assets/images/planet-08.svg"
+        >
+        Room</v-img>
       </template>
       <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
+        <v-card-title class="card-title">
           방 만들기
         </v-card-title>
-        <v-form ref="form" v-model="valid" lazy-validation>
+        <v-form
+        ref="form"
+        v-model="valid"
+        lazy-validation
+        >
           <div id="join" v-if="!state.session">
             <div id="join-dialog" class="jumbotron vertical-center">
               <div class="form-group">
@@ -67,6 +80,7 @@
             <p class="text-center">
               <v-btn
               @click="joinSession()">Join!</v-btn>
+              <rotate-square2 v-if="isLoading"></rotate-square2>
             </p>
           </v-card-actions>
       </v-form>
@@ -175,3 +189,35 @@
     }
   }
 </script>
+<style scoped>
+.dialog {
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
+.card-title {
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
+.make-planet {
+  font-family: 'Akronim', cursive;
+  font-size: 3rem;
+  height: 7rem;
+  display : flex;
+  justify-content : center;
+  align-items : center;
+  color:white;
+  transform: translate(-9px, -15px);
+}
+@keyframes shake-make-planet {
+  0% { transform: translate(-8px, -14px); }
+  33% { transform: translate(-10px, -14px); }
+  66% { transform: translate(-10px, -16px); }
+  100% { transform: translate(-8px, -16px); }
+}
+
+.make-planet:hover {
+  animation: shake-make-planet .1s infinite alternate;
+}
+</style>

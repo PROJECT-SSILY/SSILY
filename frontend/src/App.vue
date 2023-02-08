@@ -15,6 +15,13 @@
 </script>
 
 <style>
+@font-face {
+  font-family: 'MaplestoryOTFBold';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/MaplestoryOTFBold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -34,48 +41,22 @@
 }
 #stars{
   position: relative;
-  height: 100vh;
-  margin:0;  background-image: url("./assets/stars3.svg");
+  bottom: 100%;
+  height: 300%;
+  margin:0;  
+  background-image: url("@/assets/images/stars3.svg");
   background-size: contain;
   background-position: center;
   overflow: hidden;
+  animation: rotation 120s infinite linear;
 }
-@-webkit-keyframes rotating /* Safari and Chrome */ {
+@keyframes rotation {
   from {
-    -webkit-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(360deg);
-    -o-transform: rotate(360deg);
     transform: rotate(360deg);
   }
-}
-@keyframes rotating {
-  from {
-    -ms-transform: rotate(0deg);
-    -moz-transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    transform: rotate(0deg);
-    transform-origin: center;
-  }
   to {
-    -ms-transform: rotate(360deg);
-    -moz-transform: rotate(360deg);
-    -webkit-transform: rotate(360deg);
-    -o-transform: rotate(360deg);
-    transform: rotate(360deg);
-    transform-origin: center;
+    transform: rotate(0deg);
   }
-}
-.rotating {
-  -webkit-animation: rotating 200s linear infinite;
-  -moz-animation: rotating 200s linear infinite;
-  -ms-animation: rotating 200s linear infinite;
-  -o-animation: rotating 200s linear infinite;
-  animation: rotating 200s linear infinite;
 }
 
 #contents {
@@ -97,5 +78,10 @@ nav a {
 
 nav a.router-link-exact-active {
   color: #42b983;
+}
+
+
+.btnbox {
+  display: flex;
 }
 </style>

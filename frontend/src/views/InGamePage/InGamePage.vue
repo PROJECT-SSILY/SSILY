@@ -86,7 +86,7 @@ import { useRoute, useRouter } from 'vue-router'
 // import { OpenVidu } from "openvidu-browser";
 import { reactive } from '@vue/reactivity'
 // import { GetPlayerList } from "@/common/api/gameAPI";
-import { onUpdated, onBeforeMount, computed } from 'vue';
+import { onBeforeMount, computed } from 'vue';
 // import { forEach } from 'vega-lite/build/src/encoding';
 
 //=================OpenVdue====================
@@ -173,6 +173,11 @@ export default {
         // =====================
 
 
+        onBeforeMount(() => {
+            console.log('join start');
+            joinSession()
+        })
+
         const joinSession = async function() {
             await store.commit('gameStore/setSessionId', state.sessionId) // 실행 전 세션id 저장 | 이은혁
             await store.dispatch('gameStore/joinSession', state.sessionId)
@@ -187,19 +192,18 @@ export default {
             store.dispatch('gameStore/updateMainVideoStreamManager',stream)
         }
 
-
-        onBeforeMount(() => {
-            console.log('join start');
-            joinSession()
-        })
-
         const clickExit = () => {
+            store.dispatch('gameStore/leaveSession')
             router.push({
                 name: 'main'
             })
         }
 
-        onUpdated(() => {
+        const clickReady = () => {
+            store.dispatch('gameStore/changeReady')
+        }
+
+        // onUpdated(() => {
             // if (!state.readyAll) {
                 // document.querySelector(".waiting_component").innerHTML
                 // playerList.value
@@ -222,7 +226,7 @@ export default {
             // console.log("playerList.value.length::::::::::", playerList.value.length)
             // state.myTeam = tmpMyTeam
             // state.opponentTeam = tmpOpponentTeam
-        })
+        // })
 
         // const joinSession = async () => {
         //     console.log("joinsession 시작")
@@ -280,9 +284,7 @@ export default {
 
 
 
-        const clickReady = () => {
-            store.dispatch('gameStore/changeReady')
-        }
+
 
         // const leaveSession = () => {
         //     // --- Leave the session by calling 'disconnect' method over the Session object ---

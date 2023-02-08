@@ -1,6 +1,6 @@
 <template>
     <div>
-      <v-row justify="center">
+      <v-row>
         <v-btn
           color="primary"
           @click="clickDialog"
