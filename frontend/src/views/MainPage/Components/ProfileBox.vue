@@ -23,16 +23,12 @@
   </template>
 
 <script>
-import SettingDialog from '@/views/SettingDialog.vue';
 import { reactive, onBeforeMount } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 
 export default {
   name: 'ProfileBox',
-  components: {
-    SettingDialog,
-  },
   setup() {
     const route = useRouter()
     const store = useStore()
