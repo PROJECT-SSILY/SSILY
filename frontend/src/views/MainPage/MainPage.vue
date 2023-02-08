@@ -1,51 +1,51 @@
 <template>
-    <div>
-      <rotate-square2 v-if="isLoading"></rotate-square2>
-      <v-container>
-        <v-row>
-          <v-col class="room-list">
-            <room-list @sendValue="changeValue"></room-list>
-          </v-col>
-          <v-col class="console">
-            <v-row>
-              <v-col>
-                <profile-box></profile-box>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <make-room-dialog></make-room-dialog>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col v-if="state.isTeam">
-                <v-img class="start-planet" @click="randomTeam" src="../../../public/planet-09.svg">Start</v-img>
-              </v-col>
-              <v-col v-else>
-                <v-img class="start-planet" @click="randomPrivate" src="../../../public/planet-01.svg">Start</v-img>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <tutorial-dialog></tutorial-dialog>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-container>
-    </div>
-  </template>
-  
+  <div>
+    <v-container>
+      <v-row>
+        <v-col class="room-list">
+          <room-list @sendValue="changeValue"></room-list>
+        </v-col>
+        <v-col class="console">
+          <v-row>
+            <v-col>
+             <router-link :to="{ name: 'mypage' }" class="myPageBtn btnbox">
+              마이 페이지
+            </router-link>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <make-room-dialog></make-room-dialog>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col v-if="state.isTeam">
+              <v-img class="start-planet" @click="randomTeam" src="@/assets/images/planet-09.svg">Start</v-img>
+            </v-col>
+            <v-col v-else>
+              <v-img class="start-planet" @click="randomPrivate" src="@/assets/images/planet-01.svg">Start</v-img>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <tutorial-dialog></tutorial-dialog>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
+</template>
 <script>
 
 import MakeRoomDialog from './Components/MakeRoomDialog.vue';
-
+// import SettingDialog from '../SettingDialog.vue';
 import TutorialDialog from './Components/TutorialDialog.vue';
-import ProfileBox from './Components/ProfileBox.vue';
+// import ProfileBox from './Components/ProfileBox.vue';
 import RoomList from './Components/RoomList.vue';
 import { useStore } from "vuex"
 import { useRouter } from "vue-router"
@@ -55,6 +55,12 @@ import { reactive } from "vue"
 
 export default {
   name: 'MainPage',
+  components: {
+    MakeRoomDialog,
+    TutorialDialog,
+    // ProfileBox,
+    RoomList,
+  },
   setup() {
     const store = useStore()
     const router = useRouter()
@@ -62,9 +68,16 @@ export default {
       isTeam : null,
       // isLoading: false
     })
+    const changeValue = function (value) {
+      state.isTeam = value
+      // console.log(value)
+    }
+    // function getMe () {
+    //   console.log(store.getters['accountStore/getUser'])
+    // }
     // const changeValue = function (value) {
     //   state.isTeam = value
-    //   // console.log(value)
+    //   console.log(value)
     // }
     // const randomTeam = async function () {
     //   const params = {
@@ -83,26 +96,24 @@ export default {
     //   router.push({name: 'gameroom'})
     // }
     return {
-      store, 
-      router, 
+      store,
+      router,
       state,
-      // changeValue,
+      changeValue,
+      // getMe,
       // randomTeam,
       // randomPrivate,
       }
     },
-  components: {
-    MakeRoomDialog,
-    TutorialDialog,
-    ProfileBox,
-    RoomList,
-    // RotateSquare2    
-  },
 }
 // }
 </script>
 
 <style scoped>
+
+.myPageBtn {
+
+}
 
 .start-planet {
   font-family: 'Akronim', cursive;

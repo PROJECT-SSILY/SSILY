@@ -44,11 +44,12 @@
   left: -30%;
   bottom: 100%;
   height: 300%;
-  margin:0;  background-image: url("./assets/stars3.svg");
+  margin:0;  
+  background-image: url("@/assets/images/stars3.svg");
   background-size: contain;
   background-position: center;
   overflow: hidden;
-  animation: rotation 20s infinite linear;
+  animation: rotation 120s infinite linear;
 }
 @keyframes rotation {
   from {
@@ -78,5 +79,10 @@ nav a {
 
 nav a.router-link-exact-active {
   color: #42b983;
+}
+
+
+.btnbox {
+  display: flex;
 }
 </style>

@@ -6,12 +6,10 @@
       width="500"
     >
       <template v-slot:activator="{ attrs }">
-        <v-img 
-        v-bind="attrs"
-        @click.stop="state.dialog = true" 
-        class="make-planet" 
-        @click="randomTeam" 
-        src="../../../../public/planet-08.svg"
+        <v-btn
+          dark
+          v-bind="attrs"
+          @click.stop="state.dialog = true"
         >
         Room</v-img>
       </template>
@@ -80,7 +78,6 @@
             <p class="text-center">
               <v-btn
               @click="joinSession()">Join!</v-btn>
-              <!-- <rotate-square2 v-if="isLoading"></rotate-square2> -->
             </p>
           </v-card-actions>
       </v-form>
@@ -99,8 +96,8 @@
   // import {RotateSquare2} from 'vue-loading-spinner'
 
   $axios.defaults.headers.post['Content-Type'] = 'application/json';
-  const OPENVIDU_SERVER_URL = "https://localhost:4443";
-  const OPENVIDU_SERVER_SECRET = "MY_SECRET";
+  // const OPENVIDU_SERVER_URL = "https://localhost:4443";
+  // const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
   export default {
     components: {
@@ -115,7 +112,7 @@
         title: null,
         isSecret : false,
         password : null,
-        isTeamBattle : true,
+        isTeamBattle : false,
         rules: {
           required: value => !!value || '필수',
         }
@@ -127,22 +124,23 @@
       })
 
       const joinSession = async function() {
-        console.log("state.title : ", state.title);
-        console.log("state.isSecret : ", state.isSecret);
-        console.log("state.password : ", state.password);
-        console.log("state.isTeamBattle : ", state.isTeamBattle);
+        // console.log("state.title : ", state.title);
+        // console.log("state.isSecret : ", state.isSecret);
+        // console.log("state.password : ", state.password);
+        // console.log("state.isTeamBattle : ", state.isTeamBattle);
         store.commit('gameStore/setTitle', state.title)
         store.commit('gameStore/setSecret', state.isSecret)
         store.commit('gameStore/setPassword', state.password)
         store.commit('gameStore/setTeam', state.isTeamBattle)
 
         // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
-        const sessionId = await createSession()
+        const sessionId = await store.dispatch('gameStore/createSession')
+        console.log("sessionId : ", sessionId)
         router.push({name: 'gameroom', params: { sessionId : sessionId }})
+        // router.push({name: 'gameroom'})
       }
 
       const createSession = () => {
-          // state.isLoading = true
           let sessionId = null
           return new Promise((resolve, reject) => {
               $axios
@@ -157,11 +155,8 @@
                       password: OPENVIDU_SERVER_SECRET,
                   },
               })
-              
               .then(response => response.data)
               .then(data => {
-                  // state.isLoading = false
-                  console.log("data : ", data)
                   resolve(data.id)
               })
               .catch(error => {
@@ -182,7 +177,7 @@
         router,
         state,
         joinSession,
-        createSession,
+        // createSession,
         // == OpenVidu State ==
         // OV,
         // session,
@@ -196,36 +191,3 @@
     }
   }
 </script>
-
-<style scoped>
-.dialog {
-  font-family: 'MaplestoryOTFBold';
-  font-weight: normal;
-  font-style: normal;
-}
-.card-title {
-  font-family: 'MaplestoryOTFBold';
-  font-weight: normal;
-  font-style: normal;
-}
-.make-planet {
-  font-family: 'Akronim', cursive;
-  font-size: 3rem;
-  height: 7rem;
-  display : flex;
-  justify-content : center;
-  align-items : center;
-  color:white;
-  transform: translate(-9px, -15px);
-}
-@keyframes shake-make-planet {
-  0% { transform: translate(-8px, -14px); }
-  33% { transform: translate(-10px, -14px); }
-  66% { transform: translate(-10px, -16px); }
-  100% { transform: translate(-8px, -16px); }
-}
-
-.make-planet:hover {
-  animation: shake-make-planet .1s infinite alternate;
-}
-</style>
