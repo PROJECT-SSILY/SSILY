@@ -11,7 +11,7 @@
           v-bind="attrs"
           @click.stop="state.dialog = true"
         >
-        Room</v-img>
+        Room</v-btn>
       </template>
       <v-card>
         <v-card-title class="card-title">
@@ -140,38 +140,38 @@
         // router.push({name: 'gameroom'})
       }
 
-      const createSession = () => {
-          let sessionId = null
-          return new Promise((resolve, reject) => {
-              $axios
-              .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
-              "title" : state.title,
-              "isSecret" : state.isSecret,
-              "password" : state.password,
-              "isTeamBattle" : state.isTeamBattle
-              }), {
-                  auth: {
-                      username: 'OPENVIDUAPP',
-                      password: OPENVIDU_SERVER_SECRET,
-                  },
-              })
-              .then(response => response.data)
-              .then(data => {
-                  resolve(data.id)
-              })
-              .catch(error => {
-                  if (error.response.status === 409) {
-                      resolve(sessionId);
-                  } else {
-                      console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
-                      if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
-                          location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
-                      }
-                      reject(error.response);
-                  }
-              });
-          });
-      }
+      // const createSession = () => {
+      //     let sessionId = null
+      //     return new Promise((resolve, reject) => {
+      //         $axios
+      //         .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+      //         "title" : state.title,
+      //         "isSecret" : state.isSecret,
+      //         "password" : state.password,
+      //         "isTeamBattle" : state.isTeamBattle
+      //         }), {
+      //             auth: {
+      //                 username: 'OPENVIDUAPP',
+      //                 password: OPENVIDU_SERVER_SECRET,
+      //             },
+      //         })
+      //         .then(response => response.data)
+      //         .then(data => {
+      //             resolve(data.id)
+      //         })
+      //         .catch(error => {
+      //             if (error.response.status === 409) {
+      //                 resolve(sessionId);
+      //             } else {
+      //                 console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
+      //                 if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
+      //                     location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
+      //                 }
+      //                 reject(error.response);
+      //             }
+      //         });
+      //     });
+      // }
 
       return {
         router,
