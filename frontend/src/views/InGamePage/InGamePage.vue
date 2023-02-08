@@ -113,6 +113,9 @@ export default {
     setup() {
         const store = useStore()
         const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
+        // const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
+        const userList = computed(() => store.state.gameStore.userList)
+
         const router = useRouter()
         const state = reactive({
             title: null,
@@ -375,6 +378,7 @@ export default {
             leaveSession,
             sessionInfo,
             updateMainVideoStreamManager,
+            userList
         }
     }
 }
