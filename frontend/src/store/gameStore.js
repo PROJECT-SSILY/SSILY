@@ -135,7 +135,6 @@ const mutations = {
       state.chat.push(data)
     },
     setUserList: (state, data) => {
-      console.log('userList 추가  ==== ',data)
       state.userList.push(data)
     },
     setIsAllReady: (state, data) => {
@@ -206,7 +205,6 @@ const actions = {
           // 참여자 정보 정리
           var data = event.data.playerState;
           var keys = Object.keys(data);
-          console.log('keys ::::::::::::',keys)
           for (var i=0; i < keys.length; i++) {
             var user = {};
             var key = keys[i]
@@ -226,8 +224,6 @@ const actions = {
               context.commit('setUserKey', user.conectionId)
               context.commit('setUserList', user)
             }
-
-
           }
           break;
         }
