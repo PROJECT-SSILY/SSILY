@@ -135,6 +135,9 @@ const mutations = {
     },
     setUserList: (state, data) => {
       state.userList.push(data)
+    },
+    setIsAllReady: (state, data) => {
+      state.isAllReady = data
     }
 
     //==============================
@@ -198,23 +201,29 @@ const actions = {
           switch(event.data.gameStatus) {
             // 3. 참여자들 정보 받기
               case 3: {
+                  // 참여자 정보 정리
                   var data = event.data.playerState
-                  var keys = Object.keys(data)
-                  for (var i=0; i<keys.length; i++) {
-                    var key = keys[i];
-                    var user = {}
-                    user.conectionId = key
-                    user.isReady = data[key].isReady     
-                    user.exp = data[key].player.exp
-                    user.isHost = data[key].player.isHost
-                    user.isPresenter = data[key].player.isPresenter
-                    user.level = data[key].player.level
-                    user.nickname = data[key].player.nickname
-                    user.rate = data[key].player.rate
-                    user.score = data[key].player.rate
-                    user.team = data[key].player.rate
+                  var key = Object.keys(data)[0]
+                  var user = {}
+                  user.conectionId = key
+                  user.isReady = data[key].isReady     
+                  user.exp = data[key].player.exp
+                  user.isHost = data[key].player.isHost
+                  user.isPresenter = data[key].player.isPresenter
+                  user.level = data[key].player.level
+                  user.nickname = data[key].player.nickname
+                  user.rate = data[key].player.rate
+                  user.score = data[key].player.rate
+                  user.team = data[key].player.rate
+                  if (state.userList.length) {
+                    // 없는 유저일때만 저장
+                    for (var i=0; i<state.userList.length; i++) {
+                      if (state.userList.connectionId != key) {
+                        context.commit('setUserList', user)
+                        console.log('유저리스트 : ', state.userList)
+                      }}
+                  } else {
                     context.commit('setUserList', user)
-                    console.log('유저리스트 : ', state.userList)
                   }
                   break
               }
@@ -226,8 +235,7 @@ const actions = {
                   if (user.conectionId == readyUser) {
                     user.isReady = !user.isReady
                     console.log('user', user.nickname, '의 ready', user.isReady)
-                    console.log(state.isAllReady)
-                    console.log(state.userList)
+                    context.commit('setIsAllReady', state.isAllReady)
                   }
                 })
                 break
