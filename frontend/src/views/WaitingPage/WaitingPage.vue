@@ -8,7 +8,7 @@
         :myTeam="team"
         :key="player.id"/>
         <div class="userinfo_empty" 
-        v-for="p in emptyUser" 
+        v-for="p in 4-playerList.length" 
         :key="p"
         ></div>
       </div>
@@ -19,7 +19,7 @@ import { reactive, ref } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
 import UserInfo from './components/UserInfo.vue';
 import $axios from "axios";
-import { computed, onUpdated } from 'vue'
+import { onUpdated } from 'vue'
 import { useStore } from 'vuex';
 
 
@@ -52,9 +52,6 @@ export default {
     const state = reactive({
       team: null,
     })
-    const emptyUser = computed(() => {
-      return 4-PlayerList.value.length
-    })
 
     onUpdated(() => {
       state
@@ -77,7 +74,6 @@ export default {
     return {
 		router,
 		state,
-    emptyUser,
 		joinSession,
 		sessionInfo,
     PlayerList,

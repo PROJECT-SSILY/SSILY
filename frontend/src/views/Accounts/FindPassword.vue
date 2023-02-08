@@ -36,7 +36,7 @@
             @click="sendNewPw"
             >
             비밀번호 찾기
-            <Jawn v-if="state.isLoading"></Jawn>
+            <!-- <Jawn v-if="state.isLoading"></Jawn> -->
             </v-btn>
           </v-col>
         </v-row>
@@ -49,12 +49,12 @@
 import { reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import {Jawn} from 'vue-loading-spinner'
+// import {Jawn} from 'vue-loading-spinner'
 
 export default {
   name: 'FindPassword',
   components: {
-    Jawn
+    // Jawn
   },
   setup() {
     const store = useStore()
@@ -70,13 +70,13 @@ export default {
         nameRules: value => (2 <= value.length && value.length <= 10) || '이름은 2자 이상 10자 이내로 작성해주세요',
       },
       valid: true,
-      isLoading: false,
+      // isLoading: false,
       overlay: false
     })
 
     const sendNewPw = async function () {
       state.overlay = !state.overlay
-      state.isLoading = true
+      // state.isLoading = true
       const params = {
         email: state.form.email.value,
         name: state.form.name
@@ -84,11 +84,11 @@ export default {
       const result = await store.dispatch('accountStore/sendAction', params )
       
       if (result == 0) {
-        state.isLoading = false
+        // state.isLoading = false
         alert("임시 비밀번호 전송 완료!")
         router.push('login')
       } else {
-        state.isLoading = false
+        // state.isLoading = false
         state.overlay = !state.overlay
         alert("실패")
       }

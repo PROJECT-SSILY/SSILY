@@ -51,7 +51,7 @@ import { useStore } from "vuex"
 import { useRouter } from "vue-router"
 // import store from '@/store/gameStore';
 import { reactive } from "vue"
-import {RotateSquare2} from 'vue-loading-spinner'
+// import {RotateSquare2} from 'vue-loading-spinner'
 
 export default {
   name: 'MainPage',
@@ -96,7 +96,7 @@ export default {
     TutorialDialog,
     ProfileBox,
     RoomList,
-    RotateSquare2    
+    // RotateSquare2    
   },
 }
 // }

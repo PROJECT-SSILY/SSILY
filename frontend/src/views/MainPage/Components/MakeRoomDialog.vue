@@ -80,7 +80,7 @@
             <p class="text-center">
               <v-btn
               @click="joinSession()">Join!</v-btn>
-              <rotate-square2 v-if="isLoading"></rotate-square2>
+              <!-- <rotate-square2 v-if="isLoading"></rotate-square2> -->
             </p>
           </v-card-actions>
       </v-form>
@@ -96,7 +96,7 @@
   // import { computed } from 'vue'
   import $axios from "axios";
 // import { on } from 'events';
-  import {RotateSquare2} from 'vue-loading-spinner'
+  // import {RotateSquare2} from 'vue-loading-spinner'
 
   $axios.defaults.headers.post['Content-Type'] = 'application/json';
   const OPENVIDU_SERVER_URL = "https://localhost:4443";
@@ -104,13 +104,13 @@
 
   export default {
     components: {
-      RotateSquare2
+      // RotateSquare2
     },
     setup() {
       const router = useRouter()
       const store = useStore()
       const state = reactive({
-        isLoading: false,
+        // isLoading: false,
         dialog: false,
         title: null,
         isSecret : false,
@@ -142,7 +142,7 @@
       }
 
       const createSession = () => {
-          state.isLoading = true
+          // state.isLoading = true
           let sessionId = null
           return new Promise((resolve, reject) => {
               $axios
@@ -160,11 +160,8 @@
               
               .then(response => response.data)
               .then(data => {
-<<<<<<< HEAD
-=======
-                  state.isLoading = false
+                  // state.isLoading = false
                   console.log("data : ", data)
->>>>>>> 502bea9945b219a6b3b8d7bac0a716a2c3ef972f
                   resolve(data.id)
               })
               .catch(error => {
