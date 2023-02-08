@@ -34,10 +34,7 @@ export default {
     
     setup() {
         const session = computed(() => store.getters['gameStore/getSession'])
-
-
         const store = useStore()
-
         const chat = computed(() => store.state.gameStore.chat);
         const state = reactive({
             chattings:'',

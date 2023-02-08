@@ -132,6 +132,9 @@ const mutations = {
     },
     setChat: (state, data) => {
       state.chat.push(data)
+    },
+    setUserList: (state, data) => {
+      state.userList.push(data)
     }
 
     //==============================
@@ -145,6 +148,9 @@ const actions = {
 
         // --- Init a session ---
         const session = OV.initSession();
+
+        
+
 
         // --- Specify the actions when events take place in the session ---
         // On every new Stream received...
@@ -169,7 +175,7 @@ const actions = {
             console.warn(exception);
         });
 
-
+        // 채팅 신호 관리 - 수연
         session.on("signal:my-chat", (event)=> {
           const chatMessage = event.data
           const chatUser = event.from.connectionId
@@ -187,7 +193,7 @@ const actions = {
         })
 
   
-        // 게임 시그널 관리
+        // 게임 시그널 관리 - 수연
         session.on("signal:game", (event)=>{
           switch(event.data.gameStatus) {
             // 3. 참여자들 정보 받기
@@ -207,7 +213,7 @@ const actions = {
                     user.rate = data[key].player.rate
                     user.score = data[key].player.rate
                     user.team = data[key].player.rate
-                    state.userList.push(user)
+                    context.commit('setUserList', user)
                     console.log('유저리스트 : ', state.userList)
                   }
                   break
@@ -263,12 +269,16 @@ const actions = {
                     mirror: false       	// Whether to mirror your local video or not
                 });
 
+
                 console.log("아싸")
                 context.commit("setOV", OV)
                 context.commit("setSession", session)
                 context.commit("setMainStreamManager", publisher)
                 context.commit('SET_PUBLISHER', publisher)
                 // --- Publish your stream ---
+
+                session.publish(state.publisher);
+
                 // 입장할 때 참여자 정보 가져오기
                 session.signal({
                   type: 'game',
@@ -276,8 +286,7 @@ const actions = {
                     gameStatus: 3,
                   },
                   to: [],
-                })
-                session.publish(state.publisher);
+                })  
             })
             .catch(error => {
                 console.log('There was an error connecting to the session:', error.code, error.message);
@@ -391,6 +400,8 @@ const actions = {
         if (state.mainStreamManager === stream) return;
         commit("setMainStreamManager", stream)
     },
+
+    
 
     // 참여자 레디 상태 변경 - ingamePage에서 clickReady 했을 때 호출
     changeReady: () => {
