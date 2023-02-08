@@ -1,4 +1,5 @@
 package io.openvidu.server.game;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.openvidu.client.internal.ProtocolElements;
@@ -93,8 +94,7 @@ public class GameService   {
                 changeReadyState(participant, sessionId, participants, params, data, isTeamBattle);
                 return;
             case SUBMIT_ANSWER:
-                String answer = data.get("answer").getAsString();
-                submitAnswer(participant, sessionId, participants, params, data, answer);
+                submitAnswer(participant, sessionId, participants, params, data);
                 return;
         }
     }
@@ -341,15 +341,28 @@ public class GameService   {
      * 서영탁
      * 답안 제출
      */
-    private void submitAnswer(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data, String playerAnswer){
+    private void submitAnswer(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
         log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         Integer nowRound = round.get(sessionId);
         String answer = words.get(sessionId).get(nowRound);
 
+        String answers = data.get("answer").toString();
+        answers = answers.substring(4, answers.length()-4);
+        String[] answerArray = answers.split("\\\\\",\\\\\"");
+
+        boolean isCorrect = false;
+
+        for (String a : answerArray) {
+            if(a.equals(answer)){
+                isCorrect = true;
+                break;
+            }
+        }
+
         // 플레이어가 제출한 답안이 정답이라면
-        if(answer.equals(playerAnswer)){
+        if(isCorrect){
             data.addProperty("answer", answer);
             data.addProperty("winnerId", participant.getParticipantPublicId());
             data.addProperty("winnerNickname", participant.getPlayer().getNickname());
