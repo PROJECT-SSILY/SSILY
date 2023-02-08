@@ -202,11 +202,11 @@ export default {
                 userinfo.record.winrate =  res.record.wins/res.record.plays*100
             }
             if (res.level > -1 && res.level < 6)  {
-                userinfo.robot = "@/assets/images/robotface1.svg"
+                userinfo.robot = "./robotface1.svg"
             } else if (res.level > 5 && res.level < 11) {
-                userinfo.robot = "@/assets/images/robotface2.svg"
+                userinfo.robot = "./robotface2.svg"
             } else {
-                userinfo.robot = "@/assets/images/robotface3.svg"
+                userinfo.robot = "./robotface3.svg"
             }
             donutchart.series.push(2)
             // donutchart.series.push(donutchart.win)
