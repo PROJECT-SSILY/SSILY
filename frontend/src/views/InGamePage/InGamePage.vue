@@ -7,7 +7,7 @@
             <v-btn @click="state.amIDescriber = !state.amIDescriber">게임 순서 변경</v-btn>
         </p>
     <!------------------------------------------------------------------------------------->
-    <div class="waiting_component" v-if="!state.readyAll">
+    <div class="waiting_component" v-if="!readyAll">
         <div class="users_component">
             <WaitingPage
             :sessionId="state.sessionId"
@@ -117,7 +117,7 @@ export default {
         const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         // const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         const userList = computed(() => store.state.gameStore.userList)
-
+        const readyAll = computed(() => store.state.gameStore.isAllReady)
         const router = useRouter()
         const state = reactive({
             title: null,
@@ -132,7 +132,6 @@ export default {
             sessionId: route.params.sessionId || null,
             // myUserName: '',
             isHost: true,
-            readyAll: false,
             connectionId: null,
             
 
@@ -210,6 +209,9 @@ export default {
             store.dispatch('gameStore/changeTeamAction', color)
         }
 
+        const gameStart = () => {
+            store.dispatch('gameStore/gameStart')
+        }
         // onUpdated(() => {
             // if (!state.readyAll) {
                 // document.querySelector(".waiting_component").innerHTML
@@ -371,6 +373,7 @@ export default {
             state,
             // team,
             // title,
+            readyAll,
             publisher,
             myTeams,
             opponents,
@@ -378,6 +381,7 @@ export default {
             clickExit,
             clickReady,
             clickTeam,
+            gameStart,
             joinSession,
             leaveSession,
             updateMainVideoStreamManager,
