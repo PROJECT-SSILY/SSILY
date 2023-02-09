@@ -1,5 +1,7 @@
 <template>
   <div id="flex-container">
+    <PasswordInput
+    v-if="isSecret && !isHost"/>
       <div class="userinfo-component flex-item">
           <UserInfo
           v-for="user in userList"
@@ -20,6 +22,7 @@ import $axios from "axios";
 import { computed } from 'vue'
 import { useStore } from 'vuex';
 import BlankBox from './components/BlankBox.vue'
+import PasswordInput from './components/PasswordInput.vue'
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -28,6 +31,7 @@ export default {
   components: {
     UserInfo,
     BlankBox,
+    PasswordInput
   },
   props: {
     session: Object,
@@ -38,6 +42,8 @@ export default {
     const router = useRouter()
     const store = useStore()
     const userList = computed(() => store.state.gameStore.userList)
+    const isSecret = computed(() => store.state.gameStore.isSecret)
+    const isHost = computed(() => store.state.gameStore.isHost)
     const myTeam = ref(props.team)
     const Id = ref(props.myConnectionId)
 
@@ -45,7 +51,9 @@ export default {
 		router,
     Id,
     myTeam,
-    userList
+    userList,
+    isSecret,
+    isHost
     }
   }
 }
