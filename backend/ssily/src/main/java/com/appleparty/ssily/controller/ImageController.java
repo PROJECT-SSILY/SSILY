@@ -34,19 +34,9 @@ public class ImageController {
                                                   @RequestParam("sessionId") String sessionId) throws IOException {
         if(multipartFile == null || multipartFile.isEmpty()) throw new ImageNotFoundException();
 
-        String separator = File.separator;
-        String absolutePath = new File("").getAbsolutePath() + separator + separator;
-
-        String path = "src/main/resources/static/images";
-        File file = new File(path);
-
-        if(!file.exists()) file.mkdirs();
-
-        String fileName = sessionId + ".png";
-        file = new File(absolutePath + path + separator + fileName);
-        multipartFile.transferTo(file);
-
-        return responseService.getSingleResult(fileName);
+        byte[] bytes = multipartFile.getBytes();
+        imageService.saveAnswerImage(sessionId, bytes);
+        return responseService.getSingleResult(sessionId);
     }
 
     @PostMapping
