@@ -31,7 +31,8 @@ const state = {
     userList: [],
     userKey: [],
     chat: [],
-    myConnectionId: '',
+    myConnectionId: null,
+    amIDescriber: false,
 }
 
 const getters = {
@@ -167,6 +168,11 @@ const mutations = {
       var value = data.value
       state.userList[index].isPresenter = value
     },
+
+    setAmIDescriber: (state, data) => {
+      state.amIDescriber = data
+    },
+
     delUserinUserList: (state, data) => { // UserList에서 퇴장한 유저의 id 삭제
       state.userList.splice(data)
     },
@@ -179,13 +185,24 @@ const mutations = {
 }
 const actions = {
   _joinSession: (context, sessionId) => {
+    // console.log('joinsession 커넥션 아이디 : ', state.myConnectionId)
+    // if (state.myConnectionId != null) {
+    //   console.log('join session 안함 !')
+    //   state.session.signal({
+    //     type: 'game',
+    //     data: {
+    //       gameStatus: 3,
+    //     },
+    //     to: [],
+    //   })
+    //   return 
+    // }
     console.log("joinsession 시작");
     // --- Get an OpenVidu object ---
     const OV = new OpenVidu();
 
     // --- Init a session ---
     const session = OV.initSession();
-
 
     // --- Specify the actions when events take place in the session ---
     // On every new Stream received...
@@ -241,7 +258,7 @@ const actions = {
     // 게임 시그널 관리 - 수연
     session.on("signal:game", (event) => {
       switch (event.data.gameStatus) {
-        // 3. 참여자들 정보 받기
+        // 설명자 부여 
         case 0: {
           console.log('0번 시그널 수신 완료')
           var PresenterId = event.data.curPresenterId
@@ -250,14 +267,21 @@ const actions = {
             if (state.userList[n].connectionId == PresenterId) {
               context.commit('setIsPresenter', {index: n, value: true})
             } else {
-              context.commit('setIsPresenter', {index: n, value: false})}}
+              context.commit('setIsPresenter', {index: n, value: false})
+            }}
+            // 내가 설명자인지 판별하는 코드
+            if (PresenterId == state.myConnectionId) {
+              context.commit('setAmIDescriber', true)
+            } else {
+              context.commit('setAmIDescriber', false)
+            }
           break
         }
 
         case 3: {
           // 참여자 정보 정리
           var data = event.data.playerState;
-          
+          console.log('참여자 정보  : ', data)
           var keys = Object.keys(data);
           for (var i=0; i < keys.length; i++) {
             var user = {};
@@ -265,6 +289,7 @@ const actions = {
             if (state.myUserName == data[key].player.nickname) {
               context.commit('setMyConnectionId', key)
             }
+
             user.connectionId = key;
             user.isReady = data[key].isReady;
             user.exp = data[key].player.exp;
@@ -285,9 +310,8 @@ const actions = {
           }
           break;
         }
-
-        // 4. 참여자 ready 정보 경신 - 수연
         case 4: {
+          // 참여자 ready 정보 경신
           console.log('4번 시그널 받음', event.data)
           var allready = event.data.isAllReady
           context.commit('setIsAllReady', allready)
@@ -302,19 +326,16 @@ const actions = {
           }
           break;
         }
-
         case 5: {
           console.log('5번 시그널 수신 완료')
           console.log(event.data)
-        }
-
-
-        }}
+        }}}
     );
 
-
-
     context.dispatch("getToken", sessionId).then(token => {
+      console.log("여기까지 완료, token :", token, "state.myUserName :", state.myUserName);
+      console.log("session : ", session);
+      context.commit('setSession', session)
       session.connect(token, { clientData: state.myUserName })
         .then(() => {
           // --- Get your own camera stream with the desired properties ---
@@ -336,7 +357,6 @@ const actions = {
           // --- Publish your stream ---
           session.publish(state.publisher);
 
-          // 입장할 때 참여자 정보 가져오기 - 수연
           session.signal({
             type: 'game',
             data: {
@@ -344,6 +364,8 @@ const actions = {
             },
             to: [],
           });
+
+
         })
         .catch(error => {
           console.log('There was an error connecting to the session:', error.code, error.message);
@@ -453,7 +475,6 @@ const actions = {
         context.commit('SET_PUBLISHER', undefined)
         context.commit('setClearUserList')
         context.commit('setClearUserKey')
-        
     },
 
     updateMainVideoStreamManager: (commit, stream) => {
