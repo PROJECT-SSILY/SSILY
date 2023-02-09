@@ -209,12 +209,12 @@ const actions = {
       state.userList.forEach((user, index) => {
         if (user.connectionId == targetId) {
           context.commit('delUserinUserList', index) // 해당 열 삭제
-        } 
+        }
       });
       state.userKey.forEach((key, index) => {
         if (key == targetId) {
           context.commit('delUserinUserKey', index) // 해당 열 삭제
-        } 
+        }
       });
     });
 
@@ -257,7 +257,7 @@ const actions = {
         case 3: {
           // 참여자 정보 정리
           var data = event.data.playerState;
-          
+
           var keys = Object.keys(data);
           for (var i=0; i < keys.length; i++) {
             var user = {};
@@ -453,7 +453,7 @@ const actions = {
         context.commit('SET_PUBLISHER', undefined)
         context.commit('setClearUserList')
         context.commit('setClearUserKey')
-        
+
     },
 
     updateMainVideoStreamManager: (commit, stream) => {
@@ -461,7 +461,7 @@ const actions = {
         commit("setMainStreamManager", stream)
     },
 
-    
+
 
     // 참여자 레디 상태 변경 - ingamePage에서 clickReady 했을 때 호출
     changeReady: () => {
@@ -481,7 +481,7 @@ const actions = {
         type: 'my-chat'
       })
     },
-  
+
     isTeam: (state) => {
         state.commit("changeMode", null)
         console.log(state.getters.getTeam);
@@ -551,7 +551,7 @@ const actions = {
     },
 
     changeTest: (context) => {
-        context.commit("setIsAllReady", true)     
+        context.commit("setIsAllReady", true)
     },
 
     // 팀전 할 때 사용할 코드, 지금은 안 씀 - 수연
@@ -614,7 +614,7 @@ const actions = {
         console.log(err)
       }
     }
-    
+
 
 }
 export default {

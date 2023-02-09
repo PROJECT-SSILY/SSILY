@@ -45,14 +45,15 @@ const randomPrivate = (payload) => {
     });
 }
 
-const GetPlayerList = (mySessionId) => {
+const GetPlayerList = (mySessionId) => { // 중복 입장 처리용
     return $axios.get(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}/players`, {
         auth: {
             username: 'OPENVIDUAPP',
             password: OPENVIDU_SERVER_SECRET,
         }
-    })
+    }).then((response) => response.data)
 }
+
 // 시그널로 변경됨
 // const changeReady = (mySessionId, connectionId) => {
 //     return $axios.put(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}/players/${connectionId}/ready`, JSON.stringify({"body" : "body"}), {
@@ -65,7 +66,7 @@ const GetPlayerList = (mySessionId) => {
 /*
     나중에 팀전 할 때 참고!!!!!
 const changeTeam = (mySessionId, connectionId, color) => {
-    return $axios.put(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}/players/${connectionId}/team`, 
+    return $axios.put(`${OPENVIDU_SERVER_URL}/api/rooms/${mySessionId}/players/${connectionId}/team`,
     JSON.stringify({"team" : color}),{
         auth: {
             username: 'OPENVIDUAPP',
