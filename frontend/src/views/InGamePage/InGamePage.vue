@@ -43,6 +43,12 @@
         </div>
         <div class="in_game_component" v-else>
             <GameTimer date="August 15, 2016"/>
+            <div v-for="user in userList"
+            :user="user"
+            :key="user.id"
+            >
+            <h1> {{ user.nickname }}의 점수 : {{ user.score }}</h1>    
+            </div>
             <v-container>
                 <v-row>
                     <v-col>
