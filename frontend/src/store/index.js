@@ -5,14 +5,12 @@ import gameStore from './gameStore'
 
 
 
-
-
 export default createStore({
   modules: {
     accountStore,
     gameStore
   },
   // plugins: [createPersistedState({
-  //   paths: ["gameStore"]
+  //   paths: ["accountStore"]
   // })],
 })

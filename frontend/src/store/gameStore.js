@@ -15,11 +15,11 @@ const state = {
     isTeamBattle: null,
     isTeam: null,
     OV: undefined,
-    session: undefined,
+    session: null,
     mainStreamManager: undefined,
     publisher: undefined,
     subscribers: [],
-    sessionId: '',
+    sessionId: null,
     myUserName: '',
     isHost: false,
     playerList: undefined,
@@ -32,6 +32,7 @@ const state = {
     userKey: [],
     chat: [],
     myConnectionId: '',
+    amIDescriber: false,
 }
 
 const getters = {
@@ -81,7 +82,6 @@ const getters = {
 
 
 const mutations = {
-
     setTitle: (state, data) => {
         state.title = data
         console.log('set적용되는지확인' + state.title);
@@ -139,6 +139,7 @@ const mutations = {
       state.userList.push(data)
     },
     setIsAllReady: (state, data) => {
+      console.log('setIsAllReady 찍힘', data)
       state.isAllReady = data
     },
     setUserKey: (state, data) => {
@@ -160,6 +161,10 @@ const mutations = {
       var index = data.index
       var value = data.value
       state.userList[index].isPresenter = value
+    },
+
+    setAmIDescriber: (state, data) => {
+      state.amIDescriber = data
     }
 
     //==============================
@@ -173,7 +178,6 @@ const actions = {
 
     // --- Init a session ---
     const session = OV.initSession();
-
 
     // --- Specify the actions when events take place in the session ---
     // On every new Stream received...
@@ -215,7 +219,7 @@ const actions = {
     // 게임 시그널 관리 - 수연
     session.on("signal:game", (event) => {
       switch (event.data.gameStatus) {
-        // 3. 참여자들 정보 받기
+        // 설명자 부여 
         case 0: {
           console.log('0번 시그널 수신 완료')
           var PresenterId = event.data.curPresenterId
@@ -224,7 +228,14 @@ const actions = {
             if (state.userList[n].conectionId == PresenterId) {
               context.commit('setIsPresenter', {index: n, value: true})
             } else {
-              context.commit('setIsPresenter', {index: n, value: false})}}
+              context.commit('setIsPresenter', {index: n, value: false})
+            }}
+            // 내가 설명자인지 판별하는 코드
+            if (PresenterId == state.myConnectionId) {
+              context.commit('setAmIDescriber', true)
+            } else {
+              context.commit('setAmIDescriber', false)
+            }
           break
         }
 
@@ -238,7 +249,6 @@ const actions = {
             if (state.myUserName == data[key].player.nickname) {
               context.commit('setMyConnectionId', key)
             }
-
             user.conectionId = key;
             user.isReady = data[key].isReady;
             user.exp = data[key].player.exp;
@@ -254,22 +264,22 @@ const actions = {
               console.log('state.userKey: ', state.userKey)
               context.commit('setUserKey', user.conectionId)
               context.commit('setUserList', user)
-            }
-          }
+            }}
           break;
         }
-
-        // 4. 참여자 ready 정보 경신 - 수연
         case 4: {
+          // 참여자 ready 정보 경신
           console.log('4번 시그널 받음', event.data)
-          context.commit('setIsAllReady', event.data.isAllReady)
+          var allready = event.data.isAllReady
+          context.commit('setIsAllReady', allready)
           var readyData = event.data
           for (var k=0; k < state.userList.length; k++) {
             context.commit('setReady', {index: k, ready: readyData[state.userList[k].conectionId]})
           }
           // 모두 레디 했을 때, 게임 시작됨
-          if (event.data.isAllReady) {
+          if (allready) {
             context.dispatch('gameStart')
+            context.commit('setIsAllReady', allready)
           }
           break;
         }
@@ -279,7 +289,6 @@ const actions = {
           console.log(event.data)
         }
 
-
         }}
     );
 
@@ -288,6 +297,7 @@ const actions = {
     context.dispatch("getToken", sessionId).then(token => {
       console.log("여기까지 완료, token :", token, "state.myUserName :", state.myUserName);
       console.log("session : ", session);
+      context.commit('setSession', session)
       session.connect(token, { clientData: state.myUserName })
         .then(() => {
           // --- Get your own camera stream with the desired properties ---
@@ -310,7 +320,6 @@ const actions = {
           // --- Publish your stream ---
           session.publish(state.publisher);
 
-          // 입장할 때 참여자 정보 가져오기 - 수연
           session.signal({
             type: 'game',
             data: {
@@ -318,6 +327,8 @@ const actions = {
             },
             to: [],
           });
+
+
         })
         .catch(error => {
           console.log('There was an error connecting to the session:', error.code, error.message);
@@ -432,6 +443,7 @@ const actions = {
         context.commit("setSubscribers", [])
         context.commit("setOV", undefined)
         context.commit('SET_PUBLISHER', undefined)
+
     },
 
     updateMainVideoStreamManager: (commit, stream) => {
@@ -526,6 +538,10 @@ const actions = {
         context.commit("setVolume2", volume)
         // 아직 효과음 없어서 볼륨 조절 코드 없음 효과음 추가 이후 작성 예정
         console.log('alarm 볼륨 조절')
+    },
+
+    changeTest: (context) => {
+        context.commit("setIsAllReady", true)     
     },
 
     // 팀전 할 때 사용할 코드, 지금은 안 씀 - 수연

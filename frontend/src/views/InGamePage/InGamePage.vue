@@ -2,9 +2,9 @@
 <div class="wrap_component">
     <!----------------------------------- 개발용 버튼 -------------------------------------->
         <p>
-            <v-btn @click="state.readyAll=!state.readyAll">게임 시작</v-btn> |
+            <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
             <v-btn @click="state.isTeamBattle = !state.isTeamBattle">팀/개인전 변경</v-btn> |
-            <v-btn @click="state.amIDescriber = !state.amIDescriber">게임 순서 변경</v-btn>
+            <v-btn>게임 순서 변경</v-btn>
         </p>
     <!------------------------------------------------------------------------------------->
     <div class="waiting_component" v-if="!readyAll">
@@ -51,7 +51,7 @@
                     <div id="video-container" class="col-md-6">
                         <div class="me">
                             <h1>나</h1>
-                            <div class="drawing_sec" v-if="!state.amIDescriber">
+                            <div class="drawing_sec" v-if="!amIDescriber">
                                 <MyCanvasBox/>
                                 <user-video :stream-manager="publisher"/>
                             </div>
@@ -61,7 +61,7 @@
                         </div>
                         <div class="our_team">
                             <h1>우리 팀</h1>
-                            <div class="drawing_sec" v-if="state.amIDescriber">
+                            <div class="drawing_sec" v-if="amIDescriber">
                                 <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
                                 <MyCanvasBox/>
                             </div>
@@ -117,7 +117,9 @@ export default {
         const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         // const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
         const userList = computed(() => store.state.gameStore.userList)
+        const getUserList = store.getters['gameStore/getUserList']
         const readyAll = computed(() => store.state.gameStore.isAllReady)
+        const amIDescriber = computed(() => store.state.gameStore.amIDescriber)
         const router = useRouter()
         const state = reactive({
             title: null,
@@ -140,8 +142,6 @@ export default {
             opponentTeam: [],
 
             // 게임 순서 관련
-            amIDescriber: false, // false : 내가 그리는 차례, true : 내가 설명할 차례
-
             ready: false,
             team: null,
         })
@@ -175,7 +175,9 @@ export default {
         // =====================
 
 
-        onBeforeMount(() => {
+
+        onBeforeMount(async () => {
+            await store.dispatch('accountStore/getMeAction')
             console.log('join start');
             joinSession()
         })
@@ -207,6 +209,11 @@ export default {
 
         const clickTeam = (color) => {
             store.dispatch('gameStore/changeTeamAction', color)
+        }
+        const clickTest = () => {
+            console.log('clickTest 클릭')
+            store.dispatch('gameStore/changeTest', true)
+            store.dispatch('gameStore/gameStart')
         }
 
         const gameStart = () => {
@@ -379,13 +386,16 @@ export default {
             opponents,
             // subscribers,
             clickExit,
+            clickTest,
             clickReady,
             clickTeam,
             gameStart,
             joinSession,
             leaveSession,
             updateMainVideoStreamManager,
-            userList
+            userList,
+            getUserList,
+            amIDescriber
         }
     }
 }
