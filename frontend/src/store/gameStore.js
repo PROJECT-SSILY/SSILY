@@ -195,7 +195,7 @@ const actions = {
     //     },
     //     to: [],
     //   })
-    //   return 
+    //   return
     // }
     console.log("joinsession 시작");
     // --- Get an OpenVidu object ---
@@ -226,12 +226,12 @@ const actions = {
       state.userList.forEach((user, index) => {
         if (user.connectionId == targetId) {
           context.commit('delUserinUserList', index) // 해당 열 삭제
-        } 
+        }
       });
       state.userKey.forEach((key, index) => {
         if (key == targetId) {
           context.commit('delUserinUserKey', index) // 해당 열 삭제
-        } 
+        }
       });
     });
 
@@ -258,7 +258,7 @@ const actions = {
     // 게임 시그널 관리 - 수연
     session.on("signal:game", (event) => {
       switch (event.data.gameStatus) {
-        // 설명자 부여 
+        // 설명자 부여
         case 0: {
           console.log('0번 시그널 수신 완료')
           var PresenterId = event.data.curPresenterId
@@ -482,7 +482,7 @@ const actions = {
         commit("setMainStreamManager", stream)
     },
 
-    
+
 
     // 참여자 레디 상태 변경 - ingamePage에서 clickReady 했을 때 호출
     changeReady: () => {
@@ -502,7 +502,7 @@ const actions = {
         type: 'my-chat'
       })
     },
-  
+
     isTeam: (state) => {
         state.commit("changeMode", null)
         console.log(state.getters.getTeam);
@@ -572,7 +572,7 @@ const actions = {
     },
 
     changeTest: (context) => {
-        context.commit("setIsAllReady", true)     
+        context.commit("setIsAllReady", true)
     },
 
     // 팀전 할 때 사용할 코드, 지금은 안 씀 - 수연
@@ -635,7 +635,7 @@ const actions = {
         console.log(err)
       }
     }
-    
+
 
 }
 export default {
