@@ -313,8 +313,6 @@ const actions = {
 
 
     context.dispatch("getToken", sessionId).then(token => {
-      console.log("여기까지 완료, token :", token, "state.myUserName :", state.myUserName);
-      console.log("session : ", session);
       session.connect(token, { clientData: state.myUserName })
         .then(() => {
           // --- Get your own camera stream with the desired properties ---
@@ -329,7 +327,6 @@ const actions = {
             mirror: false // Whether to mirror your local video or not
           });
           // .catch((error)=> console.log(error));
-          console.log("아싸");
           context.commit("setOV", OV);
           context.commit("setSession", session);
           context.commit("setMainStreamManager", publisher);
@@ -400,13 +397,6 @@ const actions = {
     },
 
     createToken : (context, sessionId) => {
-        // const level = store.state.accountStore.user.level || 1
-        // const nickname = store.state.accountStore.user.nickname || ''
-        // const isHost = store.state.gameStore.isHost || true
-        // const rate = store.getters['accountStore/getRate']
-        // const password = store.state.gameStore.password || true
-        // const exp = store.state.accountStore.user.exp || 0
-        // state.myUserName=store.state.accountStore.user.nickname || ''
         const level = context.rootState.accountStore.user.level
         const nickname = context.rootState.accountStore.user.nickname
         const isHost = state.isHost
