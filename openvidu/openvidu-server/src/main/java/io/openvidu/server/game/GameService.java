@@ -294,7 +294,7 @@ public class GameService   {
         List<String> wordList=null;
 
         try {
-            String serverURL = PropertyConfig.getProperty("ssily.url");
+            String serverURL = "http://localhost:5000";
             log.info("serverURL = {}", serverURL);
             url = new URL(serverURL+"/api/game/words");
             conn = (HttpURLConnection) url.openConnection();
