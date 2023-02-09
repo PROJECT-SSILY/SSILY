@@ -291,7 +291,7 @@ const actions = {
         case 0: {
           console.log('0번 시그널 수신 완료')
           var PresenterId = event.data.curPresenterId
-          console.log(event.data.curPresenterId)
+          console.log('curPresenterId : ', event.data.curPresenterId)
           for (var n=0; n < state.userList.length; n++ ) {
             if (state.userList[n].connectionId == PresenterId) {
               context.commit('setIsPresenter', {index: n, value: true})
@@ -381,9 +381,14 @@ const actions = {
                 context.commit('setUserScore', {index: y, value: scoreList[x].score})
                 break
               }}}
-          console.log(state.userList)
-          // => 0번 시그널 보냄(설명자 부여) 
-          // context.dispatch('gameStart')
+          // => 0번  시그널 보냄
+          state.session.signal({
+            type: 'game',
+            data: {
+              gameStatus: 0,
+            },
+            to: [],
+          })
           break
         }
         case 100 : {
@@ -557,12 +562,19 @@ const actions = {
         to: [],
       })
   },
-
+    // 라운드 끝냄
     finishRound: () => {
       state.session.signal({
         type: 'game',
         data: {
           gameStatus: 10,
+        },
+        to: [],
+      })
+      state.session.signal({
+        type: 'game',
+        data: {
+          gameStatus: 0,
         },
         to: [],
       })
