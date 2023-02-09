@@ -15,11 +15,11 @@ const state = {
     isTeamBattle: null,
     isTeam: null,
     OV: undefined,
-    session: undefined,
+    session: null,
     mainStreamManager: undefined,
     publisher: undefined,
     subscribers: [],
-    sessionId: '',
+    sessionId: null,
     myUserName: '',
     isHost: false,
     playerList: undefined,
@@ -81,7 +81,6 @@ const getters = {
 
 
 const mutations = {
-
     setTitle: (state, data) => {
         state.title = data
         console.log('set적용되는지확인' + state.title);
@@ -142,6 +141,7 @@ const mutations = {
       state.userList = []
     },
     setIsAllReady: (state, data) => {
+      console.log('setIsAllReady 찍힘', data)
       state.isAllReady = data
     },
     setUserKey: (state, data) => {
@@ -288,14 +288,16 @@ const actions = {
         // 4. 참여자 ready 정보 경신 - 수연
         case 4: {
           console.log('4번 시그널 받음', event.data)
-          context.commit('setIsAllReady', event.data.isAllReady)
+          var allready = event.data.isAllReady
+          context.commit('setIsAllReady', allready)
           var readyData = event.data
           for (var k=0; k < state.userList.length; k++) {
             context.commit('setReady', {index: k, ready: readyData[state.userList[k].connectionId]})
           }
           // 모두 레디 했을 때, 게임 시작됨
-          if (event.data.isAllReady) {
+          if (allready) {
             context.dispatch('gameStart')
+            context.commit('setIsAllReady', allready)
           }
           break;
         }
@@ -554,6 +556,10 @@ const actions = {
         context.commit("setVolume2", volume)
         // 아직 효과음 없어서 볼륨 조절 코드 없음 효과음 추가 이후 작성 예정
         console.log('alarm 볼륨 조절')
+    },
+
+    changeTest: (context) => {
+        context.commit("setIsAllReady", true)     
     },
 
     // 팀전 할 때 사용할 코드, 지금은 안 씀 - 수연
