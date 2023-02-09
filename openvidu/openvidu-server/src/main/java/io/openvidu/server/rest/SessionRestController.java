@@ -80,7 +80,7 @@ import static io.openvidu.server.exception.ExceptionCode.*;
 @RestController
 @CrossOrigin("*")
 @ConditionalOnMissingBean(name = "sessionRestControllerPro")
-@RequestMapping("/api")
+@RequestMapping("/openvidu/api")
 public class SessionRestController {
 
 	private static final Logger log = LoggerFactory.getLogger(SessionRestController.class);
