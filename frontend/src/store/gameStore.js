@@ -138,12 +138,18 @@ const mutations = {
     setUserList: (state, data) => {
       state.userList.push(data)
     },
+    setClearUserList: (state) => {
+      state.userList = []
+    },
     setIsAllReady: (state, data) => {
       console.log('setIsAllReady 찍힘', data)
       state.isAllReady = data
     },
     setUserKey: (state, data) => {
       state.userKey.push(data)
+    },
+    setClearUserKey: (state) => {
+      state.userKey = []
     },
     setReady: (state, data) => {
       console.log('data:', data)
@@ -165,7 +171,14 @@ const mutations = {
 
     setAmIDescriber: (state, data) => {
       state.amIDescriber = data
-    }
+    },
+
+    delUserinUserList: (state, data) => { // UserList에서 퇴장한 유저의 id 삭제
+      state.userList.splice(data)
+    },
+    delUserinUserKey: (state, data) => { // UserKey에서 퇴장한 유저의 id 삭제
+      state.userKey.splice(data)
+    },
 
     //==============================
 
@@ -196,6 +209,7 @@ const actions = {
     // stream = 영상 송출과 관련된 정보들 | 이은혁
     // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직 | 이은혁
     session.on('streamCreated', ({ stream }) => {
+      console.log("테스트입니다", state.subscribers)
       const subscriber = session.subscribe(stream);
       state.subscribers.push(subscriber);
     });
@@ -206,6 +220,19 @@ const actions = {
       if (index >= 0) {
         state.subscribers.splice(index, 1);
       }
+
+      // state.userList에서 세션 퇴장한 유저 삭제 - 이은혁
+      const targetId = stream.connection.connectionId // 퇴장한 유저의 connectionId
+      state.userList.forEach((user, index) => {
+        if (user.connectionId == targetId) {
+          context.commit('delUserinUserList', index) // 해당 열 삭제
+        } 
+      });
+      state.userKey.forEach((key, index) => {
+        if (key == targetId) {
+          context.commit('delUserinUserKey', index) // 해당 열 삭제
+        } 
+      });
     });
 
     // On every asynchronous exception...
@@ -219,7 +246,7 @@ const actions = {
       const chatUser = event.from.connectionId;
       var nickname = '';
       state.userList.forEach(user => {
-        if (user.conectionId == chatUser) {
+        if (user.connectionId == chatUser) {
           nickname = user.nickname;
         }
       });
@@ -237,7 +264,7 @@ const actions = {
           var PresenterId = event.data.curPresenterId
           console.log(event.data.curPresenterId)
           for (var n=0; n < state.userList.length; n++ ) {
-            if (state.userList[n].conectionId == PresenterId) {
+            if (state.userList[n].connectionId == PresenterId) {
               context.commit('setIsPresenter', {index: n, value: true})
             } else {
               context.commit('setIsPresenter', {index: n, value: false})
@@ -262,7 +289,8 @@ const actions = {
             if (state.myUserName == data[key].player.nickname) {
               context.commit('setMyConnectionId', key)
             }
-            user.conectionId = key;
+
+            user.connectionId = key;
             user.isReady = data[key].isReady;
             user.exp = data[key].player.exp;
             user.isHost = data[key].player.isHost;
@@ -272,14 +300,14 @@ const actions = {
             user.rate = data[key].player.rate;
             user.score = data[key].player.score;
             user.team = data[key].player.team;
-            if (!(state.userKey).includes(user.nickname)) {
-              console.log('user.conectionId', user.conectionId)
+            if (!(state.userKey).includes(user.connectionId)) {
+              console.log('user.connectionId', user.connectionId)
               console.log('state.userKey: ', state.userKey)
-              context.commit('setUserKey', user.nickname)
+              context.commit('setUserKey', user.connectionId)
               context.commit('setUserList', user)
             }
-          } 
-            
+            console.log("UserList: ", state.userList)
+          }
           break;
         }
         case 4: {
@@ -289,7 +317,7 @@ const actions = {
           context.commit('setIsAllReady', allready)
           var readyData = event.data
           for (var k=0; k < state.userList.length; k++) {
-            context.commit('setReady', {index: k, ready: readyData[state.userList[k].conectionId]})
+            context.commit('setReady', {index: k, ready: readyData[state.userList[k].connectionId]})
           }
           // 모두 레디 했을 때, 게임 시작됨
           if (allready) {
@@ -322,7 +350,6 @@ const actions = {
             mirror: false // Whether to mirror your local video or not
           });
           // .catch((error)=> console.log(error));
-          console.log("아싸");
           context.commit("setOV", OV);
           context.commit("setSession", session);
           context.commit("setMainStreamManager", publisher);
@@ -394,13 +421,6 @@ const actions = {
     },
 
     createToken : (context, sessionId) => {
-        // const level = store.state.accountStore.user.level || 1
-        // const nickname = store.state.accountStore.user.nickname || ''
-        // const isHost = store.state.gameStore.isHost || true
-        // const rate = store.getters['accountStore/getRate']
-        // const password = store.state.gameStore.password || true
-        // const exp = store.state.accountStore.user.exp || 0
-        // state.myUserName=store.state.accountStore.user.nickname || ''
         const level = context.rootState.accountStore.user.level
         const nickname = context.rootState.accountStore.user.nickname
         const isHost = state.isHost
@@ -453,7 +473,8 @@ const actions = {
         context.commit("setSubscribers", [])
         context.commit("setOV", undefined)
         context.commit('SET_PUBLISHER', undefined)
-
+        context.commit('setClearUserList')
+        context.commit('setClearUserKey')
     },
 
     updateMainVideoStreamManager: (commit, stream) => {

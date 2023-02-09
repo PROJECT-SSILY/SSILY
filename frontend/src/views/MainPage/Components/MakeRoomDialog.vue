@@ -14,7 +14,7 @@
           >
         </v-img>
       </template>
-      <v-card>
+      <v-card class="formbox">
         <v-card-title class="card-title">
           방 만들기
         </v-card-title>
@@ -36,7 +36,6 @@
             </div>
           </div>
           <v-radio-group
-            :rules="[state.rules.required]"
             v-model="state.isTeamBattle"
             inline
           >
@@ -52,7 +51,6 @@
             ></v-radio>
           </v-radio-group>
           <v-radio-group
-            :rules="[state.rules.required]"
             v-model="state.isSecret"
             inline
           >
@@ -68,7 +66,7 @@
             ></v-radio>
           </v-radio-group>
           <v-text-field
-            v-if="state.isSecret ==='radio-2'"
+            v-if="state.isSecret == true"
             label="비밀번호 숫자 4자리를 입력하세요."
             hide-details="auto"
             v-model="state.password"
@@ -114,9 +112,6 @@
         isSecret : false,
         password : null,
         isTeamBattle : false,
-        rules: {
-          required: value => !!value || '필수',
-        }
       })
       onUpdated(() => {
         // 방 타이틀 랜덤 생성
@@ -215,4 +210,14 @@
   animation: shake-tutorial-planet .1s infinite alternate;
 }
 
+.formbox {
+  padding: 2rem;
+  margin-top: 10%;
+  width: 100%;
+  border-radius: 20px;
+  opacity: 100%;
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
 </style>

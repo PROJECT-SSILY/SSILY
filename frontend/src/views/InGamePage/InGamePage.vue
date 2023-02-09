@@ -17,6 +17,7 @@
             :team="state.team"
             />
         </div>
+
         <div class="side_component flex-item">
             <v-radio-group class="select_team" inline v-model="state.team" justify-content="center">
                 <v-radio label="RED" value="RED" color="red" class="ma-2" @click="clickTeam(RED)"></v-radio>
@@ -24,58 +25,60 @@
             </v-radio-group>
             <div class="chat_box">
                 <ChattingBox/>
-            </div>
-            <div class="side_footer">
+                </div>
+                <div class="side_footer">
                 <div class="sidebtn">
                     <v-btn class="readybtn" v-if="!state.ready" @Click="clickReady">READY</v-btn>
                     <v-btn class="readybtn" v-if="state.ready" @Click="clickReady">CANCEL READY</v-btn>
                 </div>
+
                 <div class="sidebtn">
                     <v-btn class="exitbtn" @click="clickExit">EXIT</v-btn>
                 </div>
             </div>
             <div class="sidebtn">
                     <v-btn class="exitbtn" @click="gameStart()">Game Start</v-btn>
+                </div>
             </div>
+        </div>      
+        <div class="in_game_component" v-else>
+            <GameTimer date="August 15, 2016"/>
+            <v-container>
+                <v-row>
+                    <v-col>
+                        <h1>상대 팀</h1>
+                        <user-video v-for="sub in opponents" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
+                    </v-col>
+                    <v-col>
+                        <div id="video-container" class="col-md-6">
+                            <div class="me">
+                                <h1>나</h1>
+                                <div class="drawing_sec" v-if="!amIDescriber">
+                                    <MyCanvasBox/>
+                                    <user-video :stream-manager="publisher"/>
+                                </div>
+                                <div class="displaying_sec" v-else>
+                                    <user-video :stream-manager="publisher"/>
+                                </div>
+                            </div>
+                            <div class="our_team">
+                                <h1>우리 팀</h1>
+                                <div class="drawing_sec" v-if="amIDescriber">
+                                    <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
+                                    <MyCanvasBox/>
+                                </div>
+                                <div class="displaying_sec" v-else>
+                                    <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
+                                </div>
+                            </div>
+                        </div>
+                    </v-col>
+                </v-row>
+            </v-container>
         </div>
     </div>
-    <div class="in_game_component" v-else>
-        <GameTimer date="August 15, 2016"/>
-        <v-container>
-            <v-row>
-                <v-col>
-                    <h1>상대 팀</h1>
-                    <user-video v-for="sub in opponents" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
-                </v-col>
-                <v-col>
-                    <div id="video-container" class="col-md-6">
-                        <div class="me">
-                            <h1>나</h1>
-                            <div class="drawing_sec" v-if="!amIDescriber">
-                                <MyCanvasBox/>
-                                <user-video :stream-manager="publisher"/>
-                            </div>
-                            <div class="displaying_sec" v-else>
-                                <user-video :stream-manager="publisher"/>
-                            </div>
-                        </div>
-                        <div class="our_team">
-                            <h1>우리 팀</h1>
-                            <div class="drawing_sec" v-if="amIDescriber">
-                                <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
-                                <MyCanvasBox/>
-                            </div>
-                            <div class="displaying_sec" v-else>
-                                <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
-                            </div>
-                        </div>
-                    </div>
-                </v-col>
-            </v-row>
-        </v-container>
-    </div>
-</div>
 </template>
+
 <script>
 import GameTimer from './components/GameTimer.vue';
 import UserVideo from './components/UserVideo.vue';
@@ -227,17 +230,29 @@ export default {
                 // state.team
                 // console.log(state.team)
             // }
-
-            // 팀 분류하여 리스트에 추가
-            // let tmpMyTeam = null
-            // const tmpOpponentTeam = []
-            // for(let i=0; i<state.subscribers.length; i++) {
-            //     // console.log("state.publisher : ", state.publisher)
-            //     if(state.subscribers[i].team === state.publisher.team) {
-            //         tmpMyTeam = state.subscribers[i]
-            //     } else {
-            //         tmpOpponentTeam.push(state.subscribers[i])
+    
+            // const updateMainVideoStreamManager = (stream) => {
+            //     if (state.mainStreamManager === stream) return;
+            //     state.mainStreamManager = stream;
             //     }
+    
+            /**
+            * --------------------------
+            * SERVER-SIDE RESPONSIBILITY
+            * --------------------------
+            * These methods retrieve the mandatory user token from OpenVidu Server.
+            * state behavior MUST BE IN YOUR SERVER-SIDE IN PRODUCTION (by using
+            * the API REST, openvidu-java-client or openvidu-node-client):
+            *   1) Initialize a Session in OpenVidu Server	(POST /openvidu/api/sessions)
+            *   2) Create a Connection in OpenVidu Server (POST /openvidu/api/sessions/<SESSION_ID>/connection)
+            *   3) The Connection.token must be consumed in Session.connect() method
+            */
+    
+            // const getToken = async (sessionId) => {
+            //     const response = await createToken(sessionId)
+            //     state.connectionId = response.connectionId
+            //     // console.log('connectionId ===>', state.connectionId)
+            //     return response.token
             // }
             // console.log("playerList.value.length::::::::::", playerList.value.length)
             // state.myTeam = tmpMyTeam
@@ -396,79 +411,80 @@ export default {
             userList,
             getUserList,
             amIDescriber
+    
+
         }
+    }}
+    </script>
+    
+    <style scoped>
+    .wrap_component {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
-}
-</script>
-
-<style scoped>
-.wrap_component {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-.waiting_component {
-    display: flex;
-    flex-direction: row;
-    padding: 20px;
-    max-width: 1200px;
-    min-width: 800px;
-    width: 100%;
-    justify-content: space-between;
-}
-.side_component {
-    width: 300px;
-    padding: 20px 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-.select_team {
-    display: flex;
-    border-radius: 30px;
-    background-color: #ffffffeb;
-    justify-content: center;
-    margin-bottom: 10px;
-}
-.chat_box {
-    flex: auto;
-    border-radius: 30px;
-    height: 500px;
-    background-color: #ffffffeb;
-    display: flex;
-    flex-direction: column-reverse;
-    justify-content: space-between;
-    padding: 20px 30px;
-}
-
-.sidebtn {
-    display: inline-block;
-    width: 50%;
-    padding-top: 10px;
-}
-.sidebtn:first-child {
-    padding-right: 5px;
-}
-.sidebtn:last-child {
-    padding-left: 5px;
-}
-.sidebtn>button {
-    width:100%;
-    margin: 0px;
-    border-radius: 20px;
-    height: 70px;
-    box-sizing: border-box;
-    font-family: sans-serif;
-    font-weight: 900;
-    font-size: 25px;
-    border: 7px solid #ffffffeb;
-}
-.readybtn {
-    background: linear-gradient(342deg, rgba(198,255,0,1) 0%, rgba(108,204,55,1) 100%);
-}
-.exitbtn {
-    background: rgb(224,61,61);
-background: linear-gradient(133deg, rgba(224,61,61,1) 0%, rgba(255,93,93,1) 100%);
-}
-</style>
+    .waiting_component {
+        display: flex;
+        flex-direction: row;
+        padding: 20px;
+        max-width: 1200px;
+        min-width: 800px;
+        width: 100%;
+        justify-content: space-between;
+    }
+    .side_component {
+        width: 300px;
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .select_team {
+        display: flex;
+        border-radius: 30px;
+        background-color: #ffffffeb;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+    .chat_box {
+        flex: auto;
+        border-radius: 30px;
+        height: 500px;
+        background-color: #ffffffeb;
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: space-between;
+        padding: 20px 30px;
+    }
+    
+    .sidebtn {
+        display: inline-block;
+        width: 50%;
+        padding-top: 10px;
+    }
+    .sidebtn:first-child {
+        padding-right: 5px;
+    }
+    .sidebtn:last-child {
+        padding-left: 5px;
+    }
+    .sidebtn>button {
+        width:100%;
+        margin: 0px;
+        border-radius: 20px;
+        height: 70px;
+        box-sizing: border-box;
+        font-family: sans-serif;
+        font-weight: 900;
+        font-size: 25px;
+        border: 7px solid #ffffffeb;
+    }
+    .readybtn {
+        background: linear-gradient(342deg, rgba(198,255,0,1) 0%, rgba(108,204,55,1) 100%);
+    }
+    .exitbtn {
+        background: rgb(224,61,61);
+    background: linear-gradient(133deg, rgba(224,61,61,1) 0%, rgba(255,93,93,1) 100%);
+    }
+    </style>
