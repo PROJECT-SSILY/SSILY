@@ -12,7 +12,7 @@
     <div style="margin: 1rem">
       <v-btn @click="allowDrawing">Draw</v-btn>
       <v-btn @click="eraseAll">Erase</v-btn>
-      <v-btn @click="getAnswerImage">제출</v-btn>
+      <v-btn @click="predictModel">제출</v-btn> <!-- 여기 원래 달린 메서드  getAnswerImage -->
     </div>
   </div>
 </template>

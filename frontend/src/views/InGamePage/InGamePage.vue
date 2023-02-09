@@ -150,14 +150,14 @@
             const joinSession = async function() {
                 const players = await GetPlayerList(state.sessionId)
                 console.log("players : ", players)
-                const content = players.content
-                for (let i=0; i<content.length; i++) {
-                    if(content.length > 0 && content.player == state.nickname) {
-                        alert("잘못된 접근입니다.")
-                        router.push({name : 'main'})
-                        return
-                    }
-                }
+                // const content = players.content
+                // for (let i=0; i<content.length; i++) {
+                //     if(content.length > 0 && content.player == state.nickname) {
+                //         alert("잘못된 접근입니다.")
+                //         router.push({name : 'main'})
+                //         return
+                //     }
+                // }
                 store.commit('gameStore/setSessionId', state.sessionId) // 실행 전 세션id 저장 | 이은혁
                 await store.dispatch('gameStore/joinSession', state.sessionId)
             }

@@ -34,6 +34,10 @@ const state = {
     chat: [],
     myConnectionId: null,
     amIDescriber: false,
+    winnerNickname: '',
+    winnerId: '',
+    round: null,
+    answer: '',
 }
 
 const getters = {
@@ -180,6 +184,30 @@ const mutations = {
     delUserinUserKey: (state, data) => { // UserKey에서 퇴장한 유저의 id 삭제
       state.userKey.splice(data)
     },
+
+    // 정답페이지 관련
+    setWinnerNickname: (state, data) => {
+      state.winnerNickname = data
+    },
+
+    setWinnerId: (state, data) => {
+      state.winnerId = data
+    },
+     
+    setRound: (state, data) => {
+      state.round = data
+    },
+
+    setAnswer: (state, data) => {
+      state.answer = data
+    },
+
+    setUserScore: (state, data) => {
+      var index = data.index
+      var value = data.value
+      state.userList[index].score = value
+    }
+
 
     //==============================
 
@@ -328,9 +356,43 @@ const actions = {
           break;
         }
         case 5: {
+          // 정답 제출 ( sendTopFive ) - 정답이면 응답 옴!
           console.log('5번 시그널 수신 완료')
+          console.log('5번 data : ', event.data)
+          context.commit('setAnswer', event.data.answer)
+          context.commit('setWinnerId', event.data.winnerId)
+          context.commit('setWinnerNickname', event.data.winnerNickname)
+          context.commit('setRound', event.data.round)
+          var winnerId = event.data.winnerId
+          // => 여기서 정답자가 10번 신호 보냄!!
+          if (winnerId == state.myConnectionId) {
+            context.dispatch('finishRound')
+          }
+          break
+        }
+        case 10: {
+          // 라운드별 경험치 누적
+          console.log('10번 시그널 수신 - 라운드 끝')
+          var scoreList = event.data.player
+          for (var x=0;state.userList.length>x; x++) {
+            // userList 에 score 정보 경신
+            for (var y=0; state.userList.length>y; y++) {
+              if (scoreList[x].connectionId == state.userList[y].connectionId) {
+                context.commit('setUserScore', {index: y, value: scoreList[x].score})
+                break
+              }}}
+          console.log(state.userList)
+          // => 0번 시그널 보냄(설명자 부여) 
+          // context.dispatch('gameStart')
+          break
+        }
+        case 100 : {
+          // 게임 끝 경험치 부여
+          console.log('100번 시그널 수신 - 게임 끝')
           console.log(event.data)
-        }}}
+          break
+        }
+      }}
     );
 
     context.dispatch("getToken", sessionId).then(token => {
@@ -495,6 +557,18 @@ const actions = {
         to: [],
       })
   },
+
+    finishRound: () => {
+      state.session.signal({
+        type: 'game',
+        data: {
+          gameStatus: 10,
+        },
+        to: [],
+      })
+    },
+
+
   uploadImage: (context, payload) => {
     console.log("찍어보자", context.rootState.accountStore.token);
     $axios
@@ -604,7 +678,7 @@ const actions = {
         // 아직 효과음 없어서 볼륨 조절 코드 없음 효과음 추가 이후 작성 예정
         console.log('alarm 볼륨 조절')
     },
-
+    // 테스트를 위해서 모든 사용자가 레디를 하지 않아도 게임 시작 상태를 만들어주는 메서드
     changeTest: (context) => {
         context.commit("setIsAllReady", true)
     },
