@@ -1,6 +1,5 @@
 package com.appleparty.ssily.dto.image;
 
-import com.appleparty.ssily.domain.image.Image;
 import lombok.*;
 
 @Getter
