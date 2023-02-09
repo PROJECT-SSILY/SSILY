@@ -167,10 +167,10 @@ const mutations = {
       var value = data.value
       state.userList[index].isPresenter = value
     },
-    delUserinUserList: (state, data) => { // UserList에서 퇴장한 유저의 id 삭제
+    delUserinUserList: (state, data) => { // UserList에서 퇴장한 유저의 id 삭제 - 이은혁
       state.userList.splice(data)
     },
-    delUserinUserKey: (state, data) => { // UserKey에서 퇴장한 유저의 id 삭제
+    delUserinUserKey: (state, data) => { // UserKey에서 퇴장한 유저의 id 삭제 - 이은혁
       state.userKey.splice(data)
     },
 
@@ -203,7 +203,6 @@ const actions = {
       if (index >= 0) {
         state.subscribers.splice(index, 1);
       }
-
       // state.userList에서 세션 퇴장한 유저 삭제 - 이은혁
       const targetId = stream.connection.connectionId // 퇴장한 유저의 connectionId
       state.userList.forEach((user, index) => {
@@ -310,9 +309,19 @@ const actions = {
         }}
     );
 
+    context.dispatch("getToken", sessionId).then(async (token) => {
+      // console.log("이제시작, userList", state.userList)
+      // // 이미 존재하는 닉네임인 경우 입장 불가 처리 - 이은혁
+      // console.log()      const nickname = await context.rootState.accountStore.user.nickname
+      // state.userList.forEach((user) => {
+      //   console.log("??????????", user, nickname)
+      //   if(user.nickname === nickname) {
+      //     console.log("1111111111")
+      //     return false// 이미 존재하는 닉네임인 경우 false 반환
+      //   }  
+      // })
+      // -----------------------------------------------
 
-
-    context.dispatch("getToken", sessionId).then(token => {
       session.connect(token, { clientData: state.myUserName })
         .then(() => {
           // --- Get your own camera stream with the desired properties ---
@@ -451,7 +460,6 @@ const actions = {
         context.commit('SET_PUBLISHER', undefined)
         context.commit('setClearUserList')
         context.commit('setClearUserKey')
-        
     },
 
     updateMainVideoStreamManager: (commit, stream) => {
