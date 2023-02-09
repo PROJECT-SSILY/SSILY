@@ -9,7 +9,7 @@
           <v-row>
             <v-col>
              <router-link :to="{ name: 'mypage' }" class="myPageBtn btnbox">
-              마이 페이지
+              <v-img class="start-planet" src="@/assets/images/planet-08.svg">Profile</v-img>
             </router-link>
             </v-col>
           </v-row>
@@ -115,7 +115,7 @@ export default {
 <style scoped>
 
 .myPageBtn {
-
+  text-decoration: none;
 }
 
 .start-planet {
