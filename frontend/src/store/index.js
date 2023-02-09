@@ -11,6 +11,6 @@ export default createStore({
     gameStore
   },
   // plugins: [createPersistedState({
-  //   paths: ["accountStore"]
+  //   paths: ["gameStore"]
   // })],
 })

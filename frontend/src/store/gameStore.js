@@ -31,7 +31,7 @@ const state = {
     userList: [],
     userKey: [],
     chat: [],
-    myConnectionId: '',
+    myConnectionId: null,
     amIDescriber: false,
 }
 
@@ -172,6 +172,18 @@ const mutations = {
 }
 const actions = {
   _joinSession: (context, sessionId) => {
+    // console.log('joinsession 커넥션 아이디 : ', state.myConnectionId)
+    // if (state.myConnectionId != null) {
+    //   console.log('join session 안함 !')
+    //   state.session.signal({
+    //     type: 'game',
+    //     data: {
+    //       gameStatus: 3,
+    //     },
+    //     to: [],
+    //   })
+    //   return 
+    // }
     console.log("joinsession 시작");
     // --- Get an OpenVidu object ---
     const OV = new OpenVidu();
@@ -242,6 +254,7 @@ const actions = {
         case 3: {
           // 참여자 정보 정리
           var data = event.data.playerState;
+          console.log('참여자 정보  : ', data)
           var keys = Object.keys(data);
           for (var i=0; i < keys.length; i++) {
             var user = {};
@@ -259,12 +272,14 @@ const actions = {
             user.rate = data[key].player.rate;
             user.score = data[key].player.score;
             user.team = data[key].player.team;
-            if (!(state.userKey).includes(user.conectionId)) {
+            if (!(state.userKey).includes(user.nickname)) {
               console.log('user.conectionId', user.conectionId)
               console.log('state.userKey: ', state.userKey)
-              context.commit('setUserKey', user.conectionId)
+              context.commit('setUserKey', user.nickname)
               context.commit('setUserList', user)
-            }}
+            }
+          } 
+            
           break;
         }
         case 4: {
@@ -283,16 +298,11 @@ const actions = {
           }
           break;
         }
-
         case 5: {
           console.log('5번 시그널 수신 완료')
           console.log(event.data)
-        }
-
-        }}
+        }}}
     );
-
-
 
     context.dispatch("getToken", sessionId).then(token => {
       console.log("여기까지 완료, token :", token, "state.myUserName :", state.myUserName);
