@@ -87,12 +87,11 @@
     import $axios from "axios";
     import { useStore } from 'vuex';
     import { useRoute, useRouter } from 'vue-router'
-
+    import { GetPlayerList } from '@/common/api/gameAPI'
     import { reactive } from '@vue/reactivity'
     import { onBeforeMount, computed } from 'vue';
 
     //=================OpenVdue====================
-
     $axios.defaults.headers.post['Content-Type'] = 'application/json';
     //=============================================
 
@@ -204,6 +203,8 @@
                 publisher,
                 myTeams,
                 opponents,
+                amIDescriber,
+                userList,
                 clickExit,
                 clickTest,
                 clickReady,
@@ -212,7 +213,6 @@
                 joinSession,
                 leaveSession,
                 updateMainVideoStreamManager,
-                userList
             }
         }
     }
