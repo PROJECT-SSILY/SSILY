@@ -6,9 +6,13 @@
       height="328"
       id="canvas"
     ></canvas>
+    <!-- <canvas
+    style="margin: 0 auto; border: 2px solid"
+    width="585" height="328" id="myCanvas"></canvas> -->
     <div style="margin: 1rem">
       <v-btn @click="allowDrawing">Draw</v-btn>
       <v-btn @click="eraseAll">Erase</v-btn>
+      <v-btn @click="getAnswerImage">제출</v-btn>
     </div>
   </div>
 </template>
@@ -16,52 +20,211 @@
 <script>
 import className from "!raw-loader!@/assets/model/class_names.txt" // computed()에서 바로 가져와 categorys에 바로 할당한다.
 
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { fabric } from "fabric";
+import { disposeTFVariables, TFModel } from "@/utils/model";
+import { CLASS_NAMES } from "@/utils/class_names";
+import { useStore } from 'vuex';
+// import $axios  from 'axios';
+
+const MY_MODEL_URL="http://localhost:8080/api/model.json";
 
 export default {
     name: 'MyCanvasBox',
     setup() {
         const fabricCanvas = ref({});
-
-        // let model
-        // let mode
+        const store = useStore()
+        const topFive = ref([])
         let mousePressed = false
         const classNames = []
         let coords = [] // 현재 그림의 좌표를 기록
+        let raw_predictions = {};
+        let model =null;
 
         const allowDrawing = function () {
             const canvas = fabricCanvas.value;
             canvas.isDrawingMode = 1;
             canvas.on("mouse:up", function () {
             // getFrame();
-                mousePressed = false
-                console.log("mouse:up")
+                mousePressed = false;
+                submitCanvas();
             });
             canvas.on("mouse:down", function() {
-                mousePressed = true
-                console.log("mouse:down")
+                mousePressed = true;
             });
             canvas.on("mouse:move", function(e) {
-                recordCoor(e)
-                console.log("mouse:move")
+                recordCoor(e);
             });
         }
 
         // 모두 지우기
         const eraseAll = function() {
             fabricCanvas.value.clear();
+            raw_predictions = null;
             coords = [];
+            fabricCanvas.value.backgroundColor="#FFFFFF";
         }
 
+        const predictModel = function () {
+            submitDrawing();
+            // getAnswerImage();
+        };
+
+        const getMinBox = function () {
+            /**
+             * Get top left and bottom right coords of bounding box of the drawing
+             */
+            var coorX = coords.map(function (p) {
+                return p.x;
+            });
+
+            var coorY = coords.map(function (p) {
+                return p.y;
+            });
+
+            var min_coords = {
+                x: Math.min.apply(null, coorX),
+                y: Math.min.apply(null, coorY),
+            };
+
+            var max_coords = {
+                x: Math.max.apply(null, coorX),
+                y: Math.max.apply(null, coorY),
+            };
+
+            return {
+                min: min_coords,
+                max: max_coords,
+            };
+        };
+
+        const getImageData = function () {
+            /**
+             * Get image data in canvas
+             */
+
+            const mbb = getMinBox();
+            const dpi = window.devicePixelRatio;
+
+            const imageData = fabricCanvas.value.contextContainer.getImageData(
+                mbb.min.x * dpi,
+                mbb.min.y * dpi,
+                (mbb.max.x - mbb.min.x) * dpi,
+                (mbb.max.y - mbb.min.y) * dpi
+            );
+
+            return imageData;
+        };
+
+        const getAnswerImage = function(){
+      // toDataURL()사용하여 png타입의 base64인코딩된 data url 형식의 문자열을 반환
+      const canvas = fabricCanvas.value
+      var dataUrl = canvas.toDataURL('image/png')
+      console.log(dataUrl)
+
+      // data:image/jpeg;base64,/9j/4AAQSkZJRg...AAAAAB//2Q==
+      // data : <type> <;base64> <data>
+      
+      // <data> 부분 뽑아내기
+      // atob = ASCII -> binary
+      // btoa = binary -> ASCII
+      // base64 데이터 디코딩
+      var byteString = window.atob(dataUrl.split(',')[1]);
+      var array = [];
+      // i 에 해당하는 string을 unicode로 변환
+      for (var i = 0; i < byteString.length; i++) {
+          array.push(byteString.charCodeAt(i));
+      }
+      console.log("array 잘 만드냐?", array);
+      // (2486) [137, 80, 78, 71, ...]
+      // Blob 생성
+      var myBlob = new Blob([new Uint8Array(array)], {type: 'image/png'});
+
+      // ** Blob -> File 로 변환**
+      var file = new File([myBlob], "blobtofile.png");
+      var formData = new FormData();
+
+      formData.append("answerImage", file);
+      formData.append("content", "Blob확인");
+      formData.append("tagList", "blob");
+      formData.append("username", "admin");
+
+      console.log("formData : ", formData.get("answerImage"));
+      console.log("token : ", store.state.accountStore.token);
+      const myToken=store.state.accountStore.token;
+      store.dispatch('gameStore/uploadImage', formData, myToken);
+
+        };
+
+        const submitCanvas = function () {
+            /**
+             * Get image on canvas and submit it to the model for prediction
+             */
+            raw_predictions = model.predictClass(getImageData());
+        };
+
+        const findIndicesOfMax = function () {
+            /**
+             * Get indices of 5 classes with highest predicted probabilities
+             */
+            var outp = [];
+            for (let i = 0; i < raw_predictions.length; i++) {
+                outp.push(i);
+                if (outp.length > 5) {
+                    let pred = raw_predictions;
+                    outp.sort(function (a, b) {
+                        return pred[b] - pred[a];
+                    });
+                    outp.pop();
+                }
+            }
+            return outp;
+        };
+
+        const getTopClassNames = function () {
+            /**
+             * Find classes for highest predicted indices from findIndicesOfMax
+             */
+            let outp = [];
+            let indices = findIndicesOfMax();
+
+            for (let i = 0; i < indices.length; i++) {
+                outp[i] = getClassNames()[indices[i]];
+            }
+            return outp;
+        };
+
+        const submitDrawing = function () {
+            const winClass = getTopClassNames()[0];
+            topFive.value = []
+            for (var i=0; i < 5 ; i++) {
+                topFive.value.push((getTopClassNames()[i]))
+            }
+            console.log("winClass = ", winClass);
+            console.log('그냥 : ', topFive)
+            store.dispatch('gameStore/sendTopFive', topFive.value)
+        };
+
+        const getClassNames = function () {
+            return CLASS_NAMES;
+        };
+
         onMounted(() => {
+            model=new TFModel();
+            Promise.all([
+                model.loadModel(MY_MODEL_URL),
+            ]);
+
             fabricCanvas.value = new fabric.Canvas(`canvas`, {
                 backgroundColor: "transparent",
                 isDrawingMode: 0,
             });
+
+            fabricCanvas.value.backgroundColor="#FFFFFF";
+
             const brush = fabricCanvas.value.freeDrawingBrush
             if (fabricCanvas.value.freeDrawingBrush) {
-                brush.width = 10;
+                brush.width = 5;
                 brush.color = 'black'
                 brush.shadow = new fabric.Shadow({
                     blur: 30,
@@ -70,30 +233,20 @@ export default {
                     affectStroke: false,
                     color: 'grey',
                 });
-                }
+            }
 
             success()
         })
 
-        // 후 처리
+        onUnmounted(() =>{
+            disposeTFVariables();
+        })
 
+        
 
-        // const setTable = (top5, probs) => {
-        //     //loop over the predictions
-        //     for (var i = 0; i < top5.length; i++) {
-        //         let sym = document.getElementById('sym' + (i + 1))
-        //         let prob = document.getElementById('prob' + (i + 1))
-        //         sym.innerHTML = top5[i]
-        //         prob.innerHTML = Math.round(probs[i] * 100)
-        //     }
-        //     // //create the pie
-        //     // createPie(".pieID.legend", ".pieID.pie");
-
-        // }
-
-            /*
-            record the current drawing coordinates
-            */
+        /*
+        record the current drawing coordinates
+        */
         const recordCoor = (event) => {
             var pointer = fabricCanvas.value.getPointer(event.e);
             var posX = pointer.x;
@@ -104,99 +257,9 @@ export default {
             }
         }
 
-        //     /*
-        //     get the best bounding box by trimming around the drawing
-        //     */
-        // const getMinBox = () => {
-        //         //get coordinates
-        //         var coorX = coords.map(function(p) {
-        //             return p.x
-        //         });
-        //         var coorY = coords.map(function(p) {
-        //             return p.y
-        //         });
-
-        //         //find top left and bottom right corners
-        //         var min_coords = {
-        //             x: Math.min.apply(null, coorX),
-        //             y: Math.min.apply(null, coorY)
-        //         }
-        //         var max_coords = {
-        //             x: Math.max.apply(null, coorX),
-        //             y: Math.max.apply(null, coorY)
-        //         }
-
-        //         //return as strucut
-        //         return {
-        //             min: min_coords,
-        //             max: max_coords
-        //         }
-        //     }
-
-        //     /*
-        //     get the current image data
-        //     */
-        // const getImageData = () => {
-        //             //get the minimum bounding box around the drawing
-        //             const mbb = getMinBox()
-
-        //             //get image data according to dpi
-        //             const dpi = window.devicePixelRatio
-        //             const imgData = fabricCanvas.value.contextContainer.getImageData(mbb.min.x * dpi, mbb.min.y * dpi,
-        //                                                         (mbb.max.x - mbb.min.x) * dpi, (mbb.max.y - mbb.min.y) * dpi);
-        //             return imgData
-        //         }
-
-        //     /*
-        //     get the prediction
-        //     */
-        // const getFrame = () => {
-        //         //make sure we have at least two recorded coordinates
-        //         if (coords.length >= 2) {
-
-        //             //get the image data from the canvas
-        //             const imgData = getImageData()
-
-        //             //get the prediction
-        //             const pred = model.predict(preprocess(imgData)).dataSync()
-
-        //             //find the top 5 predictions
-        //             const indices = findIndicesOfMax(pred, 5) // 상위 5개까지만 확인
-        //             const probs = findTopValues(pred, 5) // 상위 5개까지만 확인
-        //             const names = getClassNames(indices)
-
-        //             //set the table
-        //             setTable(names, probs)
-        //         }
-
-        //     }
-
-        //     /*
-        //     get the the class names
-        //     */
-        // const getClassNames = (indices) => {
-        //         var outp = []
-        //         for (var i = 0; i < indices.length; i++)
-        //             outp[i] = classNames[indices[i]]
-        //         return outp
-        //     }
-
-        //     /*
-        //     load the class names
-        //     */
-        // const loadDict = async () => {
-        //     new Promise((resolve, reject) => {
-        //         return className
-        //     }).then(() => {
-                
-        //     }).catch((err) => {
-        //         throw err
-        //     })
-        //     }
-
-            /*
-            load the class names
-            */
+        /*
+        load the class names
+        */
         const success = () => {
                 const lst = className.split(/\n/)
                 for (var i = 0; i < lst.length - 1; i++) {
@@ -206,92 +269,13 @@ export default {
                 }
             }
 
-        //     /*
-        //     get indices of the top probs
-        //     */
-        // const findIndicesOfMax = (inp, count) => {
-        //         var outp = [];
-        //         for (var i = 0; i < inp.length; i++) {
-        //             outp.push(i); // add index to output array
-        //             if (outp.length > count) {
-        //                 outp.sort(function(a, b) {
-        //                     return inp[b] - inp[a];
-        //                 }); // descending sort the output array
-        //                 outp.pop(); // remove the last index (index of smallest element in output array)
-        //             }
-        //         }
-        //         return outp;
-        //     }
-
-        //     /*
-        //     find the top 5 predictions
-        //     */
-        // const findTopValues = (inp, count) => {
-        //         var outp = [];
-        //         let indices = findIndicesOfMax(inp, count)
-        //         // show 5 greatest scores
-        //         for (var i = 0; i < indices.length; i++)
-        //             outp[i] = inp[indices[i]]
-        //         return outp
-        //     }
-
-        //     /*
-        //     preprocess the data
-        //     */
-        // const preprocess = (imgData) => {
-        //         return tf.tidy(() => {
-        //             //convert to a tensor
-        //             let tensor = tf.browser.fromPixels(imgData, numChannels = 1)
-
-        //             //resize
-        //             const resized = tf.image.resizeBilinear(tensor, [28, 28]).toFloat()
-
-        //             //normalize
-        //             const offset = tf.scalar(255.0);
-        //             const normalized = tf.scalar(1.0).sub(resized.div(offset));
-
-        //             //We add a dimension to get a batch shape
-        //             const batched = normalized.expandDims(0)
-        //             return batched
-        //         })
-        //     }
-
-        //     /*
-        //     load the model
-        //     */
-        // const start = async (cur_mode) => {
-        //         //arabic or english
-        //         mode = cur_mode
-
-        //         //load the model
-        //         model = await tf.loadLayersModel('model/model.json')
-
-        //         //warm up
-        //         model.predict(tf.zeros([1, 28, 28, 1]))
-
-        //         //allow drawing on the canvas
-        //         allowDrawing()
-
-        //         //load the class names
-        //         await loadDict()
-        //     }
-
-
         return {
             allowDrawing,
             eraseAll,
-            // setTable,
-            // recordCoor,
-            // getMinBox,
-            // getImageData,
-            // getFrame,
-            // getClassNames,
-            // loadDict,
+            predictModel,
             success,
-            // findIndicesOfMax,
-            // findTopValues,
-            // preprocess,
-            // start
+            getAnswerImage
+
         }
     },
 }

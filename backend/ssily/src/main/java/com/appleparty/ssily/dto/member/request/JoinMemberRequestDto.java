@@ -31,7 +31,7 @@ public class JoinMemberRequestDto {
                 .password(password)
                 .name(name)
                 .nickname(nickname)
-                .level(0)
+                .level(1)
                 .exp(0)
                 .record(
                         Record.builder()

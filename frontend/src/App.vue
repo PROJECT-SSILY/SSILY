@@ -1,11 +1,27 @@
 <template>
   <div class="background">
-    <router-view/>
-    <div></div>
+    <div id="stars" class="rotating">
+    </div>
+    <div id="contents">
+      <router-view/>
+    </div>
   </div>
 </template>
 
+
+<script>
+
+
+</script>
+
 <style>
+@font-face {
+  font-family: 'MaplestoryOTFBold';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/MaplestoryOTFBold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -14,13 +30,44 @@
   color: #2c3e50;
 }
 .background{
+  width: 100%;
+  background: linear-gradient(rgba(12,111,202,1), rgba(38,0,111,1));
+  opacity: 1;
   height: 100vh;
   overflow: hidden;
-  margin:0;  background-image: url("./assets/Splash.svg");
   background-size: cover;
-  background-repeat: no-repeat;
   background-position: center;
+  position: relative;
 }
+#stars{
+  position: relative;
+  left: -30%;
+  bottom: 100%;
+  height: 300%;
+  margin:0;  
+  background-image: url("@/assets/images/stars3.svg");
+  background-size: contain;
+  background-position: center;
+  overflow: hidden;
+  animation: rotation 120s infinite linear;
+}
+@keyframes rotation {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+#contents {
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 0;
+}
+
 nav {
   padding: 30px;
 }
@@ -32,5 +79,10 @@ nav a {
 
 nav a.router-link-exact-active {
   color: #42b983;
+}
+
+
+.btnbox {
+  display: flex;
 }
 </style>

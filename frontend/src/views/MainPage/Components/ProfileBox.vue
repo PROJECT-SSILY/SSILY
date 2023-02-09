@@ -33,28 +33,33 @@ export default {
     const route = useRouter()
     const store = useStore()
     const state = reactive({
-      nickname: null
+      nickname: null,
+      robot: 0,
     })
     onBeforeMount(async ()=> {
-          const token = store.getters['accountStore/getToken']
+          const token = await store.getters['accountStore/getToken']
           const res = await store.dispatch('accountStore/getMeAction', token)
+          console.log(res)
           state.nickname = res.nickname
       })
     const toMyPage = function() {
       route.push('mypage')
     }
+    const logOut = async function() {
+            await store.dispatch('accountStore/logoutAction')
+            route.push('/')
+        }
     return {
       store,
       state,
       route,
+      logOut,
       toMyPage
       }
   }
 }
 
-
 </script>
-
 <style scoped>
 #btnbox {
   display: flex;
