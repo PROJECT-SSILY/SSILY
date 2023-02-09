@@ -493,8 +493,41 @@ const actions = {
         },
         to: [],
       })
+  },
+  uploadImage: (context, payload) => {
+    console.log("찍어보자", context.rootState.accountStore.token);
+    $axios
+    .post(`/api/image/upload?sessionId=${state.sessionId}`, payload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${context.rootState.accountStore.token}`,
+      },
+    })
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      alert("실패");
+      console.log(err)
+    });
+  },
+    
+  sendImageData: (context, payload) => {
+    console.log("보낼 데이터는 ? :", payload);
+      state.session.signal({
+        type: 'game',
+        data: {
+          gameStatus : 6,
+          imageData: {
+            data: payload.data,
+            colorSpace: payload.colorSpace,
+            height: payload.height,
+            weight: payload.weight,
+          },
+        },
+        to : [],
+      })
     },
-
     // 채팅
     sendMessage: (context, chattings) => {
       state.session.signal({

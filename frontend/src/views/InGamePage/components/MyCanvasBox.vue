@@ -6,10 +6,13 @@
       height="328"
       id="canvas"
     ></canvas>
+    <!-- <canvas
+    style="margin: 0 auto; border: 2px solid"
+    width="585" height="328" id="myCanvas"></canvas> -->
     <div style="margin: 1rem">
       <v-btn @click="allowDrawing">Draw</v-btn>
       <v-btn @click="eraseAll">Erase</v-btn>
-      <v-btn @click="predictModel">제출</v-btn>
+      <v-btn @click="getAnswerImage">제출</v-btn>
     </div>
   </div>
 </template>
@@ -22,6 +25,7 @@ import { fabric } from "fabric";
 import { disposeTFVariables, TFModel } from "@/utils/model";
 import { CLASS_NAMES } from "@/utils/class_names";
 import { useStore } from 'vuex';
+// import $axios  from 'axios';
 
 const MY_MODEL_URL="http://localhost:8080/api/model.json";
 
@@ -63,6 +67,7 @@ export default {
 
         const predictModel = function () {
             submitDrawing();
+            // getAnswerImage();
         };
 
         const getMinBox = function () {
@@ -109,6 +114,46 @@ export default {
             );
 
             return imageData;
+        };
+
+        const getAnswerImage = function(){
+      // toDataURL()사용하여 png타입의 base64인코딩된 data url 형식의 문자열을 반환
+      const canvas = fabricCanvas.value
+      var dataUrl = canvas.toDataURL('image/png')
+      console.log(dataUrl)
+
+      // data:image/jpeg;base64,/9j/4AAQSkZJRg...AAAAAB//2Q==
+      // data : <type> <;base64> <data>
+      
+      // <data> 부분 뽑아내기
+      // atob = ASCII -> binary
+      // btoa = binary -> ASCII
+      // base64 데이터 디코딩
+      var byteString = window.atob(dataUrl.split(',')[1]);
+      var array = [];
+      // i 에 해당하는 string을 unicode로 변환
+      for (var i = 0; i < byteString.length; i++) {
+          array.push(byteString.charCodeAt(i));
+      }
+      console.log("array 잘 만드냐?", array);
+      // (2486) [137, 80, 78, 71, ...]
+      // Blob 생성
+      var myBlob = new Blob([new Uint8Array(array)], {type: 'image/png'});
+
+      // ** Blob -> File 로 변환**
+      var file = new File([myBlob], "blobtofile.png");
+      var formData = new FormData();
+
+      formData.append("answerImage", file);
+      formData.append("content", "Blob확인");
+      formData.append("tagList", "blob");
+      formData.append("username", "admin");
+
+      console.log("formData : ", formData.get("answerImage"));
+      console.log("token : ", store.state.accountStore.token);
+      const myToken=store.state.accountStore.token;
+      store.dispatch('gameStore/uploadImage', formData, myToken);
+
         };
 
         const submitCanvas = function () {
@@ -159,7 +204,6 @@ export default {
             console.log('그냥 : ', topFive)
             store.dispatch('gameStore/sendTopFive', topFive.value)
         };
-
 
         const getClassNames = function () {
             return CLASS_NAMES;
@@ -230,7 +274,8 @@ export default {
             eraseAll,
             predictModel,
             success,
-            
+            getAnswerImage
+
         }
     },
 }
