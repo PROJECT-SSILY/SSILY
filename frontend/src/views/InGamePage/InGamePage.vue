@@ -1,41 +1,43 @@
 <template>
-    <div class="wrap_component">
-        <!----------------------------------- 개발용 버튼 -------------------------------------->
-            <p>
-                <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
-                <v-btn @click="state.isTeamBattle = !state.isTeamBattle">팀/개인전 변경</v-btn> |
-                <v-btn @click="state.amIDescriber = !state.amIDescriber">게임 순서 변경</v-btn>
-            </p>
-        <!------------------------------------------------------------------------------------->
-        <div class="waiting_component" v-if="!readyAll">
-            <div class="users_component">
-                <WaitingPage
-                :sessionId="state.sessionId"
-                :playerList="state.playerList"
-                :session="state.session"
-                :myConnectionId="state.connectionId"
-                :team="state.team"
-                />
-            </div>
-            <div class="side_component flex-item">
-                <v-radio-group class="select_team" inline v-model="state.team" justify-content="center">
-                    <v-radio label="RED" value="RED" color="red" class="ma-2" @click="clickTeam(RED)"></v-radio>
-                    <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2" @click="clickTeam(BLUE)"></v-radio>
-                </v-radio-group>
-                <div class="chat_box">
-                    <ChattingBox/>
+<div class="wrap_component">
+    <!----------------------------------- 개발용 버튼 -------------------------------------->
+        <p>
+            <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
+            <v-btn @click="state.isTeamBattle = !state.isTeamBattle">팀/개인전 변경</v-btn> |
+            <v-btn>게임 순서 변경</v-btn>
+        </p>
+    <!------------------------------------------------------------------------------------->
+    <div class="waiting_component" v-if="!readyAll">
+        <div class="users_component">
+            <WaitingPage
+            :sessionId="state.sessionId"
+            :playerList="state.playerList"
+            :session="state.session"
+            :myConnectionId="state.connectionId"
+            :team="state.team"
+            />
+        </div>
+
+        <div class="side_component flex-item">
+            <v-radio-group class="select_team" inline v-model="state.team" justify-content="center">
+                <v-radio label="RED" value="RED" color="red" class="ma-2" @click="clickTeam(RED)"></v-radio>
+                <v-radio label="BLUE" value="BLUE" color="indigo" class="ma-2" @click="clickTeam(BLUE)"></v-radio>
+            </v-radio-group>
+            <div class="chat_box">
+                <ChattingBox/>
                 </div>
                 <div class="side_footer">
-                    <div class="sidebtn">
-                        <v-btn class="readybtn" v-if="!state.ready" @Click="clickReady">READY</v-btn>
-                        <v-btn class="readybtn" v-if="state.ready" @Click="clickReady">CANCEL READY</v-btn>
-                    </div>
-                    <div class="sidebtn">
-                        <v-btn class="exitbtn" @click="clickExit">EXIT</v-btn>
-                    </div>
-                </div>
                 <div class="sidebtn">
-                        <v-btn class="exitbtn" @click="gameStart()">Game Start</v-btn>
+                    <v-btn class="readybtn" v-if="!state.ready" @Click="clickReady">READY</v-btn>
+                    <v-btn class="readybtn" v-if="state.ready" @Click="clickReady">CANCEL READY</v-btn>
+                </div>
+
+                <div class="sidebtn">
+                    <v-btn class="exitbtn" @click="clickExit">EXIT</v-btn>
+                </div>
+            </div>
+            <div class="sidebtn">
+                    <v-btn class="exitbtn" @click="gameStart()">Game Start</v-btn>
                 </div>
             </div>
         </div>
@@ -51,7 +53,7 @@
                         <div id="video-container" class="col-md-6">
                             <div class="me">
                                 <h1>나</h1>
-                                <div class="drawing_sec" v-if="!state.amIDescriber">
+                                <div class="drawing_sec" v-if="!amIDescriber">
                                     <MyCanvasBox/>
                                     <user-video :stream-manager="publisher"/>
                                 </div>
@@ -61,7 +63,7 @@
                             </div>
                             <div class="our_team">
                                 <h1>우리 팀</h1>
-                                <div class="drawing_sec" v-if="state.amIDescriber">
+                                <div class="drawing_sec" v-if="amIDescriber">
                                     <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
                                     <MyCanvasBox/>
                                 </div>
@@ -85,13 +87,13 @@
     import $axios from "axios";
     import { useStore } from 'vuex';
     import { useRoute, useRouter } from 'vue-router'
+
     import { reactive } from '@vue/reactivity'
-    import { GetPlayerList } from "@/common/api/gameAPI";
     import { onBeforeMount, computed } from 'vue';
+
     //=================OpenVdue====================
 
     $axios.defaults.headers.post['Content-Type'] = 'application/json';
-
     //=============================================
 
     export default {
@@ -111,6 +113,7 @@
             const route = useRoute() // URL 파라미터를 통한 sessionId 얻기
             const userList = computed(() => store.state.gameStore.userList)
             const readyAll = computed(() => store.state.gameStore.isAllReady)
+            const amIDescriber = computed(() => store.state.gameStore.amIDescriber)
             const router = useRouter()
             const state = reactive({
                 title: null,
@@ -128,20 +131,19 @@
                 opponentTeam: [],
 
                 // 게임 순서 관련
-                amIDescriber: false, // false : 내가 그리는 차례, true : 내가 설명할 차례
 
                 ready: false,
                 team: null,
             })
 
-            // == OpenVidu State ===
+
+            // == OpenVidu State ==
             const publisher = computed(() => store.state.gameStore.publisher )
             const myTeams = computed(() => store.getters['gameStore/getMyTeams'])
             const opponents = computed(() => store.getters['gameStore/getOpponents'])
-            // =====================
 
-
-            onBeforeMount(() => {
+            onBeforeMount(async () => {
+                await store.dispatch('accountStore/getMeAction')
                 console.log('join start');
                 joinSession()
             })
@@ -160,7 +162,6 @@
                 store.commit('gameStore/setSessionId', state.sessionId) // 실행 전 세션id 저장 | 이은혁
                 await store.dispatch('gameStore/joinSession', state.sessionId)
             }
-
             const leaveSession = async function() {
                 store.dispatch('gameStore/leaveSession')
                 window.removeEventListener('beforeunload', leaveSession);
@@ -194,6 +195,8 @@
                 store.dispatch('gameStore/gameStart')
             }
 
+
+
             return {
                 router,
                 state,
@@ -201,7 +204,6 @@
                 publisher,
                 myTeams,
                 opponents,
-                userList,
                 clickExit,
                 clickTest,
                 clickReady,
@@ -210,6 +212,7 @@
                 joinSession,
                 leaveSession,
                 updateMainVideoStreamManager,
+                userList
             }
         }
     }

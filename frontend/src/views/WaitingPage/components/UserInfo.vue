@@ -15,6 +15,7 @@
 <script>
 import { useStore } from "vuex"
 
+
 export default {
   name: 'UserInfo',
   props: {
@@ -22,6 +23,7 @@ export default {
   },
   setup() {
     const store = useStore()
+
     return {
       store
     }
