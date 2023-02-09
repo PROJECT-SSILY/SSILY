@@ -183,9 +183,8 @@ public class GameService   {
                 else if (teamState.get(id) == Team.BLUE) blue++;
             }
         }
-        log.info("participants 사이즈는? {}", participants.size());
 
-        if(cnt == 4) {
+        if(cnt == participants.size()) {
             if(isTeamBattle) data.addProperty("isAllReady", (red == 2 && blue == 2));
             else data.addProperty("isAllReady", true);
         }
