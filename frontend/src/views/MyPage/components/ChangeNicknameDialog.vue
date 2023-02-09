@@ -38,6 +38,7 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
+          <alert-dialog v-if="state.alert"/>
           <p class="text-center">
             <v-btn
             @click="checkNickname">
@@ -58,14 +59,20 @@
   import { reactive, watch } from 'vue'
   import { useStore } from 'vuex'
   // import { computed } from 'vue'
+  import AlertDialog from '../../AlertDialog.vue'
 
   export default {
+    name: 'ChangeNicknameDialog',
+    components: {
+      AlertDialog
+    },
     setup() {
       const router = useRouter()
       const store = useStore()  
       const state = reactive({
         dialog: false,
         valid: true,
+        alert: false,
         form: {
             nickname: { value: "", valid: true, status: false }
         },
@@ -80,8 +87,12 @@
       })
       const changeNickname = async function () {
           if (!state.form.nickname.status){
-              alert("닉네임 중복확인이 필요합니다.")
-              return
+            state.alert = false
+            await store.commit('accountStore/setAlertColor', 'error')
+            await store.commit('accountStore/setAlertMessage', '닉네임 중복 확인이 필요합니다.')
+            await store.commit('accountStore/setAlertIcon', 'alert')
+            state.alert = true
+            return
           } else {
               await store.dispatch('accountStore/changeNicknameAction', state.form.nickname.value)
               await router.go(0)
@@ -89,12 +100,27 @@
       }
       const checkNickname = async function () {
           const result = await store.dispatch('accountStore/checkNicknameAction', state.form.nickname.value )
-          if (result.data.data) {
+          if ( state.form.nickname.value.length == 0) {
+              state.form.nickname.status = false
+              state.alert = false
+              await store.commit('accountStore/setAlertColor', 'error')
+              await store.commit('accountStore/setAlertMessage', '닉네임을 입력해주세요.')
+              await store.commit('accountStore/setAlertIcon', 'alert')
+              state.alert = true
+          } else if (result.data.data) {
               state.form.nickname.status = true
-              alert("사용 가능한 닉네임입니다.")
+              state.alert = false
+              await store.commit('accountStore/setAlertColor', 'success')
+              await store.commit('accountStore/setAlertMessage', '사용 가능한 닉네임입니다.')
+              await store.commit('accountStore/setAlertIcon', 'check')
+              state.alert = true
           } else {
               state.form.nickname.status = false
-              alert("이미 사용 중인 닉네임입니다.")
+              state.alert = false
+              await store.commit('accountStore/setAlertColor', 'error')
+              await store.commit('accountStore/setAlertMessage', '이미 사용중인 닉네임입니다.')
+              await store.commit('accountStore/setAlertIcon', 'alert')
+              state.alert = true
           }
           }
       return {

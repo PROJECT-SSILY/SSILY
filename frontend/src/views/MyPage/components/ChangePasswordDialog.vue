@@ -66,6 +66,7 @@
             <v-divider></v-divider>
             <v-card-actions>
               <v-spacer></v-spacer>
+              <alert-dialog v-if="state.alert"/>
               <p class="text-center">
                 <v-btn
                 @click="changePassword()">변경</v-btn>
@@ -81,13 +82,18 @@
     import { useRouter } from 'vue-router'
     import { reactive } from 'vue'
     import { useStore } from 'vuex'
-    // import { computed } from 'vue'
+    import AlertDialog from '../../AlertDialog.vue'
 
     export default {
+      name: 'ChangePasswordDialog',
+      components: {
+        AlertDialog
+      },    
       setup() {
         const router = useRouter()
         const store = useStore()  
         const state = reactive({
+          alert: false,
           dialog: false,
           valid: false,
           form:{
@@ -108,14 +114,31 @@
         })
         const changePassword = async function () {
           if (state.form.oldpassword == state.form.password1) {
-            alert('변경할 비밀번호는 기존 비밀번호와 달라야 합니다!')
+            state.alert = false
+            await store.commit('accountStore/setAlertColor', 'error')
+            await store.commit('accountStore/setAlertMessage', '변경할 비밀번호는 기존 비밀번호와 달라야 합니다!')
+            await store.commit('accountStore/setAlertIcon', 'alert')
+            state.alert = true
             return
+          } else if 
+            (state.form.oldpassword == store.state.accountStore.password) {
+              state.alert = false
+              await store.commit('accountStore/setAlertColor', 'error')
+              await store.commit('accountStore/setAlertMessage', '기존 비밀번호를 정확히 입력해 주세요!')
+              await store.commit('accountStore/setAlertIcon', 'alert')
+              state.alert = true
+              return
           } else {
             const formdata = {
               "oldPassword": state.form.oldpassword,
               "newPassword" : state.form.password1
             }
             await store.dispatch('accountStore/changePasswordAction', formdata)
+            state.alert = false
+            await store.commit('accountStore/setAlertColor', 'success')
+            await store.commit('accountStore/setAlertMessage', '비밀번호 변경 성공!')
+            await store.commit('accountStore/setAlertIcon', 'check')
+            state.alert = true
             router.go(0)
           }
         }

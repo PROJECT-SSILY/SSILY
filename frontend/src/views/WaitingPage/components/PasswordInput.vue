@@ -2,21 +2,11 @@
   <div class="text-center">
     <v-dialog
       v-model="state.dialog"
+      persistent
       fullscreen
       hide-overlay
       transition="dialog-bottom-transition"
-    >
-      <template v-slot:activator="{ attrs }
-      ">
-        <v-btn
-          dark
-          v-bind="attrs"
-          @click.stop="state.dialog = true"
-        >
-        입장
-        </v-btn>
-      </template>
-
+    >      
       <v-card class="formbox">
         <v-card-title>
           비밀번호 입력
@@ -34,10 +24,12 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
+
             <p class="text-center">
               <v-btn 
               @click="checkPassword">참가하기</v-btn>
             </p>
+            <alert-dialog v-if="state.alert"/>
           </v-card-actions>
       </v-form>
       </v-card>
@@ -50,12 +42,16 @@
   import { reactive, computed } from 'vue'
   import { useStore } from 'vuex'
   import $axios from "axios";
+  import AlertDialog from '../../AlertDialog.vue'
 
   $axios.defaults.headers.post['Content-Type'] = 'application/json';
 
  
   export default {
     name: 'PasswordInput',
+    components: {
+      AlertDialog
+    },
     props: {
       dialog: Object
     },
@@ -64,12 +60,17 @@
       const store = useStore()      
       const state = reactive({
         input: null,
-        dialog : true
+        dialog : true,
+        alert: false
       })
       const password = computed(() => store.state.gameStore.password)
-      const checkPassword = function() {
+      const checkPassword = async function() {
+        state.alert = false
         if (state.input != password.value) {
-          alert('비밀번호가 일치하지 않습니다!')
+          await store.commit('accountStore/setAlertColor', 'error')
+          await store.commit('accountStore/setAlertMessage', '비밀번호가 틀렸습니다.')
+          await store.commit('accountStore/setAlertIcon', 'alert')
+          state.alert = true
           return
         } else {
           state.dialog = false
@@ -79,7 +80,8 @@
         router, 
         state,
         password,
-        checkPassword
+        checkPassword,
+
       }
     }
   }
@@ -95,5 +97,10 @@
   font-family: 'MaplestoryOTFBold';
   font-weight: normal;
   font-style: normal;
+}
+
+.my-custom-dialog {
+  position: absolute;
+  top: -70%
 }
 </style>

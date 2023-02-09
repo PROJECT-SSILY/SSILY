@@ -4,6 +4,7 @@ import $axios from "axios";
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
 const OPENVIDU_SERVER_URL = "https://localhost:4443";
+// const OPENVIDU_SERVER_URL = "https://i8c104.p.ssafy.io:8443";
 const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 import { randomTeam, randomPrivate } from "@/common/api/gameAPI";
@@ -511,7 +512,7 @@ const actions = {
       console.log(err)
     });
   },
-    
+
   sendImageData: (context, payload) => {
     console.log("보낼 데이터는 ? :", payload);
       state.session.signal({

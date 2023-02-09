@@ -27,7 +27,7 @@ import { CLASS_NAMES } from "@/utils/class_names";
 import { useStore } from 'vuex';
 // import $axios  from 'axios';
 
-const MY_MODEL_URL="http://localhost:8080/api/model.json";
+const MY_MODEL_URL="http://localhost:5000/api/model.json";
 
 export default {
     name: 'MyCanvasBox',
@@ -124,7 +124,7 @@ export default {
 
       // data:image/jpeg;base64,/9j/4AAQSkZJRg...AAAAAB//2Q==
       // data : <type> <;base64> <data>
-      
+
       // <data> 부분 뽑아내기
       // atob = ASCII -> binary
       // btoa = binary -> ASCII
@@ -242,7 +242,7 @@ export default {
             disposeTFVariables();
         })
 
-        
+
 
         /*
         record the current drawing coordinates
