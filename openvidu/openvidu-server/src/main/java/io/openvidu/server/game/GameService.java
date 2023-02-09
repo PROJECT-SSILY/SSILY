@@ -1,5 +1,4 @@
 package io.openvidu.server.game;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.openvidu.client.internal.ProtocolElements;
@@ -35,6 +34,10 @@ public class GameService   {
     static final int JOIN_ROOM = 3;
     static final int CHANGE_READY_STATE = 4;
     static final int SUBMIT_ANSWER = 5;
+
+    static final int FINISH_ROUND = 10;
+    static final int FINISH_GAME = 100;
+
 
     //Tread 관리
     public static ConcurrentHashMap<String, Thread> gameThread = new ConcurrentHashMap<>();
@@ -95,6 +98,12 @@ public class GameService   {
                 return;
             case SUBMIT_ANSWER:
                 submitAnswer(participant, sessionId, participants, params, data);
+                return;
+            case FINISH_ROUND:
+                finishRound(participant, sessionId, participants, params, data);
+                return;
+            case FINISH_GAME:
+                finishGame(participant, sessionId, participants, params, data);
                 return;
         }
     }
@@ -167,13 +176,14 @@ public class GameService   {
 
         for (String id : nowReadyState.keySet()) {
             data.addProperty(id, nowReadyState.get(id));
-            if(nowReadyState.get(id)) {
+            if (nowReadyState.get(id)) {
                 cnt++;
 
-                if(teamState.get(id) == Team.RED) red++;
-                else if(teamState.get(id) == Team.BLUE) blue++;
+                if (teamState.get(id) == Team.RED) red++;
+                else if (teamState.get(id) == Team.BLUE) blue++;
             }
         }
+        log.info("participants 사이즈는? {}", participants.size());
 
         if(cnt == 4) {
             if(isTeamBattle) data.addProperty("isAllReady", (red == 2 && blue == 2));
@@ -373,6 +383,7 @@ public class GameService   {
                 rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
                         ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
             }
+            finishRound(participant, sessionId, participants, params, data);
         }
     }
 
@@ -403,11 +414,12 @@ public class GameService   {
         data.addProperty("cnt", cnt);
         data.addProperty("winnerId", participant.getParticipantPublicId());
         data.addProperty("winnerNickname", winner.getNickname());
-        params.add("data", data);
-
         // 라운드 증가
         Integer nowRound = round.get(sessionId);
         round.put(sessionId, nowRound+1);
+        data.addProperty("round", nowRound);
+
+        params.add("data", data);
 
         // 라운드 종료 알라기
         for (Participant p : participants) {
