@@ -1,8 +1,7 @@
 <template>
 <!-- <p>{{streamManager}}</p> -->
 <div v-if="streamManager">
-	<ov-video :stream-manager="streamManager"/>
-	<div><p>{{ clientData }}</p></div>
+	<ov-video :stream-manager="streamManager" class="video"/>
 </div>
 </template>
 
@@ -20,13 +19,6 @@ export default {
 		streamManager: Object,
 	},
 
-	computed: {
-		clientData () {
-			const { clientData } = this.getConnectionData();
-			return clientData;
-		},
-	},
-
 	methods: {
 		getConnectionData () {
 			const { connection } = this.streamManager.stream;
@@ -35,3 +27,10 @@ export default {
 	},
 };
 </script>
+<style scoped>
+.video {
+	width: inherit;
+	border-radius: inherit;
+	background: black;
+}
+</style>

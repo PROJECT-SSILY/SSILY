@@ -20,7 +20,6 @@
           :team="state.team"
         />
       </div>
-
       <div class="side_component flex-item">
         <v-radio-group
           class="select_team"
@@ -55,7 +54,6 @@
               >CANCEL READY</v-btn
             >
           </div>
-
           <div class="sidebtn">
             <v-btn class="exitbtn" @click="clickExit">EXIT</v-btn>
           </div>
@@ -103,7 +101,49 @@
                 </v-row>
             </v-container>
         </div>
+      </div>
+      <div class="ingame_component_content">
+        <div class="opponent_container">
+          <user-video class="opp_stream"
+            v-for="sub in opponents"
+            :key="sub.stream.connection.connectionId"
+            :stream-manager="sub"
+            :class="sub.stream.connection.connectionId===currentPresenterId?'presenter':''"
+          />
+        </div>
+        <div class="ourteam_container">
+          <div class="me">
+            <div class="draw_sec" v-if="!amIDescriber">
+              <MyCanvasBox class="canvas" />
+              <user-video :stream-manager="publisher" class="my_stream" />
+            </div>
+            <div class="display_sec" v-else>
+              <user-video :stream-manager="publisher" class="my_stream" />
+            </div>
+          </div>
+          <div class="ourteam_members">
+            <div class="draw_sec" v-if="amIDescriber">
+              <user-video
+                v-for="sub in myTeams"
+                :key="sub.stream.connection.connectionId"
+                :stream-manager="sub"
+                class="our_stream"
+              />
+              <MyCanvasBox class="canvas" />
+            </div>
+            <div class="display_sec" v-else>
+              <user-video
+                v-for="sub in myTeams"
+                :key="sub.stream.connection.connectionId"
+                :stream-manager="sub"
+                class="our_stream"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -146,6 +186,7 @@ export default {
     const readyAll = computed(() => store.state.gameStore.isAllReady);
     const amIDescriber = computed(() => store.state.gameStore.amIDescriber);
     const round = computed(() => store.state.gameStore.round);
+    const currentPresenterId = computed(() => store.state.gameStore.presenterId);
     const router = useRouter();
     const state = reactive({
       title: null,
@@ -172,24 +213,24 @@ export default {
     const myTeams = computed(() => store.getters["gameStore/getMyTeams"]);
     const opponents = computed(() => store.getters["gameStore/getOpponents"]);
 
-    const joinSession = async function() {
-        const players = await GetPlayerList(state.sessionId)
-        console.log("players : ", players)
-        // const content = players.content
-        // for (let i=0; i<content.length; i++) {
-        //     if(content.length > 0 && content.player == state.nickname) {
-        //         alert("잘못된 접근입니다.")
-        //         router.push({name : 'main'})
-        //         return
-        //     }
-        // }
-        store.commit('gameStore/setSessionId', state.sessionId) // 실행 전 세션id 저장 | 이은혁
-        await store.dispatch('gameStore/joinSession', state.sessionId)
-    }
-    const leaveSession = async function() {
-        store.dispatch('gameStore/leaveSession')
-        window.removeEventListener('beforeunload', leaveSession);
-    }
+    const joinSession = async function () {
+      const players = await GetPlayerList(state.sessionId);
+      console.log("players : ", players);
+      // const content = players.content
+      // for (let i=0; i<content.length; i++) {
+      //     if(content.player === state.nickname) {
+      //         alert("잘못된 접근입니다.")
+      //         router.push({name : 'main'})
+      //         return
+      //     }
+      // }
+      store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
+      await store.dispatch("gameStore/joinSession", state.sessionId);
+    };
+    const leaveSession = async function () {
+      store.dispatch("gameStore/leaveSession");
+      window.removeEventListener("beforeunload", leaveSession);
+    };
 
     onBeforeMount(async () => {
       await store.dispatch("accountStore/getMeAction");
@@ -197,7 +238,6 @@ export default {
       joinSession();
     });
 
-  
     const updateMainVideoStreamManager = async function (stream) {
       store.dispatch("gameStore/updateMainVideoStreamManager", stream);
     };
@@ -238,6 +278,7 @@ export default {
       amIDescriber,
       userList,
       round,
+      currentPresenterId,
       clickExit,
       clickTest,
       clickReady,
@@ -252,6 +293,8 @@ export default {
 </script>
 
 <style scoped>
+/* ======= waiting_component ================================================================= */
+
 .wrap_component {
   display: flex;
   flex-direction: column;
@@ -329,4 +372,66 @@ export default {
     rgba(255, 93, 93, 1) 100%
   );
 }
+/* =========================================================================================== */
+
+/* ======= in_game_component ================================================================= */
+.in_game_component {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+}
+.ingame_component_content {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
+}
+.opponent_container, .ourteam_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  min-width: 300px;
+}
+.display_sec {
+  width: 100%;
+}
+.display_sec .my_stream {
+  width: 100%;
+  overflow: hidden;
+  box-shadow: 0px 0px 20px 0px #0000003b;
+}
+.draw_sec {
+  position: relative;
+}
+.opp_stream {
+  transition-duration: 0.3s;
+  height: 226px;
+  margin: 10px 0;
+  width: 300px;
+  border-radius: 43px;
+  box-shadow: 0px 0px 20px 0px #0000005c;
+}
+.presenter {
+  height: 315px;
+  margin: 10px 0;
+  width: 420px;
+}
+.draw_sec .my_stream {
+  height: 105px;
+  width: 140px;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  border-top-left-radius: 43px;
+  border-bottom-right-radius: 43px;
+  overflow: hidden;
+  box-shadow: 0px 0px 20px 0px #0000005c;
+}
+.canvas {
+  width: 100%;
+}
+
+/* =========================================================================================== */
 </style>

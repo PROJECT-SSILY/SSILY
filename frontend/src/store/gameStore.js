@@ -36,12 +36,16 @@ const state = {
     chat: [],
     myConnectionId: null,
     amIDescriber: false,
-    winnerNickname: '',
+    winnerNickname: '', // [라운드 결과] 승리 유저
     winnerId: '',
-    round: 1,
+    round: 1, // 현재 라운드
     answer: '',
-    sortedUserList: [], // score 내림차순으로 정렬된 리스트
-    endRound: false, // 라운드 끝나고 중간 결과 출력하기 위한 변수
+    presenterId: null,
+    sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
+    endRound: false, // [라운드 결과] 라운드 끝났을 때 true, 라운드 진행중일 때 false
+    winnerList: [], // [게임 결과] 승리 유저 리스트
+    gameResult: [], // [게임 결과] 유저 리스트 (key: connectionId, extraExp, levelUp, nickname)
+    endGame: false // [게임 결과] 게임 끝났을 때 true, 게임 진행줄일 때 false
 }
 
 const getters = {
@@ -63,28 +67,41 @@ const getters = {
   getChat: (state) => {
     return state.chat;
   },
+  getPresenterId: (state) => {
+    return state.presenterId
+  },
   // 우리편 팀원들을 골라서 뽑아내는 메서드
   getMyTeams: (state) => {
-    const myTeamColor = state.publisher.team;
     const res = [];
-    state.subscribers.forEach((sub) => {
-      if (sub.team == myTeamColor) {
-        res.push(sub);
+    if (state.isTeamBattle) {
+        state.subscribers.forEach(sub => {
+          const connectionId = sub.stream.connection.connectionId
+          console.log("sub.stream.connection.connectionId : ", sub.stream.connection.connectionId) // 각 sub들의 connectionId
+          state.userList.forEach(user => {
+            if(user.connectionId === connectionId && user.team === state.team){
+              res.push(sub)
+            }
+          })
+        })
+        return res;
+      } else {
+        return []
       }
-    });
-    return res;
   },
 
   // 상대편 팀원들을 골라서 뽑아내는 메서드
   getOpponents: (state) => {
-    const myTeamColor = state.publisher.team;
-    const res = [];
-    state.subscribers.forEach((sub) => {
-      if (sub.team != myTeamColor) {
-        res.push(sub);
-      }
-    });
-    return res;
+    // if (state.isTeamBattle) {
+    //   state.subscribers.forEach(sub => {
+    //     const connectionId = sub.stream.connection.connectionId
+    //     console.log("sub.stream.connection.connectionId : ", sub.stream.connection.connectionId) // 각 sub들의 connectionId
+    //     state.userList.forEach(user => {
+    //       if(user.connectionId === connectionId && user.team === state.team)
+    //     })
+    //     // if(connectionId == )
+    //   })
+    // }
+    return state.subscribers
   },
 };
 
@@ -175,15 +192,10 @@ const mutations = {
       var value = data.value
       state.userList[index].isPresenter = value
     },
-
-    setAmIDescriber: (state, data) => {
-      state.amIDescriber = data
-    },
-
     delUserinUserList: (state, data) => { // UserList에서 퇴장한 유저의 id 삭제
       state.userList.splice(data)
     },
-    delUserinUserKey: (state, data) => { // UserKey에서 퇴장한 유저의 id 삭제
+    delUserinUserKey: (state, data) => { // UserKey에서 퇴장한 유저의 id 삭제 - 이은혁
       state.userKey.splice(data)
     },
 
@@ -209,12 +221,25 @@ const mutations = {
       var value = data.value
       state.userList[index].score = value
     },
-    
+    setPresenterId: (state, data) => {
+      console.log('여기까지 왔음?')
+      state.presenterId = data
+    },
     setSortedUserList: (state, data) => {
       state.sortedUserList = data
     },
     setEndRound: (state, data) => {
       state.endRound = data
+    },
+    setWinnerList: (state, data) => { // 게임 승리 유저 리스트
+      state.winnerList = data
+    },
+    setGameResult: (state, data) => { // 게임 결과 리스트
+      state.gameResult = data
+    },
+
+    setEndGame: (state, data) => {
+      state.endGame = data
     }
 };
 
@@ -242,7 +267,7 @@ const actions = {
     // --- Specify the actions when events take place in the session ---
     // On every new Stream received...
     // stream = 영상 송출과 관련된 정보들 | 이은혁
-    // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직 | 이은혁
+    // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 subscribers에 다른 사람들의 stream정보를 담는 로직 | 이은혁
     session.on("streamCreated", ({ stream }) => {
       console.log("테스트입니다", state.subscribers);
       const subscriber = session.subscribe(stream);
@@ -255,7 +280,6 @@ const actions = {
       if (index >= 0) {
         state.subscribers.splice(index, 1);
       }
-
       // state.userList에서 세션 퇴장한 유저 삭제 - 이은혁
       const targetId = stream.connection.connectionId; // 퇴장한 유저의 connectionId
       state.userList.forEach((user, index) => {
@@ -295,7 +319,9 @@ const actions = {
         // 설명자 부여
         case 0: {
           console.log('0번 시그널 수신 완료')
-          var PresenterId = event.data.curPresenterId
+          const PresenterId = event.data.curPresenterId
+          console.log('=========================')
+          context.commit("setPresenterId", PresenterId) // 현재 설명자 id 저장 - 이은혁
           console.log('curPresenterId : ', event.data.curPresenterId)
           for (var n=0; n < state.userList.length; n++ ) {
             if (state.userList[n].connectionId == PresenterId) {
@@ -417,21 +443,25 @@ const actions = {
         case 100 : {
           // 게임 끝 경험치 부여
           console.log('100번 시그널 수신 - 게임 끝')
+          console.log('event.data : ',event.data)
+          console.log('event.data.winnerCnt : ', event.data.winnerCnt)
+          // context.commit('setWinnerNickname', event.data.winner)
+          var winnerList = []
+          for (var a=0; a<event.data.winnerCnt; a++ ){
+            winnerList.push(event.data.winner[a].nickname)
+          }
+          context.commit('setWinnerList', winnerList)
+          context.commit('setGameResult', event.data.gameResult)
+          context.commit('setEndGame', true)
           break
         }
       }}
     );
-    context.dispatch("getToken", sessionId).then((token) => {
-      console.log(
-        "여기까지 완료, token :",
-        token,
-        "state.myUserName :",
-        state.myUserName
-      );
-      console.log("session : ", session);
-      context.commit("setSession", session);
-      session
-        .connect(token, { clientData: state.myUserName })
+
+
+
+    context.dispatch("getToken", sessionId).then(token => {
+      session.connect(token, { clientData: state.myUserName })
         .then(() => {
           // --- Get your own camera stream with the desired properties ---
           let publisher = OV.initPublisher(undefined, {
@@ -586,16 +616,17 @@ const actions = {
       .then((sessionId) => dispatch("createToken", sessionId));
   },
 
-  leaveSession: (context) => {
-    if (state.session) state.session.disconnect();
-    context.commit("setSession", undefined);
-    context.commit("setMainStreamManager", undefined);
-    context.commit("setSubscribers", []);
-    context.commit("setOV", undefined);
-    context.commit("SET_PUBLISHER", undefined);
-    context.commit("setClearUserList");
-    context.commit("setClearUserKey");
-  },
+    leaveSession: (context) => {
+        if (state.session) state.session.disconnect();
+        context.commit("setSession", undefined)
+        context.commit("setMainStreamManager", undefined)
+        context.commit("setSubscribers", [])
+        context.commit("setOV", undefined)
+        context.commit('SET_PUBLISHER', undefined)
+        context.commit('setClearUserList')
+        context.commit('setClearUserKey')
+        
+    },
 
   updateMainVideoStreamManager: (commit, stream) => {
     if (state.mainStreamManager === stream) return;
