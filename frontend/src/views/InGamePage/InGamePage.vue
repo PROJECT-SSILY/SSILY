@@ -65,50 +65,6 @@
         </div>
       </div>
     </div>
-    <div class="in_game_component" v-else>
-      <GameTimer date="August 15, 2016" />
-      <v-container>
-        <v-row>
-          <v-col>
-            <h1>상대 팀</h1>
-            <user-video
-              v-for="sub in opponents"
-              :key="sub.stream.connection.connectionId"
-              :stream-manager="sub"
-            />
-          </v-col>
-          <v-col>
-            <div id="video-container" class="col-md-6">
-              <div class="me">
-                <h1>나</h1>
-                <div class="drawing_sec" v-if="!amIDescriber">
-                  <MyCanvasBox />
-                  <user-video :stream-manager="publisher" />
-                </div>
-                <div class="displaying_sec" v-else>
-                  <user-video :stream-manager="publisher" />
-                </div>
-              </div>
-              <div class="our_team">
-                <h1>우리 팀</h1>
-                <div class="drawing_sec" v-if="amIDescriber">
-                  <user-video
-                    v-for="opp in opponents"
-                    :key="opp.stream.connection.connectionId"
-                    :stream-manager="opp"
-                  />
-                  <MyCanvasBox />
-                </div>
-                <div class="displaying_sec" v-else>
-                  <user-video
-                    v-for="opp in opponents"
-                    :key="opp.stream.connection.connectionId"
-                    :stream-manager="opp"
-                  />
-                </div>
-              </div>
-            </div>
-        </div>
         <div class="in_game_component" v-else>
             <GameTimer date="August 15, 2016"/>
             <div v-for="user in userList"
@@ -151,8 +107,8 @@
             </v-container>
         </div>
     </div>
-  </div>
 </template>
+
 <script>
 import GameTimer from "./components/GameTimer.vue";
 import UserVideo from "./components/UserVideo.vue";

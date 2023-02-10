@@ -379,14 +379,6 @@ const actions = {
                 context.commit('setUserScore', {index: y, value: scoreList[x].score})
                 break
               }}}
-          // => 0번  시그널 보냄
-          state.session.signal({
-            type: 'game',
-            data: {
-              gameStatus: 0,
-            },
-            to: [],
-          })
           break
         }
         case 100 : {
