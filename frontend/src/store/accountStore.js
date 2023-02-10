@@ -156,23 +156,29 @@ const actions = {
             throw err;
         }
     },
-    changePasswordAction: (context, payload) => {
-        const params = { 
-            oldPassword : payload.oldPassword,
-            newPassword : payload.newPassword 
-        }
-        $axios.put("/api/member/password", 
-        params, {headers: {Authorization: `Bearer ${context.state.token}`}})
-        .then(res => {
-            console.log("res is", res);
-            console.log("code = ", res.data.code)
+    changePasswordAction: async (context, payload) => {
+        try {
+            const params = { 
+                oldPassword : payload.oldPassword,
+                newPassword : payload.newPassword 
+            }
+            const res = await $axios.put("/api/member/password", 
+            params, {headers: {Authorization: `Bearer ${context.state.token}`}})
+            console.log(res);
             return res.data.code
-        })
-        .catch(error => {
-            console.log("error = ", error)
-            console.log("errorcode : ", error.response.data.code);
-            return error.response.data.code
-        });
+        } catch(err) {
+            return err.response.data.code
+        }
+        // .then(res => {
+        //     console.log("res is", res);
+        //     console.log("code = ", res.data.code)
+        //     return res.data.code
+        // })
+        // .catch(error => {
+        //     console.log("error = ", error)
+        //     console.log("errorcode : ", error.response.data.code);
+        //     return error.response.data.code
+        // });
       
 
         
