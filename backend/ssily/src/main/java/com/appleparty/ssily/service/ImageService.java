@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Blob;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -21,12 +22,20 @@ public class ImageService {
 
     @Transactional
     public void saveAnswerImage(String name, byte[] img) {
-        Image image = Image.builder()
-                .name(name)
-                .img(BlobProxy.generateProxy(img))
-                .build();
+        Optional<Image> optionalImage = imageRepository.findByName(name);
 
-        imageRepository.save(image);
+        if(optionalImage.isPresent()){
+            Image image = optionalImage.get();
+            image.updateImg(BlobProxy.generateProxy(img));
+        }
+        else{
+            Image image = Image.builder()
+                    .name(name)
+                    .img(BlobProxy.generateProxy(img))
+                    .build();
+
+            imageRepository.save(image);
+        }
     }
 
     public Blob findImage(String name){
