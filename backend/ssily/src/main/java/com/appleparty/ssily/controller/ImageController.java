@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.Base64;
 
 @Slf4j
-//@CrossOrigin(origins = {"*"})
+@CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/image")
 @RequiredArgsConstructor
