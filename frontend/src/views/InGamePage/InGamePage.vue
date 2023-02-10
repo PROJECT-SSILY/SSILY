@@ -375,7 +375,7 @@ export default {
 }
 .opp_stream {
   transition-duration: 0.3s;
-  height: 226px;
+  height: 225px;
   margin: 10px 0;
   width: 300px;
   border-radius: 43px;
@@ -387,13 +387,12 @@ export default {
   width: 420px;
 }
 .draw_sec .my_stream {
-  height: 105px;
-  width: 140px;
-  right: 0;
-  bottom: 0;
+  height: 100px;
+  width: 100px;
+  right: 10px;
+  bottom: 10px;
   position: absolute;
-  border-top-left-radius: 43px;
-  border-bottom-right-radius: 43px;
+  border-radius: 100px;
   overflow: hidden;
   box-shadow: 0px 0px 20px 0px #0000005c;
 }

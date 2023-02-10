@@ -281,13 +281,13 @@ export default {
 }
 
 #canvas, .upper-canvas {
-    border-radius: 50px;
+    border-radius: 55px;
     /* position: inherit; */
 }
 
 .group_button {
-    width: 50px;
-    height: 100px;
+    width: 45px;
+    height: 90px;
     position: absolute;
     margin-top: -50px;
     margin-left: 10px;
@@ -298,8 +298,8 @@ export default {
 }
 
 #brush, #eraser {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     padding: 10px;
     cursor: pointer;
     background: white;

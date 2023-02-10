@@ -30,6 +30,7 @@ export default {
 <style scoped>
 .video {
 	width: inherit;
+	height: inherit;
 	border-radius: inherit;
 	background: black;
 }
