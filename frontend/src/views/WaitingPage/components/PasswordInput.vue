@@ -2,20 +2,13 @@
   <div class="text-center">
     <v-dialog
       v-model="state.dialog"
-      width="500"
-    >
-      <template v-slot:activator="{ attrs }
-      ">
-        <v-btn
-          dark
-          v-bind="attrs"
-          @click.stop="state.dialog = true"
-        >
-        </v-btn>
-      </template>
-
-      <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
+      persistent
+      fullscreen
+      hide-overlay
+      transition="dialog-bottom-transition"
+    >      
+      <v-card class="formbox">
+        <v-card-title>
           비밀번호 입력
         </v-card-title>
         <v-form
@@ -23,23 +16,20 @@
         v-model="valid"
         lazy-validation
         >
-          <div id="join" v-if="!state.session">
-            <div id="join-dialog" class="jumbotron vertical-center">
-
-            </div>
-          </div>
           <v-text-field 
             label="비밀번호 숫자 4자리를 입력하세요."
             hide-details="auto"
-            v-model="state.password"
+            v-model="state.input"
           ></v-text-field>
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
+
             <p class="text-center">
               <v-btn 
-              @click="joinSession()">Join!</v-btn>
+              @click="checkPassword">참가하기</v-btn>
             </p>
+            <alert-dialog v-if="state.alert"/>
           </v-card-actions>
       </v-form>
       </v-card>
@@ -49,17 +39,19 @@
 
 <script>
   import { useRouter } from 'vue-router'
-  import { reactive } from 'vue'
+  import { reactive, computed } from 'vue'
   import { useStore } from 'vuex'
-  // import { computed } from 'vue'
   import $axios from "axios";
+  import AlertDialog from '../../AlertDialog.vue'
 
   $axios.defaults.headers.post['Content-Type'] = 'application/json';
-  // const OPENVIDU_SERVER_URL = "https://localhost:4443";
-  // const OPENVIDU_SERVER_SECRET = "MY_SECRET";
+
  
   export default {
     name: 'PasswordInput',
+    components: {
+      AlertDialog
+    },
     props: {
       dialog: Object
     },
@@ -67,11 +59,19 @@
       const router = useRouter()
       const store = useStore()      
       const state = reactive({
-        password: null
+        input: null,
+        dialog : true,
+        alert: false
       })
-      const joinSession = async function() {
-        if (state.password === store.state.gameStore.password) {
-          router.push('gameroom')
+      const password = computed(() => store.state.gameStore.password)
+      const checkPassword = async function() {
+        state.alert = false
+        if (state.input != password.value) {
+          await store.commit('accountStore/setAlertColor', 'error')
+          await store.commit('accountStore/setAlertMessage', '비밀번호가 틀렸습니다.')
+          await store.commit('accountStore/setAlertIcon', 'alert')
+          state.alert = true
+          return
         } else {
           state.dialog = false
         }
@@ -79,8 +79,28 @@
       return {
         router, 
         state,
-        joinSession
+        password,
+        checkPassword,
+
       }
     }
   }
 </script>
+
+<style scoped>
+
+.formbox {
+  padding: 2rem;
+  width: 100%;
+  border-radius: 20px;
+  opacity: 100%;
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
+
+.my-custom-dialog {
+  position: absolute;
+  top: -70%
+}
+</style>

@@ -4,12 +4,14 @@ import com.google.gson.JsonParser;
 import io.openvidu.client.internal.ProtocolElements;
 import io.openvidu.server.config.PropertyConfig;
 import io.openvidu.server.core.Participant;
+import io.openvidu.server.core.SessionManager;
 import io.openvidu.server.rpc.RpcNotificationService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -23,11 +25,19 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class GameService   {
 
+    @Autowired
+    private SessionManager sessionManager;
+
     static final int SET_PRESENTER_SETTING = 0;
     static final int GET_PRESENTER_SETTING =1;
     static final int GAME_START = 2;
-    static final int GET_READY_STATE = 3;
+    static final int JOIN_ROOM = 3;
     static final int CHANGE_READY_STATE = 4;
+    static final int SUBMIT_ANSWER = 5;
+
+    static final int FINISH_ROUND = 10;
+    static final int FINISH_GAME = 100;
+
 
     //Tread 관리
     public static ConcurrentHashMap<String, Thread> gameThread = new ConcurrentHashMap<>();
@@ -45,8 +55,7 @@ public class GameService   {
     public static ConcurrentHashMap<String, List<String>> words=new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, ArrayList<Participant>> participantList=new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, Integer> presenterIndex=new ConcurrentHashMap<>();
-    public final List<String> allWords=allWords();
-
+    public final List<String> allWords=getAllWords();
 
     // RPC 프로토콜을 위한 전역변수
     static RpcNotificationService rpcNotificationService;
@@ -69,6 +78,8 @@ public class GameService   {
         String type = message.get("type").getAsString();
         params.addProperty(ProtocolElements.PARTICIPANTSENDMESSAGE_TYPE_PARAM, type); //params의 "type" 안에 저장
 
+        boolean isTeamBattle = sessionManager.getSessionWithNotActive(sessionId).getSessionProperties().isTeamBattle();
+
         switch (gameStatus) {
             case SET_PRESENTER_SETTING: // 사용자들의 팀 정보값 얻기. 0번
                 setPresenterSetting(participant, message, sessionId, participants, params, data, notice);
@@ -79,22 +90,31 @@ public class GameService   {
             case GAME_START:
                 gameStart(participant, message, sessionId, participants, params, data, notice);
                 return;
-            case GET_READY_STATE:
-                getReadyState(participant, sessionId, participants, params, data);
+            case JOIN_ROOM:
+                joinRoom(participant, sessionId, participants, params, data);
                 return;
             case CHANGE_READY_STATE:
-                changeReadyState(participant, sessionId, participants, params, data);
+                changeReadyState(participant, sessionId, participants, params, data, isTeamBattle);
+                return;
+            case SUBMIT_ANSWER:
+                submitAnswer(participant, sessionId, participants, params, data);
+                return;
+            case FINISH_ROUND:
+                finishRound(participant, sessionId, participants, params, data);
+                return;
+            case FINISH_GAME:
+                finishGame(participant, sessionId, participants, params, data);
                 return;
         }
     }
 
     /**
      * 서영탁
-     * 게임 접속 시 참여자들의 Ready 상태를 알려줌
+     * 게임 접속 시 참여자들의 정보와 Ready 상태를 알려줌
      */
-    public void getReadyState(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+    public void joinRoom(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
-        log.info("getReadyState is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+        log.info("joinRoom is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         // 해당 방에서 관리되는게 없으면 빈 map 생성
         readyState.putIfAbsent(sessionId, new HashMap<>());
@@ -111,21 +131,30 @@ public class GameService   {
 
         readyState.computeIfPresent(sessionId, (k, v) -> v = nowReadyState);
 
-        for (String id : nowReadyState.keySet()) {
-            data.addProperty(id, nowReadyState.get(id));
+        JsonObject playerState  = new JsonObject();
+        for (Participant p : participants) {
+            String id = p.getParticipantPublicId();
+            JsonObject jsonObject = p.toJson();
+            jsonObject.addProperty("isReady", nowReadyState.get(id));
+            playerState.add(id, jsonObject);
         }
 
+        data.add("playerState", playerState);
         params.add("data", data);
 
-        rpcNotificationService.sendNotification(participant.getParticipantPrivateId(),
-                ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
     }
 
     /**
      * 서영탁
      * 참여자의 Ready 상태 변경
+     * 팀전일 경우에 RED 팀 2명, BLUE 팀 2명이 모두 준비해야 실행 가능
      */
-    private void changeReadyState(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
+    private void changeReadyState(Participant participant, String sessionId, Set<Participant> participants,
+                                  JsonObject params, JsonObject data, boolean isTeamBattle){
 
         log.info("changeReadyState is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
@@ -137,12 +166,28 @@ public class GameService   {
         readyState.computeIfPresent(sessionId, (k, v) -> v = nowReadyState);
 
         int cnt = 0;
-        for (String id : nowReadyState.keySet()) {
-            data.addProperty(id, nowReadyState.get(id));
-            if(nowReadyState.get(id)) cnt++;
+        int red = 0;
+        int blue = 0;
+
+        HashMap<String, Team> teamState = new HashMap<>();
+        for (Participant p : participants) {
+            teamState.put(p.getParticipantPublicId(), p.getPlayer().getTeam());
         }
 
-        if(cnt == 4) data.addProperty("isAllReady", true);
+        for (String id : nowReadyState.keySet()) {
+            data.addProperty(id, nowReadyState.get(id));
+            if (nowReadyState.get(id)) {
+                cnt++;
+
+                if (teamState.get(id) == Team.RED) red++;
+                else if (teamState.get(id) == Team.BLUE) blue++;
+            }
+        }
+
+        if(cnt == participants.size()) {
+            if(isTeamBattle) data.addProperty("isAllReady", (red == 2 && blue == 2));
+            else data.addProperty("isAllReady", true);
+        }
         else data.addProperty("isAllReady", false);
 
         params.add("data", data);
@@ -175,14 +220,14 @@ public class GameService   {
         if(presenterIndex.get(sessionId)==null){
             presenterIndex.put(sessionId, 0);
             curParticipantList.get(0).getPlayer().setPresenter(true);
-            curPresenterId=curParticipantList.get(0).getParticipantPrivateId();
+            curPresenterId=curParticipantList.get(0).getParticipantPublicId();
         } else{
             int prePresenterIndex=presenterIndex.get(sessionId);
             int curPresenterIndex=(prePresenterIndex+1)%4;
             curParticipantList.get(prePresenterIndex).getPlayer().setPresenter(false);
             presenterIndex.put(sessionId, curPresenterIndex);
             curParticipantList.get(curPresenterIndex).getPlayer().setPresenter(true);
-            curPresenterId=curParticipantList.get(0).getParticipantPrivateId();
+            curPresenterId=curParticipantList.get(0).getParticipantPublicId();
         }
         data.addProperty("curPresenterId", curPresenterId);
         params.add("data", data);
@@ -218,9 +263,10 @@ public class GameService   {
 
 
         //제시어 불러오기
-//        words.putIfAbsent(sessionId, new ArrayList<>());
+        words.putIfAbsent(sessionId, new ArrayList<>());
         words.put(sessionId, pickWords());
 
+        log.info("words는 뭐 들어 있나요? {}", words.get(sessionId));
         // 라운드 설정 : (1라운드)
         round.put(sessionId, 1);
 
@@ -237,7 +283,8 @@ public class GameService   {
      * 김윤미
      * @return : 전체 단어 조회
      */
-    private List<String> allWords() {
+    private List<String> getAllWords() {
+
         URL url = null;
         HttpURLConnection conn = null;
 
@@ -247,10 +294,11 @@ public class GameService   {
         List<String> wordList=null;
 
         try {
-            String serverURL = PropertyConfig.getProperty("ssily.url");
+            String serverURL = "http://localhost:5000";
             log.info("serverURL = {}", serverURL);
             url = new URL(serverURL+"/api/game/words");
             conn = (HttpURLConnection) url.openConnection();
+            log.info("이거 뭐임{}",conn);
 
             conn.setRequestProperty("Accept", "application/json");
             conn.setRequestMethod("GET");
@@ -290,8 +338,9 @@ public class GameService   {
      * @return
      */
     private List<String> pickWords() {
-        if(allWords==null) return null;
-
+        if(allWords==null){
+            return null;
+        }
         List<String> pickedWords=new ArrayList<>();
         ThreadLocalRandom.current().ints(0, allWords.size()).distinct().limit(12).forEach(index -> pickedWords.add(allWords.get(index).toString()));
         return pickedWords;
@@ -301,15 +350,28 @@ public class GameService   {
      * 서영탁
      * 답안 제출
      */
-    private void submitAnswer(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data, String playerAnswer){
+    private void submitAnswer(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
         log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         Integer nowRound = round.get(sessionId);
         String answer = words.get(sessionId).get(nowRound);
 
+        String answers = data.get("answer").toString();
+        answers = answers.substring(4, answers.length()-4);
+        String[] answerArray = answers.split("\\\\\",\\\\\"");
+
+        boolean isCorrect = false;
+
+        for (String a : answerArray) {
+            if(a.equals(answer)){
+                isCorrect = true;
+                break;
+            }
+        }
+
         // 플레이어가 제출한 답안이 정답이라면
-        if(answer.equals(playerAnswer)){
+        if(isCorrect){
             data.addProperty("answer", answer);
             data.addProperty("winnerId", participant.getParticipantPublicId());
             data.addProperty("winnerNickname", participant.getPlayer().getNickname());
@@ -320,6 +382,7 @@ public class GameService   {
                 rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
                         ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
             }
+            finishRound(participant, sessionId, participants, params, data);
         }
     }
 
@@ -350,11 +413,12 @@ public class GameService   {
         data.addProperty("cnt", cnt);
         data.addProperty("winnerId", participant.getParticipantPublicId());
         data.addProperty("winnerNickname", winner.getNickname());
-        params.add("data", data);
-
         // 라운드 증가
         Integer nowRound = round.get(sessionId);
         round.put(sessionId, nowRound+1);
+        data.addProperty("round", nowRound);
+
+        params.add("data", data);
 
         // 라운드 종료 알라기
         for (Participant p : participants) {

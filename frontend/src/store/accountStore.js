@@ -10,17 +10,20 @@ import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwActi
 const state = {
     token: localStorage.getItem('token') || null,
     user: {
-        email: "",
-        name: "",
-        nickname: "",
-        level: null,
+        email: "test@example.com",
+        name: "이름",
+        nickname: "닉네임",
+        level: 0,
         exp: null,
         record: {
             plays: null,
             wins: null,
             draws: null,
         }
-    }
+    },
+    alertColor: null,
+    alertMessage: null,
+    alertIcon: null,
 }
 
 const getters = {
@@ -54,6 +57,15 @@ const mutations = {
     setNickname: (state, nickname) => {
         state.nickname = nickname;
     },
+    setAlertColor: (state, data) => {
+        state.alertColor = data;
+    },
+    setAlertMessage: (state, data) => {
+        state.alertMessage = data;
+    },
+    setAlertIcon: (state, data) => {
+        state.alertIcon = data;
+    },
 }
 
 const actions = {
@@ -66,7 +78,8 @@ const actions = {
         }
         await commit("setToken", response.data.data.accessToken);
         localStorage.setItem('token', state.token)
-        dispatch("getMeAction", response.data.data.accessToken)
+        dispatch("getMeAction")
+        // dispatch("getMeAction", response.data.data.accessToken)
         // console.log('토큰: ', state.token)
     },
     logoutAction: async ({ commit }) => {
@@ -121,9 +134,9 @@ const actions = {
             throw err;
         }
     },
-    getMeAction: async ( context, token) => {
+    getMeAction: async (context) => {
         try {
-            const response = await requestMe(token);
+            const response = await requestMe(state.token);
             console.log("getMe : ", response.data.data);
             await context.commit("setUser", response.data.data);
             return response.data.data

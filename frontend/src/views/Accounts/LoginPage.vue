@@ -4,39 +4,63 @@
   v-model="state.valid"
   lazy-validation
   >
-    <v-text-field
-      v-model="state.form.email"
-      type="email"
-      :rules="emailRules"
-      label="이메일(아이디)"
-    ></v-text-field>
+  <v-container class="formbox">
+    <h1 class="title">회원 로그인</h1>
+    <br>
+    <v-row>
+      <v-col cols="12">
+        <v-text-field
+          v-model="state.form.email"
+          type="email"
+          :rules="emailRules"
+          label="이메일(아이디)"
+        ></v-text-field>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
+        <v-text-field
+          v-model="state.form.password"
+          type="password"
+          label="비밀번호"
+        ></v-text-field>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="4">
+        <v-btn
+          block 
+          class="mr-4"
+          @click="clickLogIn"
+        >
+          로그인
+        </v-btn>
+      </v-col>
+      <v-col cols="4">
+        <v-btn
+          block 
+          class="mr-4"
+          @click="clickSignUp"
+        >
+          회원가입
+        </v-btn>
+      </v-col>
+      <v-col cols="4">
+        <v-btn
+          block
+          class="mr-4"
+          @click="clickFindPw"
+        >
+          비밀번호 찾기
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
+    
 
-    <v-text-field
-      v-model="state.form.password"
-      type="password"
-      label="비밀번호"
-    ></v-text-field>
+    
 
-    <v-btn
-      class="mr-4"
-      @click="clickLogIn"
-    >
-      로그인
-    </v-btn>
-
-    <v-btn
-      class="mr-4"
-      @click="clickSignUp"
-    >
-      회원가입
-    </v-btn>
-
-    <v-btn
-      class="mr-4"
-      @click="clickFindPw"
-    >
-      비밀번호 찾기
-    </v-btn>
+    
   </v-form>
 </template>
 
@@ -96,6 +120,21 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.title {
+  background: linear-gradient(rgba(12,111,202,1), rgba(38,0,111,1));
+	background-clip: text;
+	-webkit-background-clip: text;
+  color: transparent;
+}
+.formbox {
+  margin-top: 10%;
+  background-color: rgb(255, 255, 255);
+  width: 50%;
+  border-radius: 20px;
+  opacity: 85%;
+  font-family: 'MaplestoryOTFBold';
+  font-weight: normal;
+  font-style: normal;
+}
 </style>
