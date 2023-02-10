@@ -8,7 +8,6 @@ import MainPage from '../views/MainPage/MainPage.vue'
 import FindPassword from '../views/Accounts/FindPassword.vue'
 import InGamePage from '../views/InGamePage/InGamePage.vue'
 import accountStore from '@/store/accountStore'
-import ResultPage from '@/views/ResultPage/ResultPage.vue'
 
 const requireAuth = () => (to, from, next) => {
   const token = accountStore.state.token
@@ -79,11 +78,6 @@ const routes = [
     component: InGamePage,
     beforeEnter: requireAuth()
   },
-  {
-    path: '/result',
-    name: 'result',
-    component: ResultPage,
-  }
   // {
   //   path: '/about',
   //   name: 'about',

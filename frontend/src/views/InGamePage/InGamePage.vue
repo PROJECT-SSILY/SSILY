@@ -66,6 +66,7 @@
       </div>
     </div>
         <div class="in_game_component" v-else>
+            <RoundResult/>
             <GameTimer date="August 15, 2016"/>
             <h1> {{ round }} 라운드</h1>
             <div v-for="user in userList"
@@ -116,6 +117,7 @@ import UserVideo from "./components/UserVideo.vue";
 import MyCanvasBox from "./components/MyCanvasBox.vue";
 import WaitingPage from "@/views/WaitingPage/WaitingPage.vue";
 import ChattingBox from "@/views/WaitingPage/components/ChattingBox.vue";
+import RoundResult from "./components/RoundResult.vue";
 import $axios from "axios";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
@@ -135,6 +137,7 @@ export default {
     MyCanvasBox,
     WaitingPage,
     ChattingBox,
+    RoundResult,
   },
   props: {
     ready: Boolean,
@@ -163,7 +166,6 @@ export default {
       opponentTeam: [],
 
       // 게임 순서 관련
-
       ready: false,
       team: null,
     });
@@ -217,6 +219,8 @@ export default {
     const clickTeam = (color) => {
       store.dispatch("gameStore/changeTeamAction", color);
     };
+
+  
     const clickTest = () => {
       console.log("clickTest 클릭");
       store.dispatch("gameStore/changeTest", true);
