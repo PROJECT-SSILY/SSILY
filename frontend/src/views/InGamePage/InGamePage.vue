@@ -67,6 +67,7 @@
     </div>
         <div class="in_game_component" v-else>
             <GameTimer date="August 15, 2016"/>
+            <h1> {{ round }} 라운드</h1>
             <div v-for="user in userList"
             :user="user"
             :key="user.id"
@@ -144,6 +145,7 @@ export default {
     const userList = computed(() => store.state.gameStore.userList);
     const readyAll = computed(() => store.state.gameStore.isAllReady);
     const amIDescriber = computed(() => store.state.gameStore.amIDescriber);
+    const round = computed(() => store.state.gameStore.round);
     const router = useRouter();
     const state = reactive({
       title: null,
@@ -234,6 +236,7 @@ export default {
       opponents,
       amIDescriber,
       userList,
+      round,
       clickExit,
       clickTest,
       clickReady,
