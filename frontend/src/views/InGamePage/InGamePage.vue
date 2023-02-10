@@ -65,55 +65,50 @@
         </div>
       </div>
     </div>
-    <div class="in_game_component" v-else>
-      <GameTimer date="August 15, 2016" />
-      <v-container>
-        <v-row>
-          <v-col>
-            <h1>상대 팀</h1>
-            <user-video
-              v-for="sub in opponents"
-              :key="sub.stream.connection.connectionId"
-              :stream-manager="sub"
-            />
-          </v-col>
-          <v-col>
-            <div id="video-container" class="col-md-6">
-              <div class="me">
-                <h1>나</h1>
-                <div class="drawing_sec" v-if="!amIDescriber">
-                  <MyCanvasBox />
-                  <user-video :stream-manager="publisher" />
-                </div>
-                <div class="displaying_sec" v-else>
-                  <user-video :stream-manager="publisher" />
-                </div>
-              </div>
-              <div class="our_team">
-                <h1>우리 팀</h1>
-                <div class="drawing_sec" v-if="amIDescriber">
-                  <user-video
-                    v-for="opp in opponents"
-                    :key="opp.stream.connection.connectionId"
-                    :stream-manager="opp"
-                  />
-                  <MyCanvasBox />
-                </div>
-                <div class="displaying_sec" v-else>
-                  <user-video
-                    v-for="opp in opponents"
-                    :key="opp.stream.connection.connectionId"
-                    :stream-manager="opp"
-                  />
-                </div>
-              </div>
+        <div class="in_game_component" v-else>
+            <GameTimer date="August 15, 2016"/>
+            <div v-for="user in userList"
+            :user="user"
+            :key="user.id"
+            >
+            <h1> {{ user.nickname }}의 점수 : {{ user.score }}</h1>    
             </div>
-          </v-col>
-        </v-row>
-      </v-container>
+            <v-container>
+                <v-row>
+                    <v-col>
+                        <h1>상대 팀</h1>
+                        <user-video v-for="sub in opponents" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
+                    </v-col>
+                    <v-col>
+                        <div id="video-container" class="col-md-6">
+                            <div class="me">
+                                <h1>나</h1>
+                                <div class="drawing_sec" v-if="!amIDescriber">
+                                    <MyCanvasBox/>
+                                    <user-video :stream-manager="publisher"/>
+                                </div>
+                                <div class="displaying_sec" v-else>
+                                    <user-video :stream-manager="publisher"/>
+                                </div>
+                            </div>
+                            <div class="our_team">
+                                <h1>우리 팀</h1>
+                                <div class="drawing_sec" v-if="amIDescriber">
+                                    <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
+                                    <MyCanvasBox/>
+                                </div>
+                                <div class="displaying_sec" v-else>
+                                    <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
+                                </div>
+                            </div>
+                        </div>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </div>
     </div>
-  </div>
 </template>
+
 <script>
 import GameTimer from "./components/GameTimer.vue";
 import UserVideo from "./components/UserVideo.vue";
@@ -176,31 +171,32 @@ export default {
     const myTeams = computed(() => store.getters["gameStore/getMyTeams"]);
     const opponents = computed(() => store.getters["gameStore/getOpponents"]);
 
+    const joinSession = async function() {
+        const players = await GetPlayerList(state.sessionId)
+        console.log("players : ", players)
+        // const content = players.content
+        // for (let i=0; i<content.length; i++) {
+        //     if(content.length > 0 && content.player == state.nickname) {
+        //         alert("잘못된 접근입니다.")
+        //         router.push({name : 'main'})
+        //         return
+        //     }
+        // }
+        store.commit('gameStore/setSessionId', state.sessionId) // 실행 전 세션id 저장 | 이은혁
+        await store.dispatch('gameStore/joinSession', state.sessionId)
+    }
+    const leaveSession = async function() {
+        store.dispatch('gameStore/leaveSession')
+        window.removeEventListener('beforeunload', leaveSession);
+    }
+
     onBeforeMount(async () => {
       await store.dispatch("accountStore/getMeAction");
       console.log("join start");
       joinSession();
     });
 
-    const joinSession = async function () {
-      const players = await GetPlayerList(state.sessionId);
-      console.log("players : ", players);
-      const content = players.content;
-      for (let i = 0; i < content.length; i++) {
-        if (content.length > 0 && content.player == state.nickname) {
-          alert("잘못된 접근입니다.");
-          router.push({ name: "main" });
-          return;
-        }
-      }
-      store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
-      await store.dispatch("gameStore/joinSession", state.sessionId);
-    };
-    const leaveSession = async function () {
-      store.dispatch("gameStore/leaveSession");
-      window.removeEventListener("beforeunload", leaveSession);
-    };
-
+  
     const updateMainVideoStreamManager = async function (stream) {
       store.dispatch("gameStore/updateMainVideoStreamManager", stream);
     };
