@@ -1,5 +1,5 @@
 <template>
-  <v-form
+  <v-form @keyup.enter="clickLogIn"
   ref="form"
   v-model="state.valid"
   lazy-validation
@@ -36,6 +36,7 @@
           로그인
         </v-btn>
       </v-col>
+      <alert-dialog v-if="state.alert"/>
       <v-col cols="4">
         <v-btn
           block 
@@ -69,11 +70,17 @@ import { reactive } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { onMounted } from '@vue/runtime-core'
+import AlertDialog from '../AlertDialog.vue'
+
 export default {
   name: 'LoginPage',
+  components: {
+    AlertDialog
+  },  
   setup() {
     const store = useStore()
     const state = reactive({
+      alert: false,
       form: {
         email: '',
         password: '',
@@ -97,9 +104,19 @@ export default {
         password: state.form.password
       }
       const response = await store.dispatch('accountStore/loginAction', formData)
-      if (response == -100 ) {
-        console.log('로그인 실패!!') 
+      if (response == 401) {
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '비밀번호가 일치하지 않습니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
         router.go()
+      } else if (response == 404) {
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '해당 회원을 찾을 수 없습니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
       } else {
         console.log('로그인 성공!!')
         router.push({

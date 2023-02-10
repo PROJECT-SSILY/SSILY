@@ -29,6 +29,7 @@
             ></v-text-field>
           </v-col>
         </v-row>
+        <alert-dialog v-if="state.alert"/>
         <v-row>
           <v-col>
             <v-btn
@@ -36,7 +37,13 @@
             @click="sendNewPw"
             >
             비밀번호 찾기
-            <!-- <Jawn v-if="state.isLoading"></Jawn> -->
+              <v-progress-circular
+                :size="20"
+                indeterminate
+                color="grey lighten-5"
+                v-if="state.progress"
+                class="spinner"
+              ></v-progress-circular>
             </v-btn>
           </v-col>
         </v-row>
@@ -49,10 +56,13 @@
 import { reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-
+import AlertDialog from '../AlertDialog.vue'
 
 export default {
   name: 'FindPassword',
+  components: {
+    AlertDialog
+  }, 
   setup() {
     const store = useStore()
     const router = useRouter()
@@ -67,23 +77,26 @@ export default {
         nameRules: value => (2 <= value.length && value.length <= 10) || '이름은 2자 이상 10자 이내로 작성해주세요',
       },
       valid: true,
-      overlay: false
+      alert: false,
+      progress: false,
     })
 
     const sendNewPw = async function () {
-      state.overlay = !state.overlay
+      state.progress = true
       const params = {
         email: state.form.email.value,
         name: state.form.name
       }
       const result = await store.dispatch('accountStore/sendAction', params )
       if (result == 0) {
-        // state.isLoading = false
-        alert("임시 비밀번호 전송 완료!")
+        state.progress = false
         router.push('login')
       } else {
-        state.overlay = !state.overlay
-        alert("실패")
+        state.alert = false
+          await store.commit('accountStore/setAlertColor', 'error')
+          await store.commit('accountStore/setAlertMessage', '일치하는 사용자 정보가 없습니다.')
+          await store.commit('accountStore/setAlertIcon', 'alert')
+          state.alert = true
       }
     }
     return {
@@ -110,5 +123,10 @@ export default {
   font-family: 'MaplestoryOTFBold';
   font-weight: normal;
   font-style: normal;
+}
+.spinner {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 10px
 }
 </style>

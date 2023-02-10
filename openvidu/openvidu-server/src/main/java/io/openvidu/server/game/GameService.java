@@ -1,5 +1,4 @@
 package io.openvidu.server.game;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.openvidu.client.internal.ProtocolElements;
@@ -35,6 +34,10 @@ public class GameService   {
     static final int JOIN_ROOM = 3;
     static final int CHANGE_READY_STATE = 4;
     static final int SUBMIT_ANSWER = 5;
+
+    static final int FINISH_ROUND = 10;
+    static final int FINISH_GAME = 100;
+
 
     //Tread 관리
     public static ConcurrentHashMap<String, Thread> gameThread = new ConcurrentHashMap<>();
@@ -95,6 +98,12 @@ public class GameService   {
                 return;
             case SUBMIT_ANSWER:
                 submitAnswer(participant, sessionId, participants, params, data);
+                return;
+            case FINISH_ROUND:
+                finishRound(participant, sessionId, participants, params, data);
+                return;
+            case FINISH_GAME:
+                finishGame(participant, sessionId, participants, params, data);
                 return;
         }
     }
@@ -167,15 +176,15 @@ public class GameService   {
 
         for (String id : nowReadyState.keySet()) {
             data.addProperty(id, nowReadyState.get(id));
-            if(nowReadyState.get(id)) {
+            if (nowReadyState.get(id)) {
                 cnt++;
 
-                if(teamState.get(id) == Team.RED) red++;
-                else if(teamState.get(id) == Team.BLUE) blue++;
+                if (teamState.get(id) == Team.RED) red++;
+                else if (teamState.get(id) == Team.BLUE) blue++;
             }
         }
 
-        if(cnt == 4) {
+        if(cnt == participants.size()) {
             if(isTeamBattle) data.addProperty("isAllReady", (red == 2 && blue == 2));
             else data.addProperty("isAllReady", true);
         }
@@ -214,11 +223,11 @@ public class GameService   {
             curPresenterId=curParticipantList.get(0).getParticipantPublicId();
         } else{
             int prePresenterIndex=presenterIndex.get(sessionId);
-            int curPresenterIndex=(prePresenterIndex+1)%4;
+            int curPresenterIndex=(prePresenterIndex+1)%(curParticipantList.size());
             curParticipantList.get(prePresenterIndex).getPlayer().setPresenter(false);
             presenterIndex.put(sessionId, curPresenterIndex);
             curParticipantList.get(curPresenterIndex).getPlayer().setPresenter(true);
-            curPresenterId=curParticipantList.get(0).getParticipantPublicId();
+            curPresenterId=curParticipantList.get(curPresenterIndex).getParticipantPublicId();
         }
         data.addProperty("curPresenterId", curPresenterId);
         params.add("data", data);
@@ -285,7 +294,7 @@ public class GameService   {
         List<String> wordList=null;
 
         try {
-            String serverURL = PropertyConfig.getProperty("ssily.url");
+            String serverURL = "http://localhost:5500";
             log.info("serverURL = {}", serverURL);
             url = new URL(serverURL+"/api/game/words");
             conn = (HttpURLConnection) url.openConnection();
@@ -346,7 +355,8 @@ public class GameService   {
         log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         Integer nowRound = round.get(sessionId);
-        String answer = words.get(sessionId).get(nowRound);
+//        String answer = words.get(sessionId).get(nowRound);
+        String answer = "바다(해변)";
 
         String answers = data.get("answer").toString();
         answers = answers.substring(4, answers.length()-4);
@@ -373,6 +383,7 @@ public class GameService   {
                 rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
                         ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
             }
+//            finishRound(participant, sessionId, participants, params, data);
         }
     }
 
@@ -403,11 +414,12 @@ public class GameService   {
         data.addProperty("cnt", cnt);
         data.addProperty("winnerId", participant.getParticipantPublicId());
         data.addProperty("winnerNickname", winner.getNickname());
-        params.add("data", data);
-
         // 라운드 증가
         Integer nowRound = round.get(sessionId);
         round.put(sessionId, nowRound+1);
+        data.addProperty("round", nowRound);
+
+        params.add("data", data);
 
         // 라운드 종료 알라기
         for (Participant p : participants) {
@@ -547,7 +559,7 @@ public class GameService   {
         BufferedWriter bw = null;
 
         try{
-            String serverURL = PropertyConfig.getProperty("ssily.url");
+            String serverURL = "http://localhost:5500";
             URL url = new URL(serverURL+"/api/member/state");
 
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
