@@ -1,5 +1,7 @@
 import { roomList } from "@/common/api/gameAPI";
 import { OpenVidu } from "openvidu-browser";
+
+
 import $axios from "axios";
 
 $axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -39,6 +41,8 @@ const state = {
     round: 1,
     answer: '',
     presenterId: null,
+    sortedUserList: [], // score 내림차순으로 정렬된 리스트
+    endRound: false, // 라운드 끝나고 중간 결과 출력하기 위한 변수
 }
 
 const getters = {
@@ -202,7 +206,6 @@ const mutations = {
     },
      
     setRound: (state, data) => {
-      console.log('set round ------->>>', data)
       state.round = (data + 1)
     },
 
@@ -217,6 +220,12 @@ const mutations = {
     },
     setPresenterId: (state, data) => {
       state.presenterId = data
+    },
+    setSortedUserList: (state, data) => {
+      state.sortedUserList = data
+    },
+    setEndRound: (state, data) => {
+      state.endRound = data
     }
 };
 
@@ -398,6 +407,16 @@ const actions = {
                   console.log('최고점 : ', maxScore,  maxScoreUser)
                 }
                 context.commit('setUserScore', {index: y, value: scoreList[x].score})
+                var sortList = state.userList
+                sortList.sort((a, b) => {
+                  if (a.score > b.score) return -1;
+                  if (a.score < b.score) return 1;
+                  return 0;
+                });
+                context.commit('setSortedUserList', sortList)
+                console.log('setEndRound === 전 ==> ', state.endRound)
+                context.commit('setEndRound', true)
+                console.log('setEndRound =후 => ', state.endRound)
                 break
               }}}
           // 라운드를 8번 돌면 게임을 종료한다.
@@ -409,7 +428,6 @@ const actions = {
         case 100 : {
           // 게임 끝 경험치 부여
           console.log('100번 시그널 수신 - 게임 끝')
-          console.log(event.data)
           break
         }
       }}
@@ -802,6 +820,9 @@ const actions = {
       console.log(err);
     }
   },
+  changeRoundEnd : (context, data) => {
+    context.commit("setEndRound", data);
+  }
 };
 export default {
   namespaced: true,

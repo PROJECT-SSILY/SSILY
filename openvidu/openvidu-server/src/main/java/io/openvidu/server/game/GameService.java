@@ -442,7 +442,7 @@ public class GameService   {
         // 우승자 첮가
         for (Participant p : participants) {
             int score = p.getPlayer().getScore();
-            p.getPlayer().initPlayerState();  // 상태 초기화 (다시 대기방으로 돌아가기 위해)
+            log.info("nickname = {}, score = {}", p.getPlayer().getNickname(), score);
             if(score >= max){
                 if(score > max) {
                     winner = new ArrayList<>();
@@ -451,6 +451,8 @@ public class GameService   {
                 winner.add(p);
             }
         }
+
+        log.info("winner.size = {}", winner.size());
 
         // 우승자 정보 json
         JsonObject winnerJson = new JsonObject();
@@ -463,6 +465,7 @@ public class GameService   {
             winnerJson.add(String.valueOf(winnerCnt), player);
 
             winnerNicknames.add(p.getPlayer().getNickname());
+            winnerCnt++;
         }
 
         data.add("winner", winnerJson);
@@ -485,6 +488,7 @@ public class GameService   {
 
             gameResult.add(String.valueOf(cnt), player);
             playerList.add(player);
+            cnt++;
         }
 
         // 백엔드 전송
@@ -501,6 +505,9 @@ public class GameService   {
         // TODO : 모든 자원 반납
 
 
+        for (Participant p : participants) {
+            p.getPlayer().initPlayerState();  // 상태 초기화 (다시 대기방으로 돌아가기 위해)
+        }
 
         if(ssilyThread != null){
             ssilyThread.interrupt();
@@ -563,18 +570,20 @@ public class GameService   {
             URL url = new URL(serverURL+"/api/member/state");
 
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-            conn.setRequestMethod("POST"); // http 메서드
+
+            conn.setRequestMethod("PUT"); // http 메서드
             conn.setRequestProperty("Content-Type", "application/json"); // header Content-Type 정보
             conn.setDoInput(true); // 서버에 전달할 값이 있다면 true
-            conn.setDoOutput(false); // 서버로부터 받는 값이 있다면 true
+            conn.setDoOutput(true); // 서버로부터 받는 값이 있다면 true
 
             JSONObject requestBody = new JSONObject();
             requestBody.put("winner", winnerNicknames);
             requestBody.put("player", playerList);
 
-            bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8"));
-            bw.write(requestBody.toJSONString()); // 버퍼에 담기
-            bw.flush(); // 버퍼에 담긴 데이터 전달
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            out.write(requestBody.toJSONString());
+            out.close();
+            conn.getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
