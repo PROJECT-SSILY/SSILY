@@ -1,6 +1,6 @@
 <template>
     <div class="canvas_container">
-        <button @click="getAnswerImage" style="background: white; padding: 5px 10px; position: absolute; z-index: 100; left: 60px;">제출</button>
+        <button @click="predictModel" style="background: white; padding: 5px 10px; position: absolute; z-index: 100; left: 60px;">제출</button>
         <div class="group_button">
             <div id="brush" @click="allowDrawing">
                 <v-img src="@/assets/canvas/brush.svg" alt="brush"/>

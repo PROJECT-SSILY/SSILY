@@ -66,7 +66,6 @@
     <div class="in_game_component" v-else>
         <RoundResult/>
         <div class="in_game_component_header">
-          <h1>{{ currentPresenterId }}dd</h1>
         <GameTimer date="August 15, 2016" />
         <h1>{{ round }} 라운드</h1>
         <div v-for="user in userList" :user="user" :key="user.id">
@@ -79,7 +78,7 @@
             v-for="sub in opponents"
             :key="sub.stream.connection.connectionId"
             :stream-manager="sub"
-            :class="sub.stream.connection.connectionId"
+            :class="sub.stream.connection.connectionId===currentPresenterId?'presenter':''"
           />
         </div>
         <div class="ourteam_container">
@@ -375,12 +374,17 @@ export default {
   position: relative;
 }
 .opp_stream {
-    height: 374px;
-    margin: 10px 0;
-width: 500px;
-border-radius: 43px;
+  transition-duration: 0.3s;
+  height: 226px;
+  margin: 10px 0;
+  width: 300px;
+  border-radius: 43px;
   box-shadow: 0px 0px 20px 0px #0000005c;
-
+}
+.presenter {
+  height: 315px;
+  margin: 10px 0;
+  width: 420px;
 }
 .draw_sec .my_stream {
   height: 105px;

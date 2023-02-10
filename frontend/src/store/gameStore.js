@@ -219,6 +219,7 @@ const mutations = {
       state.userList[index].score = value
     },
     setPresenterId: (state, data) => {
+      console.log('여기까지 왔음?')
       state.presenterId = data
     },
     setSortedUserList: (state, data) => {
@@ -306,6 +307,7 @@ const actions = {
         case 0: {
           console.log('0번 시그널 수신 완료')
           const PresenterId = event.data.curPresenterId
+          console.log('=========================')
           context.commit("setPresenterId", PresenterId) // 현재 설명자 id 저장 - 이은혁
           console.log('curPresenterId : ', event.data.curPresenterId)
           for (var n=0; n < state.userList.length; n++ ) {
