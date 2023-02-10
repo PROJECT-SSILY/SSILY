@@ -36,7 +36,7 @@ const state = {
     amIDescriber: false,
     winnerNickname: '',
     winnerId: '',
-    round: null,
+    round: 1,
     answer: '',
 }
 
@@ -193,7 +193,8 @@ const mutations = {
     },
      
     setRound: (state, data) => {
-      state.round = data
+      console.log('set round ------->>>', data)
+      state.round = (data + 1)
     },
 
     setAnswer: (state, data) => {
@@ -360,9 +361,8 @@ const actions = {
           context.commit('setAnswer', event.data.answer)
           context.commit('setWinnerId', event.data.winnerId)
           context.commit('setWinnerNickname', event.data.winnerNickname)
-          context.commit('setRound', event.data.round)
           var winnerId = event.data.winnerId
-          // => 여기서 정답자가 10번 신호 보냄!!
+          // => 여기서 정답자가 10번, 0번 신호 보낸다.
           if (winnerId == state.myConnectionId) {
             context.dispatch('finishRound')
           }
@@ -372,13 +372,26 @@ const actions = {
           // 라운드별 경험치 누적
           console.log('10번 시그널 수신 - 라운드 끝')
           var scoreList = event.data.player
+          console.log('10번 event data : ',event.data)
+          context.commit('setRound', event.data.round)
+          var maxScore = -1
+          var maxScoreUser = undefined
           for (var x=0;state.userList.length>x; x++) {
             // userList 에 score 정보 경신
             for (var y=0; state.userList.length>y; y++) {
               if (scoreList[x].connectionId == state.userList[y].connectionId) {
+                if (scoreList[x].score > maxScore) {
+                  maxScore = scoreList[x].score
+                  maxScoreUser = scoreList[x].connectionId
+                  console.log('최고점 : ', maxScore,  maxScoreUser)
+                }
                 context.commit('setUserScore', {index: y, value: scoreList[x].score})
                 break
               }}}
+          // 라운드를 8번 돌면 게임을 종료한다.
+          if ( event.data.round == 8 && maxScoreUser == state.myConnectionId) {
+            context.dispatch('finishGame')
+          }
           break
         }
         case 100 : {
@@ -570,7 +583,7 @@ const actions = {
     commit("setMainStreamManager", stream);
   },
 
-  // 참여자 레디 상태 변경 - ingamePage에서 clickReady 했을 때 호출
+  // 참여자 레디 상태 변경 - ingamePage에서 clickReady 했을 때 호출 - 수연
   changeReady: () => {
     state.session.signal({
       type: "game",
@@ -580,7 +593,7 @@ const actions = {
       to: [],
     });
   },
-    // 라운드 끝냄
+    // 라운드 끝냄 - 수연
     finishRound: () => {
       state.session.signal({
         type: 'game',
@@ -597,7 +610,16 @@ const actions = {
         to: [],
       })
     },
-
+    // 게임 끝냄 - 수연
+    finishGame: () => {
+      state.session.signal({
+        type: 'game',
+        data: {
+          gameStatus: 100,
+        },
+        to: [],
+      })
+    },
 
   uploadImage: (context, payload) => {
     console.log("찍어보자", context.rootState.accountStore.token);
