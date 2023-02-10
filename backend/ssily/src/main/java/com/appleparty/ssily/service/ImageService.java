@@ -1,12 +1,15 @@
 package com.appleparty.ssily.service;
 
 import com.appleparty.ssily.domain.image.Image;
+import com.appleparty.ssily.exception.image.ImageNotFoundException;
 import com.appleparty.ssily.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Blob;
 
 @Slf4j
 @Service
@@ -18,12 +21,16 @@ public class ImageService {
 
     @Transactional
     public void saveAnswerImage(String name, byte[] img) {
-        log.info("save");
         Image image = Image.builder()
                 .name(name)
                 .img(BlobProxy.generateProxy(img))
                 .build();
 
         imageRepository.save(image);
+    }
+
+    public Blob findImage(String name){
+        Image image = imageRepository.findByName(name).orElseThrow(ImageNotFoundException::new);
+        return image.getImg();
     }
 }

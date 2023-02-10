@@ -1,6 +1,6 @@
 import $axios from "axios";
-const OPENVIDU_SERVER_URL = "https://localhost:4443";
-// const OPENVIDU_SERVER_URL = "https://i8c104.p.ssafy.io:8443";
+const OPENVIDU_SERVER_URL = "https://localhost:4443/openvidu";
+// const OPENVIDU_SERVER_URL = "https://i8c104.p.ssafy.io:8443/openvidu";
 const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 
 const roomList = () => {
