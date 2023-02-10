@@ -570,7 +570,8 @@ public class GameService   {
             URL url = new URL(serverURL+"/api/member/state");
 
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-            conn.setRequestMethod("POST"); // http 메서드
+
+            conn.setRequestMethod("PUT"); // http 메서드
             conn.setRequestProperty("Content-Type", "application/json"); // header Content-Type 정보
             conn.setDoInput(true); // 서버에 전달할 값이 있다면 true
             conn.setDoOutput(true); // 서버로부터 받는 값이 있다면 true
@@ -579,12 +580,10 @@ public class GameService   {
             requestBody.put("winner", winnerNicknames);
             requestBody.put("player", playerList);
 
-            bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8"));
-            bw.write(requestBody.toJSONString()); // 버퍼에 담기
-
-            log.info("백엔드 전송");
-
-            bw.flush(); // 버퍼에 담긴 데이터 전달
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            out.write(requestBody.toJSONString());
+            out.close();
+            conn.getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
