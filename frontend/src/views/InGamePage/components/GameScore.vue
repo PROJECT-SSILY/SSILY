@@ -47,31 +47,32 @@
 
 <script>
 import { useStore } from "vuex";
-import { reactive } from "vue";
+import { computed } from "vue";
+// import { reactive } from "vue";
 
 export default {
   name: 'GameScore',
   setup() {
     const store = useStore();
-    // const userList = computed(() => store.state.gameStore.userList);
-    const userList = reactive({
-      1 : {
-        nickname: "득득",
-        score: 1
-      },
-      2 : {
-        nickname: "미미",
-        score: 1
-      },
-      3 : {
-        nickname: "탁탁",
-        score: 1
-      },
-      4 : {
-        nickname: "혁혁",
-        score: 1
-      },
-    })
+    const userList = computed(() => store.state.gameStore.userList);
+    // const userList = reactive({
+    //   1 : {
+    //     nickname: "득득",
+    //     score: 1
+    //   },
+    //   2 : {
+    //     nickname: "미미",
+    //     score: 1
+    //   },
+    //   3 : {
+    //     nickname: "탁탁",
+    //     score: 1
+    //   },
+    //   4 : {
+    //     nickname: "혁혁",
+    //     score: 1
+    //   },
+    // })
     return {
       store,
       userList
@@ -94,7 +95,7 @@ export default {
   font-style: normal;
 }
 .my-score {
-  display: flex;
+
   background-color:rgb(192, 246, 192);
   justify-content: center;
   width: 80%;

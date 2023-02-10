@@ -67,7 +67,7 @@
     </div>
         <div class="in_game_component" v-else>
             <RoundResult/>
-            <GameTimer date="August 15, 2016"/>
+            <GameTimer/>
             <h1> {{ round }} 라운드</h1>
             <GameScore/>
             <v-container>
