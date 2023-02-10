@@ -374,17 +374,24 @@ const actions = {
           var scoreList = event.data.player
           console.log('10번 event data : ',event.data)
           context.commit('setRound', event.data.round)
+          var maxScore = -1
+          var maxScoreUser = undefined
           for (var x=0;state.userList.length>x; x++) {
             // userList 에 score 정보 경신
             for (var y=0; state.userList.length>y; y++) {
               if (scoreList[x].connectionId == state.userList[y].connectionId) {
+                if (scoreList[x].score > maxScore) {
+                  maxScore = scoreList[x].score
+                  maxScoreUser = scoreList[x].connectionId
+                  console.log('최고점 : ', maxScore,  maxScoreUser)
+                }
                 context.commit('setUserScore', {index: y, value: scoreList[x].score})
                 break
               }}}
           // 라운드를 8번 돌면 게임을 종료한다.
-          // if ( event.data.round == 8) {
-          //   context.dispatch('finishGame')
-          // }
+          if ( event.data.round == 8 && maxScoreUser == state.myConnectionId) {
+            context.dispatch('finishGame')
+          }
           break
         }
         case 100 : {

@@ -223,11 +223,11 @@ public class GameService   {
             curPresenterId=curParticipantList.get(0).getParticipantPublicId();
         } else{
             int prePresenterIndex=presenterIndex.get(sessionId);
-            int curPresenterIndex=(prePresenterIndex+1)%4;
+            int curPresenterIndex=(prePresenterIndex+1)%(curParticipantList.size());
             curParticipantList.get(prePresenterIndex).getPlayer().setPresenter(false);
             presenterIndex.put(sessionId, curPresenterIndex);
             curParticipantList.get(curPresenterIndex).getPlayer().setPresenter(true);
-            curPresenterId=curParticipantList.get(0).getParticipantPublicId();
+            curPresenterId=curParticipantList.get(curPresenterIndex).getParticipantPublicId();
         }
         data.addProperty("curPresenterId", curPresenterId);
         params.add("data", data);
@@ -355,7 +355,8 @@ public class GameService   {
         log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         Integer nowRound = round.get(sessionId);
-        String answer = words.get(sessionId).get(nowRound);
+//        String answer = words.get(sessionId).get(nowRound);
+        String answer = "바다(해변)";
 
         String answers = data.get("answer").toString();
         answers = answers.substring(4, answers.length()-4);
@@ -382,7 +383,7 @@ public class GameService   {
                 rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
                         ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
             }
-            finishRound(participant, sessionId, participants, params, data);
+//            finishRound(participant, sessionId, participants, params, data);
         }
     }
 
@@ -558,7 +559,7 @@ public class GameService   {
         BufferedWriter bw = null;
 
         try{
-            String serverURL = PropertyConfig.getProperty("ssily.url");
+            String serverURL = "http://localhost:5500";
             URL url = new URL(serverURL+"/api/member/state");
 
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
