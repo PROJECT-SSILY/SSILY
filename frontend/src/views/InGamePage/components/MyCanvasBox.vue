@@ -1,19 +1,20 @@
 <template>
-  <div>
-    <canvas
-      style="margin: 0 auto; border: 2px solid"
-      width="585"
-      height="328"
-      id="canvas"
-    ></canvas>
-    <!-- <canvas
-    style="margin: 0 auto; border: 2px solid"
-    width="585" height="328" id="myCanvas"></canvas> -->
-    <div style="margin: 1rem">
-      <v-btn @click="allowDrawing">Draw</v-btn>
-      <v-btn @click="eraseAll">Erase</v-btn>
-      <v-btn @click="predictModel">제출</v-btn> <!-- 여기 원래 달린 메서드  getAnswerImage -->
-    </div>
+    <div class="canvas_container">
+        <button @click="getAnswerImage" style="background: white; padding: 5px 10px; position: absolute; z-index: 100; left: 60px;">제출</button>
+        <div class="group_button">
+            <div id="brush" @click="allowDrawing">
+                <v-img src="@/assets/canvas/brush.svg" alt="brush"/>
+            </div>
+            <div id="eraser" @click="eraseAll">
+                <v-img src="@/assets/canvas/eraser.svg" alt="eraser"/>
+            </div>
+        </div>
+        <canvas
+        width="600"
+        height="400"
+        id="canvas"
+        >
+    </canvas>
   </div>
 </template>
 
@@ -274,4 +275,45 @@ export default {
   },
 };
 </script>
-<style></style>
+<style scoped>
+.canvas_container {
+    position: relative;
+}
+
+#canvas, .upper-canvas {
+    border-radius: 50px;
+    /* position: inherit; */
+}
+
+.group_button {
+    width: 50px;
+    height: 100px;
+    position: absolute;
+    margin-top: -50px;
+    margin-left: 10px;
+    top: 50%;
+    z-index: 100;
+    border-radius: 15px;
+    box-shadow: 0px 0px 20px 0px #0000003b;
+}
+
+#brush, #eraser {
+    width: 50px;
+    height: 50px;
+    padding: 10px;
+    cursor: pointer;
+    background: white;
+}
+#brush {
+    border-radius: 15px 15px 0 0;
+}
+#eraser {
+    border-radius: 0 0 15px 15px;
+}
+#brush:hover, #eraser:hover {
+    background: rgb(227, 227, 227);
+}
+#brush:active, #eraser:active {
+    background: rgb(195, 195, 195);
+}
+</style>

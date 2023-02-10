@@ -38,6 +38,7 @@ const state = {
     winnerId: '',
     round: 1,
     answer: '',
+    presenterId: null,
 }
 
 const getters = {
@@ -59,28 +60,41 @@ const getters = {
   getChat: (state) => {
     return state.chat;
   },
+  getPresenterId: (state) => {
+    return state.presenterId
+  },
   // 우리편 팀원들을 골라서 뽑아내는 메서드
   getMyTeams: (state) => {
-    const myTeamColor = state.publisher.team;
     const res = [];
-    state.subscribers.forEach((sub) => {
-      if (sub.team == myTeamColor) {
-        res.push(sub);
+    if (state.isTeamBattle) {
+        state.subscribers.forEach(sub => {
+          const connectionId = sub.stream.connection.connectionId
+          console.log("sub.stream.connection.connectionId : ", sub.stream.connection.connectionId) // 각 sub들의 connectionId
+          state.userList.forEach(user => {
+            if(user.connectionId === connectionId && user.team === state.team){
+              res.push(sub)
+            }
+          })
+        })
+        return res;
+      } else {
+        return []
       }
-    });
-    return res;
   },
 
   // 상대편 팀원들을 골라서 뽑아내는 메서드
   getOpponents: (state) => {
-    const myTeamColor = state.publisher.team;
-    const res = [];
-    state.subscribers.forEach((sub) => {
-      if (sub.team != myTeamColor) {
-        res.push(sub);
-      }
-    });
-    return res;
+    // if (state.isTeamBattle) {
+    //   state.subscribers.forEach(sub => {
+    //     const connectionId = sub.stream.connection.connectionId
+    //     console.log("sub.stream.connection.connectionId : ", sub.stream.connection.connectionId) // 각 sub들의 connectionId
+    //     state.userList.forEach(user => {
+    //       if(user.connectionId === connectionId && user.team === state.team)
+    //     })
+    //     // if(connectionId == )
+    //   })
+    // }
+    return state.subscribers
   },
 };
 
@@ -200,6 +214,9 @@ const mutations = {
       var index = data.index
       var value = data.value
       state.userList[index].score = value
+    },
+    setPresenterId: (state, data) => {
+      state.presenterId = data
     }
 };
 
@@ -227,7 +244,7 @@ const actions = {
     // --- Specify the actions when events take place in the session ---
     // On every new Stream received...
     // stream = 영상 송출과 관련된 정보들 | 이은혁
-    // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 다른사람의 subscribers에 내 stream정보를 담는 로직 | 이은혁
+    // 세션에 publisher를 등록하면 자동으로 streamCreated가 실행되고 subscribers에 다른 사람들의 stream정보를 담는 로직 | 이은혁
     session.on("streamCreated", ({ stream }) => {
       console.log("테스트입니다", state.subscribers);
       const subscriber = session.subscribe(stream);
@@ -279,7 +296,8 @@ const actions = {
         // 설명자 부여
         case 0: {
           console.log('0번 시그널 수신 완료')
-          var PresenterId = event.data.curPresenterId
+          const PresenterId = event.data.curPresenterId
+          context.commit("setPresenterId", PresenterId) // 현재 설명자 id 저장 - 이은혁
           console.log('curPresenterId : ', event.data.curPresenterId)
           for (var n=0; n < state.userList.length; n++ ) {
             if (state.userList[n].connectionId == PresenterId) {
