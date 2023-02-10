@@ -68,12 +68,7 @@
         <div class="in_game_component" v-else>
             <GameTimer date="August 15, 2016"/>
             <h1> {{ round }} 라운드</h1>
-            <div v-for="user in userList"
-            :user="user"
-            :key="user.id"
-            >
-            <h1> {{ user.nickname }}의 점수 : {{ user.score }}</h1>    
-            </div>
+            <GameScore/>
             <v-container>
                 <v-row>
                     <v-col>
@@ -114,6 +109,7 @@
 import GameTimer from "./components/GameTimer.vue";
 import UserVideo from "./components/UserVideo.vue";
 import MyCanvasBox from "./components/MyCanvasBox.vue";
+import GameScore from "./components/GameScore.vue";
 import WaitingPage from "@/views/WaitingPage/WaitingPage.vue";
 import ChattingBox from "@/views/WaitingPage/components/ChattingBox.vue";
 import $axios from "axios";
@@ -135,6 +131,7 @@ export default {
     MyCanvasBox,
     WaitingPage,
     ChattingBox,
+    GameScore
   },
   props: {
     ready: Boolean,
