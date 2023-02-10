@@ -36,12 +36,15 @@ const state = {
     chat: [],
     myConnectionId: null,
     amIDescriber: false,
-    winnerNickname: '',
+    winnerNickname: '', // [라운드 결과] 승리 유저
     winnerId: '',
-    round: 1,
+    round: 1, // 현재 라운드
     answer: '',
-    sortedUserList: [], // score 내림차순으로 정렬된 리스트
-    endRound: false, // 라운드 끝나고 중간 결과 출력하기 위한 변수
+    sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
+    endRound: false, // [라운드 결과] 라운드 끝났을 때 true, 라운드 진행중일 때 false
+    winnerList: [], // [게임 결과] 승리 유저 리스트
+    gameResult: [], // [게임 결과] 유저 리스트 (key: connectionId, extraExp, levelUp, nickname)
+    endGame: false // [게임 결과] 게임 끝났을 때 true, 게임 진행줄일 때 false
 }
 
 const getters = {
@@ -215,6 +218,16 @@ const mutations = {
     },
     setEndRound: (state, data) => {
       state.endRound = data
+    },
+    setWinnerList: (state, data) => { // 게임 승리 유저 리스트
+      state.winnerList = data
+    },
+    setGameResult: (state, data) => { // 게임 결과 리스트
+      state.gameResult = data
+    },
+
+    setEndGame: (state, data) => {
+      state.endGame = data
     }
 };
 
@@ -417,6 +430,16 @@ const actions = {
         case 100 : {
           // 게임 끝 경험치 부여
           console.log('100번 시그널 수신 - 게임 끝')
+          console.log('event.data : ',event.data)
+          console.log('event.data.winnerCnt : ', event.data.winnerCnt)
+          // context.commit('setWinnerNickname', event.data.winner)
+          var winnerList = []
+          for (var a=0; a<event.data.winnerCnt; a++ ){
+            winnerList.push(event.data.winner[a].nickname)
+          }
+          context.commit('setWinnerList', winnerList)
+          context.commit('setGameResult', event.data.gameResult)
+          context.commit('setEndGame', true)
           break
         }
       }}
