@@ -1,5 +1,8 @@
 <template>
     <div v-if="endRound">
+        <div v-if="endGame">
+            <h1>{{ gameResult }}</h1>
+        </div>
         <h1>{{ round }}round 결과</h1>
         <h1> {{ winnerNickname }} WON! </h1>
         <div v-for="user in sortedUserList"
@@ -22,8 +25,10 @@ export default {
     const store = useStore()
     const sortedUserList = computed(() => store.state.gameStore.sortedUserList)
     const winnerNickname = computed(() => store.state.gameStore.winnerNickname)
+    const gameResult = computed(() => store.state.gameStore.gameResult)
     const endRound = computed(() => store.state.gameStore.endRound)
     const round = computed(() => store.state.gameStore.round)
+    const endGame = computed(() => store.state.gameStore.endGame)
     const state = reactive({
       winner: '',
     })
@@ -37,7 +42,9 @@ export default {
       sortedUserList,
       winnerNickname,
       round,
-      nextRound
+      gameResult,
+      nextRound,
+      endGame
     }
   }
 }
