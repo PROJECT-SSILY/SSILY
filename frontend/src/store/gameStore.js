@@ -10,31 +10,35 @@ const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 import { randomTeam, randomPrivate } from "@/common/api/gameAPI";
 
 const state = {
-  title: null,
-  isSecret: false,
-  password: null,
-  isTeamBattle: null,
-  isTeam: null,
-  OV: undefined,
-  session: null,
-  mainStreamManager: undefined,
-  publisher: undefined,
-  subscribers: [],
-  sessionId: null,
-  myUserName: "",
-  isHost: false,
-  playerList: undefined,
-  messages: [],
-  media: 0.5,
-  alarm: 0.5,
-  audio: new Audio("https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3"),
-  isAllReady: false,
-  userList: [],
-  userKey: [],
-  chat: [],
-  myConnectionId: null,
-  amIDescriber: false,
-};
+    title: null,
+    isSecret: false,
+    password: null,
+    isTeamBattle: null,
+    isTeam: null,
+    OV: undefined,
+    session: null,
+    mainStreamManager: undefined,
+    publisher: undefined,
+    subscribers: [],
+    sessionId: null,
+    myUserName: '',
+    isHost: false,
+    playerList: undefined,
+    messages: [],
+    media: 0.5,
+    alarm: 0.5,
+    audio: new Audio('https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3'),
+    isAllReady: false,
+    userList: [],
+    userKey: [],
+    chat: [],
+    myConnectionId: null,
+    amIDescriber: false,
+    winnerNickname: '',
+    winnerId: '',
+    round: null,
+    answer: '',
+}
 
 const getters = {
   getTeam: (state) => {
@@ -81,108 +85,128 @@ const getters = {
 };
 
 const mutations = {
-  setTitle: (state, data) => {
-    state.title = data;
-    console.log("set적용되는지확인" + state.title);
-  },
-  setSecret: (state, payload) => {
-    state.isSecret = payload;
-  },
-  setPassword: (state, payload) => {
-    state.password = payload;
-  },
-  setTeam: (state, payload) => {
-    state.isTeamBattle = payload;
-    console.log("set적용되는지확인" + state.isTeamBattle);
-  },
-  setOV: (state, data) => {
-    state.OV = data;
-  },
-  setSession: (state, data) => {
-    state.session = data;
-  },
-  SET_PUBLISHER(state, data) {
-    state.publisher = data;
-  },
-  setMainStreamManager: (state, data) => {
-    state.mainStreamManager = data;
-  },
-  setSubscribers: (state, data) => {
-    state.subscribers = data;
-  },
-  setSessionId: (state, id) => {
-    state.sessionId = id;
-  },
-  setMyUserName: (state, name) => {
-    state.myUserName = name;
-  },
-  changeMode: (state) => {
-    state.isTeam = !state.isTeam;
-  },
-  setPlayerList: (state, data) => {
-    state.playerList = data;
-  },
-  setVolume1: (state, volume) => {
-    state.media = volume;
-  },
-  setVolume2: (state, volume) => {
-    state.alarm = volume;
-  },
-  SET_MESSAGES: (state, data) => {
-    state.messages = data;
-  },
-  setChat: (state, data) => {
-    state.chat.push(data);
-  },
-  setUserList: (state, data) => {
-    state.userList.push(data);
-  },
-  setClearUserList: (state) => {
-    state.userList = [];
-  },
-  setIsAllReady: (state, data) => {
-    console.log("setIsAllReady 찍힘", data);
-    state.isAllReady = data;
-  },
-  setUserKey: (state, data) => {
-    state.userKey.push(data);
-  },
-  setClearUserKey: (state) => {
-    state.userKey = [];
-  },
-  setReady: (state, data) => {
-    console.log("data:", data);
-    var index = data.index;
-    var ready = data.ready;
-    state.userList[index].isReady = ready;
-  },
-  setIsHost: (state, data) => {
-    state.isHost = data;
-  },
-  setMyConnectionId: (state, data) => {
-    state.myConnectionId = data;
-  },
-  setIsPresenter: (state, data) => {
-    var index = data.index;
-    var value = data.value;
-    state.userList[index].isPresenter = value;
-  },
+    setTitle: (state, data) => {
+        state.title = data
+        console.log('set적용되는지확인' + state.title);
+    },
+    setSecret: (state, payload) => {
+        state.isSecret = payload
+    },
+    setPassword: (state, payload) => {
+        state.password = payload
+    },
+    setTeam: (state, payload) => {
+        state.isTeamBattle = payload
+        console.log('set적용되는지확인' + state.isTeamBattle);
+    },
+    setOV: (state, data) => {
+        state.OV = data;
+    },
+    setSession: (state, data) => {
+        state.session = data;
+    },
+    SET_PUBLISHER (state, data) {
+        state.publisher = data
+    },
+    setMainStreamManager: (state, data) => {
+        state.mainStreamManager = data;
+    },
+    setSubscribers: (state, data) => {
+        state.subscribers = data;
+    },
+    setSessionId: (state, id) => {
+        state.sessionId = id;
+    },
+    setMyUserName: (state, name) => {
+        state.myUserName = name;
+    },
+    changeMode: (state) => {
+      state.isTeam = !state.isTeam
+    },
+    setPlayerList: (state, data) => {
+        state.playerList = data
+    },
+    setVolume1: (state, volume) => {
+      state.media = volume
+    },
+    setVolume2: (state, volume) => {
+      state.alarm = volume
+    },
+    SET_MESSAGES: (state, data) => {
+        state.messages = data
+    },
+    setChat: (state, data) => {
+      state.chat.push(data)
+    },
+    setUserList: (state, data) => {
+      state.userList.push(data)
+    },
+    setClearUserList: (state) => {
+      state.userList = []
+    },
+    setIsAllReady: (state, data) => {
+      console.log('setIsAllReady 찍힘', data)
+      state.isAllReady = data
+    },
+    setUserKey: (state, data) => {
+      state.userKey.push(data)
+    },
+    setClearUserKey: (state) => {
+      state.userKey = []
+    },
+    setReady: (state, data) => {
+      console.log('data:', data)
+      var index = data.index
+      var ready = data.ready
+      state.userList[index].isReady = ready
+    },
+    setIsHost: (state, data) => {
+      state.isHost = data
+    },
+    setMyConnectionId: (state, data) => {
+      state.myConnectionId = data
+    },
+    setIsPresenter: (state, data) => {
+      var index = data.index
+      var value = data.value
+      state.userList[index].isPresenter = value
+    },
 
-  setAmIDescriber: (state, data) => {
-    state.amIDescriber = data;
-  },
+    setAmIDescriber: (state, data) => {
+      state.amIDescriber = data
+    },
 
-  delUserinUserList: (state, data) => {
-    // UserList에서 퇴장한 유저의 id 삭제
-    state.userList.splice(data);
-  },
-  delUserinUserKey: (state, data) => {
-    // UserKey에서 퇴장한 유저의 id 삭제
-    state.userKey.splice(data);
-  },
+    delUserinUserList: (state, data) => { // UserList에서 퇴장한 유저의 id 삭제
+      state.userList.splice(data)
+    },
+    delUserinUserKey: (state, data) => { // UserKey에서 퇴장한 유저의 id 삭제
+      state.userKey.splice(data)
+    },
 
-  //==============================
+    // 정답페이지 관련
+    setWinnerNickname: (state, data) => {
+      state.winnerNickname = data
+    },
+
+    setWinnerId: (state, data) => {
+      state.winnerId = data
+    },
+     
+    setRound: (state, data) => {
+      state.round = data
+    },
+
+    setAnswer: (state, data) => {
+      state.answer = data
+    },
+
+    setUserScore: (state, data) => {
+      var index = data.index
+      var value = data.value
+      state.userList[index].score = value
+    }
 };
+
 const actions = {
   _joinSession: (context, sessionId) => {
     // console.log('joinsession 커넥션 아이디 : ', state.myConnectionId)
@@ -259,10 +283,10 @@ const actions = {
       switch (event.data.gameStatus) {
         // 설명자 부여
         case 0: {
-          console.log("0번 시그널 수신 완료");
-          var PresenterId = event.data.curPresenterId;
-          console.log(event.data.curPresenterId);
-          for (var n = 0; n < state.userList.length; n++) {
+          console.log('0번 시그널 수신 완료')
+          var PresenterId = event.data.curPresenterId
+          console.log('curPresenterId : ', event.data.curPresenterId)
+          for (var n=0; n < state.userList.length; n++ ) {
             if (state.userList[n].connectionId == PresenterId) {
               context.commit("setIsPresenter", { index: n, value: true });
             } else {
@@ -330,12 +354,41 @@ const actions = {
           break;
         }
         case 5: {
-          console.log("5번 시그널 수신 완료");
-          console.log(event.data);
+          // 정답 제출 ( sendTopFive ) - 정답이면 응답 옴!
+          console.log('5번 시그널 수신 완료')
+          console.log('5번 data : ', event.data)
+          context.commit('setAnswer', event.data.answer)
+          context.commit('setWinnerId', event.data.winnerId)
+          context.commit('setWinnerNickname', event.data.winnerNickname)
+          context.commit('setRound', event.data.round)
+          var winnerId = event.data.winnerId
+          // => 여기서 정답자가 10번 신호 보냄!!
+          if (winnerId == state.myConnectionId) {
+            context.dispatch('finishRound')
+          }
+          break
         }
-      }
-    });
-
+        case 10: {
+          // 라운드별 경험치 누적
+          console.log('10번 시그널 수신 - 라운드 끝')
+          var scoreList = event.data.player
+          for (var x=0;state.userList.length>x; x++) {
+            // userList 에 score 정보 경신
+            for (var y=0; state.userList.length>y; y++) {
+              if (scoreList[x].connectionId == state.userList[y].connectionId) {
+                context.commit('setUserScore', {index: y, value: scoreList[x].score})
+                break
+              }}}
+          break
+        }
+        case 100 : {
+          // 게임 끝 경험치 부여
+          console.log('100번 시그널 수신 - 게임 끝')
+          console.log(event.data)
+          break
+        }
+      }}
+    );
     context.dispatch("getToken", sessionId).then((token) => {
       console.log(
         "여기까지 완료, token :",
@@ -527,6 +580,25 @@ const actions = {
       to: [],
     });
   },
+    // 라운드 끝냄
+    finishRound: () => {
+      state.session.signal({
+        type: 'game',
+        data: {
+          gameStatus: 10,
+        },
+        to: [],
+      })
+      state.session.signal({
+        type: 'game',
+        data: {
+          gameStatus: 0,
+        },
+        to: [],
+      })
+    },
+
+
   uploadImage: (context, payload) => {
     console.log("찍어보자", context.rootState.accountStore.token);
     $axios
