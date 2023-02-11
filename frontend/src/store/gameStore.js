@@ -27,7 +27,7 @@ const state = {
     messages: [],
     media: 0.5,
     alarm: 0.5,
-    audio: new Audio('https://ccrma.stanford.edu/~jos/mp3/harpsi-cs.mp3'),
+    audio: new Audio(require('../../public/Superhuman.mp3')),
     isAllReady: false,
     userList: [],
     userKey: [],

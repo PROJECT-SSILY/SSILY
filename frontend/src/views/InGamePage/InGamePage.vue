@@ -65,7 +65,8 @@
     </div>
     <div class="in_game_component" v-else>
       <RoundResult />
-      <GameTimer />
+      <GameTimer :key="gameTimer"/>
+      <v-btn @click="forceRender">시계</v-btn>
       <h1>{{ round }} 라운드</h1>
       <GameScore />
       <v-container>
@@ -173,7 +174,7 @@ import $axios from "axios";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { GetPlayerList } from "@/common/api/gameAPI";
-import { reactive } from "@vue/reactivity";
+import { reactive, ref } from "@vue/reactivity";
 import { onBeforeMount, computed } from "vue";
 
 //=================OpenVdue====================
@@ -233,18 +234,18 @@ export default {
     const joinSession = async function () {
       const players = await GetPlayerList(state.sessionId);
       console.log("players : ", players);
-      for (let i = 0; i < players.content.length; i++) {
-        console.log(
-          "접근 가능 여부 확인중.. ",
-          players.content[i].player.nickname,
-          state.nickname
-        );
-        if (players.content[i].player.nickname === state.nickname) {
-          alert("잘못된 접근입니다.");
-          router.push({ name: "main" });
-          return;
-        }
-      }
+      // for (let i = 0; i < players.content.length; i++) {
+      //   console.log(
+      //     "접근 가능 여부 확인중.. ",
+      //     players.content[i].player.nickname,
+      //     state.nickname
+      //   );
+      //   if (players.content[i].player.nickname === state.nickname) {
+      //     alert("잘못된 접근입니다.");
+      //     router.push({ name: "main" });
+      //     return;
+      //   }
+      // }
       store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
       await store.dispatch("gameStore/joinSession", state.sessionId);
     };
@@ -288,6 +289,11 @@ export default {
       store.dispatch("gameStore/gameStart");
     };
 
+    const gameTimer = ref(0)
+
+    const forceRender = function() {
+      gameTimer.value += 1
+    }
     return {
       router,
       state,
@@ -307,6 +313,8 @@ export default {
       joinSession,
       leaveSession,
       updateMainVideoStreamManager,
+      gameTimer,
+      forceRender
     };
   },
 };
