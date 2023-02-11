@@ -24,4 +24,8 @@ public class Image {
     @Lob
     private Blob img;
 
+    public void updateImg(Blob img){
+        this.img = img;
+    }
+
 }

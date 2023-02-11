@@ -63,13 +63,43 @@
         </div>
       </div>
     </div>
-    <div class="in_game_component" v-else>
-        <RoundResult/>
-        <div class="in_game_component_header">
-        <GameTimer date="August 15, 2016" />
-        <h1>{{ round }} 라운드</h1>
-        <div v-for="user in userList" :user="user" :key="user.id">
-          <h1>{{ user.nickname }}의 점수 : {{ user.score }}</h1>
+        <div class="in_game_component" v-else>
+            <RoundResult/>
+            <GameTimer/>
+            <h1> {{ round }} 라운드</h1>
+            <GameScore/>
+            <v-container>
+                <v-row>
+                    <v-col>
+                        <h1>상대 팀</h1>
+                        <user-video v-for="sub in opponents" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
+                    </v-col>
+                    <v-col>
+                        <div id="video-container" class="col-md-6">
+                            <div class="me">
+                                <h1>나</h1>
+                                <div class="drawing_sec" v-if="!amIDescriber">
+                                    <MyCanvasBox/>
+                                    <user-video :stream-manager="publisher"/>
+                                </div>
+                                <div class="displaying_sec" v-else>
+                                    <user-video :stream-manager="publisher"/>
+                                </div>
+                            </div>
+                            <div class="our_team">
+                                <h1>우리 팀</h1>
+                                <div class="drawing_sec" v-if="amIDescriber">
+                                    <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
+                                    <MyCanvasBox/>
+                                </div>
+                                <div class="displaying_sec" v-else>
+                                    <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
+                                </div>
+                            </div>
+                        </div>
+                    </v-col>
+                </v-row>
+            </v-container>
         </div>
       </div>
       <div class="ingame_component_content">
@@ -120,6 +150,7 @@
 import GameTimer from "./components/GameTimer.vue";
 import UserVideo from "./components/UserVideo.vue";
 import MyCanvasBox from "./components/MyCanvasBox.vue";
+import GameScore from "./components/GameScore.vue";
 import WaitingPage from "@/views/WaitingPage/WaitingPage.vue";
 import ChattingBox from "@/views/WaitingPage/components/ChattingBox.vue";
 import RoundResult from "./components/RoundResult.vue";
@@ -141,7 +172,8 @@ export default {
     UserVideo,
     MyCanvasBox,
     WaitingPage,
-    ChattingBox,
+    ChattingBox,                   
+    GameScore,
     RoundResult,
   },
   props: {
@@ -375,7 +407,7 @@ export default {
 }
 .opp_stream {
   transition-duration: 0.3s;
-  height: 226px;
+  height: 225px;
   margin: 10px 0;
   width: 300px;
   border-radius: 43px;
@@ -387,13 +419,12 @@ export default {
   width: 420px;
 }
 .draw_sec .my_stream {
-  height: 105px;
-  width: 140px;
-  right: 0;
-  bottom: 0;
+  height: 100px;
+  width: 100px;
+  right: 10px;
+  bottom: 10px;
   position: absolute;
-  border-top-left-radius: 43px;
-  border-bottom-right-radius: 43px;
+  border-radius: 100px;
   overflow: hidden;
   box-shadow: 0px 0px 20px 0px #0000005c;
 }

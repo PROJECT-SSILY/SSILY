@@ -157,7 +157,7 @@ const actions = {
         }
     },
     changePasswordAction: async (context, payload) => {
-        try {
+          try {
             const params = { 
                 oldPassword : payload.oldPassword,
                 newPassword : payload.newPassword 
