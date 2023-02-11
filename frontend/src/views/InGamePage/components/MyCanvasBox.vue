@@ -276,7 +276,9 @@ export default {
       topFive.value = [];
       for (var i = 0; i < 5; i++) {
         topFive.value.push(getTopClassNames()[i]);
+        console.log('getTopClassNames()[i] => ', i ,getTopClassNames()[i])
       }
+      console.log('getTopClassNames = ',getTopClassNames)
       console.log("winClass = ", winClass);
       console.log("그냥 : ", topFive);
       store.dispatch("gameStore/sendTopFive", topFive.value);

@@ -6,7 +6,6 @@
       <v-btn @click="state.isTeamBattle = !state.isTeamBattle"
         >팀/개인전 변경</v-btn
       >
-      |
       <v-btn>게임 순서 변경</v-btn>
     </p>
     <!------------------------------------------------------------------------------------->
@@ -65,6 +64,7 @@
     </div>
     <div class="in_game_component" v-else>
       <RoundResult />
+      <GameResult v-show="endGame"/>
       <GameTimer :key="gameTimer"/>
       <v-btn @click="forceRender">시계</v-btn>
       <h1>{{ round }} 라운드</h1>
@@ -176,6 +176,8 @@ import { useRoute, useRouter } from "vue-router";
 import { GetPlayerList } from "@/common/api/gameAPI";
 import { reactive, ref } from "@vue/reactivity";
 import { onBeforeMount, computed } from "vue";
+import GameResult from "../InGamePage/components/GameResult.vue";
+
 
 //=================OpenVdue====================
 $axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -191,6 +193,7 @@ export default {
     ChattingBox,
     GameScore,
     RoundResult,
+    GameResult,
   },
   props: {
     ready: Boolean,
@@ -202,6 +205,7 @@ export default {
     const readyAll = computed(() => store.state.gameStore.isAllReady);
     const amIDescriber = computed(() => store.state.gameStore.amIDescriber);
     const round = computed(() => store.state.gameStore.round);
+    const endGame = computed(() => store.state.gameStore.endGame);
     const currentPresenterId = computed(
       () => store.state.gameStore.presenterId
     );
@@ -305,6 +309,7 @@ export default {
       userList,
       round,
       currentPresenterId,
+      endGame,
       clickExit,
       clickTest,
       clickReady,

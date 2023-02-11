@@ -43,7 +43,7 @@ const state = {
     endRound: false, // [라운드 결과] 라운드 끝났을 때 true, 라운드 진행중일 때 false
     winnerList: [], // [게임 결과] 승리 유저 리스트
     gameResult: [], // [게임 결과] 유저 리스트 (key: connectionId, extraExp, levelUp, nickname)
-    endGame: false // [게임 결과] 게임 끝났을 때 true, 게임 진행줄일 때 false
+    endGame: false // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
 }
 
 const getters = {
@@ -428,9 +428,9 @@ const actions = {
                   return 0;
                 });
                 context.commit('setSortedUserList', sortList)
-                console.log('setEndRound === 전 ==> ', state.endRound)
-                context.commit('setEndRound', true)
-                console.log('setEndRound =후 => ', state.endRound)
+                if (event.data.round != 8) {
+                  context.commit('setEndRound', true)
+                }
                 break
               }}}
           // 라운드를 8번 돌면 게임을 종료한다.
@@ -451,7 +451,9 @@ const actions = {
           }
           context.commit('setWinnerList', winnerList)
           context.commit('setGameResult', event.data.gameResult)
+          console.log('endGame 변경')
           context.commit('setEndGame', true)
+          console.log('endgame 변경 되었는지 확인 => ?', state.endGame)
           break
         }
       }}
