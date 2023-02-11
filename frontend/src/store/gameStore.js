@@ -1,7 +1,5 @@
 import { roomList } from "@/common/api/gameAPI";
 import { OpenVidu } from "openvidu-browser";
-
-
 import $axios from "axios";
 
 $axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -397,6 +395,7 @@ const actions = {
           context.commit('setAnswer', event.data.answer)
           context.commit('setWinnerId', event.data.winnerId)
           context.commit('setWinnerNickname', event.data.winnerNickname)
+          //context.commit('setRound', event.data.round)
           var winnerId = event.data.winnerId
           // => 여기서 정답자가 10번, 0번 신호 보낸다.
           if (winnerId == state.myConnectionId) {
@@ -506,66 +505,48 @@ const actions = {
     this._joinSession = value;
   },
 
-  createSession: (context, sessionId) => {
-    // => 세션 생성 후 세션ID 발급됨
-    if (sessionId) {
-      console.log("세션ID 이미 존재");
-      return sessionId;
-    } else {
-      console.log("토큰 존재하지 않음");
-      context.commit("setIsHost", true);
-      console.log(
-        "title",
-        state.title,
-        "isSecret",
-        state.isSecret,
-        "password",
-        state.password,
-        "isTeamBattle",
-        state.isTeamBattle
-      );
-      return new Promise((resolve, reject) => {
-        $axios
-          .post(
-            `${OPENVIDU_SERVER_URL}/api/rooms`,
-            JSON.stringify({
-              title: state.title,
-              isSecret: state.isSecret,
-              password: state.password,
-              isTeamBattle: state.isTeamBattle,
-            }),
-            {
-              auth: {
-                username: "OPENVIDUAPP",
-                password: OPENVIDU_SERVER_SECRET,
-              },
-            }
-          )
-          .then((response) => response.data)
-          .then((data) => {
-            console.log("세션ID :", data.id);
-            resolve(data.id);
-          })
-          .catch((error) => {
-            if (error.response.status === 409) {
-              resolve(sessionId);
-            } else {
-              console.warn(
-                `No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`
-              );
-              if (
-                window.confirm(
-                  `No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`
-                )
-              ) {
-                location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
-              }
-              reject(error.response);
-            }
-          });
-      });
-    }
-  },
+    createSession : (context, sessionId) => { // => 세션 생성 후 세션ID 발급됨
+        if (sessionId) {
+          console.log("세션ID 이미 존재");
+          context.commit("setSessionId", sessionId);
+            return sessionId
+        } else {
+            console.log("토큰 존재하지 않음");
+            context.commit('setIsHost', true)
+            console.log("title", state.title, "isSecret",  state.isSecret,"password", state.password, "isTeamBattle", state.isTeamBattle)
+            return new Promise((resolve, reject) => {
+                $axios
+                .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
+                "title" : state.title,
+                "isSecret" : state.isSecret,
+                "password" : state.password,
+                "isTeamBattle" : state.isTeamBattle
+                }), {
+                    auth: {
+                        username: 'OPENVIDUAPP',
+                        password: OPENVIDU_SERVER_SECRET,
+                    },
+                })
+                .then(response => response.data)
+                .then(data => {
+                  console.log("세션ID :", data.id)
+                  context.commit("setSessionId", data.id);
+                    resolve(data.id)
+                })
+                .catch(error => {
+                    if (error.response.status === 409) {
+                        resolve(sessionId);
+                    } else {
+                        console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
+                        if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
+                            location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
+                        }
+                        reject(error.response);
+                    }
+                });
+            });
+        }
+    },
 
   createToken: (context, sessionId) => {
     const level = context.rootState.accountStore.user.level;
@@ -616,17 +597,16 @@ const actions = {
       .then((sessionId) => dispatch("createToken", sessionId));
   },
 
-    leaveSession: (context) => {
-        if (state.session) state.session.disconnect();
-        context.commit("setSession", undefined)
-        context.commit("setMainStreamManager", undefined)
-        context.commit("setSubscribers", [])
-        context.commit("setOV", undefined)
-        context.commit('SET_PUBLISHER', undefined)
-        context.commit('setClearUserList')
-        context.commit('setClearUserKey')
-        
-    },
+  leaveSession: (context) => {
+    if (state.session) state.session.disconnect();
+    context.commit("setSession", undefined);
+    context.commit("setMainStreamManager", undefined);
+    context.commit("setSubscribers", []);
+    context.commit("setOV", undefined);
+    context.commit("SET_PUBLISHER", undefined);
+    context.commit("setClearUserList");
+    context.commit("setClearUserKey");
+  },
 
   updateMainVideoStreamManager: (commit, stream) => {
     if (state.mainStreamManager === stream) return;
@@ -671,22 +651,36 @@ const actions = {
       })
     },
 
+  downloadImage: async (context) => {
+    try {
+      const res = await $axios.get(`/api/image/${state.sessionId}`, {
+        headers: {
+          Authorization: `Bearer ${context.rootState.accountStore.token}`,
+        },
+      });
+      //console.log("res is: ", res);
+      return res.data.data;
+      }catch (error) {
+        return error.response.data.code
+      }
+  },
+
   uploadImage: (context, payload) => {
     console.log("찍어보자", context.rootState.accountStore.token);
     $axios
-      .post(`/api/image/upload?sessionId=${state.sessionId}`, payload, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${context.rootState.accountStore.token}`,
-        },
-      })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        alert("실패");
-        console.log(err);
-      });
+    .post(`/api/image/upload?sessionId=${state.sessionId}`, payload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${context.rootState.accountStore.token}`,
+      },
+    })
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      alert("실패");
+      console.log(err)
+    });
   },
 
   sendImageData: (context, payload) => {
