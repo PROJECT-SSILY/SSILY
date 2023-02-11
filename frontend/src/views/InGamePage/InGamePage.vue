@@ -6,7 +6,6 @@
       <v-btn @click="state.isTeamBattle = !state.isTeamBattle"
         >팀/개인전 변경</v-btn
       >
-      |
       <v-btn>게임 순서 변경</v-btn>
     </p>
     <!------------------------------------------------------------------------------------->
@@ -65,6 +64,7 @@
     </div>
     <div class="in_game_component" v-else>
       <RoundResult />
+      <GameResult v-show="endGame"/>
       <GameTimer />
       <h1>{{ round }} 라운드</h1>
       <GameScore />
@@ -175,6 +175,8 @@ import { useRoute, useRouter } from "vue-router";
 import { GetPlayerList } from "@/common/api/gameAPI";
 import { reactive } from "@vue/reactivity";
 import { onBeforeMount, computed } from "vue";
+import GameResult from "../InGamePage/components/GameResult.vue";
+
 
 //=================OpenVdue====================
 $axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -190,6 +192,7 @@ export default {
     ChattingBox,
     GameScore,
     RoundResult,
+    GameResult,
   },
   props: {
     ready: Boolean,
@@ -201,6 +204,7 @@ export default {
     const readyAll = computed(() => store.state.gameStore.isAllReady);
     const amIDescriber = computed(() => store.state.gameStore.amIDescriber);
     const round = computed(() => store.state.gameStore.round);
+    const endGame = computed(() => store.state.gameStore.endGame);
     const currentPresenterId = computed(
       () => store.state.gameStore.presenterId
     );
@@ -233,18 +237,18 @@ export default {
     const joinSession = async function () {
       const players = await GetPlayerList(state.sessionId);
       console.log("players : ", players);
-      for (let i = 0; i < players.content.length; i++) {
-        console.log(
-          "접근 가능 여부 확인중.. ",
-          players.content[i].player.nickname,
-          state.nickname
-        );
-        if (players.content[i].player.nickname === state.nickname) {
-          alert("잘못된 접근입니다.");
-          router.push({ name: "main" });
-          return;
-        }
-      }
+      // for (let i = 0; i < players.content.length; i++) {
+      //   console.log(
+      //     "접근 가능 여부 확인중.. ",
+      //     players.content[i].player.nickname,
+      //     state.nickname
+      //   );
+      //   if (players.content[i].player.nickname === state.nickname) {
+      //     alert("잘못된 접근입니다.");
+      //     router.push({ name: "main" });
+      //     return;
+      //   }
+      // }
       store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
       await store.dispatch("gameStore/joinSession", state.sessionId);
     };
@@ -299,6 +303,7 @@ export default {
       userList,
       round,
       currentPresenterId,
+      endGame,
       clickExit,
       clickTest,
       clickReady,

@@ -40,7 +40,7 @@ import TutorialDialog from "./Components/TutorialDialog.vue";
 import RoomList from "./Components/RoomList.vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { computed, reactive } from "vue";
+import { computed, reactive, onMounted } from "vue";
 
 export default {
   name: "MainPage",
@@ -52,7 +52,7 @@ export default {
   },
   setup() {
     const store = useStore();
-    const router = useRouter();
+    const router = useRouter(); 
     const state = reactive({
       isTeam: null,
       roomDialog: false,
@@ -66,6 +66,11 @@ export default {
       state.tutorDialog = false;
       state.settingDialog = false;
     };
+
+    onMounted(() => 
+      store.dispatch('accountStore/getMeAction') // 메인페이지에서 닉네임 사라지지 않도록 처리
+    )
+
 
     return {
       store,
