@@ -165,7 +165,7 @@ export default {
       sessionId: route.params.sessionId || null,
       isHost: true,
       connectionId: null,
-      nickname: computed(() => store.state.accountStore.nickname),
+      nickname: computed(() => store.state.accountStore.user.nickname),
 
       // 팀 분류
       myTeam: null,
@@ -184,14 +184,14 @@ export default {
     const joinSession = async function () {
       const players = await GetPlayerList(state.sessionId);
       console.log("players : ", players);
-      // const content = players.content
-      // for (let i=0; i<content.length; i++) {
-      //     if(content.player === state.nickname) {
-      //         alert("잘못된 접근입니다.")
-      //         router.push({name : 'main'})
-      //         return
-      //     }
-      // }
+      for (let i=0; i<players.content.length; i++) {
+        console.log("접근 가능 여부 확인중.. ", players.content[i].player.nickname, state.nickname)
+        if(players.content[i].player.nickname === state.nickname) {
+              alert("잘못된 접근입니다.")
+              router.push({name : 'main'})
+              return
+          }
+      }
       store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
       await store.dispatch("gameStore/joinSession", state.sessionId);
     };

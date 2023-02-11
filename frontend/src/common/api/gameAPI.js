@@ -10,6 +10,7 @@ const roomList = () => {
             password: OPENVIDU_SERVER_SECRET,
         }
     })
+    .then(res => res.data)
 }
 const randomTeam = (payload) => {
     console.log(payload);

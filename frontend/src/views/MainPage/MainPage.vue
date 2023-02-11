@@ -1,150 +1,191 @@
 <template>
-  <div>
-    <v-container>
-      <v-row>
-        <v-col class="room-list">
-          <room-list @sendValue="changeValue"></room-list>
-        </v-col>
-        <v-col class="console">
-          <v-row>
-            <v-col>
-             <router-link :to="{ name: 'mypage' }" class="myPageBtn btnbox">
-              <v-img class="start-planet" src="@/assets/images/planet-08.svg">Profile</v-img>
+  <div class="wrap-page">
+    <MakeRoomDialog v-show="state.roomDialog" />
+    <TutorialDialog v-show="state.tutorDialog" />
+    <SettingDialog v-show="state.settingDialog"/>
+    <div
+      class="bg-dark"
+      :class="state.settingDialog || state.tutorDialog || state.roomDialog ? 'active':''"
+      @click="closeDialog"
+    ></div>
+    <main>
+      <button @click="state.settingDialog = true" id="ico-volume"><v-img src="@/assets/images/volume.svg" alt="volume"/></button>
+      <section>
+        <!-- 대기방 리스트 -->
+        <div class="wrap-roomlist">
+          <RoomList />
+        </div>
+      </section>
+      <aside>
+        <!-- 게임 관련 버튼 그룹 및 마이페이지 -->
+        <div class="sec-myinfo">
+          <router-link :to="{ name: 'mypage' }" class="btn-mypage">
+            <v-img src="@/assets/images/rocket.png" alt="rocket" id="rocket" />
+            {{ state.nickname }} 님
             </router-link>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <make-room-dialog></make-room-dialog>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col v-if="state.isTeam">
-              <v-img class="start-planet" @click="randomTeam" src="@/assets/images/planet-09.svg">Start</v-img>
-            </v-col>
-            <v-col v-else>
-              <v-img class="start-planet" @click="randomPrivate" src="@/assets/images/planet-01.svg">Start</v-img>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <tutorial-dialog></tutorial-dialog>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-    </v-container>
+        </div>
+        <div class="sec-btn">
+          <button @click="state.roomDialog = !state.roomDialog">방 만들기</button>
+          <button>바로 입장</button>
+          <button @click="state.tutorDialog = !state.tutorDialog">튜토리얼</button>
+        </div>
+      </aside>
+    </main>
   </div>
 </template>
 <script>
-
-import MakeRoomDialog from './Components/MakeRoomDialog.vue';
-// import SettingDialog from '../SettingDialog.vue';
-import TutorialDialog from './Components/TutorialDialog.vue';
-// import ProfileBox from './Components/ProfileBox.vue';
-import RoomList from './Components/RoomList.vue';
-import { useStore } from "vuex"
-import { useRouter } from "vue-router"
-// import store from '@/store/gameStore';
-import { onMounted, reactive } from "vue"
-// import {RotateSquare2} from 'vue-loading-spinner'
+import MakeRoomDialog from "./Components/MakeRoomDialog.vue";
+import SettingDialog from "../SettingDialog.vue";
+import TutorialDialog from "./Components/TutorialDialog.vue";
+import RoomList from "./Components/RoomList.vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+import { computed, reactive } from "vue";
 
 export default {
-  name: 'MainPage',
+  name: "MainPage",
   components: {
     MakeRoomDialog,
     TutorialDialog,
-    // ProfileBox,
+    SettingDialog,
     RoomList,
   },
   setup() {
-    const store = useStore()
-    const router = useRouter()
+    const store = useStore();
+    const router = useRouter();
     const state = reactive({
-      isTeam : null,
-      // isLoading: false
-    })
-    const changeValue = function (value) {
-      state.isTeam = value
-      // console.log(value)
-    }
-    onMounted(() => 
-      store.dispatch('accountStore/getMeAction')
-    )
-    // function getMe () {
-    //   console.log(store.getters['accountStore/getUser'])
-    // }
-    // const changeValue = function (value) {
-    //   state.isTeam = value
-    //   console.log(value)
-    // }
-    // const randomTeam = async function () {
-    //   const params = {
-    //     isTeamBattle: state.isTeam
-    //   }
-    //   const result = await store.dispatch('gameStore/randomTeamAction', params)
-    //   console.log(result)
-    //   router.push({name: 'gameroom'})
-    // }
-    // const randomPrivate = async function () {
-    //   const params = {
-    //     isTeamBattle: state.isTeam
-    //   }
-    //   const result = await store.dispatch('gameStore/randomPrivateAction', params)
-    //   console.log(result)
-    //   router.push({name: 'gameroom'})
-    // }
+      isTeam: null,
+      roomDialog: false,
+      tutorDialog: false,
+      settingDialog: false,
+      nickname: computed(() => store.getters["accountStore/getUser"].nickname),
+    });
+
+    const closeDialog = () => {
+      state.roomDialog = false;
+      state.tutorDialog = false;
+      state.settingDialog = false;
+    };
+
     return {
       store,
       router,
       state,
-      changeValue,
-      // getMe,
-      // randomTeam,
-      // randomPrivate,
-      }
-    },
-}
+      closeDialog,
+    };
+  },
+};
 // }
 </script>
 
 <style scoped>
+/* 공용 css */
 
-.myPageBtn {
+/* -------------- */
+
+.wrap-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
+main {
+  display: flex;
+  flex-direction: row;
+  width: 800px;
+  height: 500px;
+  align-items: flex-end;
+}
+section {
+  width: 500px;
+  margin-right: 15px;
+}
+.wrap-roomlist {
+  height: 500px;
+  padding-top: 50px;
+  position: relative;
+}
+aside {
+  width: 300px;
+  margin-left: 15px;
+  height: 500px;
+  background: white;
+  border-radius: 60px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0px 0px 50px #0000005c;
+}
+.sec-myinfo {
+  height: 110px;
+  width: 100%;
+  background: #d3d3d3;
+  border-bottom-right-radius: 55px;
+  box-shadow: inset 0px -4px 10px #0000003d;
+  padding: 13px;
+}
+#rocket {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 23px;
+  left: 21px;
+  transition: 0.2s;
+}
+#rocket:hover {
+  top:20px;
+  left: 12px;
+  width: 105px;
+  height: 105px;
+}
+.btn-mypage {
+  height: 100%;
+  width: 100%;
+  background: white;
+  display: inline-block;
+  border-radius: 60px;
+  box-shadow: 0 0 10px #0000003d;
   text-decoration: none;
+  color: black;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 30px 20px 30px 100px;
+  text-align: center;
 }
-
-.start-planet {
-  font-family: 'Akronim', cursive;
-  font-size: 4rem;
-  height: 10rem;
-  display : flex;
-  justify-content : center;
-  align-items : center;
-  color:white;
-  transform: translate(-9px, -15px);
+.btn-mypage:hover {
+  background: rgb(252, 252, 252);
+  box-shadow: inset 1px 3px 3px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.2);
 }
-
-@keyframes shake-start-planet {
-  0% { transform: translate(-8px, -14px); }
-  33% { transform: translate(-10px, -14px); }
-  66% { transform: translate(-10px, -16px); }
-  100% { transform: translate(-8px, -16px); }
+.btn-mypage:active {
+  background: rgb(245, 245, 245);
+  box-shadow: inset 1px 3px 4px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.2);
 }
-
-.start-planet:hover {
-  animation: shake-start-planet .1s infinite alternate;
+.sec-btn {
+  height: 300px;
+  margin: 79px 10px 10px 10px;
+  box-sizing: border-box;
+  border: 10px solid #c6c6c6;
+  border-radius: 55px;
+  overflow: hidden;
 }
-
-.room-list {
-  padding-top: 10rem;
+.sec-btn > button {
+  background: #24cb83;
+  color: white;
+  text-shadow: 0 0 10px #00000080;
+  width: 100%;
+  height: 94px;
+  display: block;
+  text-align: center;
+  font-size: 25px;
+  border-bottom: 2px solid #0000001c;
 }
-
-.console {
-  padding-top: 10rem;
+.sec-btn > button:hover {
+  background: #25d388;
+}
+.sec-btn > button:active {
+  background: #1fae70;
 }
 </style>
