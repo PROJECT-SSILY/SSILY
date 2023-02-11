@@ -63,82 +63,97 @@
         </div>
       </div>
     </div>
-        <div class="in_game_component" v-else>
-            <RoundResult/>
-            <GameTimer/>
-            <h1> {{ round }} 라운드</h1>
-            <GameScore/>
-            <v-container>
-                <v-row>
-                    <v-col>
-                        <h1>상대 팀</h1>
-                        <user-video v-for="sub in opponents" :key="sub.stream.connection.connectionId" :stream-manager="sub"/>
-                    </v-col>
-                    <v-col>
-                        <div id="video-container" class="col-md-6">
-                            <div class="me">
-                                <h1>나</h1>
-                                <div class="drawing_sec" v-if="!amIDescriber">
-                                    <MyCanvasBox/>
-                                    <user-video :stream-manager="publisher"/>
-                                </div>
-                                <div class="displaying_sec" v-else>
-                                    <user-video :stream-manager="publisher"/>
-                                </div>
-                            </div>
-                            <div class="our_team">
-                                <h1>우리 팀</h1>
-                                <div class="drawing_sec" v-if="amIDescriber">
-                                    <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
-                                    <MyCanvasBox/>
-                                </div>
-                                <div class="displaying_sec" v-else>
-                                    <user-video v-for="opp in opponents" :key="opp.stream.connection.connectionId"  :stream-manager="opp"/>
-                                </div>
-                            </div>
-                        </div>
-                    </v-col>
-                </v-row>
-            </v-container>
-        </div>
+    <div class="in_game_component" v-else>
+      <RoundResult />
+      <GameTimer />
+      <h1>{{ round }} 라운드</h1>
+      <GameScore />
+      <v-container>
+        <v-row>
+          <v-col>
+            <h1>상대 팀</h1>
+            <user-video
+              v-for="sub in opponents"
+              :key="sub.stream.connection.connectionId"
+              :stream-manager="sub"
+            />
+          </v-col>
+          <v-col>
+            <div id="video-container" class="col-md-6">
+              <div class="me">
+                <h1>나</h1>
+                <div class="drawing_sec" v-if="!amIDescriber">
+                  <MyCanvasBox />
+                  <user-video :stream-manager="publisher" />
+                </div>
+                <div class="displaying_sec" v-else>
+                  <user-video :stream-manager="publisher" />
+                </div>
+              </div>
+              <div class="our_team">
+                <h1>우리 팀</h1>
+                <div class="drawing_sec" v-if="amIDescriber">
+                  <user-video
+                    v-for="opp in opponents"
+                    :key="opp.stream.connection.connectionId"
+                    :stream-manager="opp"
+                  />
+                  <MyCanvasBox />
+                </div>
+                <div class="displaying_sec" v-else>
+                  <user-video
+                    v-for="opp in opponents"
+                    :key="opp.stream.connection.connectionId"
+                    :stream-manager="opp"
+                  />
+                </div>
+              </div>
+            </div>
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
+    <div class="ingame_component_content">
+      <div class="opponent_container">
+        <user-video
+          class="opp_stream"
+          v-for="sub in opponents"
+          :key="sub.stream.connection.connectionId"
+          :stream-manager="sub"
+          :class="
+            sub.stream.connection.connectionId === currentPresenterId
+              ? 'presenter'
+              : ''
+          "
+        />
       </div>
-      <div class="ingame_component_content">
-        <div class="opponent_container">
-          <user-video class="opp_stream"
-            v-for="sub in opponents"
-            :key="sub.stream.connection.connectionId"
-            :stream-manager="sub"
-            :class="sub.stream.connection.connectionId===currentPresenterId?'presenter':''"
-          />
-        </div>
-        <div class="ourteam_container">
-          <div class="me">
-            <div class="draw_sec" v-if="!amIDescriber">
-              <MyCanvasBox class="canvas" />
-              <user-video :stream-manager="publisher" class="my_stream" />
-            </div>
-            <div class="display_sec" v-else>
-              <user-video :stream-manager="publisher" class="my_stream" />
-            </div>
+      <div class="ourteam_container">
+        <div class="me">
+          <div class="draw_sec" v-if="!amIDescriber">
+            <MyCanvasBox class="canvas" />
+            <user-video :stream-manager="publisher" class="my_stream" />
           </div>
-          <div class="ourteam_members">
-            <div class="draw_sec" v-if="amIDescriber">
-              <user-video
-                v-for="sub in myTeams"
-                :key="sub.stream.connection.connectionId"
-                :stream-manager="sub"
-                class="our_stream"
-              />
-              <MyCanvasBox class="canvas" />
-            </div>
-            <div class="display_sec" v-else>
-              <user-video
-                v-for="sub in myTeams"
-                :key="sub.stream.connection.connectionId"
-                :stream-manager="sub"
-                class="our_stream"
-              />
-            </div>
+          <div class="display_sec" v-else>
+            <user-video :stream-manager="publisher" class="my_stream" />
+          </div>
+        </div>
+        <div class="ourteam_members">
+          <div class="draw_sec" v-if="amIDescriber">
+            <user-video
+              v-for="sub in myTeams"
+              :key="sub.stream.connection.connectionId"
+              :stream-manager="sub"
+              class="our_stream"
+            />
+            <MyCanvasBox class="canvas" />
+          </div>
+          <div class="display_sec" v-else>
+            <user-video
+              v-for="sub in myTeams"
+              :key="sub.stream.connection.connectionId"
+              :stream-manager="sub"
+              class="our_stream"
+            />
           </div>
         </div>
       </div>
@@ -172,7 +187,7 @@ export default {
     UserVideo,
     MyCanvasBox,
     WaitingPage,
-    ChattingBox,                   
+    ChattingBox,
     GameScore,
     RoundResult,
   },
@@ -186,7 +201,9 @@ export default {
     const readyAll = computed(() => store.state.gameStore.isAllReady);
     const amIDescriber = computed(() => store.state.gameStore.amIDescriber);
     const round = computed(() => store.state.gameStore.round);
-    const currentPresenterId = computed(() => store.state.gameStore.presenterId);
+    const currentPresenterId = computed(
+      () => store.state.gameStore.presenterId
+    );
     const router = useRouter();
     const state = reactive({
       title: null,
@@ -197,7 +214,7 @@ export default {
       sessionId: route.params.sessionId || null,
       isHost: true,
       connectionId: null,
-      nickname: computed(() => store.state.accountStore.nickname),
+      nickname: computed(() => store.state.accountStore.user.nickname),
 
       // 팀 분류
       myTeam: null,
@@ -216,14 +233,18 @@ export default {
     const joinSession = async function () {
       const players = await GetPlayerList(state.sessionId);
       console.log("players : ", players);
-      // const content = players.content
-      // for (let i=0; i<content.length; i++) {
-      //     if(content.player === state.nickname) {
-      //         alert("잘못된 접근입니다.")
-      //         router.push({name : 'main'})
-      //         return
-      //     }
-      // }
+      for (let i = 0; i < players.content.length; i++) {
+        console.log(
+          "접근 가능 여부 확인중.. ",
+          players.content[i].player.nickname,
+          state.nickname
+        );
+        if (players.content[i].player.nickname === state.nickname) {
+          alert("잘못된 접근입니다.");
+          router.push({ name: "main" });
+          return;
+        }
+      }
       store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
       await store.dispatch("gameStore/joinSession", state.sessionId);
     };
@@ -257,7 +278,6 @@ export default {
       store.dispatch("gameStore/changeTeamAction", color);
     };
 
-  
     const clickTest = () => {
       console.log("clickTest 클릭");
       store.dispatch("gameStore/changeTest", true);
@@ -386,7 +406,8 @@ export default {
   width: 100vw;
   height: 100vh;
 }
-.opponent_container, .ourteam_container {
+.opponent_container,
+.ourteam_container {
   display: flex;
   flex-direction: column;
   justify-content: center;

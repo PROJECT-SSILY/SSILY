@@ -15,6 +15,7 @@
 </script>
 
 <style>
+@import '@/assets/css/base.css';
 @font-face {
   font-family: 'MaplestoryOTFBold';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/MaplestoryOTFBold.woff') format('woff');
