@@ -1,5 +1,5 @@
 <template>
-  <v-form @keyup.enter="clickLogIn"
+  <v-form
   ref="form"
   v-model="state.valid"
   lazy-validation
