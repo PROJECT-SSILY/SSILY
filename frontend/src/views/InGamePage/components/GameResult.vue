@@ -14,7 +14,7 @@
           <div v-for="(user, index) in gameResult"
           :user="user"
           :key="user.id">
-              <h1>{{ parseInt(index) + 1}}{{ user.nickname }} : {{ user.extraExp }}점! </h1>
+              <h1>{{ parseInt(index) + 1}}등 {{ user.nickname }} + {{ user.extraExp }} Exp </h1>
           </div>
         </v-card-text>
         <v-card-actions>

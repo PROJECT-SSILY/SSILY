@@ -17,9 +17,6 @@
         </g>
       </svg>
       <span class="base-timer__label">{{ formattedTimeLeft }}</span>
-      <v-btn @click="startTimer()">
-        시작
-      </v-btn>
     </div>
   </template>
   
@@ -99,9 +96,9 @@
       }
     },
   
-    // mounted() {
-    //   this.startTimer();
-    // },
+    mounted() {
+      this.startTimer();
+    },
   
     methods: {
       onTimesUp() {
@@ -112,6 +109,8 @@
         this.timerInterval = setInterval(() => (this.timePassed += 1), 1000);
       }
     }
+    
+    
   };
   </script>
   

@@ -65,7 +65,8 @@
     <div class="in_game_component" v-else>
       <RoundResult />
       <GameResult v-show="endGame"/>
-      <GameTimer />
+      <GameTimer :key="gameTimer"/>
+      <v-btn @click="forceRender">시계</v-btn>
       <h1>{{ round }} 라운드</h1>
       <GameScore />
       <v-container>
@@ -173,7 +174,7 @@ import $axios from "axios";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { GetPlayerList } from "@/common/api/gameAPI";
-import { reactive } from "@vue/reactivity";
+import { reactive, ref } from "@vue/reactivity";
 import { onBeforeMount, computed } from "vue";
 import GameResult from "../InGamePage/components/GameResult.vue";
 
@@ -292,6 +293,11 @@ export default {
       store.dispatch("gameStore/gameStart");
     };
 
+    const gameTimer = ref(0)
+
+    const forceRender = function() {
+      gameTimer.value += 1
+    }
     return {
       router,
       state,
@@ -312,6 +318,8 @@ export default {
       joinSession,
       leaveSession,
       updateMainVideoStreamManager,
+      gameTimer,
+      forceRender
     };
   },
 };

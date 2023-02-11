@@ -1,20 +1,30 @@
 <template>
-    <div class="canvas_container">
-        <button @click="predictModel" style="background: white; padding: 5px 10px; position: absolute; z-index: 100; left: 60px;">제출</button>
-        <div class="group_button">
-            <div id="brush" @click="allowDrawing">
-                <v-img src="@/assets/canvas/brush.svg" alt="brush"/>
-            </div>
-            <div id="eraser" @click="eraseAll">
-                <v-img src="@/assets/canvas/eraser.svg" alt="eraser"/>
-            </div>
-        </div>
-        <canvas
+  <div class="canvas_container">
+    <button @click="predictModel" style="background: white; padding: 5px 10px; position: absolute; z-index: 100; left: 60px;">제출</button>
+    <div class="group_button">
+      <div id="brush" @click="allowDrawing">
+        <v-img src="@/assets/canvas/brush.svg" alt="brush"/>
+      </div>
+      <div id="eraser" @click="eraseAll">
+        <v-img src="@/assets/canvas/eraser.svg" alt="eraser"/>
+      </div>
+    </div>
+    <canvas
         width="600"
         height="400"
         id="canvas"
-        >
+    >
     </canvas>
+    <!-- 여기부터 신대득의 테스트 공간..-->
+    <div style="margin: 1rem">
+    <canvas
+        width="600"
+        height="400"
+        id="answerCanvas"
+    ></canvas>
+      <v-btn @click="canvasToImage">그림보내기</v-btn>
+      <v-btn @click="imageToCanvas">그림받기</v-btn>
+    </div>
   </div>
 </template>
 
@@ -33,6 +43,7 @@ const MY_MODEL_URL = "http://localhost:5500/api/model.json";
 export default {
   name: "MyCanvasBox",
   setup() {
+
     const fabricCanvas = ref({});
     const store = useStore();
     const topFive = ref([]);
@@ -68,7 +79,6 @@ export default {
 
     const predictModel = function () {
       submitDrawing();
-      // getAnswerImage();
     };
 
     const getMinBox = function () {
@@ -117,7 +127,7 @@ export default {
       return imageData;
     };
 
-    const getAnswerImage = function () {
+      const canvasToImage = async function(){
       // toDataURL()사용하여 png타입의 base64인코딩된 data url 형식의 문자열을 반환
       const canvas = fabricCanvas.value;
       var dataUrl = canvas.toDataURL("image/png");
@@ -136,10 +146,11 @@ export default {
       for (var i = 0; i < byteString.length; i++) {
         array.push(byteString.charCodeAt(i));
       }
-      console.log("array 잘 만드냐?", array);
+      //console.log("array 잘 만드냐?", array);
       // (2486) [137, 80, 78, 71, ...]
       // Blob 생성
       var myBlob = new Blob([new Uint8Array(array)], { type: "image/png" });
+      console.log("myBlob is ==>", myBlob);
 
       // ** Blob -> File 로 변환**
       var file = new File([myBlob], "blobtofile.png");
@@ -152,8 +163,74 @@ export default {
 
       console.log("formData : ", formData.get("answerImage"));
       console.log("token : ", store.state.accountStore.token);
-      const myToken = store.state.accountStore.token;
-      store.dispatch("gameStore/uploadImage", formData, myToken);
+      //const myToken = store.state.accountStore.token;
+      store.dispatch("gameStore/uploadImage", formData);
+    };
+
+    const imageToCanvas= async function(){
+        console.log("imageToCanvas 시작!");
+        const getFile =await store.dispatch("gameStore/downloadImage");
+        console.log("getFile 찍자");
+        console.log(getFile);
+
+
+        //var myFile = new File([getFile], "blobtofile.png");
+        //console.log("outImage is ", outImage);
+        //console.log("outImage value is", outImage.value);
+
+
+/*
+        const chunks = [];
+        const numberOfSlices = 10;
+        const chunkSize = Math.ceil(blob.size / numberOfSlices);
+        for (let i = 0; i < numberOfSlices; i += 1) {
+          const startByte = chunkSize * i;
+          chunks.push(
+          blob.slice(
+          startByte,
+          startByte + chunkSize,
+          blob.type
+        )
+      );
+}
+*/
+
+
+// 이미지 방법
+/*
+      var byteString = window.atob(getFile.split(",")[1]);
+      var array = [];
+      // i 에 해당하는 string을 unicode로 변환
+      for (var i = 0; i < byteString.length; i++) {
+        array.push(byteString.charCodeAt(i));
+      }
+      //console.log("array 잘 만드냐?", array);
+      // (2486) [137, 80, 78, 71, ...]
+      // Blob 생성
+      var myBlob = new Blob([new Uint8Array(array)], { type: "image/png" });
+
+        const newURL= window.URL.createObjectURL(myBlob);
+        //console.log("newURL is", newURL);
+        outImage.value.src = newURL;
+        */
+
+        /*
+        outImage.value.onload = () => {
+          window.URL.revokeObjectURL(this.src)  //나중에 반드시 해제해주어야 메모리 누수가 안생김.
+        }
+        */
+
+
+      var myCanvas=document.getElementById('answerCanvas');
+      var ctx = myCanvas.getContext('2d');
+      var img = new Image;
+      img.src = getFile;
+      
+      img.onload = function(){
+       ctx.drawImage(img,0,0); // Or at whatever offset you like
+      };
+
+
     };
 
     const submitCanvas = function () {
@@ -272,7 +349,8 @@ export default {
       eraseAll,
       predictModel,
       success,
-      getAnswerImage,
+      canvasToImage,
+      imageToCanvas,
     };
   },
 };
