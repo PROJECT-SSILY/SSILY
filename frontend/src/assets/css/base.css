@@ -1,3 +1,14 @@
+/* App 공통 css */
+#contents {
+  height: 100%;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
 /* dialog 관련 css */
 .wrap-dialog {
     position: absolute;
@@ -34,9 +45,6 @@
     background: #00000080;
     backdrop-filter: blur(20px);
   }
-
-/* ================= */
-
 
 
 /* 볼륨 조절 관련 css */

@@ -482,7 +482,7 @@ const actions = {
           context.commit("SET_PUBLISHER", publisher);
           // --- Publish your stream ---
           session.publish(state.publisher);
-
+          
           session.signal({
             type: "game",
             data: {
@@ -617,6 +617,7 @@ const actions = {
 
   // 참여자 레디 상태 변경 - ingamePage에서 clickReady 했을 때 호출 - 수연
   changeReady: () => {
+    console.log("신호 받음")
     state.session.signal({
       type: "game",
       data: {
