@@ -430,6 +430,9 @@ export default {
   height: 20px;
   text-align: left;
   margin: 7px 20px;
+  color: #5b5b5b;
+  font-weight: 600;
+  font-size: 15px;
 }
 
 
