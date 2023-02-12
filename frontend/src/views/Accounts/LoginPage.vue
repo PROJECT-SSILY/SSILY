@@ -1,8 +1,9 @@
 <template>
-  <v-form @keyup.enter="clickLogIn"
+  <v-form
   ref="form"
   v-model="state.valid"
   lazy-validation
+  @keyup.enter="enterLogIn"
   >
   <v-container class="formbox">
     <h1 class="title">회원 로그인</h1>
@@ -124,7 +125,24 @@ export default {
         })
       }
     }
-    return {state, store, onMounted, clickSignUp, clickFindPw, clickLogIn}
+    const enterLogIn = async function () {
+      console.log('엔터 실행')
+      const formData = {
+        email: state.form.email,
+        password: state.form.password
+      }
+      const response = await store.dispatch('accountStore/loginAction', formData)
+      if (response == -100 ) {
+        console.log('로그인 실패!!') 
+        router.go()
+      } else {
+        console.log('로그인 성공!!')
+        router.push({
+          name: 'main'
+        })
+      }
+    }
+    return {state, store, onMounted, clickSignUp, clickFindPw, clickLogIn, enterLogIn}
   },
   data() {
     return {

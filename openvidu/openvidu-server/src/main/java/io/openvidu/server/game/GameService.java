@@ -36,6 +36,7 @@ public class GameService   {
     static final int SUBMIT_ANSWER = 5;
 
     static final int FINISH_ROUND = 10;
+    static final int TIME_OVER_ROUND = 20;
     static final int FINISH_GAME = 100;
 
 
@@ -101,6 +102,9 @@ public class GameService   {
                 return;
             case FINISH_ROUND:
                 finishRound(participant, sessionId, participants, params, data);
+                return;
+            case TIME_OVER_ROUND:
+                timeOverRound(participant, sessionId, participants, params, data);
                 return;
             case FINISH_GAME:
                 finishGame(participant, sessionId, participants, params, data);
@@ -429,9 +433,46 @@ public class GameService   {
     }
 
     /**
-     * 서영탁
-     * 게임 종료
+     * 신대득
+     * 라운드 60초 지나면 처리 할 이벤트
+     * 이 신호는 방장만 보내는걸로 ! (방장만 조건이 없을경우 인원수만큼 발생할 수 있음.)
      */
+    private void timeOverRound(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data) {
+        log.info("timeOver is called by [{}]", participant.getPlayer());
+        if(!participant.getPlayer().isHost())
+            return;
+
+        int cnt = 0;
+        JsonObject playerJson = new JsonObject();
+        for (Participant p : participants) {
+            JsonObject player = new JsonObject();
+            player.addProperty("connectionId", p.getParticipantPublicId());
+            player.addProperty("score", p.getPlayer().getScore());
+            playerJson.add(String.valueOf(cnt), player);
+            cnt++;
+        }
+        data.add("player", playerJson);
+
+        data.addProperty("cnt", cnt);
+        // 라운드 증가
+        Integer nowRound = round.get(sessionId);
+        round.put(sessionId, nowRound+1);
+        data.addProperty("round", nowRound);
+
+        params.add("data", data);
+
+        // 라운드 종료 알라기
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
+
+        /**
+         * 서영탁
+         * 게임 종료
+         */
     private void finishGame(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
         log.info("finishGame is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
