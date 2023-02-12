@@ -33,8 +33,9 @@
       <div class="content-component">
         <ChattingBox class="box-chat"/>
         <div class="box-btn">
-          <div class="box-blank"></div>
+          <!-- <div class="box-blank"></div> --> <!-- 추후 업데이트 시 사용 예정 -->
           <button class="btn-ready" :class="state.ready?'ready':''" @click="clickReady">READY</button>
+          <button class="btn-profile">내 프로필</button>
         </div>
       </div>
       <footer>
@@ -369,10 +370,15 @@ export default {
   background: #F9F9F9;
   border-radius: 30px;
   border: 1px solid #E6E6E6;
-  margin-right: 15px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .box-btn {
   width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .box-blank {
   width: 300px;
@@ -381,15 +387,44 @@ export default {
   border-radius: 30px;
   box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.25);
 }
+.box-btn>button {
+  width: 170px;
+  height: 70px;
+  border-radius: 30px;
+  margin: 7px 0;
+  transition: 0.1s;
+}
+.box-btn>button:hover {
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+}
+.box-btn>button:active {
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.5);
+}
 .btn-ready {
-  width: 300px;
-  height: 150px;
-  border: 10px solid #e0e0e0;
   background: #24cb83;
   color: white;
-  border-radius: 100px;
-  font-size: 40px;
+  font-size: 25px;
 }
+.btn-ready:hover {
+  background: #ddc300;
+  font-size: 30px;
+}
+.btn-ready:active {
+  background: #b49f00;
+}
+.btn-profile {
+  background: #C6C6C6;
+  color: white;
+  font-size: 20px;
+}
+.btn-profile:hover {
+  background: #b7b7b7;
+  font-size: 25px;
+}
+.btn-profile:active {
+  background: rgb(172, 172, 172);
+}
+
 #title {
   width: 100%;
   height: 20px;
