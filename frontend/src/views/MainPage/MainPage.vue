@@ -1,4 +1,7 @@
 <template>
+  <div class="background">
+    <div id="stars" class="rotating"></div>
+  </div>
   <div class="wrap-page">
     <MakeRoomDialog v-show="state.roomDialog" />
     <TutorialDialog v-show="state.tutorDialog" />
@@ -84,10 +87,6 @@ export default {
 </script>
 
 <style scoped>
-/* 공용 css */
-
-/* -------------- */
-
 .wrap-page {
   display: flex;
   flex-direction: column;

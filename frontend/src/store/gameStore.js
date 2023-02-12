@@ -191,6 +191,9 @@ const mutations = {
       var value = data.value
       state.userList[index].isPresenter = value
     },
+    setAmIDescriber: (state, data) => {
+      state.amIDescriber = data
+    },
     delUserinUserList: (state, data) => { // UserList에서 퇴장한 유저의 id 삭제
       state.userList.splice(data)
     },
@@ -487,7 +490,7 @@ const actions = {
             videoSource: undefined,
             publishAudio: true,
             publishVideo: true,
-            resolution: "640x480",
+            resolution: "640x360",
             frameRate: 30,
             insertMode: "APPEND",
             mirror: false, // Whether to mirror your local video or not
