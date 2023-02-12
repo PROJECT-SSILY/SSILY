@@ -1,20 +1,20 @@
 <template>
     <div>
-        <div id='chat-area'>
+        <div class='area-chat'>
             <div v-for="val in chat" v-bind:key="val.id">
-                <div v-if="val.user === nickname" class="mychat">
+                <div v-if="val.user === nickname" class="text-chat-me">
                     <div>{{ val.text }}</div>
                 </div>
-                <div v-else class="otherchat">
+                <div v-else class="text-chat-other">
                     <div>{{ val.user }} : {{ val.text }}</div>
                 </div>
             </div>
         </div>
-
-        <div class='chat_input'>
-            <input v-model='state.chattings' placeholder="input message.." @keyup.enter='sendMessage' type="text" class="message_input"/>
-            <button :disabled="!state.chattings" @click='sendMessage' type="submit" class="message_submit">Send</button>
+        <div class='group-chat'>
+            <input v-model='state.chattings' placeholder="input message.." @keyup.enter='sendMessage' type="text" class="input-chat"/>
+            <button :disabled="!state.chattings" @click='sendMessage' type="submit" class="btn-submit-chat">Send</button>
         </div>
+
     </div>
 </template>
 
@@ -70,34 +70,54 @@ export default {
 </script>
 
 <style>
-
-.mychat {
+.area-chat {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 5px 25px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.group-chat {
+    width: 100%;
+    height: 50px;
+    padding: 0 30px;
+    border-top: 1px solid #00000014;
+}
+.input-chat  {
+    width: 80%;
+}
+.btn-submit-chat {
+    width: 20%;
+    min-width: 80px;
+}
+.group-chat>button, .group-chat>input {
+    height: inherit;
+}
+.text-chat-me {
     border-radius: 10px;
     text-align: right;
     margin: 4px 0;
     display: flex;
     flex-direction: row-reverse;
 }
-.mychat>div {
+.text-chat-me>div {
     background: rgb(255, 217, 0);
     padding: 2px 10px;
     border-radius: 10px 10px 0 10px;
 }
-.otherchat {
+.text-chat-other {
     border-radius: 10px;
     text-align: left;
     margin: 4px 0;
     display: flex;
     flex-direction: row;
 }
-.otherchat>div {
-    background: rgb(2, 2, 2);
-    color: white;
+.text-chat-other>div {
+    background: rgb(234 234 234);
+    color: black;
     padding: 2px 10px;
     border-radius: 0 10px 10px 10px;
-}
-.chat_input {
-    padding-top: 10px;
-    margin-top: 10px;
 }
 </style>
