@@ -9,12 +9,12 @@
         >
           개인전
         </button>
-        <!-- <button
+        <button
           @click="state.isTeamBattle = true"
           :class="state.isTeamBattle ? 'active' : ''"
         >
           팀전
-        </button> -->
+        </button>
       </div>
       <div class="wrap-list">
         <RoomListItem
@@ -24,11 +24,11 @@
           @click="getInRoom(room)"
           class="list-item"
         />
-        <div
+        <!-- <div
           class="list-item blank"
           v-for="blank in 5 - state.roomlist.length"
           :key="blank"
-        ></div>
+        ></div> -->
         <div class="btn-paging">
           <button>PREV</button>
           <button>NEXT</button>

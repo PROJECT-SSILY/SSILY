@@ -761,14 +761,14 @@ const actions = {
       throw err;
     }
   },
-  randomPrivateAction: async (context, payload) => {
+  randomPrivateAction: async (context) => {
     try {
-      console.log(payload);
       const userInfo = {
-        isTeamBattle: payload.isTeamBattle,
+        isTeamBattle: false,
         level: context.rootState.accountStore.user.level,
         nickname: context.rootState.accountStore.user.nickname,
-        rate: "0.0",
+        rate: context.rootGetters["accountStore/getRate"],
+        exp: context.rootState.accountStore.user.exp
       };
       console.log(userInfo);
       const response = await randomPrivate(userInfo);

@@ -94,8 +94,6 @@ export default {
       if (state.form.isSecret) {
         if (!(/^\d{4}$/.test(state.form.password.value))) 
       {
-        console.log(state.form.password.value);
-        console.log(/^\d{4}$/.test(state.form.password.value));
         state.alert = false
         await store.commit('accountStore/setAlertColor', 'error')
         await store.commit('accountStore/setAlertMessage', '비밀번호는 4자리 숫자여야 합니다.')
