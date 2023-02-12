@@ -2,13 +2,7 @@ import $axios from "axios";
 
 const requestLogin = payload =>
 $axios.post("/api/auth/login", payload).catch(error => {
-if (error.response.status == 404) {
-    alert("존재하지 않는 아이디입니다.");
-}
-if (error.response.status == 401) {
-    alert("비밀번호를 확인하세요.");
-}
-return -100;
+return error.response.status
 });
 
 const requestRegister = payload => $axios.post("/api/member", payload); // 회원가입 요청
@@ -37,15 +31,14 @@ const requestMe = (token) => {
 //   return false;
 // });
 
-const sendNewPwAction = (payload) => {
-    return $axios.post("/api/member/password", payload)
-    .then(res => {
-        console.log(res.data.code)
-        return res.data.code
-    })
-    .catch(error => {
-        return error.response.data.code
-    });
+const sendNewPwAction = async (payload) => {
+    try {
+        const res = await $axios.post("/api/member/password", payload);
+        console.log(res.data.code);
+        return res.data.code;
+    } catch (error) {
+        return error.response.data.code;
+    }
 };
 
 const changeNickname = (token, payload) => {
@@ -74,11 +67,13 @@ const changePassword = (token, payload) => {
     $axios.put("/api/member/password", 
         params, {headers: {Authorization: `Bearer ${token}`}})
     .then(res => {
-    console.log('변경 완료');
-    console.log(res);
+        console.log("res is", res);
+        console.log("code = ", res.data.code)
+        return res.data.code
     })
     .catch(error => {
-        console.log(error)
+        console.log("error = ", error)
+        console.log("code : ", error.response.data.code);
         return error.response.data.code
     });
 }

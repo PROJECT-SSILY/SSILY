@@ -36,6 +36,7 @@ public class GameService   {
     static final int SUBMIT_ANSWER = 5;
 
     static final int FINISH_ROUND = 10;
+    static final int TIME_OVER_ROUND = 20;
     static final int FINISH_GAME = 100;
 
 
@@ -101,6 +102,9 @@ public class GameService   {
                 return;
             case FINISH_ROUND:
                 finishRound(participant, sessionId, participants, params, data);
+                return;
+            case TIME_OVER_ROUND:
+                timeOverRound(participant, sessionId, participants, params, data);
                 return;
             case FINISH_GAME:
                 finishGame(participant, sessionId, participants, params, data);
@@ -223,11 +227,11 @@ public class GameService   {
             curPresenterId=curParticipantList.get(0).getParticipantPublicId();
         } else{
             int prePresenterIndex=presenterIndex.get(sessionId);
-            int curPresenterIndex=(prePresenterIndex+1)%4;
+            int curPresenterIndex=(prePresenterIndex+1)%(curParticipantList.size());
             curParticipantList.get(prePresenterIndex).getPlayer().setPresenter(false);
             presenterIndex.put(sessionId, curPresenterIndex);
             curParticipantList.get(curPresenterIndex).getPlayer().setPresenter(true);
-            curPresenterId=curParticipantList.get(0).getParticipantPublicId();
+            curPresenterId=curParticipantList.get(curPresenterIndex).getParticipantPublicId();
         }
         data.addProperty("curPresenterId", curPresenterId);
         params.add("data", data);
@@ -294,7 +298,7 @@ public class GameService   {
         List<String> wordList=null;
 
         try {
-            String serverURL = "http://localhost:5000";
+            String serverURL = "http://localhost:5500";
             log.info("serverURL = {}", serverURL);
             url = new URL(serverURL+"/api/game/words");
             conn = (HttpURLConnection) url.openConnection();
@@ -355,7 +359,8 @@ public class GameService   {
         log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         Integer nowRound = round.get(sessionId);
-        String answer = words.get(sessionId).get(nowRound);
+//        String answer = words.get(sessionId).get(nowRound);
+        String answer = "바다(해변)";
 
         String answers = data.get("answer").toString();
         answers = answers.substring(4, answers.length()-4);
@@ -382,7 +387,7 @@ public class GameService   {
                 rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
                         ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
             }
-            finishRound(participant, sessionId, participants, params, data);
+//            finishRound(participant, sessionId, participants, params, data);
         }
     }
 
@@ -428,9 +433,46 @@ public class GameService   {
     }
 
     /**
-     * 서영탁
-     * 게임 종료
+     * 신대득
+     * 라운드 60초 지나면 처리 할 이벤트
+     * 이 신호는 방장만 보내는걸로 ! (방장만 조건이 없을경우 인원수만큼 발생할 수 있음.)
      */
+    private void timeOverRound(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data) {
+        log.info("timeOver is called by [{}]", participant.getPlayer());
+        if(!participant.getPlayer().isHost())
+            return;
+
+        int cnt = 0;
+        JsonObject playerJson = new JsonObject();
+        for (Participant p : participants) {
+            JsonObject player = new JsonObject();
+            player.addProperty("connectionId", p.getParticipantPublicId());
+            player.addProperty("score", p.getPlayer().getScore());
+            playerJson.add(String.valueOf(cnt), player);
+            cnt++;
+        }
+        data.add("player", playerJson);
+
+        data.addProperty("cnt", cnt);
+        // 라운드 증가
+        Integer nowRound = round.get(sessionId);
+        round.put(sessionId, nowRound+1);
+        data.addProperty("round", nowRound);
+
+        params.add("data", data);
+
+        // 라운드 종료 알라기
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
+
+        /**
+         * 서영탁
+         * 게임 종료
+         */
     private void finishGame(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
         log.info("finishGame is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
@@ -441,7 +483,7 @@ public class GameService   {
         // 우승자 첮가
         for (Participant p : participants) {
             int score = p.getPlayer().getScore();
-            p.getPlayer().initPlayerState();  // 상태 초기화 (다시 대기방으로 돌아가기 위해)
+            log.info("nickname = {}, score = {}", p.getPlayer().getNickname(), score);
             if(score >= max){
                 if(score > max) {
                     winner = new ArrayList<>();
@@ -450,6 +492,8 @@ public class GameService   {
                 winner.add(p);
             }
         }
+
+        log.info("winner.size = {}", winner.size());
 
         // 우승자 정보 json
         JsonObject winnerJson = new JsonObject();
@@ -462,6 +506,7 @@ public class GameService   {
             winnerJson.add(String.valueOf(winnerCnt), player);
 
             winnerNicknames.add(p.getPlayer().getNickname());
+            winnerCnt++;
         }
 
         data.add("winner", winnerJson);
@@ -484,6 +529,7 @@ public class GameService   {
 
             gameResult.add(String.valueOf(cnt), player);
             playerList.add(player);
+            cnt++;
         }
 
         // 백엔드 전송
@@ -500,6 +546,9 @@ public class GameService   {
         // TODO : 모든 자원 반납
 
 
+        for (Participant p : participants) {
+            p.getPlayer().initPlayerState();  // 상태 초기화 (다시 대기방으로 돌아가기 위해)
+        }
 
         if(ssilyThread != null){
             ssilyThread.interrupt();
@@ -558,22 +607,24 @@ public class GameService   {
         BufferedWriter bw = null;
 
         try{
-            String serverURL = PropertyConfig.getProperty("ssily.url");
+            String serverURL = "http://localhost:5500";
             URL url = new URL(serverURL+"/api/member/state");
 
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-            conn.setRequestMethod("POST"); // http 메서드
+
+            conn.setRequestMethod("PUT"); // http 메서드
             conn.setRequestProperty("Content-Type", "application/json"); // header Content-Type 정보
             conn.setDoInput(true); // 서버에 전달할 값이 있다면 true
-            conn.setDoOutput(false); // 서버로부터 받는 값이 있다면 true
+            conn.setDoOutput(true); // 서버로부터 받는 값이 있다면 true
 
             JSONObject requestBody = new JSONObject();
             requestBody.put("winner", winnerNicknames);
             requestBody.put("player", playerList);
 
-            bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8"));
-            bw.write(requestBody.toJSONString()); // 버퍼에 담기
-            bw.flush(); // 버퍼에 담긴 데이터 전달
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            out.write(requestBody.toJSONString());
+            out.close();
+            conn.getInputStream();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

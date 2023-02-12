@@ -4,8 +4,9 @@
 //     requestMe,
 //     requestId,
 //   } from "../common/api/accountAPI";
+import $axios from "axios";
 
-import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname, changePassword, deleteAccount } from "@/common/api/accountAPI";
+import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname, deleteAccount } from "@/common/api/accountAPI";
 
 const state = {
     token: localStorage.getItem('token') || null,
@@ -73,8 +74,10 @@ const actions = {
         // console.log("loginData : ", loginData);
         const response = await requestLogin(loginData);
         // console.log("response : ", response);
-        if (response == -100) {
-          return -100;
+        if (response == 404) {
+          return 404;
+        } else if (response == 401) {
+          return 401
         }
         await commit("setToken", response.data.data.accessToken);
         localStorage.setItem('token', state.token)
@@ -146,7 +149,7 @@ const actions = {
     },
     changeNicknameAction: async (context, nickname) => {
         try {
-            const response = await changeNickname(context.state.token, nickname)
+            const response = changeNickname(context.state.token, nickname)
             return response
         } catch (err) {
             console.log(err)
@@ -154,15 +157,31 @@ const actions = {
         }
     },
     changePasswordAction: async (context, payload) => {
-        try {
-            console.log("비밀번호", payload)
-            const response = await changePassword(context.state.token, payload)
-            console.log("store에서 보냈다")
-            return response
-        } catch (err) {
-            console.log(err)
-            throw err;
+          try {
+            const params = { 
+                oldPassword : payload.oldPassword,
+                newPassword : payload.newPassword 
+            }
+            const res = await $axios.put("/api/member/password", 
+            params, {headers: {Authorization: `Bearer ${context.state.token}`}})
+            console.log(res);
+            return res.data.code
+        } catch(err) {
+            return err.response.data.code
         }
+        // .then(res => {
+        //     console.log("res is", res);
+        //     console.log("code = ", res.data.code)
+        //     return res.data.code
+        // })
+        // .catch(error => {
+        //     console.log("error = ", error)
+        //     console.log("errorcode : ", error.response.data.code);
+        //     return error.response.data.code
+        // });
+      
+
+        
     },
     deleteAction: async (context) => {
         try {

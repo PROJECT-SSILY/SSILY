@@ -2,9 +2,9 @@
   <div class="background">
     <div id="stars" class="rotating">
     </div>
-    <div id="contents">
-      <router-view/>
-    </div>
+  </div>
+  <div id="contents">
+    <router-view/>
   </div>
 </template>
 
@@ -15,6 +15,7 @@
 </script>
 
 <style>
+@import '@/assets/css/base.css';
 @font-face {
   font-family: 'MaplestoryOTFBold';
   src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/MaplestoryOTFBold.woff') format('woff');
@@ -28,16 +29,17 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  width: 100vw;
 }
 .background{
-  width: 100%;
+  width: 100vw;
   background: linear-gradient(rgba(12,111,202,1), rgba(38,0,111,1));
   opacity: 1;
   height: 100vh;
   overflow: hidden;
   background-size: cover;
   background-position: center;
-  position: relative;
+  position: absolute;
 }
 #stars{
   position: relative;
@@ -62,12 +64,14 @@
 
 #contents {
   height: 100%;
-  position: absolute;
-  width: 100%;
-  left: 0;
-  top: 0;
+    width: 100vw;
+    position: fixed;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 0;
+    left: 0;
+    top: 0;
 }
-
 nav {
   padding: 30px;
 }

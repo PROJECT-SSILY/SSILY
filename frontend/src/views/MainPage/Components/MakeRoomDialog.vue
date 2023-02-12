@@ -1,213 +1,144 @@
 <template>
-  <div class="text-center">
-    <v-dialog
-      v-model="state.dialog"
-      class="dialog"
-      width="500"
-    >
-      <template v-slot:activator="{ attrs }">
-        <v-img 
-          v-bind="attrs"
-          @click.stop="state.dialog = true" 
-          class="tutorial-planet" 
-          src="../../../../public/planet-11.svg"
-          >
-        </v-img>
-      </template>
-      <v-card class="formbox">
-        <v-card-title class="card-title">
-          방 만들기
-        </v-card-title>
-        <v-form
-        ref="form"
-        v-model="valid"
-        lazy-validation
-        >
-          <div id="join" v-if="!state.session">
-            <div id="join-dialog" class="jumbotron vertical-center">
-              <div class="form-group">
-                <v-text-field
-                v-model="state.title"
-                class="form-control"
-                label="방 제목"
-                type="text"
-                required></v-text-field>
-              </div>
-            </div>
-          </div>
-          <v-radio-group
-            v-model="state.isTeamBattle"
-            inline
-          >
-            <v-radio
-              label="팀전"
-              color="orange darken-3"
-              :value="true"
-            ></v-radio>
-            <v-radio
-              label="개인전"
-              color="orange darken-3"
-              :value="false"
-            ></v-radio>
-          </v-radio-group>
-          <v-radio-group
-            v-model="state.isSecret"
-            inline
-          >
-            <v-radio
-              label="공개"
-              color="orange darken-3"
-              :value="false"
-            ></v-radio>
-            <v-radio
-              label="비공개"
-              color="orange darken-3"
-              :value="true"
-            ></v-radio>
-          </v-radio-group>
+  <div class="wrap-dialog">
+  <div class="dialog">
+    <div class="tit-dialog">방 만들기</div>
+    <v-form ref="form" v-model="valid" @submit.prevent="joinSession">
+        <div class="form-group">
           <v-text-field
-            v-if="state.isSecret == true"
-            label="비밀번호 숫자 4자리를 입력하세요."
-            hide-details="auto"
-            v-model="state.password"
+            v-model="state.title"
+            class="inp-txt form-control"
+            label="방 제목"
+            type="text"
+            required
           ></v-text-field>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <p class="text-center">
-              <v-btn
-              @click="joinSession()">Join!</v-btn>
-            </p>
-          </v-card-actions>
-      </v-form>
-      </v-card>
-    </v-dialog>
+      </div>
+      <v-radio-group v-model="state.isTeamBattle" inline>
+        <v-radio label="팀전" color="orange darken-3" :value="true"></v-radio>
+        <v-radio
+          label="개인전"
+          color="orange darken-3"
+          :value="false"
+        ></v-radio>
+      </v-radio-group>
+      <v-radio-group v-model="state.isSecret" inline>
+        <v-radio label="공개" color="orange darken-3" :value="false"></v-radio>
+        <v-radio label="비공개" color="orange darken-3" :value="true"></v-radio>
+      </v-radio-group>
+      <v-text-field
+        v-if="state.isSecret == true"
+        label="비밀번호 숫자 4자리를 입력하세요."
+        hide-details="auto"
+        v-model="state.password"
+      ></v-text-field>
+      <button type="submit" class="btn-dialog">완료</button>
+    </v-form>
   </div>
+</div>
 </template>
 
 <script>
-  import { useRouter } from 'vue-router'
-  import { onUpdated, reactive } from 'vue'
-  import { useStore } from 'vuex'
-  // import { computed } from 'vue'
-  import $axios from "axios";
-// import { on } from 'events';
-  // import {RotateSquare2} from 'vue-loading-spinner'
+import { useRouter } from "vue-router";
+import { onUpdated, reactive } from "vue";
+import { useStore } from "vuex";
+import $axios from "axios";
 
-  $axios.defaults.headers.post['Content-Type'] = 'application/json';
-  // const OPENVIDU_SERVER_URL = "https://localhost:4443";
-  // const OPENVIDU_SERVER_SECRET = "MY_SECRET";
+$axios.defaults.headers.post["Content-Type"] = "application/json";
 
-  export default {
-    components: {
-      // RotateSquare2
-    },
-    setup() {
-      const router = useRouter()
-      const store = useStore()
-      const state = reactive({
-        // isLoading: false,
-        dialog: false,
-        title: null,
-        isSecret : false,
-        password : null,
-        isTeamBattle : false,
-      })
-      onUpdated(() => {
-        // 방 타이틀 랜덤 생성
-        const titlelist = ['함께 즐겨요', '재미있는 게임 합시다', '매너있는 게임하실 분 구해요!', '스겜합시다!']
-        state.title = titlelist[Math.floor(Math.random() * titlelist.length)]
-      })
+export default {
+  components: {
+    // RotateSquare2
+  },
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+    const state = reactive({
+      title: null,
+      isSecret: false,
+      password: null,
+      isTeamBattle: false,
+    });
+    onUpdated(() => {
+      // 방 타이틀 랜덤 생성
+      const titlelist = [
+        "함께 즐겨요",
+        "재미있는 게임 합시다",
+        "매너있는 게임하실 분 구해요!",
+        "스겜합시다!",
+        "어서 들어오세요!",
+      ];
+      state.title = titlelist[Math.floor(Math.random() * titlelist.length)];
+    });
 
-      const joinSession = async function() {
-        // console.log("state.title : ", state.title);
-        // console.log("state.isSecret : ", state.isSecret);
-        // console.log("state.password : ", state.password);
-        // console.log("state.isTeamBattle : ", state.isTeamBattle);
-        store.commit('gameStore/setTitle', state.title)
-        store.commit('gameStore/setSecret', state.isSecret)
-        store.commit('gameStore/setPassword', state.password)
-        store.commit('gameStore/setTeam', state.isTeamBattle)
+    const joinSession = async function () {
+      store.commit("gameStore/setTitle", state.title);
+      store.commit("gameStore/setSecret", state.isSecret);
+      store.commit("gameStore/setPassword", state.password);
+      store.commit("gameStore/setTeam", state.isTeamBattle);
 
-        // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
-        const sessionId = await store.dispatch('gameStore/createSession')
-        console.log("sessionId : ", sessionId)
-        router.push({name: 'gameroom', params: { sessionId : sessionId }})
-        // router.push({name: 'gameroom'})
-      }
+      // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
+      const sessionId = await store.dispatch("gameStore/createSession");
+      console.log("sessionId : ", sessionId);
+      router.push({ name: "gameroom", params: { sessionId: sessionId } });
+    };
 
-      // const createSession = () => {
-      //     let sessionId = null
-      //     return new Promise((resolve, reject) => {
-      //         $axios
-      //         .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
-      //         "title" : state.title,
-      //         "isSecret" : state.isSecret,
-      //         "password" : state.password,
-      //         "isTeamBattle" : state.isTeamBattle
-      //         }), {
-      //             auth: {
-      //                 username: 'OPENVIDUAPP',
-      //                 password: OPENVIDU_SERVER_SECRET,
-      //             },
-      //         })
-      //         .then(response => response.data)
-      //         .then(data => {
-      //             resolve(data.id)
-      //         })
-      //         .catch(error => {
-      //             if (error.response.status === 409) {
-      //                 resolve(sessionId);
-      //             } else {
-      //                 console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
-      //                 if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
-      //                     location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
-      //                 }
-      //                 reject(error.response);
-      //             }
-      //         });
-      //     });
-      // }
-
-      return {
-        router,
-        state,
-        joinSession,
-        // createSession,
-        // == OpenVidu State ==
-        // OV,
-        // session,
-        // mainStreamManager,
-        // publisher,
-        // subscribers,
-        // mySessionId,
-        // myUserName,
-        // =====================
-      }
-    }
-  }
+    return {
+      router,
+      state,
+      joinSession,
+    };
+  },
+};
 </script>
 
 <style scoped>
-.tutorial-planet {
-  font-family: 'Akronim', cursive;
+.dialog {
+  height: 100%;
+  max-height: 500px;
+  width: 500px;
+}
+.btn-dialog {
+  background: #24CB83;
+  color: #FFFFFF;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* ================ */
+/* .tutorial-planet {
+  font-family: "Akronim", cursive;
   font-size: 2rem;
   height: 8rem;
-  display : flex;
-  justify-content : center;
-  align-items : center;
-  color:white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
   transform: translate(-9px, -15px);
 }
 @keyframes shake-tutorial-planet {
-  0% { transform: translate(-8px, -14px); }
-  33% { transform: translate(-10px, -14px); }
-  66% { transform: translate(-10px, -16px); }
-  100% { transform: translate(-8px, -16px); }
+  0% {
+    transform: translate(-8px, -14px);
+  }
+  33% {
+    transform: translate(-10px, -14px);
+  }
+  66% {
+    transform: translate(-10px, -16px);
+  }
+  100% {
+    transform: translate(-8px, -16px);
+  }
 }
 
 .tutorial-planet:hover {
-  animation: shake-tutorial-planet .1s infinite alternate;
+  animation: shake-tutorial-planet 0.1s infinite alternate;
 }
 
 .formbox {
@@ -216,8 +147,8 @@
   width: 100%;
   border-radius: 20px;
   opacity: 100%;
-  font-family: 'MaplestoryOTFBold';
+  font-family: "MaplestoryOTFBold";
   font-weight: normal;
   font-style: normal;
-}
+} */
 </style>
