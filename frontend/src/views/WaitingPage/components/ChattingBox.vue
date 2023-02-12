@@ -1,17 +1,17 @@
 <template>
     <div>
-    <div id='chat-area'>
-        <div v-for="val in chat" v-bind:key="val.id">
-            <div v-if="val.user === nickname" class="mychat">
-                <div>{{ val.text }}</div>
-            </div>
-            <div v-else class="otherchat">
-                <div>{{ val.user }} : {{ val.text }}</div>
-            </div>
+        <div id='chat-area'>
+            <div v-for="val in chat" v-bind:key="val.id">
+                <div v-if="val.user === nickname" class="mychat">
+                    <div>{{ val.text }}</div>
+                </div>
+                <div v-else class="otherchat">
+                    <div>{{ val.user }} : {{ val.text }}</div>
+                </div>
             </div>
         </div>
 
-    <div class='chat_input'>
+        <div class='chat_input'>
             <input v-model='state.chattings' placeholder="input message.." @keyup.enter='sendMessage' type="text" class="message_input"/>
             <button :disabled="!state.chattings" @click='sendMessage' type="submit" class="message_submit">Send</button>
         </div>
@@ -27,11 +27,6 @@ import { watch } from 'vue'
 // watch,
 export default {
     name:'ChattingBox',
-    
-    // props:{
-    //     session: Object,
-    // },
-    
     setup() {
         const store = useStore()
         const chat = computed(() => store.state.gameStore.chat);
@@ -102,7 +97,6 @@ export default {
     border-radius: 0 10px 10px 10px;
 }
 .chat_input {
-    border-top: 1px solid gray;
     padding-top: 10px;
     margin-top: 10px;
 }
