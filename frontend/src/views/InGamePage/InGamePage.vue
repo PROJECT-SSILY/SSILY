@@ -34,7 +34,7 @@
         <ChattingBox class="box-chat"/>
         <div class="box-btn">
           <div class="box-blank"></div>
-          <button class="btn-ready" :class="state.ready?'ready':''" @Click="clickReady">READY</button>
+          <button class="btn-ready" :class="state.ready?'ready':''" @click="clickReady">READY</button>
         </div>
       </div>
       <footer>
@@ -249,7 +249,9 @@ export default {
       //   }
       // }
       store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
+      console.log("여기까지")
       await store.dispatch("gameStore/joinSession", state.sessionId);
+      console.log("여기까지 완료")
     };
     const leaveSession = async function () {
       store.dispatch("gameStore/leaveSession");
@@ -274,6 +276,7 @@ export default {
     };
 
     const clickReady = () => {
+      console.log("ready")
       store.dispatch("gameStore/changeReady");
     };
 

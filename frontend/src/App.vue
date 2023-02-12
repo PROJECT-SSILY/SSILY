@@ -62,14 +62,6 @@
   }
 }
 
-#contents {
-  height: 100%;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
 nav {
   padding: 30px;
 }
