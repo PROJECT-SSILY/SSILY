@@ -93,10 +93,10 @@ export default {
         router.push('login')
       } else {
         state.alert = false
-          await store.commit('accountStore/setAlertColor', 'error')
-          await store.commit('accountStore/setAlertMessage', '일치하는 사용자 정보가 없습니다.')
-          await store.commit('accountStore/setAlertIcon', 'alert')
-          state.alert = true
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '일치하는 사용자 정보가 없습니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
       }
     }
     return {

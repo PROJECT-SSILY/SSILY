@@ -8,6 +8,7 @@ import MainPage from '../views/MainPage/MainPage.vue'
 import FindPassword from '../views/Accounts/FindPassword.vue'
 import InGamePage from '../views/InGamePage/InGamePage.vue'
 import accountStore from '@/store/accountStore'
+import GameResult from '@/views/InGamePage/components/GameResult.vue'
 
 const requireAuth = () => (to, from, next) => {
   const token = accountStore.state.token
@@ -77,6 +78,12 @@ const routes = [
     name: 'gameroom',
     component: InGamePage,
     beforeEnter: requireAuth()
+  },
+  // 테스트 위해서 등록 -> merge할때는 지우기 !!
+  {
+    path: '/gameresult',
+    name: 'gameresult',
+    component: GameResult,
   },
   // {
   //   path: '/about',
