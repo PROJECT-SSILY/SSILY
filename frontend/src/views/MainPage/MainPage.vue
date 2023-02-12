@@ -26,7 +26,7 @@
         </div>
         <div class="sec-btn">
           <button @click="state.roomDialog = !state.roomDialog">방 만들기</button>
-          <button>바로 입장</button>
+          <button @click="randomPrivate">바로 입장</button>
           <button @click="state.tutorDialog = !state.tutorDialog">튜토리얼</button>
         </div>
       </aside>
@@ -41,6 +41,7 @@ import RoomList from "./Components/RoomList.vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { computed, reactive, onMounted } from "vue";
+
 
 export default {
   name: "MainPage",
@@ -67,6 +68,15 @@ export default {
       state.settingDialog = false;
     };
 
+    const randomPrivate = async function () {
+      const response = await store.dispatch('gameStore/randomPrivateAction')
+      console.log('response : ', response)
+      router.push({
+        name: "gameroom",
+        params: { sessionId: response.sessionId },
+      });
+    };
+
     onMounted(() => 
       store.dispatch('accountStore/getMeAction') // 메인페이지에서 닉네임 사라지지 않도록 처리
     )
@@ -77,6 +87,7 @@ export default {
       router,
       state,
       closeDialog,
+      randomPrivate
     };
   },
 };
