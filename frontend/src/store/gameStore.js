@@ -36,14 +36,15 @@ const state = {
     amIDescriber: false,
     winnerNickname: '', // [라운드 결과] 승리 유저
     winnerId: '',
-    round: 1, // 현재 라운드
+    round: 0, // 현재 라운드
     answer: '',
     presenterId: null,
     sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
     endRound: false, // [라운드 결과] 라운드 끝났을 때 true, 라운드 진행중일 때 false
     winnerList: [], // [게임 결과] 승리 유저 리스트
     gameResult: [], // [게임 결과] 유저 리스트 (key: connectionId, extraExp, levelUp, nickname)
-    endGame: false // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
+    endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
+    isTimeOut: false,
 }
 
 const getters = {
@@ -207,7 +208,7 @@ const mutations = {
     },
      
     setRound: (state, data) => {
-      state.round = (data + 1)
+      state.round = data
     },
 
     setAnswer: (state, data) => {
@@ -235,9 +236,11 @@ const mutations = {
     setGameResult: (state, data) => { // 게임 결과 리스트
       state.gameResult = data
     },
-
     setEndGame: (state, data) => {
       state.endGame = data
+    },
+    setIsTimeOut: (state, data) => {
+      state.isTimeOut = data
     }
 };
 
@@ -435,6 +438,20 @@ const actions = {
               }}}
           // 라운드를 8번 돌면 게임을 종료한다.
           if ( event.data.round == 8 && maxScoreUser == state.myConnectionId) {
+            context.dispatch('finishGame')
+          }
+          break
+        }
+        case 20: {
+          console.log('20번 시그널 수신 - 시간초과')
+          console.log(event.data)
+          context.commit('setRound', event.data.round)
+          context.commit('setIsTimeOut', true)
+          if (event.data.round != 8) {
+            context.commit('setEndRound', true)
+          }
+          // 라운드를 8번 돌면 게임을 종료한다.
+          if ( event.data.round == 8 && state.isHost == true) {
             context.dispatch('finishGame')
           }
           break
@@ -844,7 +861,22 @@ const actions = {
   },
   changeRoundEnd : (context, data) => {
     context.commit("setEndRound", data);
+  },
+  // 시간 초과 시 라운드 종료 시그널 - 수연
+  timeOverRound: () => {
+    try {
+      state.session.signal({
+        type: "game",
+        data: {
+          gameStatus: 20,
+        },
+        to: [],
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
+
 };
 export default {
   namespaced: true,
