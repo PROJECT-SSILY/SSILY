@@ -10,42 +10,42 @@ const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 import { randomTeam, randomPrivate } from "@/common/api/gameAPI";
 
 const state = {
-    title: null,
-    isSecret: false,
-    password: null,
-    isTeamBattle: null,
-    isTeam: null,
-    OV: undefined,
-    session: null,
-    mainStreamManager: undefined,
-    publisher: undefined,
-    subscribers: [],
-    sessionId: null,
-    myUserName: '',
-    isHost: false,
-    playerList: undefined,
-    messages: [],
-    media: 0.5,
-    alarm: 0.5,
-    audio: new Audio(require('../../public/Superhuman.mp3')),
-    isAllReady: false,
-    userList: [],
-    userKey: [],
-    chat: [],
-    myConnectionId: null,
-    amIDescriber: false,
-    winnerNickname: '', // [라운드 결과] 승리 유저
-    winnerId: '',
-    round: 0, // 현재 라운드
-    answer: '',
-    presenterId: null,
-    sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
-    endRound: false, // [라운드 결과] 라운드 끝났을 때 true, 라운드 진행중일 때 false
-    winnerList: [], // [게임 결과] 승리 유저 리스트
-    gameResult: [], // [게임 결과] 유저 리스트 (key: connectionId, extraExp, levelUp, nickname)
-    endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
-    isTimeOut: false,
-}
+  title: null,
+  isSecret: false,
+  password: null,
+  isTeamBattle: null,
+  isTeam: null,
+  OV: undefined,
+  session: null,
+  mainStreamManager: undefined,
+  publisher: undefined,
+  subscribers: [],
+  sessionId: null,
+  myUserName: "",
+  isHost: false,
+  playerList: undefined,
+  messages: [],
+  media: 0.5,
+  alarm: 0.5,
+  audio: new Audio(require("../../public/Superhuman.mp3")),
+  isAllReady: false,
+  userList: [],
+  userKey: [],
+  chat: [],
+  myConnectionId: null,
+  amIDescriber: false,
+  winnerNickname: "", // [라운드 결과] 승리 유저
+  winnerId: "",
+  round: 0, // 현재 라운드
+  answer: "",
+  presenterId: null,
+  sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
+  endRound: false, // [라운드 결과] 라운드 끝났을 때 true, 라운드 진행중일 때 false
+  winnerList: [], // [게임 결과] 승리 유저 리스트
+  gameResult: [], // [게임 결과] 유저 리스트 (key: connectionId, extraExp, levelUp, nickname)
+  endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
+  isTimeOut: false,
+};
 
 const getters = {
   getTeam: (state) => {
@@ -67,25 +67,28 @@ const getters = {
     return state.chat;
   },
   getPresenterId: (state) => {
-    return state.presenterId
+    return state.presenterId;
   },
   // 우리편 팀원들을 골라서 뽑아내는 메서드
   getMyTeams: (state) => {
     const res = [];
     if (state.isTeamBattle) {
-        state.subscribers.forEach(sub => {
-          const connectionId = sub.stream.connection.connectionId
-          console.log("sub.stream.connection.connectionId : ", sub.stream.connection.connectionId) // 각 sub들의 connectionId
-          state.userList.forEach(user => {
-            if(user.connectionId === connectionId && user.team === state.team){
-              res.push(sub)
-            }
-          })
-        })
-        return res;
-      } else {
-        return []
-      }
+      state.subscribers.forEach((sub) => {
+        const connectionId = sub.stream.connection.connectionId;
+        console.log(
+          "sub.stream.connection.connectionId : ",
+          sub.stream.connection.connectionId
+        ); // 각 sub들의 connectionId
+        state.userList.forEach((user) => {
+          if (user.connectionId === connectionId && user.team === state.team) {
+            res.push(sub);
+          }
+        });
+      });
+      return res;
+    } else {
+      return [];
+    }
   },
 
   // 상대편 팀원들을 골라서 뽑아내는 메서드
@@ -100,148 +103,152 @@ const getters = {
     //     // if(connectionId == )
     //   })
     // }
-    return state.subscribers
+    return state.subscribers;
   },
 };
 
 const mutations = {
-    setTitle: (state, data) => {
-        state.title = data
-        console.log('set적용되는지확인' + state.title);
-    },
-    setSecret: (state, payload) => {
-        state.isSecret = payload
-    },
-    setPassword: (state, payload) => {
-        state.password = payload
-    },
-    setTeam: (state, payload) => {
-        state.isTeamBattle = payload
-        console.log('set적용되는지확인' + state.isTeamBattle);
-    },
-    setOV: (state, data) => {
-        state.OV = data;
-    },
-    setSession: (state, data) => {
-        state.session = data;
-    },
-    SET_PUBLISHER (state, data) {
-        state.publisher = data
-    },
-    setMainStreamManager: (state, data) => {
-        state.mainStreamManager = data;
-    },
-    setSubscribers: (state, data) => {
-        state.subscribers = data;
-    },
-    setSessionId: (state, id) => {
-        state.sessionId = id;
-    },
-    setMyUserName: (state, name) => {
-        state.myUserName = name;
-    },
-    changeMode: (state) => {
-      state.isTeam = !state.isTeam
-    },
-    setPlayerList: (state, data) => {
-        state.playerList = data
-    },
-    setVolume1: (state, volume) => {
-      state.media = volume
-    },
-    setVolume2: (state, volume) => {
-      state.alarm = volume
-    },
-    SET_MESSAGES: (state, data) => {
-        state.messages = data
-    },
-    setChat: (state, data) => {
-      state.chat.push(data)
-    },
-    setUserList: (state, data) => {
-      state.userList.push(data)
-    },
-    setClearUserList: (state) => {
-      state.userList = []
-    },
-    setIsAllReady: (state, data) => {
-      console.log('setIsAllReady 찍힘', data)
-      state.isAllReady = data
-    },
-    setUserKey: (state, data) => {
-      state.userKey.push(data)
-    },
-    setClearUserKey: (state) => {
-      state.userKey = []
-    },
-    setReady: (state, data) => {
-      console.log('data:', data)
-      var index = data.index
-      var ready = data.ready
-      state.userList[index].isReady = ready
-    },
-    setIsHost: (state, data) => {
-      state.isHost = data
-    },
-    setMyConnectionId: (state, data) => {
-      state.myConnectionId = data
-    },
-    setIsPresenter: (state, data) => {
-      var index = data.index
-      var value = data.value
-      state.userList[index].isPresenter = value
-    },
-    delUserinUserList: (state, data) => { // UserList에서 퇴장한 유저의 id 삭제
-      state.userList.splice(data)
-    },
-    delUserinUserKey: (state, data) => { // UserKey에서 퇴장한 유저의 id 삭제 - 이은혁
-      state.userKey.splice(data)
-    },
+  setTitle: (state, data) => {
+    state.title = data;
+    console.log("set적용되는지확인" + state.title);
+  },
+  setSecret: (state, payload) => {
+    state.isSecret = payload;
+  },
+  setPassword: (state, payload) => {
+    state.password = payload;
+  },
+  setTeam: (state, payload) => {
+    state.isTeamBattle = payload;
+    console.log("set적용되는지확인" + state.isTeamBattle);
+  },
+  setOV: (state, data) => {
+    state.OV = data;
+  },
+  setSession: (state, data) => {
+    state.session = data;
+  },
+  SET_PUBLISHER(state, data) {
+    state.publisher = data;
+  },
+  setMainStreamManager: (state, data) => {
+    state.mainStreamManager = data;
+  },
+  setSubscribers: (state, data) => {
+    state.subscribers = data;
+  },
+  setSessionId: (state, id) => {
+    state.sessionId = id;
+  },
+  setMyUserName: (state, name) => {
+    state.myUserName = name;
+  },
+  changeMode: (state) => {
+    state.isTeam = !state.isTeam;
+  },
+  setPlayerList: (state, data) => {
+    state.playerList = data;
+  },
+  setVolume1: (state, volume) => {
+    state.media = volume;
+  },
+  setVolume2: (state, volume) => {
+    state.alarm = volume;
+  },
+  SET_MESSAGES: (state, data) => {
+    state.messages = data;
+  },
+  setChat: (state, data) => {
+    state.chat.push(data);
+  },
+  setUserList: (state, data) => {
+    state.userList.push(data);
+  },
+  setClearUserList: (state) => {
+    state.userList = [];
+  },
+  setIsAllReady: (state, data) => {
+    console.log("setIsAllReady 찍힘", data);
+    state.isAllReady = data;
+  },
+  setUserKey: (state, data) => {
+    state.userKey.push(data);
+  },
+  setClearUserKey: (state) => {
+    state.userKey = [];
+  },
+  setReady: (state, data) => {
+    console.log("data:", data);
+    var index = data.index;
+    var ready = data.ready;
+    state.userList[index].isReady = ready;
+  },
+  setIsHost: (state, data) => {
+    state.isHost = data;
+  },
+  setMyConnectionId: (state, data) => {
+    state.myConnectionId = data;
+  },
+  setIsPresenter: (state, data) => {
+    var index = data.index;
+    var value = data.value;
+    state.userList[index].isPresenter = value;
+  },
+  delUserinUserList: (state, data) => {
+    // UserList에서 퇴장한 유저의 id 삭제
+    state.userList.splice(data);
+  },
+  delUserinUserKey: (state, data) => {
+    // UserKey에서 퇴장한 유저의 id 삭제 - 이은혁
+    state.userKey.splice(data);
+  },
 
-    // 정답페이지 관련
-    setWinnerNickname: (state, data) => {
-      state.winnerNickname = data
-    },
+  // 정답페이지 관련
+  setWinnerNickname: (state, data) => {
+    state.winnerNickname = data;
+  },
 
-    setWinnerId: (state, data) => {
-      state.winnerId = data
-    },
-     
-    setRound: (state, data) => {
-      state.round = data
-    },
+  setWinnerId: (state, data) => {
+    state.winnerId = data;
+  },
 
-    setAnswer: (state, data) => {
-      state.answer = data
-    },
+  setRound: (state, data) => {
+    state.round = data;
+  },
 
-    setUserScore: (state, data) => {
-      var index = data.index
-      var value = data.value
-      state.userList[index].score = value
-    },
-    setPresenterId: (state, data) => {
-      console.log('여기까지 왔음?')
-      state.presenterId = data
-    },
-    setSortedUserList: (state, data) => {
-      state.sortedUserList = data
-    },
-    setEndRound: (state, data) => {
-      state.endRound = data
-    },
-    setWinnerList: (state, data) => { // 게임 승리 유저 리스트
-      state.winnerList = data
-    },
-    setGameResult: (state, data) => { // 게임 결과 리스트
-      state.gameResult = data
-    },
-    setEndGame: (state, data) => {
-      state.endGame = data
-    },
-    setIsTimeOut: (state, data) => {
-      state.isTimeOut = data
-    }
+  setAnswer: (state, data) => {
+    state.answer = data;
+  },
+
+  setUserScore: (state, data) => {
+    var index = data.index;
+    var value = data.value;
+    state.userList[index].score = value;
+  },
+  setPresenterId: (state, data) => {
+    console.log("여기까지 왔음?");
+    state.presenterId = data;
+  },
+  setSortedUserList: (state, data) => {
+    state.sortedUserList = data;
+  },
+  setEndRound: (state, data) => {
+    state.endRound = data;
+  },
+  setWinnerList: (state, data) => {
+    // 게임 승리 유저 리스트
+    state.winnerList = data;
+  },
+  setGameResult: (state, data) => {
+    // 게임 결과 리스트
+    state.gameResult = data;
+  },
+  setEndGame: (state, data) => {
+    state.endGame = data;
+  },
+  setIsTimeOut: (state, data) => {
+    state.isTimeOut = data;
+  },
 };
 
 const actions = {
@@ -319,12 +326,12 @@ const actions = {
       switch (event.data.gameStatus) {
         // 설명자 부여
         case 0: {
-          console.log('0번 시그널 수신 완료')
-          const PresenterId = event.data.curPresenterId
-          console.log('=========================')
-          context.commit("setPresenterId", PresenterId) // 현재 설명자 id 저장 - 이은혁
-          console.log('curPresenterId : ', event.data.curPresenterId)
-          for (var n=0; n < state.userList.length; n++ ) {
+          console.log("0번 시그널 수신 완료");
+          const PresenterId = event.data.curPresenterId;
+          console.log("=========================");
+          context.commit("setPresenterId", PresenterId); // 현재 설명자 id 저장 - 이은혁
+          console.log("curPresenterId : ", event.data.curPresenterId);
+          for (var n = 0; n < state.userList.length; n++) {
             if (state.userList[n].connectionId == PresenterId) {
               context.commit("setIsPresenter", { index: n, value: true });
             } else {
@@ -393,93 +400,97 @@ const actions = {
         }
         case 5: {
           // 정답 제출 ( sendTopFive ) - 정답이면 응답 옴!
-          console.log('5번 시그널 수신 완료')
-          console.log('5번 data : ', event.data)
-          context.commit('setAnswer', event.data.answer)
-          context.commit('setWinnerId', event.data.winnerId)
-          context.commit('setWinnerNickname', event.data.winnerNickname)
+          console.log("5번 시그널 수신 완료");
+          console.log("5번 data : ", event.data);
+          context.commit("setAnswer", event.data.answer);
+          context.commit("setWinnerId", event.data.winnerId);
+          context.commit("setWinnerNickname", event.data.winnerNickname);
           //context.commit('setRound', event.data.round)
-          var winnerId = event.data.winnerId
+          var winnerId = event.data.winnerId;
           // => 여기서 정답자가 10번, 0번 신호 보낸다.
           if (winnerId == state.myConnectionId) {
-            context.dispatch('finishRound')
+            context.dispatch("finishRound");
           }
-          break
+          break;
         }
         case 10: {
           // 라운드별 경험치 누적
-          console.log('10번 시그널 수신 - 라운드 끝')
-          var scoreList = event.data.player
-          console.log('10번 event data : ',event.data)
-          context.commit('setRound', event.data.round)
-          var maxScore = -1
-          var maxScoreUser = undefined
-          for (var x=0;state.userList.length>x; x++) {
+          console.log("10번 시그널 수신 - 라운드 끝");
+          var scoreList = event.data.player;
+          console.log("10번 event data : ", event.data);
+          context.commit("setRound", event.data.round);
+          var maxScore = -1;
+          var maxScoreUser = undefined;
+          for (var x = 0; state.userList.length > x; x++) {
             // userList 에 score 정보 경신
-            for (var y=0; state.userList.length>y; y++) {
+            for (var y = 0; state.userList.length > y; y++) {
               if (scoreList[x].connectionId == state.userList[y].connectionId) {
                 if (scoreList[x].score > maxScore) {
-                  maxScore = scoreList[x].score
-                  maxScoreUser = scoreList[x].connectionId
-                  console.log('최고점 : ', maxScore,  maxScoreUser)
+                  maxScore = scoreList[x].score;
+                  maxScoreUser = scoreList[x].connectionId;
+                  console.log("최고점 : ", maxScore, maxScoreUser);
                 }
-                context.commit('setUserScore', {index: y, value: scoreList[x].score})
-                var sortList = state.userList
+                context.commit("setUserScore", {
+                  index: y,
+                  value: scoreList[x].score,
+                });
+                var sortList = state.userList;
                 sortList.sort((a, b) => {
                   if (a.score > b.score) return -1;
                   if (a.score < b.score) return 1;
                   return 0;
                 });
-                context.commit('setSortedUserList', sortList)
+                context.commit("setSortedUserList", sortList);
                 if (event.data.round != 8) {
-                  context.commit('setEndRound', true)
+                  context.commit("setEndRound", true);
                 }
-                break
-              }}}
-          // 라운드를 8번 돌면 게임을 종료한다.
-          if ( event.data.round == 8 && maxScoreUser == state.myConnectionId) {
-            context.dispatch('finishGame')
+                break;
+              }
+            }
           }
-          break
+          // 라운드를 8번 돌면 게임을 종료한다.
+          if (event.data.round == 8 && maxScoreUser == state.myConnectionId) {
+            context.dispatch("finishGame");
+          }
+          break;
         }
         case 20: {
-          console.log('20번 시그널 수신 - 시간초과')
-          console.log(event.data)
-          context.commit('setRound', event.data.round)
-          context.commit('setIsTimeOut', true)
+          console.log("20번 시그널 수신 - 시간초과");
+          console.log(event.data);
+          context.commit("setRound", event.data.round);
+          context.commit("setIsTimeOut", true);
           if (event.data.round != 8) {
-            context.commit('setEndRound', true)
+            context.commit("setEndRound", true);
           }
           // 라운드를 8번 돌면 게임을 종료한다.
-          if ( event.data.round == 8 && state.isHost == true) {
-            context.dispatch('finishGame')
+          if (event.data.round == 8 && state.isHost == true) {
+            context.dispatch("finishGame");
           }
-          break
+          break;
         }
-        case 100 : {
+        case 100: {
           // 게임 끝 경험치 부여
-          console.log('100번 시그널 수신 - 게임 끝')
-          console.log('event.data : ',event.data)
-          console.log('event.data.winnerCnt : ', event.data.winnerCnt)
+          console.log("100번 시그널 수신 - 게임 끝");
+          console.log("event.data : ", event.data);
+          console.log("event.data.winnerCnt : ", event.data.winnerCnt);
           // context.commit('setWinnerNickname', event.data.winner)
-          var winnerList = []
-          for (var a=0; a<event.data.winnerCnt; a++ ){
-            winnerList.push(event.data.winner[a].nickname)
+          var winnerList = [];
+          for (var a = 0; a < event.data.winnerCnt; a++) {
+            winnerList.push(event.data.winner[a].nickname);
           }
-          context.commit('setWinnerList', winnerList)
-          context.commit('setGameResult', event.data.gameResult)
-          console.log('endGame 변경')
-          context.commit('setEndGame', true)
-          console.log('endgame 변경 되었는지 확인 => ?', state.endGame)
-          break
+          context.commit("setWinnerList", winnerList);
+          context.commit("setGameResult", event.data.gameResult);
+          console.log("endGame 변경");
+          context.commit("setEndGame", true);
+          console.log("endgame 변경 되었는지 확인 => ?", state.endGame);
+          break;
         }
-      }}
-    );
+      }
+    });
 
-
-
-    context.dispatch("getToken", sessionId).then(token => {
-      session.connect(token, { clientData: state.myUserName })
+    context.dispatch("getToken", sessionId).then((token) => {
+      session
+        .connect(token, { clientData: state.myUserName })
         .then(() => {
           // --- Get your own camera stream with the desired properties ---
           let publisher = OV.initPublisher(undefined, {
@@ -499,7 +510,7 @@ const actions = {
           context.commit("SET_PUBLISHER", publisher);
           // --- Publish your stream ---
           session.publish(state.publisher);
-          
+
           session.signal({
             type: "game",
             data: {
@@ -524,48 +535,68 @@ const actions = {
     this._joinSession = value;
   },
 
-    createSession : (context, sessionId) => { // => 세션 생성 후 세션ID 발급됨
-        if (sessionId) {
-          console.log("세션ID 이미 존재");
-          context.commit("setSessionId", sessionId);
-            return sessionId
-        } else {
-            console.log("토큰 존재하지 않음");
-            context.commit('setIsHost', true)
-            console.log("title", state.title, "isSecret",  state.isSecret,"password", state.password, "isTeamBattle", state.isTeamBattle)
-            return new Promise((resolve, reject) => {
-                $axios
-                .post(`${OPENVIDU_SERVER_URL}/api/rooms`, JSON.stringify({
-                "title" : state.title,
-                "isSecret" : state.isSecret,
-                "password" : state.password,
-                "isTeamBattle" : state.isTeamBattle
-                }), {
-                    auth: {
-                        username: 'OPENVIDUAPP',
-                        password: OPENVIDU_SERVER_SECRET,
-                    },
-                })
-                .then(response => response.data)
-                .then(data => {
-                  console.log("세션ID :", data.id)
-                  context.commit("setSessionId", data.id);
-                    resolve(data.id)
-                })
-                .catch(error => {
-                    if (error.response.status === 409) {
-                        resolve(sessionId);
-                    } else {
-                        console.warn(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`);
-                        if (window.confirm(`No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`)) {
-                            location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
-                        }
-                        reject(error.response);
-                    }
-                });
-            });
-        }
-    },
+  createSession: (context, sessionId) => {
+    // => 세션 생성 후 세션ID 발급됨
+    if (sessionId) {
+      console.log("세션ID 이미 존재");
+      context.commit("setSessionId", sessionId);
+      return sessionId;
+    } else {
+      console.log("토큰 존재하지 않음");
+      context.commit("setIsHost", true);
+      console.log(
+        "title",
+        state.title,
+        "isSecret",
+        state.isSecret,
+        "password",
+        state.password,
+        "isTeamBattle",
+        state.isTeamBattle
+      );
+      return new Promise((resolve, reject) => {
+        $axios
+          .post(
+            `${OPENVIDU_SERVER_URL}/api/rooms`,
+            JSON.stringify({
+              title: state.title,
+              isSecret: state.isSecret,
+              password: state.password,
+              isTeamBattle: state.isTeamBattle,
+            }),
+            {
+              auth: {
+                username: "OPENVIDUAPP",
+                password: OPENVIDU_SERVER_SECRET,
+              },
+            }
+          )
+          .then((response) => response.data)
+          .then((data) => {
+            console.log("세션ID :", data.id);
+            context.commit("setSessionId", data.id);
+            resolve(data.id);
+          })
+          .catch((error) => {
+            if (error.response.status === 409) {
+              resolve(sessionId);
+            } else {
+              console.warn(
+                `No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}`
+              );
+              if (
+                window.confirm(
+                  `No connection to OpenVidu Server. This may be a certificate error at ${OPENVIDU_SERVER_URL}\n\nClick OK to navigate and accept it. If no certificate warning is shown, then check that your OpenVidu Server is up and running at "${OPENVIDU_SERVER_URL}"`
+                )
+              ) {
+                location.assign(`${OPENVIDU_SERVER_URL}/accept-certificate`);
+              }
+              reject(error.response);
+            }
+          });
+      });
+    }
+  },
 
   createToken: (context, sessionId) => {
     const level = context.rootState.accountStore.user.level;
@@ -634,7 +665,6 @@ const actions = {
 
   // 참여자 레디 상태 변경 - ingamePage에서 clickReady 했을 때 호출 - 수연
   changeReady: () => {
-    console.log("신호 받음")
     state.session.signal({
       type: "game",
       data: {
@@ -643,33 +673,33 @@ const actions = {
       to: [],
     });
   },
-    // 라운드 끝냄 - 수연
-    finishRound: () => {
-      state.session.signal({
-        type: 'game',
-        data: {
-          gameStatus: 10,
-        },
-        to: [],
-      })
-      state.session.signal({
-        type: 'game',
-        data: {
-          gameStatus: 0,
-        },
-        to: [],
-      })
-    },
-    // 게임 끝냄 - 수연
-    finishGame: () => {
-      state.session.signal({
-        type: 'game',
-        data: {
-          gameStatus: 100,
-        },
-        to: [],
-      })
-    },
+  // 라운드 끝냄 - 수연
+  finishRound: () => {
+    state.session.signal({
+      type: "game",
+      data: {
+        gameStatus: 10,
+      },
+      to: [],
+    });
+    state.session.signal({
+      type: "game",
+      data: {
+        gameStatus: 0,
+      },
+      to: [],
+    });
+  },
+  // 게임 끝냄 - 수연
+  finishGame: () => {
+    state.session.signal({
+      type: "game",
+      data: {
+        gameStatus: 100,
+      },
+      to: [],
+    });
+  },
 
   downloadImage: async (context) => {
     try {
@@ -680,27 +710,27 @@ const actions = {
       });
       //console.log("res is: ", res);
       return res.data.data;
-      }catch (error) {
-        return error.response.data.code
-      }
+    } catch (error) {
+      return error.response.data.code;
+    }
   },
 
   uploadImage: (context, payload) => {
     console.log("찍어보자", context.rootState.accountStore.token);
     $axios
-    .post(`/api/image/upload?sessionId=${state.sessionId}`, payload, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${context.rootState.accountStore.token}`,
-      },
-    })
-    .then((res) => {
-      console.log(res);
-    })
-    .catch((err) => {
-      alert("실패");
-      console.log(err)
-    });
+      .post(`/api/image/upload?sessionId=${state.sessionId}`, payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${context.rootState.accountStore.token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        alert("실패");
+        console.log(err);
+      });
   },
 
   sendImageData: (context, payload) => {
@@ -859,7 +889,7 @@ const actions = {
       console.log(err);
     }
   },
-  changeRoundEnd : (context, data) => {
+  changeRoundEnd: (context, data) => {
     context.commit("setEndRound", data);
   },
   // 시간 초과 시 라운드 종료 시그널 - 수연
@@ -875,8 +905,7 @@ const actions = {
     } catch (err) {
       console.log(err);
     }
-  }
-
+  },
 };
 export default {
   namespaced: true,
