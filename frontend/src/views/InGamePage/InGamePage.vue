@@ -67,7 +67,7 @@
       <GameResult v-show="endGame"/>
       <GameTimer :key="gameTimer"/>
       <v-btn @click="forceRender">시계</v-btn>
-      <h1>{{ round }} 라운드</h1>
+      <h1>{{ round + 1}} 라운드</h1>
       <GameScore />
       <v-container>
         <v-row>
@@ -206,6 +206,7 @@ export default {
     const amIDescriber = computed(() => store.state.gameStore.amIDescriber);
     const round = computed(() => store.state.gameStore.round);
     const endGame = computed(() => store.state.gameStore.endGame);
+    const endRound = computed(() => store.state.gameStore.endRound);
     const currentPresenterId = computed(
       () => store.state.gameStore.presenterId
     );
@@ -319,7 +320,8 @@ export default {
       leaveSession,
       updateMainVideoStreamManager,
       gameTimer,
-      forceRender
+      forceRender,
+      endRound,
     };
   },
 };

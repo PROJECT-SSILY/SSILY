@@ -1,5 +1,5 @@
 <template>
-  <div class="score-box">
+  <div class="score-box" v-if="!isTimeOut">
     <v-container>
       <v-row>
         <v-col>
@@ -75,7 +75,7 @@ export default {
     // })
     return {
       store,
-      userList
+      userList,
     }
   }
 }
