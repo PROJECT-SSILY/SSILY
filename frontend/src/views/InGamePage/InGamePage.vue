@@ -430,9 +430,9 @@ export default {
   height: 20px;
   text-align: left;
   margin: 7px 20px;
-  color: #5b5b5b;
   font-weight: 600;
   font-size: 15px;
+  color: #8b8b8b;
 }
 
 
@@ -537,16 +537,27 @@ footer {
   background: #e3ac00;
   color: white;
 }
+.btn-main:hover {
+  background: #ffbf00;
+}
+.btn-main:active {
+  background: rgb(214, 160, 0);
+}
 .notice {
   width: 400px;
   background: #4F4F4F;
   display: inline-block;
-  padding: 3px 10px;
-  color: white;
+  color: #c2c2c2;
 }
 .btn-store, .btn-set {
   border: 1px solid #4B4B4B;
   color: #EFEDED;
+}
+.btn-store:hover, .btn-set:hover {
+  background: #787878;
+}
+.btn-store:active, .btn-set:active {
+  background: #656565;
 }
 /* =========================================================================================== */
 </style>

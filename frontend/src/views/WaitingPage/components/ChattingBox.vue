@@ -74,10 +74,11 @@ export default {
     width: 100%;
     height: 100%;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     padding: 5px 25px;
     overflow-y: auto;
     overflow-x: hidden;
+    justify-content: flex-end;
 }
 .group-chat {
     width: 100%;

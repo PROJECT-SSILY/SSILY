@@ -66,10 +66,10 @@ export default {
   width: 161px;
   height: 161px;
   border-radius: 30px;
-  background: #ffffff;
-  padding: 10px;
+  background: #272727;
   margin: 7px;
   box-shadow: 0 -1px 5px #00000025;
+  position: relative;
 }
 .blank {
   background: #ECECEC;
