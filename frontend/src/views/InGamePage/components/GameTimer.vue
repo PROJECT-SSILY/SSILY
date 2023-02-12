@@ -21,6 +21,8 @@
   </template>
   
   <script>
+import { mapState } from 'vuex';
+  
   const FULL_DASH_ARRAY = 283;
   const WARNING_THRESHOLD = 5;
   const ALERT_THRESHOLD = 3;
@@ -85,13 +87,35 @@
         } else {
           return info.color;
         }
-      }
+      },
+      ...mapState({
+        endRound(state) {
+          return state.gameStore.endRound
+        },
+        isHost(state) {
+          return state.gameStore.isHost
+        }
+      })
     },
   
     watch: {
       timeLeft(newValue) {
         if (newValue === 0) {
+          // 타이머 종료 이벤트 여기에 !
           this.onTimesUp();
+          if (this.isHost) {
+            this.timeOver()
+          }
+        }
+      },
+      endRound(newValue) {
+        if (newValue == true) {
+          // 라운드가 끝나면 타이머 리셋 - 수연
+          this.onTimesUp();
+          this.timePassed = 0
+        } else {
+          // 라운드가 시작되면 타이머 시작
+          this.startTimer();
         }
       }
     },
@@ -107,6 +131,10 @@
   
       startTimer() {
         this.timerInterval = setInterval(() => (this.timePassed += 1), 1000);
+        this.$store.commit('gameStore/setIsTimeOut', false)
+      },
+      timeOver() {
+        this.$store.dispatch('gameStore/timeOverRound')
       }
     }
     

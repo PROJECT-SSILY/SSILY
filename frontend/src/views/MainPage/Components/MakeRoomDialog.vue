@@ -40,8 +40,8 @@
       type="submit" 
       class="btn-dialog">완료</v-btn>
     </v-form>
+    </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -91,7 +91,6 @@ export default {
     });
 
     const joinSession = async function () {
-      console.log(state.form.password.value);
       if (state.form.isSecret) {
         if (!(/^\d{4}$/.test(state.form.password.value))) 
       {
