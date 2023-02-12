@@ -67,6 +67,16 @@ export default {
       state.settingDialog = false;
     };
 
+    const randomPrivate = function (params) {
+      const roominfo = JSON.parse(JSON.stringify(params));
+      store.commit("gameStore/setTitle", roominfo.title);
+      store.commit("gameStore/setTeam", roominfo.isTeamBattle);
+      router.push({
+        name: "gameroom",
+        params: { sessionId: roominfo.sessionId },
+      });
+    };
+
     onMounted(() => 
       store.dispatch('accountStore/getMeAction') // 메인페이지에서 닉네임 사라지지 않도록 처리
     )
@@ -77,6 +87,7 @@ export default {
       router,
       state,
       closeDialog,
+      randomPrivate
     };
   },
 };

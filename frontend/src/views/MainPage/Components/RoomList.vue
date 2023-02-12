@@ -9,12 +9,12 @@
         >
           개인전
         </button>
-        <button
+        <!-- <button
           @click="state.isTeamBattle = true"
           :class="state.isTeamBattle ? 'active' : ''"
         >
           팀전
-        </button>
+        </button> -->
       </div>
       <div class="wrap-list">
         <RoomListItem

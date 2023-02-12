@@ -2,7 +2,11 @@
   <div class="wrap-dialog">
   <div class="dialog">
     <div class="tit-dialog">방 만들기</div>
-    <v-form ref="form" v-model="valid" @submit.prevent="joinSession">
+    <v-form 
+    ref="form" 
+    lazy-validation
+    v-model="state.valid" 
+    @submit.prevent="joinSession">
         <div class="form-group">
           <v-text-field
             v-model="state.title"
@@ -12,25 +16,29 @@
             required
           ></v-text-field>
       </div>
-      <v-radio-group v-model="state.isTeamBattle" inline>
+      <!-- <v-radio-group v-model="state.isTeamBattle" inline>
         <v-radio label="팀전" color="orange darken-3" :value="true"></v-radio>
         <v-radio
           label="개인전"
           color="orange darken-3"
           :value="false"
         ></v-radio>
-      </v-radio-group>
-      <v-radio-group v-model="state.isSecret" inline>
+      </v-radio-group> -->
+      <v-radio-group v-model="state.form.isSecret" inline>
         <v-radio label="공개" color="orange darken-3" :value="false"></v-radio>
         <v-radio label="비공개" color="orange darken-3" :value="true"></v-radio>
       </v-radio-group>
       <v-text-field
-        v-if="state.isSecret == true"
+        v-if="state.form.isSecret == true"
         label="비밀번호 숫자 4자리를 입력하세요."
         hide-details="auto"
-        v-model="state.password"
+        v-model="state.form.password.value"
+        :rules="[state.rules.passwordRules]"
       ></v-text-field>
-      <button type="submit" class="btn-dialog">완료</button>
+      <alert-dialog v-if="state.alert"/>
+      <v-btn
+      type="submit" 
+      class="btn-dialog">완료</v-btn>
     </v-form>
   </div>
 </div>
@@ -39,23 +47,36 @@
 <script>
 import { useRouter } from "vue-router";
 import { onUpdated, reactive } from "vue";
+// import { watch } from "vue";
 import { useStore } from "vuex";
 import $axios from "axios";
+import AlertDialog from '../../AlertDialog.vue'
 
 $axios.defaults.headers.post["Content-Type"] = "application/json";
 
 export default {
   components: {
-    // RotateSquare2
+    AlertDialog
   },
   setup() {
     const router = useRouter();
     const store = useStore();
     const state = reactive({
-      title: null,
-      isSecret: false,
-      password: null,
-      isTeamBattle: false,
+      form: {
+        title: null,
+        isSecret: false,
+        password:{ value: "", valid: true, status: false },
+        isTeamBattle: false,
+        valid: false,
+        alert:false,
+      },
+      rules: {
+      // required: value => !!value || '필수',
+      passwordRules: value => (
+        /^\d{4}$/.test(value)
+        ) || '비밀번호는 4자리 숫자여야 합니다!',
+        
+      }
     });
     onUpdated(() => {
       // 방 타이틀 랜덤 생성
@@ -66,21 +87,33 @@ export default {
         "스겜합시다!",
         "어서 들어오세요!",
       ];
-      state.title = titlelist[Math.floor(Math.random() * titlelist.length)];
+      state.form.title = titlelist[Math.floor(Math.random() * titlelist.length)];
     });
 
     const joinSession = async function () {
-      store.commit("gameStore/setTitle", state.title);
-      store.commit("gameStore/setSecret", state.isSecret);
-      store.commit("gameStore/setPassword", state.password);
-      store.commit("gameStore/setTeam", state.isTeamBattle);
-
+      console.log(state.form.password.value);
+      if (state.form.isSecret) {
+        if (!(/^\d{4}$/.test(state.form.password.value))) 
+      {
+        console.log(state.form.password.value);
+        console.log(/^\d{4}$/.test(state.form.password.value));
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '비밀번호는 4자리 숫자여야 합니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return
+      } else {
+      store.commit("gameStore/setTitle", state.form.title);
+      store.commit("gameStore/setSecret", state.form.isSecret);
+      store.commit("gameStore/setPassword", state.form.password.value);
+      store.commit("gameStore/setTeam", state.form.isTeamBattle);
       // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
       const sessionId = await store.dispatch("gameStore/createSession");
       console.log("sessionId : ", sessionId);
       router.push({ name: "gameroom", params: { sessionId: sessionId } });
+    }}
     };
-
     return {
       router,
       state,
