@@ -2,12 +2,12 @@
   <SettingDialog v-show="state.setDialog" />
   <div
     class="bg-dark"
-    :class="state.setDialog ? 'active':''"
+    :class="state.setDialog ? 'active' : ''"
     @click="closeDialog"
   ></div>
   <div class="wrap-page">
     <!----------------------------------- 개발용 버튼 -------------------------------------->
-    <p style="position:absolute; top:0;">
+    <p style="position: absolute; top: 0">
       <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
       <v-btn @click="state.isTeamBattle = !state.isTeamBattle"
         >팀/개인전 변경</v-btn
@@ -15,8 +15,6 @@
       <v-btn>게임 순서 변경</v-btn>
     </p>
     <!------------------------------------------------------------------------------------->
-
-
 
     <!-- 아래부터 대기방 페이지 관련 코드-->
     <div class="waiting-component" v-if="!readyAll">
@@ -31,86 +29,85 @@
         />
       </div>
       <div class="content-component">
-        <ChattingBox class="box-chat"/>
+        <ChattingBox class="box-chat" />
         <div class="box-btn">
-          <!-- <div class="box-blank"></div> --> <!-- 추후 업데이트 시 사용 예정 -->
-          <button class="btn-ready" :class="state.ready?'ready':''" @click="clickReady">READY</button>
+          <!-- <div class="box-blank"></div> -->
+          <!-- 추후 업데이트 시 사용 예정 -->
+          <button
+            class="btn-ready"
+            :class="state.ready ? 'ready' : ''"
+            @click="clickReady"
+          >
+            READY
+          </button>
           <button class="btn-profile">내 프로필</button>
         </div>
       </div>
       <footer>
         <div class="inner-footer">
-            <button class="btn-main" @click="clickExit">메인</button>
-            <input class="notice" type="text" disabled value="notice">
-            <button class="btn-store">상점</button>
-            <button class="btn-set" @click="state.setDialog=!state.setDialog">설정</button>
+          <button class="btn-main" @click="clickExit">메인</button>
+          <input class="notice" type="text" disabled value="notice" />
+          <button class="btn-store">상점</button>
+          <button class="btn-set" @click="state.setDialog = !state.setDialog">
+            설정
+          </button>
         </div>
       </footer>
     </div>
 
+    <!-- 아래부터 게임 진행 페이지 관련 코드-->
 
-
-
-
-
-<!-- 아래부터 게임 진행 페이지 관련 코드-->
-
-    <div class="in_game_component" v-else>
+    <div class="component-ingame" v-else>
       <RoundResult />
-      <GameResult v-show="endGame"/>
-      <GameTimer :key="gameTimer"/>
-      <v-btn @click="forceRender">시계</v-btn>
-      <h1>{{ round }} 라운드</h1>
+      <GameResult v-show="endGame" />
+      <GameTimer :key="gameTimer" />
+      <!-- <v-btn @click="forceRender">시계</v-btn> -->
+      <!-- <h1>{{ round }} 라운드</h1> -->
       <GameScore />
-      <v-container>
-        <v-row>
-          <v-col>
-            <h1>상대 팀</h1>
+      <!-- 상대 팀 -->
+      <div class="area-opponents">
+        <user-video
+          class="stream-opponent"
+          v-for="sub in opponents"
+          :key="sub.stream.connection.connectionId"
+          :stream-manager="sub"
+          :class="sub.stream.connection.connectionId === currentPresenterId?'presenter':''"
+        />
+      </div>
+      <div class="area-ourteam"></div>
+      <div class="me">
+          <div class="sec-draw" v-if="!amIDescriber">
+            <MyCanvasBox class="canvas" />
+            <user-video :stream-manager="publisher" class="stream-me" />
+          </div>
+          <div class="sec-display" v-else>
+            <user-video :stream-manager="publisher" class="stream-me" />
+          </div>
+        </div>
+        <div class="ourteam-members">
+          <div class="sec-draw" v-if="amIDescriber">
             <user-video
-              v-for="sub in opponents"
+              v-for="sub in myTeams"
               :key="sub.stream.connection.connectionId"
               :stream-manager="sub"
+              class="our-stream"
             />
-          </v-col>
-          <v-col>
-            <div id="video-container" class="col-md-6">
-              <div class="me">
-                <h1>나</h1>
-                <div class="drawing_sec" v-if="!amIDescriber">
-                  <MyCanvasBox />
-                  <user-video :stream-manager="publisher" />
-                </div>
-                <div class="displaying_sec" v-else>
-                  <user-video :stream-manager="publisher" />
-                </div>
-              </div>
-              <div class="our_team">
-                <h1>우리 팀</h1>
-                <div class="drawing_sec" v-if="amIDescriber">
-                  <user-video
-                    v-for="opp in opponents"
-                    :key="opp.stream.connection.connectionId"
-                    :stream-manager="opp"
-                  />
-                  <MyCanvasBox />
-                </div>
-                <div class="displaying_sec" v-else>
-                  <user-video
-                    v-for="opp in opponents"
-                    :key="opp.stream.connection.connectionId"
-                    :stream-manager="opp"
-                  />
-                </div>
-              </div>
-            </div>
-          </v-col>
-        </v-row>
-      </v-container>
-    </div>
-    <!-- <div class="ingame_component_content">
-      <div class="opponent_container">
+            <MyCanvasBox class="canvas" />
+          </div>
+          <div class="sec-display" v-else>
+            <user-video
+              v-for="sub in myTeams"
+              :key="sub.stream.connection.connectionId"
+              :stream-manager="sub"
+              class="our-stream"
+            />
+          </div>
+        </div>
+      </div>
+    <!-- <div class="inner-component-ingame">
+      <div class="opponent-container">
         <user-video
-          class="opp_stream"
+          class="stream-opponent"
           v-for="sub in opponents"
           :key="sub.stream.connection.connectionId"
           :stream-manager="sub"
@@ -121,32 +118,32 @@
           "
         />
       </div>
-      <div class="ourteam_container">
+      <div class="container-ourteam">
         <div class="me">
-          <div class="draw_sec" v-if="!amIDescriber">
+          <div class="sec-draw" v-if="!amIDescriber">
             <MyCanvasBox class="canvas" />
-            <user-video :stream-manager="publisher" class="my_stream" />
+            <user-video :stream-manager="publisher" class="stream-me" />
           </div>
-          <div class="display_sec" v-else>
-            <user-video :stream-manager="publisher" class="my_stream" />
+          <div class="sec-display" v-else>
+            <user-video :stream-manager="publisher" class="stream-me" />
           </div>
         </div>
-        <div class="ourteam_members">
-          <div class="draw_sec" v-if="amIDescriber">
+        <div class="ourteam-members">
+          <div class="sec-draw" v-if="amIDescriber">
             <user-video
               v-for="sub in myTeams"
               :key="sub.stream.connection.connectionId"
               :stream-manager="sub"
-              class="our_stream"
+              class="our-stream"
             />
             <MyCanvasBox class="canvas" />
           </div>
-          <div class="display_sec" v-else>
+          <div class="sec-display" v-else>
             <user-video
               v-for="sub in myTeams"
               :key="sub.stream.connection.connectionId"
               :stream-manager="sub"
-              class="our_stream"
+              class="our-stream"
             />
           </div>
         </div>
@@ -163,7 +160,7 @@ import GameScore from "./components/GameScore.vue";
 import WaitingPage from "@/views/WaitingPage/WaitingPage.vue";
 import ChattingBox from "@/views/WaitingPage/components/ChattingBox.vue";
 import RoundResult from "./components/RoundResult.vue";
-import SettingDialog from "@/views/SettingDialog.vue"
+import SettingDialog from "@/views/SettingDialog.vue";
 import $axios from "axios";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
@@ -171,7 +168,6 @@ import { GetPlayerList } from "@/common/api/gameAPI";
 import { reactive, ref } from "@vue/reactivity";
 import { onBeforeMount, computed } from "vue";
 import GameResult from "../InGamePage/components/GameResult.vue";
-
 
 //=================OpenVdue====================
 $axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -226,7 +222,6 @@ export default {
 
       // 모달 관련
       setDialog: false,
-
     });
 
     // == OpenVidu State ==
@@ -250,9 +245,9 @@ export default {
       //   }
       // }
       store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
-      console.log("여기까지")
+      console.log("여기까지");
       await store.dispatch("gameStore/joinSession", state.sessionId);
-      console.log("여기까지 완료")
+      console.log("여기까지 완료");
     };
     const leaveSession = async function () {
       store.dispatch("gameStore/leaveSession");
@@ -277,7 +272,7 @@ export default {
     };
 
     const clickReady = () => {
-      console.log("ready")
+      console.log("ready");
       store.dispatch("gameStore/changeReady");
     };
 
@@ -298,11 +293,11 @@ export default {
       state.setDialog = false;
     };
 
-    const gameTimer = ref(0)
+    const gameTimer = ref(0);
 
-    const forceRender = function() {
-      gameTimer.value += 1
-    }
+    const forceRender = function () {
+      gameTimer.value += 1;
+    };
     return {
       router,
       state,
@@ -325,14 +320,14 @@ export default {
       closeDialog,
       updateMainVideoStreamManager,
       gameTimer,
-      forceRender
+      forceRender,
     };
   },
 };
 </script>
 
 <style scoped>
-/* ======= waiting_component ================================================================= */
+/* ======= waiting-component ================================================================= */
 
 .wrap-page {
   height: 100vh;
@@ -348,13 +343,13 @@ export default {
   height: 550px;
   background: white;
   border-radius: 60px;
-  padding:40px;
+  padding: 40px;
 }
 .users-component {
   width: 100%;
   padding: 10px;
   border-radius: 30px;
-  background: #D9D9D9;
+  background: #d9d9d9;
   box-shadow: inset 0 0 5px rgb(0 0 0 / 25%);
 }
 .content-component {
@@ -367,9 +362,9 @@ export default {
 .box-chat {
   width: 100%;
   height: 225px;
-  background: #F9F9F9;
+  background: #f9f9f9;
   border-radius: 30px;
-  border: 1px solid #E6E6E6;
+  border: 1px solid #e6e6e6;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -387,17 +382,17 @@ export default {
   border-radius: 30px;
   box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.25);
 }
-.box-btn>button {
+.box-btn > button {
   width: 170px;
   height: 70px;
   border-radius: 30px;
   margin: 7px 0;
   transition: 0.1s;
 }
-.box-btn>button:hover {
+.box-btn > button:hover {
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
 }
-.box-btn>button:active {
+.box-btn > button:active {
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.5);
 }
 .btn-ready {
@@ -413,7 +408,7 @@ export default {
   background: #b49f00;
 }
 .btn-profile {
-  background: #C6C6C6;
+  background: #c6c6c6;
   color: white;
   font-size: 20px;
 }
@@ -434,80 +429,6 @@ export default {
   font-size: 15px;
   color: #8b8b8b;
 }
-
-
-/* ----------------------------------- */
-
-.chat_box {
-  flex: auto;
-  border-radius: 30px;
-  height: 500px;
-  background-color: #ffffffeb;
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: space-between;
-  padding: 20px 30px;
-}
-/* =========================================================================================== */
-
-/* ======= in_game_component ================================================================= */
-.in_game_component {
-  display: flex;
-  flex-direction: column;
-  width: 100vw;
-}
-.ingame_component_content {
-  display: flex;
-  flex-direction: row;
-  width: 100vw;
-  height: 100vh;
-}
-.opponent_container,
-.ourteam_container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 50%;
-  min-width: 300px;
-}
-.display_sec {
-  width: 100%;
-}
-.display_sec .my_stream {
-  width: 100%;
-  overflow: hidden;
-  box-shadow: 0px 0px 20px 0px #0000003b;
-}
-.draw_sec {
-  position: relative;
-}
-.opp_stream {
-  transition-duration: 0.3s;
-  height: 225px;
-  margin: 10px 0;
-  width: 300px;
-  border-radius: 43px;
-  box-shadow: 0px 0px 20px 0px #0000005c;
-}
-.presenter {
-  height: 315px;
-  margin: 10px 0;
-  width: 420px;
-}
-.draw_sec .my_stream {
-  height: 100px;
-  width: 100px;
-  right: 10px;
-  bottom: 10px;
-  position: absolute;
-  border-radius: 100px;
-  overflow: hidden;
-  box-shadow: 0px 0px 20px 0px #0000005c;
-}
-.canvas {
-  width: 100%;
-}
 footer {
   width: 100%;
   height: 50px;
@@ -527,7 +448,8 @@ footer {
   border-top-right-radius: 60px;
   padding: 10px;
 }
-.inner-footer>button, .inner-footer>.notice {
+.inner-footer > button,
+.inner-footer > .notice {
   padding: 3px 20px;
   margin: 0 10px;
   border-radius: 10px;
@@ -545,19 +467,83 @@ footer {
 }
 .notice {
   width: 400px;
-  background: #4F4F4F;
+  background: #4f4f4f;
   display: inline-block;
   color: #c2c2c2;
 }
-.btn-store, .btn-set {
-  border: 1px solid #4B4B4B;
-  color: #EFEDED;
+.btn-store,
+.btn-set {
+  border: 1px solid #4b4b4b;
+  color: #efeded;
 }
-.btn-store:hover, .btn-set:hover {
+.btn-store:hover,
+.btn-set:hover {
   background: #787878;
 }
-.btn-store:active, .btn-set:active {
+.btn-store:active,
+.btn-set:active {
   background: #656565;
+}
+
+/* ----------------------------------- */
+
+
+/* ======= component-ingame ================================================================= */
+.component-ingame {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+}
+.inner-component-ingame {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
+}
+.container-ourteam {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  min-width: 300px;
+}
+.sec-display {
+  width: 100%;
+}
+.sec-display .stream-me {
+  width: 100%;
+  overflow: hidden;
+  box-shadow: 0px 0px 20px 0px #0000003b;
+}
+.sec-draw {
+  position: relative;
+}
+.stream-opponent {
+  transition-duration: 0.3s;
+  height: 225px;
+  margin: 10px 0;
+  width: 300px;
+  border-radius: 43px;
+  box-shadow: 0px 0px 20px 0px #0000005c;
+}
+.presenter {
+  height: 315px;
+  margin: 10px 0;
+  width: 420px;
+}
+.sec-draw .stream-me {
+  height: 100px;
+  width: 100px;
+  right: 10px;
+  bottom: 10px;
+  position: absolute;
+  border-radius: 100px;
+  overflow: hidden;
+  box-shadow: 0px 0px 20px 0px #0000005c;
+}
+.canvas {
+  width: 100%;
 }
 /* =========================================================================================== */
 </style>
