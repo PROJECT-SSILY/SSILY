@@ -280,7 +280,6 @@ export default {
       }
       console.log('getTopClassNames = ',getTopClassNames)
       console.log("winClass = ", winClass);
-      console.log("그냥 : ", topFive);
       store.dispatch("gameStore/sendTopFive", topFive.value);
     };
 

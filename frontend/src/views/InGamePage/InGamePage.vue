@@ -59,10 +59,17 @@
 
     <div class="component-ingame" v-else>
       <RoundResult />
+<<<<<<< HEAD
       <GameResult v-show="endGame" />
       <GameTimer :key="gameTimer" />
       <!-- <v-btn @click="forceRender">시계</v-btn> -->
       <!-- <h1>{{ round }} 라운드</h1> -->
+=======
+      <GameResult v-show="endGame"/>
+      <GameTimer :key="gameTimer"/>
+      <v-btn @click="forceRender">시계</v-btn>
+      <h1>{{ round + 1}} 라운드</h1>
+>>>>>>> 24b96e23f806f82b42fe66a571e62891b54d002d
       <GameScore />
       <!-- 상대 팀 -->
       <div class="area-opponents">
@@ -197,6 +204,7 @@ export default {
     const amIDescriber = computed(() => store.state.gameStore.amIDescriber);
     const round = computed(() => store.state.gameStore.round);
     const endGame = computed(() => store.state.gameStore.endGame);
+    const endRound = computed(() => store.state.gameStore.endRound);
     const currentPresenterId = computed(
       () => store.state.gameStore.presenterId
     );
@@ -321,6 +329,10 @@ export default {
       updateMainVideoStreamManager,
       gameTimer,
       forceRender,
+<<<<<<< HEAD
+=======
+      endRound,
+>>>>>>> 24b96e23f806f82b42fe66a571e62891b54d002d
     };
   },
 };
