@@ -1,39 +1,39 @@
 <template>
   <div class="wrap-dialog">
-  <div class="dialog">
-    <div class="tit-dialog">방 만들기</div>
-    <v-form ref="form" v-model="valid" @submit.prevent="joinSession">
-        <div class="form-group">
-          <v-text-field
-            v-model="state.title"
-            class="inp-txt form-control"
-            label="방 제목"
-            type="text"
-            required
-          ></v-text-field>
-      </div>
-      <v-radio-group v-model="state.isTeamBattle" inline>
-        <v-radio label="팀전" color="orange darken-3" :value="true"></v-radio>
-        <v-radio
-          label="개인전"
-          color="orange darken-3"
-          :value="false"
-        ></v-radio>
-      </v-radio-group>
-      <v-radio-group v-model="state.isSecret" inline>
-        <v-radio label="공개" color="orange darken-3" :value="false"></v-radio>
-        <v-radio label="비공개" color="orange darken-3" :value="true"></v-radio>
-      </v-radio-group>
-      <v-text-field
-        v-if="state.isSecret == true"
-        label="비밀번호 숫자 4자리를 입력하세요."
-        hide-details="auto"
-        v-model="state.password"
-      ></v-text-field>
-      <button type="submit" class="btn-dialog">완료</button>
-    </v-form>
+    <div class="dialog">
+      <div class="tit-dialog">방 만들기</div>
+      <v-form ref="form" v-model="valid" @submit.prevent="joinSession">
+          <div class="form-group">
+            <v-text-field
+              v-model="state.title"
+              class="inp-txt form-control"
+              label="방 제목"
+              type="text"
+              required
+            ></v-text-field>
+        </div>
+        <v-radio-group v-model="state.isTeamBattle" inline>
+          <v-radio label="팀전" color="orange darken-3" :value="true"></v-radio>
+          <v-radio
+            label="개인전"
+            color="orange darken-3"
+            :value="false"
+          ></v-radio>
+        </v-radio-group>
+        <v-radio-group v-model="state.isSecret" inline>
+          <v-radio label="공개" color="orange darken-3" :value="false"></v-radio>
+          <v-radio label="비공개" color="orange darken-3" :value="true"></v-radio>
+        </v-radio-group>
+        <v-text-field
+          v-if="state.isSecret == true"
+          label="비밀번호 숫자 4자리를 입력하세요."
+          hide-details="auto"
+          v-model="state.password"
+        ></v-text-field>
+        <button type="submit" class="btn-dialog">완료</button>
+      </v-form>
+    </div>
   </div>
-</div>
 </template>
 
 <script>

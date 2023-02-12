@@ -64,13 +64,11 @@
 
 #contents {
   height: 100%;
-    width: 100vw;
-    position: fixed;
-    overflow-x: hidden;
-    overflow-y: scroll;
-    padding: 0;
-    left: 0;
-    top: 0;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 nav {
   padding: 30px;

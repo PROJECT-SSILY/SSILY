@@ -1,10 +1,9 @@
 /* dialog 관련 css */
 .wrap-dialog {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     position: absolute;
+    width: 300px;
+    z-index: 3;
+    width: 500px;
   }
   .dialog {
     background: white;

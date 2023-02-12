@@ -1,7 +1,7 @@
 <template>
-<div class="userinfo-item-wrapper ">
-  <div class="userinfo-item">
-    <h1>닉네임: {{ user.nickname }}</h1>
+<div class="wrapper-item-userinfo ">
+  <div class="item-userinfo">
+    <p>닉네임: {{ user.nickname }}</p>
     <p>레벨: {{ user.level }}</p>
     <p>팀: {{ user.team }}</p>
     <p>방장여부: {{ user.isHost }}</p>
@@ -32,30 +32,4 @@ export default {
 </script>
 
 <style>
-
-.userinfo-item-wrapper {
-  display: inline-block;
-  box-sizing: content-box;
-  padding: 3px;
-  margin: 20px 0px;
-  border: 1px solid rgb(185, 185, 185);
-  border-radius: 100%;
-}
-.userinfo-item {
-  width: 297px;
-  height: 297px;
-  box-sizing: border-box;
-  background-color: white;
-  border-radius: 100%;
-  border: 35px solid black;
-  border-color: inherit;
-  box-shadow: inset 0px 0px 7px 1px;
-}
-.BLUE {
-  border-color: #09c4ff;
-}
-.RED {
-  border-color: #ff5f5f;
-}
-
 </style>

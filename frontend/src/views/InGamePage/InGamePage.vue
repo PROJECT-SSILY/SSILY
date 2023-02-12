@@ -1,7 +1,13 @@
 <template>
-  <div class="wrap_component">
+  <SettingDialog v-show="state.setDialog" />
+  <div
+    class="bg-dark"
+    :class="state.setDialog ? 'active':''"
+    @click="closeDialog"
+  ></div>
+  <div class="wrap-page">
     <!----------------------------------- 개발용 버튼 -------------------------------------->
-    <p>
+    <p style="position:absolute; top:0;">
       <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
       <v-btn @click="state.isTeamBattle = !state.isTeamBattle"
         >팀/개인전 변경</v-btn
@@ -10,8 +16,13 @@
       <v-btn>게임 순서 변경</v-btn>
     </p>
     <!------------------------------------------------------------------------------------->
-    <div class="waiting_component" v-if="!readyAll">
-      <div class="users_component">
+
+
+
+    <!-- 아래부터 대기방 페이지 관련 코드-->
+    <div class="waiting-component" v-if="!readyAll">
+      <div class="users-component">
+        <p id="title">제목입니다</p>
         <WaitingPage
           :sessionId="state.sessionId"
           :playerList="state.playerList"
@@ -20,49 +31,30 @@
           :team="state.team"
         />
       </div>
-      <div class="side_component flex-item">
-        <v-radio-group
-          class="select_team"
-          inline
-          v-model="state.team"
-          justify-content="center"
-        >
-          <v-radio
-            label="RED"
-            value="RED"
-            color="red"
-            class="ma-2"
-            @click="clickTeam(RED)"
-          ></v-radio>
-          <v-radio
-            label="BLUE"
-            value="BLUE"
-            color="indigo"
-            class="ma-2"
-            @click="clickTeam(BLUE)"
-          ></v-radio>
-        </v-radio-group>
-        <div class="chat_box">
-          <ChattingBox />
-        </div>
-        <div class="side_footer">
-          <div class="sidebtn">
-            <v-btn class="readybtn" v-if="!state.ready" @Click="clickReady"
-              >READY</v-btn
-            >
-            <v-btn class="readybtn" v-if="state.ready" @Click="clickReady"
-              >CANCEL READY</v-btn
-            >
-          </div>
-          <div class="sidebtn">
-            <v-btn class="exitbtn" @click="clickExit">EXIT</v-btn>
-          </div>
-        </div>
-        <div class="sidebtn">
-          <v-btn class="exitbtn" @click="gameStart()">Game Start</v-btn>
+      <div class="content-component">
+        <ChattingBox class="box-chat"/>
+        <div class="box-btn">
+          <div class="box-blank"></div>
+          <button class="btn-ready" :class="state.ready?'ready':''" @Click="clickReady">READY</button>
         </div>
       </div>
+      <footer>
+        <div class="inner-footer">
+            <button class="btn-main" @click="clickExit">메인</button>
+            <input class="notice" type="text" disabled value="notice">
+            <button class="btn-store">상점</button>
+            <button class="btn-set" @click="state.setDialog=!state.setDialog">설정</button>
+        </div>
+      </footer>
     </div>
+
+
+
+
+
+
+<!-- 아래부터 게임 진행 페이지 관련 코드-->
+
     <div class="in_game_component" v-else>
       <RoundResult />
       <GameTimer />
@@ -113,7 +105,7 @@
         </v-row>
       </v-container>
     </div>
-    <div class="ingame_component_content">
+    <!-- <div class="ingame_component_content">
       <div class="opponent_container">
         <user-video
           class="opp_stream"
@@ -157,7 +149,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -169,6 +161,7 @@ import GameScore from "./components/GameScore.vue";
 import WaitingPage from "@/views/WaitingPage/WaitingPage.vue";
 import ChattingBox from "@/views/WaitingPage/components/ChattingBox.vue";
 import RoundResult from "./components/RoundResult.vue";
+import SettingDialog from "@/views/SettingDialog.vue"
 import $axios from "axios";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
@@ -190,6 +183,7 @@ export default {
     ChattingBox,
     GameScore,
     RoundResult,
+    SettingDialog,
   },
   props: {
     ready: Boolean,
@@ -223,6 +217,10 @@ export default {
       // 게임 순서 관련
       ready: false,
       team: null,
+
+      // 모달 관련
+      setDialog: false,
+
     });
 
     // == OpenVidu State ==
@@ -233,18 +231,18 @@ export default {
     const joinSession = async function () {
       const players = await GetPlayerList(state.sessionId);
       console.log("players : ", players);
-      for (let i = 0; i < players.content.length; i++) {
-        console.log(
-          "접근 가능 여부 확인중.. ",
-          players.content[i].player.nickname,
-          state.nickname
-        );
-        if (players.content[i].player.nickname === state.nickname) {
-          alert("잘못된 접근입니다.");
-          router.push({ name: "main" });
-          return;
-        }
-      }
+      // for (let i = 0; i < players.content.length; i++) {
+      //   console.log(
+      //     "접근 가능 여부 확인중.. ",
+      //     players.content[i].player.nickname,
+      //     state.nickname
+      //   );
+      //   if (players.content[i].player.nickname === state.nickname) {
+      //     alert("잘못된 접근입니다.");
+      //     router.push({ name: "main" });
+      //     return;
+      //   }
+      // }
       store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
       await store.dispatch("gameStore/joinSession", state.sessionId);
     };
@@ -287,6 +285,9 @@ export default {
     const gameStart = () => {
       store.dispatch("gameStore/gameStart");
     };
+    const closeDialog = () => {
+      state.setDialog = false;
+    };
 
     return {
       router,
@@ -306,6 +307,7 @@ export default {
       gameStart,
       joinSession,
       leaveSession,
+      closeDialog,
       updateMainVideoStreamManager,
     };
   },
@@ -315,35 +317,73 @@ export default {
 <style scoped>
 /* ======= waiting_component ================================================================= */
 
-.wrap_component {
+.wrap-page {
+  height: 100vh;
+  width: 100%;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  z-index: 0;
 }
-.waiting_component {
+.waiting-component {
+  width: 800px;
+  height: 550px;
+  background: white;
+  border-radius: 60px;
+  padding:40px;
+}
+.users-component {
+  width: 100%;
+  padding: 10px;
+  border-radius: 30px;
+  background: #D9D9D9;
+  box-shadow: inset 0 0 5px rgb(0 0 0 / 25%);
+}
+.content-component {
+  margin-top: 15px;
+  height: 225px;
   display: flex;
   flex-direction: row;
-  padding: 20px;
-  max-width: 1200px;
-  min-width: 800px;
+  align-items: center;
+}
+.box-chat {
   width: 100%;
-  justify-content: space-between;
-}
-.side_component {
-  width: 300px;
-  padding: 20px 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.select_team {
-  display: flex;
+  height: 225px;
+  background: #F9F9F9;
   border-radius: 30px;
-  background-color: #ffffffeb;
-  justify-content: center;
-  margin-bottom: 10px;
+  border: 1px solid #E6E6E6;
+  margin-right: 15px;
 }
+.box-btn {
+  width: 400px;
+}
+.box-blank {
+  width: 300px;
+  height: 60px;
+  margin-bottom: 15px;
+  border-radius: 30px;
+  box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.25);
+}
+.btn-ready {
+  width: 300px;
+  height: 150px;
+  border: 10px solid #e0e0e0;
+  background: #24cb83;
+  color: white;
+  border-radius: 100px;
+  font-size: 40px;
+}
+#title {
+  width: 100%;
+  height: 20px;
+  text-align: left;
+  margin: 7px 20px;
+}
+
+
+/* ----------------------------------- */
+
 .chat_box {
   flex: auto;
   border-radius: 30px;
@@ -353,44 +393,6 @@ export default {
   flex-direction: column-reverse;
   justify-content: space-between;
   padding: 20px 30px;
-}
-
-.sidebtn {
-  display: inline-block;
-  width: 50%;
-  padding-top: 10px;
-}
-.sidebtn:first-child {
-  padding-right: 5px;
-}
-.sidebtn:last-child {
-  padding-left: 5px;
-}
-.sidebtn > button {
-  width: 100%;
-  margin: 0px;
-  border-radius: 20px;
-  height: 70px;
-  box-sizing: border-box;
-  font-family: sans-serif;
-  font-weight: 900;
-  font-size: 25px;
-  border: 7px solid #ffffffeb;
-}
-.readybtn {
-  background: linear-gradient(
-    342deg,
-    rgba(198, 255, 0, 1) 0%,
-    rgba(108, 204, 55, 1) 100%
-  );
-}
-.exitbtn {
-  background: rgb(224, 61, 61);
-  background: linear-gradient(
-    133deg,
-    rgba(224, 61, 61, 1) 0%,
-    rgba(255, 93, 93, 1) 100%
-  );
 }
 /* =========================================================================================== */
 
@@ -452,6 +454,45 @@ export default {
 .canvas {
   width: 100%;
 }
-
+footer {
+  width: 100%;
+  height: 50px;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  align-items: center;
+  z-index: 4;
+}
+.inner-footer {
+  width: 800px;
+  height: 50px;
+  background: #636363;
+  border-top-left-radius: 60px;
+  border-top-right-radius: 60px;
+  padding: 10px;
+}
+.inner-footer>button, .inner-footer>.notice {
+  padding: 3px 20px;
+  margin: 0 10px;
+  border-radius: 10px;
+  height: 30px;
+}
+.btn-main {
+  background: #e3ac00;
+  color: white;
+}
+.notice {
+  width: 400px;
+  background: #4F4F4F;
+  display: inline-block;
+  padding: 3px 10px;
+  color: white;
+}
+.btn-store, .btn-set {
+  border: 1px solid #4B4B4B;
+  color: #EFEDED;
+}
 /* =========================================================================================== */
 </style>
