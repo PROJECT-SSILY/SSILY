@@ -115,14 +115,35 @@ export default {
        * Get image data in canvas
        */
 
+<<<<<<< Updated upstream
       const mbb = getMinBox();
       const dpi = window.devicePixelRatio;
       
       // fabricCanvas.value.setBackgroundColor("#FFFFFF")
       // fabricCanvas.value.renderAll()
 
+<<<<<<< HEAD
       fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       // fabricCanvas.value.stroke.setFill('black', fabricCanvas.value.renderAll.bind(fabricCanvas.value));
+=======
+=======
+      
+      // fabricCanvas.value.setBackgroundColor("#FFFFFF")
+      // fabricCanvas.value.renderAll()
+      
+      const mbb = getMinBox();
+      const dpi = window.devicePixelRatio;
+
+
+      fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
+      // const object = fabricCanvas.value.getActiveObject();
+      // object.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
+      
+      // fabricCanvas.value.stroke.setFill('black', fabricCanvas.value.renderAll.bind(fabricCanvas.value));
+      // fabricCanvas.value.getActiveObject().stroke.color = "black";
+      // fabricCanvas.value.renderAll();
+>>>>>>> Stashed changes
+>>>>>>> feature/gameroom
       const imageData = fabricCanvas.value.contextContainer.getImageData(
         mbb.min.x * dpi,
         mbb.min.y * dpi,
