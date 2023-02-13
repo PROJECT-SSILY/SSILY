@@ -66,7 +66,7 @@ export default {
   width: 161px;
   height: 161px;
   border-radius: 30px;
-  background: #272727;
+  background: #b7b7b7;
   margin: 7px;
   box-shadow: 0 -1px 5px #00000025;
   position: relative;

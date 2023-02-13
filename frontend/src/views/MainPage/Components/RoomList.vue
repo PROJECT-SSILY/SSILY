@@ -24,11 +24,11 @@
           @click="getInRoom(room)"
           class="list-item"
         />
-        <!-- <div
+        <div
           class="list-item blank"
           v-for="blank in 5 - state.roomlist.length"
           :key="blank"
-        ></div> -->
+        ></div>
         <div class="btn-paging">
           <button>PREV</button>
           <button>NEXT</button>
@@ -56,6 +56,7 @@ export default {
     const store = useStore();
     const state = reactive({
       isTeamBattle: false,
+      password: null,
       teamrooms: [],
       privaterooms: [],
       roomlist: computed(() => {
@@ -69,8 +70,12 @@ export default {
 
     const getInRoom = function (params) {
       const roominfo = JSON.parse(JSON.stringify(params));
+      state.password = prompt('비밀번호를 입력해주세요.');
+      console.log(state.password)
+      console.log(roominfo.isTeamBattle)
       store.commit("gameStore/setTitle", roominfo.title);
       store.commit("gameStore/setTeam", roominfo.isTeamBattle);
+      store.commit("gameStore/setPassword", state.password);
       router.push({
         name: "gameroom",
         params: { sessionId: roominfo.sessionId },

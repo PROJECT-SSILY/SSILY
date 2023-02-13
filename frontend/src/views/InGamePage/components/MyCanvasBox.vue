@@ -74,6 +74,7 @@ export default {
       fabricCanvas.value.clear();
       raw_predictions = null;
       coords = [];
+      // fabricCanvas.value.backgroundColor = "rgba(81, 255, 255, 0.2)";
       fabricCanvas.value.backgroundColor = "rgba(81, 255, 255, 0.2)";
     };
 
@@ -116,13 +117,19 @@ export default {
 
       const mbb = getMinBox();
       const dpi = window.devicePixelRatio;
+      
+      // fabricCanvas.value.setBackgroundColor("#FFFFFF")
+      // fabricCanvas.value.renderAll()
 
+      fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
+      // fabricCanvas.value.stroke.setFill('black', fabricCanvas.value.renderAll.bind(fabricCanvas.value));
       const imageData = fabricCanvas.value.contextContainer.getImageData(
         mbb.min.x * dpi,
         mbb.min.y * dpi,
         (mbb.max.x - mbb.min.x) * dpi,
         (mbb.max.y - mbb.min.y) * dpi
       );
+      fabricCanvas.value.setBackgroundColor("rgba(81, 255, 255, 0.2)", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
 
       return imageData;
     };
@@ -292,22 +299,32 @@ export default {
       Promise.all([model.loadModel(MY_MODEL_URL)]);
 
       fabricCanvas.value = new fabric.Canvas(`canvas`, {
-        backgroundColor: "transparent",
+        backgroundColor: "rgba(81, 255, 255, 0.2)",
         isDrawingMode: 1,
       });
 
-      fabricCanvas.value.backgroundColor = "rgba(81, 255, 255, 0.2)";
+      // fabricCanvas.value.backgroundColor = "rgba(81, 255, 255, 0.2)";
+      // fabricCanvas.value.backgroundColor = "rgba(81, 255, 255, 0.2)";
 
       const brush = fabricCanvas.value.freeDrawingBrush;
       if (fabricCanvas.value.freeDrawingBrush) {
-        brush.width = 15;
-        brush.color = "#AEFFFF";
+        // brush.width = 15;
+        // brush.color = "#AEFFFF";
+        // brush.shadow = new fabric.Shadow({
+        //   blur: 30,
+        //   offsetX: 0,
+        //   offsetY: 0,
+        //   affectStroke: false,
+        //   color: "#51FFFF",
+        brush.width = 5;
+        // brush.color = "#AEFFFF";
+        brush.color = "black";
         brush.shadow = new fabric.Shadow({
           blur: 30,
-          offsetX: 0,
-          offsetY: 0,
+          offsetX: 10,
+          offsetY: 10,
           affectStroke: false,
-          color: "#51FFFF",
+          color: "grey",
         });
       }
 
