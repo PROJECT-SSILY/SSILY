@@ -15,6 +15,12 @@
         id="canvas"
     >
     </canvas>
+    <v-alert
+      v-if="wrongFlag && !endRound"
+      type="error"
+      title="Alert title"
+      text="틀렸습니다!"
+    ></v-alert>
     <!-- 여기부터 신대득의 테스트 공간..-->
     <!-- <div style="margin: 1rem">
       <canvas
@@ -31,7 +37,7 @@
 <script>
 import className from "!raw-loader!@/assets/model/class_names.txt"; // computed()에서 바로 가져와 categorys에 바로 할당한다.
 
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { fabric } from "fabric";
 import { disposeTFVariables, TFModel } from "@/utils/model";
 import { CLASS_NAMES } from "@/utils/class_names";
@@ -43,7 +49,7 @@ const MY_MODEL_URL = "http://localhost:5500/api/model.json";
 export default {
   name: "MyCanvasBox",
   setup() {
-
+    const endRound = computed(() => store.state.gameStore.endRound)
     const fabricCanvas = ref({});
     const store = useStore();
     const topFive = ref([]);
@@ -52,6 +58,7 @@ export default {
     let coords = []; // 현재 그림의 좌표를 기록
     let raw_predictions = {};
     let model = null;
+    const wrongFlag = computed(() => store.state.gameStore.wrongFlag)
 
     const allowDrawing = function () {
       const canvas = fabricCanvas.value;
@@ -294,7 +301,11 @@ export default {
       }
       console.log('getTopClassNames = ',getTopClassNames)
       console.log("winClass = ", winClass);
-      store.dispatch("gameStore/sendTopFive", topFive.value);
+      store.dispatch("gameStore/sendTopFive", topFive.value)
+      store.commit('gameStore/setWrongFlag', true)
+      setTimeout(function() {
+        store.commit('gameStore/setWrongFlag', false)
+        }, 1000);
     };
 
     const getClassNames = function () {
@@ -374,6 +385,8 @@ export default {
       success,
       canvasToImage,
       imageToCanvas,
+      wrongFlag,
+      endRound
     };
   },
 };
