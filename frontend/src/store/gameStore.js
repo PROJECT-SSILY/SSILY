@@ -46,7 +46,6 @@ const state = {
     endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
     isTimeOut: false,
     word: '',
-    wrongFlag: false,
 }
 
 const getters = {
@@ -256,9 +255,6 @@ const mutations = {
     setWord: (state, data) => {
       state.word = data
     },
-    setWrongFlag: (state, data) => {
-      state.wrongFlag = data
-    }
 };
 
 const actions = {
@@ -420,17 +416,16 @@ const actions = {
         case 5: {
           // 정답 제출 ( sendTopFive ) - 정답이면 응답 옴!
           console.log("5번 시그널 수신 완료");
-          context.commit('gameStore/setWrongFlag', false) // WrongFlag 리셋
-          console.log("5번 data : ", event.data);
-          context.commit("setAnswer", event.data.answer);
-          context.commit("setWinnerId", event.data.winnerId);
-          context.commit("setWinnerNickname", event.data.winnerNickname);
-          //context.commit('setRound', event.data.round)
           var winnerId = event.data.winnerId;
           // => 여기서 정답자가 10번, 0번 신호 보낸다.
           if (winnerId == state.myConnectionId) {
             context.dispatch("finishRound");
           }
+          console.log("5번 data : ", event.data);
+          context.commit("setAnswer", event.data.answer);
+          context.commit("setWinnerId", event.data.winnerId);
+          context.commit("setWinnerNickname", event.data.winnerNickname);
+          //context.commit('setRound', event.data.round)
           break;
         }
         case 10: {
@@ -439,7 +434,7 @@ const actions = {
           if (event.data.round != 8) {
             context.commit("setEndRound", true);
           }
-          context.commit('gameStore/setWrongFlag', false) // WrongFlag 리셋
+
           var scoreList = event.data.player;
           console.log("10번 event data : ", event.data);
           context.commit("setRound", event.data.round);

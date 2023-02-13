@@ -16,7 +16,7 @@
     >
     </canvas>
     <v-alert
-      v-if="wrongFlag && !endRound"
+      v-if="state.alertFlag"
       type="error"
       title="Alert title"
       text="틀렸습니다!"
@@ -36,7 +36,7 @@
 
 <script>
 import className from "!raw-loader!@/assets/model/class_names.txt"; // computed()에서 바로 가져와 categorys에 바로 할당한다.
-
+import { reactive } from '@vue/reactivity'
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { fabric } from "fabric";
 import { disposeTFVariables, TFModel } from "@/utils/model";
@@ -58,7 +58,10 @@ export default {
     let coords = []; // 현재 그림의 좌표를 기록
     let raw_predictions = {};
     let model = null;
-    const wrongFlag = computed(() => store.state.gameStore.wrongFlag)
+    const state = reactive({
+      alertFlag: false,
+    })
+    
 
     const allowDrawing = function () {
       const canvas = fabricCanvas.value;
@@ -302,10 +305,15 @@ export default {
       console.log('getTopClassNames = ',getTopClassNames)
       console.log("winClass = ", winClass);
       store.dispatch("gameStore/sendTopFive", topFive.value)
-      store.commit('gameStore/setWrongFlag', true)
       setTimeout(function() {
-        store.commit('gameStore/setWrongFlag', false)
-        }, 1000);
+        if (endRound.value == false) {
+          state.alertFlag = true
+        }
+        }, 300);
+      setTimeout(function() {
+      if (state.alertFlag == true) {
+        state.alertFlag = false}
+      }, 1200);
     };
 
     const getClassNames = function () {
@@ -385,8 +393,8 @@ export default {
       success,
       canvasToImage,
       imageToCanvas,
-      wrongFlag,
-      endRound
+      endRound,
+      state
     };
   },
 };
