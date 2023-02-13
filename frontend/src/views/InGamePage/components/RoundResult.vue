@@ -19,12 +19,6 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-            color="green darken-1"
-            text
-          >
-          다음 라운드로!
-          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -44,12 +38,6 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-            color="green darken-1"
-            text
-          >
-          다음 라운드로!
-          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -77,7 +65,7 @@ export default {
     })
     setInterval(() => {
         store.dispatch('gameStore/changeRoundEnd', false)
-      }, 5000)
+      }, 10000)
     
     return {
       store,
