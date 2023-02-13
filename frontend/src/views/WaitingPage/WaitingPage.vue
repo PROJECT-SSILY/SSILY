@@ -1,7 +1,7 @@
 <template>
   <div class="list-users">
     <PasswordInput
-    v-if="isSecret && !isHost"/>
+    v-if="isSecret "/>
           <UserInfo
           class="list-users-item"
           v-for="user in userList"
@@ -20,7 +20,6 @@ import UserInfo from './components/UserInfo.vue';
 import $axios from "axios";
 import { computed } from 'vue'
 import { useStore } from 'vuex';
-import PasswordInput from './components/PasswordInput.vue'
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -28,7 +27,6 @@ export default {
   name: 'WaitingPage',
   components: {
     UserInfo,
-    PasswordInput
   },
   props: {
     session: Object,
