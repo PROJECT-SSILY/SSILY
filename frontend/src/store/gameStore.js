@@ -341,6 +341,11 @@ const actions = {
           } else {
             context.commit("setAmIDescriber", false);
           }
+          // 게임 시작 시 참여자들 음소거  ===> 아직 되는지 확실하지 않음
+          state.publisher.publishAudio(false);
+          for (var j=0; state.subscribers.length > j; j++ ){
+            state.subscribers[j].subscribeToAudio(false)
+          }
           break;
         }
 
@@ -665,6 +670,11 @@ const actions = {
         },
         to: [],
       })
+      // 라운드 종료시 참여자 소리 들림  ====> 아직 되는지 확실하지 않음
+      state.publisher.publishAudio(true);
+      for (var r=0; state.subscribers.length > r; r++ ){
+        state.subscribers[r].subscribeToAudio(true)
+      }
     },
     // 게임 끝냄 - 수연
     finishGame: () => {
