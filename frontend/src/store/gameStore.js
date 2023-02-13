@@ -158,6 +158,9 @@ const mutations = {
     setChat: (state, data) => {
       state.chat.push(data)
     },
+    setChatClear: (state) => {
+      state.chat = []
+    },
     setUserList: (state, data) => {
       state.userList.push(data)
     },
@@ -631,6 +634,8 @@ const actions = {
     context.commit("SET_PUBLISHER", undefined);
     context.commit("setClearUserList");
     context.commit("setClearUserKey");
+    context.commit("setClearUserKey");
+    context.commit("setChatClear");
   },
 
   updateMainVideoStreamManager: (commit, stream) => {
