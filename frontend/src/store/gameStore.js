@@ -109,92 +109,95 @@ const getters = {
 };
 
 const mutations = {
-  setTitle: (state, data) => {
-    state.title = data;
-    console.log("set적용되는지확인" + state.title);
-  },
-  setSecret: (state, payload) => {
-    state.isSecret = payload;
-  },
-  setPassword: (state, payload) => {
-    state.password = payload;
-  },
-  setTeam: (state, payload) => {
-    state.isTeamBattle = payload;
-    console.log("set적용되는지확인" + state.isTeamBattle);
-  },
-  setOV: (state, data) => {
-    state.OV = data;
-  },
-  setSession: (state, data) => {
-    state.session = data;
-  },
-  SET_PUBLISHER(state, data) {
-    state.publisher = data;
-  },
-  setMainStreamManager: (state, data) => {
-    state.mainStreamManager = data;
-  },
-  setSubscribers: (state, data) => {
-    state.subscribers = data;
-  },
-  setSessionId: (state, id) => {
-    state.sessionId = id;
-  },
-  setMyUserName: (state, name) => {
-    state.myUserName = name;
-  },
-  changeMode: (state) => {
-    state.isTeam = !state.isTeam;
-  },
-  setPlayerList: (state, data) => {
-    state.playerList = data;
-  },
-  setVolume1: (state, volume) => {
-    state.media = volume;
-  },
-  setVolume2: (state, volume) => {
-    state.alarm = volume;
-  },
-  SET_MESSAGES: (state, data) => {
-    state.messages = data;
-  },
-  setChat: (state, data) => {
-    state.chat.push(data);
-  },
-  setUserList: (state, data) => {
-    state.userList.push(data);
-  },
-  setClearUserList: (state) => {
-    state.userList = [];
-  },
-  setIsAllReady: (state, data) => {
-    console.log("setIsAllReady 찍힘", data);
-    state.isAllReady = data;
-  },
-  setUserKey: (state, data) => {
-    state.userKey.push(data);
-  },
-  setClearUserKey: (state) => {
-    state.userKey = [];
-  },
-  setReady: (state, data) => {
-    console.log("data:", data);
-    var index = data.index;
-    var ready = data.ready;
-    state.userList[index].isReady = ready;
-  },
-  setIsHost: (state, data) => {
-    state.isHost = data;
-  },
-  setMyConnectionId: (state, data) => {
-    state.myConnectionId = data;
-  },
-  setIsPresenter: (state, data) => {
-    var index = data.index;
-    var value = data.value;
-    state.userList[index].isPresenter = value;
-  },
+    setTitle: (state, data) => {
+        state.title = data
+        console.log('set적용되는지확인' + state.title);
+    },
+    setSecret: (state, payload) => {
+        state.isSecret = payload
+    },
+    setPassword: (state, payload) => {
+        state.password = payload
+    },
+    setTeam: (state, payload) => {
+        state.isTeamBattle = payload
+        console.log('set적용되는지확인' + state.isTeamBattle);
+    },
+    setOV: (state, data) => {
+        state.OV = data;
+    },
+    setSession: (state, data) => {
+        state.session = data;
+    },
+    SET_PUBLISHER (state, data) {
+        state.publisher = data
+    },
+    setMainStreamManager: (state, data) => {
+        state.mainStreamManager = data;
+    },
+    setSubscribers: (state, data) => {
+        state.subscribers = data;
+    },
+    setSessionId: (state, id) => {
+        state.sessionId = id;
+    },
+    setMyUserName: (state, name) => {
+        state.myUserName = name;
+    },
+    changeMode: (state) => {
+      state.isTeam = !state.isTeam
+    },
+    setPlayerList: (state, data) => {
+        state.playerList = data
+    },
+    setVolume1: (state, volume) => {
+      state.media = volume
+    },
+    setVolume2: (state, volume) => {
+      state.alarm = volume
+    },
+    SET_MESSAGES: (state, data) => {
+        state.messages = data
+    },
+    setChat: (state, data) => {
+      state.chat.push(data)
+    },
+    setChatClear: (state) => {
+      state.chat = []
+    },
+    setUserList: (state, data) => {
+      state.userList.push(data)
+    },
+    setClearUserList: (state) => {
+      state.userList = []
+    },
+    setIsAllReady: (state, data) => {
+      console.log('setIsAllReady 찍힘', data)
+      state.isAllReady = data
+    },
+    setUserKey: (state, data) => {
+      state.userKey.push(data)
+    },
+    setClearUserKey: (state) => {
+      state.userKey = []
+    },
+    setReady: (state, data) => {
+      console.log('data:', data)
+      var index = data.index
+      var ready = data.ready
+      state.userList[index].isReady = ready
+    },
+    setIsHost: (state, data) => {
+      state.isHost = data
+    },
+    setMyConnectionId: (state, data) => {
+      state.myConnectionId = data
+    },
+    setIsPresenter: (state, data) => {
+      var index = data.index
+      var value = data.value
+      state.userList[index].isPresenter = value
+    },
     setAmIDescriber: (state, data) => {
       state.amIDescriber = data
     },
@@ -676,6 +679,8 @@ const actions = {
     context.commit("SET_PUBLISHER", undefined);
     context.commit("setClearUserList");
     context.commit("setClearUserKey");
+    context.commit("setClearUserKey");
+    context.commit("setChatClear");
   },
 
   updateMainVideoStreamManager: (commit, stream) => {
@@ -935,6 +940,17 @@ const actions = {
         type: "game",
         data: {
           gameStatus: 20,
+        },
+        to: [],
+      });
+    } catch (err) {
+      console.log(err);
+    }
+    try {
+      state.session.signal({
+        type: "game",
+        data: {
+          gameStatus: 0,
         },
         to: [],
       });

@@ -20,7 +20,7 @@
     <!-- 아래부터 대기방 페이지 관련 코드-->
     <div class="component-waiting" v-if="!readyAll">
       <div class="users-component">
-        <p id="title">제목입니다</p>
+        <p id="title">{{state.title}}</p>
         <WaitingPage
           :sessionId="state.sessionId"
           :playerList="state.playerList"
@@ -100,7 +100,7 @@
             <v-img id="robot" src="@/assets/images/character.svg" alt="robot" />
           </div>
         </div>
-        <div class="ourteam-members">
+        <!-- <div class="ourteam-members">
           <div class="sec-draw" v-if="!amIDescriber">
             <user-video
               v-for="sub in myTeams"
@@ -118,7 +118,7 @@
               class="our-stream"
             />
           </div>
-        </div>
+        </div> -->
       </div>
       <footer></footer>
       
@@ -180,7 +180,7 @@ export default {
     );
     const router = useRouter();
     const state = reactive({
-      title: null,
+      title: computed(() => store.state.gameStore.title ),
       isSecret: false,
       password: null,
       isTeamBattle: null,
