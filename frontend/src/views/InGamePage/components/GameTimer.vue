@@ -5,6 +5,8 @@
   </template>
   
   <script>
+  import { mapState } from 'vuex';
+
 
   const TIME_LIMIT = 10;
   
@@ -17,7 +19,14 @@
     },
   
     computed: {
-  
+      ...mapState({
+        endRound(state) {
+          return state.gameStore.endRound
+        },
+        isHost(state) {
+          return state.gameStore.isHost
+        }
+      }),
       formattedTimeLeft() {
         const timeLeft = this.timeLeft;
         const minutes = Math.floor(timeLeft / 60);
