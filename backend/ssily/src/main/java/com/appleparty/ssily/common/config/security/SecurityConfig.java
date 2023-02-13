@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         web.ignoring()
-                .antMatchers("/favicon.ico", "/model.json");
+                .antMatchers("/favicon.ico", "/*.json", "/*.bin", "/images/*.png");
     }
 
     @Override
@@ -56,6 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/member/email").permitAll()
                 .antMatchers(HttpMethod.GET, "/member/nickname").permitAll()
                 .antMatchers(HttpMethod.POST, "/member/password").permitAll()
+                .antMatchers(HttpMethod.PUT, "/member/state").permitAll()
                 .antMatchers("/game/**").permitAll()
                 .anyRequest().authenticated()
 

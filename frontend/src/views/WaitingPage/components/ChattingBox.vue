@@ -1,102 +1,123 @@
 <template>
     <div>
-    <div id='chat-area'>
-        <div v-for="val in chat" v-bind:key="val.id">
-                <div v-if="val.user === myUserNick" class="mychat">
-                    {{ val.text }}
+        <div class='area-chat'>
+            <div v-for="val in chat" v-bind:key="val.id">
+                <div v-if="val.user === nickname" class="text-chat-me">
+                    <div>{{ val.text }}</div>
                 </div>
-                <div v-else class="otherchat">
-                    {{ val.user }} : {{ val.text }}
+                <div v-else class="text-chat-other">
+                    <div>{{ val.user }} : {{ val.text }}</div>
                 </div>
             </div>
         </div>
-    <div class='chat_input'>
-            <input v-model='chattings' @keyup.enter='sendMessage' placeholder="input message.." type="text" class="message_input"/>
-            <button :disabled="!chattings" @click='sendMessage' type="submit" class="message_submit">Send</button>
+        <div class='group-chat'>
+            <input v-model='state.chattings' placeholder="input message.." @keyup.enter='sendMessage' type="text" class="input-chat"/>
+            <button :disabled="!state.chattings" @click='sendMessage' type="submit" class="btn-submit-chat">Send</button>
         </div>
+
     </div>
 </template>
 
 <script>
+import { useStore } from 'vuex';
+import { computed } from 'vue';
+import { reactive } from '@vue/reactivity'
+import { watch } from 'vue'
+
+// watch,
 export default {
     name:'ChattingBox',
-    data(){
-        return{
+    setup() {
+        const store = useStore()
+        const chat = computed(() => store.state.gameStore.chat);
+        const state = reactive({
             chattings:'',
-            chat:[],
-            myUserNick : null,
+            chat: [] ,
+            userNick:'',
+            sendData:'',
+        })
+        
+        const nickname = store.state.accountStore.user.nickname || '';
+        console.log("chattingBox nick", nickname);
+
+        watch(() => chat, (newValue, oldValue) => {
+            console.log('chat변화감지', {newValue, oldValue })
+            setTimeout(() => {
+            var chatDiv = document.getElementById("chat-area");
+            chatDiv.scrollTo({
+            top: chatDiv.scrollHeight - chatDiv.clientHeight,
+            behavior: 'smooth'
+                 })
+            }, 50);
+        })
+
+        const sendMessage = () => {
+            store.dispatch('gameStore/sendMessage', state.chattings)
+            state.chattings = ''
+        }
+  
+        return {
+            store, 
+            state, 
+            nickname, 
+            chat,
+            // onMounted, 
+            sendMessage
         }
     },
-    props:{
-        session: Object,
-    },
-    watch: {
 
-    chat() {
-   setTimeout(() => {
-   var chatDiv = document.getElementById("chat-area");
-   chatDiv.scrollTo({
-      // document.body.scrollTop = document.body.scrollHeight;
-      top: chatDiv.scrollHeight - chatDiv.clientHeight,
-      behavior: 'smooth'
-          })
-      }, 50);
-    },
-    },
-    created: function(){
-        this.myUserNick = '내 이름'
-        console.log('닉넴')
-        console.log(this.myUserNick)
-              //  방에 들어와 있는 모든 사람이 받는거
-            this.session.on('signal:my-chat', (event) => {
-            console.log('여기')
-            console.log(event)
-                // this.chatting_user = event.from.data["clientData"]
-            console.log('내가 입력한 내용')
-            console.log(event.data); // Message
-            const content = event.data.slice(1, -1) // Message
-            console.log('입력한 사람')
-            console.log(event.from.data); // Message
-            const chatting_user = event.from.data.slice(15, -2)
-            console.log(chatting_user)
-
-            const aa = JSON.parse(event.data)
-            console.log('aa')
-            console.log(aa)
-            if (aa.correct) {
-               this.chat.push({
-                   user: chatting_user,
-                   text: `정답은 ${aa.answer}입니다.`
-               });
-            }
-            else {
-               this.chat.push({
-                   user: chatting_user,
-                   text: content
-               });
-            }
-              });
-        
-    },
-    methods:{
-        sendMessage() {
-            // post 같은 느낌 = signal
-            this.session.signal({
-                    data: JSON.stringify(this.chattings),
-                    type: 'my-chat'
-                })
-                .then(() => {
-                    this.chattings = '';
-                    console.log('Message success');
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-        },
-      },
 }
 </script>
 
 <style>
-
+.area-chat {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 5px 25px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.group-chat {
+    width: 100%;
+    height: 50px;
+    padding: 0 30px;
+    border-top: 1px solid #00000014;
+}
+.input-chat  {
+    width: 80%;
+}
+.btn-submit-chat {
+    width: 20%;
+    min-width: 80px;
+}
+.group-chat>button, .group-chat>input {
+    height: inherit;
+}
+.text-chat-me {
+    border-radius: 10px;
+    text-align: right;
+    margin: 4px 0;
+    display: flex;
+    flex-direction: row-reverse;
+}
+.text-chat-me>div {
+    background: rgb(255, 217, 0);
+    padding: 2px 10px;
+    border-radius: 10px 10px 0 10px;
+}
+.text-chat-other {
+    border-radius: 10px;
+    text-align: left;
+    margin: 4px 0;
+    display: flex;
+    flex-direction: row;
+}
+.text-chat-other>div {
+    background: rgb(234 234 234);
+    color: black;
+    padding: 2px 10px;
+    border-radius: 0 10px 10px 10px;
+}
 </style>

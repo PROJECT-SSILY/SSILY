@@ -3,16 +3,16 @@ module.exports = {
 
   pluginOptions: {
     vuetify: {
-			// https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
-		}
+      // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
+    },
   },
-  
+
   devServer: {
     proxy: {
-        '/api': {
-            target: 'http://localhost:8080/',
-            changeOrigin: true,
-        }
+      "/api": {
+        target: "http://localhost:5500/",
+        changeOrigin: true,
+      },
     },
-  } 
-}
+  },
+};

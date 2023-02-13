@@ -36,6 +36,9 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// 파일 처리 관련 의존성
+	implementation 'commons-io:commons-io:2.6'
 }
 
 tasks.named('test') {
