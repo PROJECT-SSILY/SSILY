@@ -235,6 +235,7 @@ export default {
     onBeforeMount(async () => {
       await store.dispatch("accountStore/getMeAction");
       console.log("join start");
+
       joinSession();
     });
 
