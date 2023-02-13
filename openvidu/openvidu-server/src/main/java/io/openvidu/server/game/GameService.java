@@ -381,7 +381,7 @@ public class GameService   {
         answers = answers.substring(4, answers.length()-4);
         String[] answerArray = answers.split("\\\\\",\\\\\"");
 
-        boolean isCorrect = false;
+        boolean isCorrect = true ; // 원래 false, 테스트를 위해 잠깐 바꿔놓겠습니다 .. = 수연
 
         for (String a : answerArray) {
             if(a.equals(answer)){
