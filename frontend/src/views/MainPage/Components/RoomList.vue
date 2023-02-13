@@ -80,7 +80,14 @@ export default {
         }
       }),
       passwordDialog: false,
-      alert: false
+      alert: false,
+
+      // 페이지네이션
+      // currentPage: null, //현재 페이지
+      // limit: null,  //한 페이지 당 나타낼 데이터의 갯수
+      // pageCount: null,  //화면에 나타날 페이지 갯수
+      // totalCount: null,  //총 데이터의 갯수
+      // totalPage: Math.ceil(state.totalCount/state.limit),
     });
 
     const getInRoom = async function (params) {

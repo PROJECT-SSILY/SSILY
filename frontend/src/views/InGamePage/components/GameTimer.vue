@@ -8,7 +8,7 @@
   import { mapState } from 'vuex';
 
 
-  const TIME_LIMIT =  7;
+  const TIME_LIMIT =  60;
   
   export default {
     data() {
@@ -32,7 +32,7 @@
         const minutes = Math.floor(timeLeft / 60);
         let seconds = timeLeft % 60;
   
-        if (seconds < 10) {
+        if (seconds < 60) {
           seconds = `0${seconds}`;
         }
   
