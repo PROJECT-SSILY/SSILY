@@ -1,7 +1,7 @@
 <template>
   <div class="list-users">
     <PasswordInput
-    v-if="isSecret && !isHost"/>
+    v-if="isSecret "/>
           <UserInfo
           class="list-users-item"
           v-for="user in userList"

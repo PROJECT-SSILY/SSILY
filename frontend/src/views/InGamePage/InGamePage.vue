@@ -179,7 +179,7 @@ export default {
     const router = useRouter();
     const state = reactive({
       title: null,
-      isSecret: false,
+      isSecret: computed(()=>store.state.gameStore.password),
       password: null,
       isTeamBattle: null,
       mainStreamManager: undefined,
@@ -233,6 +233,7 @@ export default {
     onBeforeMount(async () => {
       await store.dispatch("accountStore/getMeAction");
       console.log("join start");
+
       joinSession();
     });
 
