@@ -62,7 +62,7 @@ export default {
       canvas.on("mouse:up", function () {
         // getFrame();
         mousePressed = false;
-        submitCanvas();
+        // submitCanvas();
       });
       canvas.on("mouse:down", function () {
         mousePressed = true;
@@ -103,6 +103,7 @@ export default {
       else { //제출
         setTimeout(() => submitPossible=true, 3000);
         submitPossible=false;
+        submitCanvas();
         submitDrawing();
       }
     };
@@ -140,12 +141,19 @@ export default {
        * Get image data in canvas
        */
 
+      const mbb = getMinBox();
+      const dpi = window.devicePixelRatio;
+
+      // console.log("mbb = {}", mbb);
+      // console.log("mbb.max = {}", mbb.max);
+      let max = mbb.max;
+      let min = mbb.min;
+
+      if(max.x == Infinity || max.x == -Infinity || max.y == Infinity || max.y == -Infinity) return;
+      if(min.x == Infinity || min.x == -Infinity || min.y == Infinity || min.y == -Infinity) return;
       
       // fabricCanvas.value.setBackgroundColor("#FFFFFF")
       // fabricCanvas.value.renderAll()
-      
-      const mbb = getMinBox();
-      const dpi = window.devicePixelRatio;
 
 
       fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
@@ -276,7 +284,9 @@ export default {
       /**
        * Get image on canvas and submit it to the model for prediction
        */
-      raw_predictions = model.predictClass(getImageData());
+      let imageData = getImageData();
+      if(imageData == null) raw_predictions = [];
+      else raw_predictions = model.predictClass(imageData);
     };
 
     const findIndicesOfMax = function () {
