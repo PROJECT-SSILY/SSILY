@@ -4,6 +4,8 @@ function preprocess(img) {
     /**
      * Convert an image from canvas to a tensor that the model can process
      */
+    if(img == null) return;
+    console.log("a");
     return tf.tidy(() => {
         //convert to a tensor
         let tensor = tf.browser.fromPixels(img, 1);

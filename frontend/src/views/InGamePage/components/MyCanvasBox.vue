@@ -59,7 +59,7 @@ export default {
       canvas.on("mouse:up", function () {
         // getFrame();
         mousePressed = false;
-        submitCanvas();
+        // submitCanvas();
       });
       canvas.on("mouse:down", function () {
         mousePressed = true;
@@ -79,6 +79,7 @@ export default {
     };
 
     const predictModel = function () {
+      submitCanvas();
       submitDrawing();
     };
 
@@ -117,6 +118,14 @@ export default {
 
       const mbb = getMinBox();
       const dpi = window.devicePixelRatio;
+
+      // console.log("mbb = {}", mbb);
+      // console.log("mbb.max = {}", mbb.max);
+      let max = mbb.max;
+      let min = mbb.min;
+
+      if(max.x == Infinity || max.x == -Infinity || max.y == Infinity || max.y == -Infinity) return;
+      if(min.x == Infinity || min.x == -Infinity || min.y == Infinity || min.y == -Infinity) return;
       
       // fabricCanvas.value.setBackgroundColor("#FFFFFF")
       // fabricCanvas.value.renderAll()
@@ -244,7 +253,9 @@ export default {
       /**
        * Get image on canvas and submit it to the model for prediction
        */
-      raw_predictions = model.predictClass(getImageData());
+      let imageData = getImageData();
+      if(imageData == null) raw_predictions = [];
+      else raw_predictions = model.predictClass(imageData);
     };
 
     const findIndicesOfMax = function () {
