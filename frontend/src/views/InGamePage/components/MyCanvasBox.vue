@@ -10,21 +10,21 @@
       </div>
     </div>
     <canvas
-        width="600"
-        height="400"
+        width="560"
+        height="330"
         id="canvas"
     >
     </canvas>
     <!-- 여기부터 신대득의 테스트 공간..-->
-    <div style="margin: 1rem">
-    <canvas
-        width="600"
-        height="400"
-        id="answerCanvas"
-    ></canvas>
+    <!-- <div style="margin: 1rem">
+      <canvas
+          width="600"
+          height="400"
+          id="answerCanvas"
+      ></canvas>
       <v-btn @click="canvasToImage">그림보내기</v-btn>
       <v-btn @click="imageToCanvas">그림받기</v-btn>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -74,7 +74,7 @@ export default {
       fabricCanvas.value.clear();
       raw_predictions = null;
       coords = [];
-      fabricCanvas.value.backgroundColor = "#FFFFFF";
+      fabricCanvas.value.backgroundColor = "rgba(81, 255, 255, 0.2)";
     };
 
     const predictModel = function () {
@@ -293,21 +293,21 @@ export default {
 
       fabricCanvas.value = new fabric.Canvas(`canvas`, {
         backgroundColor: "transparent",
-        isDrawingMode: 0,
+        isDrawingMode: 1,
       });
 
-      fabricCanvas.value.backgroundColor = "#FFFFFF";
+      fabricCanvas.value.backgroundColor = "rgba(81, 255, 255, 0.2)";
 
       const brush = fabricCanvas.value.freeDrawingBrush;
       if (fabricCanvas.value.freeDrawingBrush) {
-        brush.width = 5;
-        brush.color = "black";
+        brush.width = 15;
+        brush.color = "#AEFFFF";
         brush.shadow = new fabric.Shadow({
           blur: 30,
-          offsetX: 10,
-          offsetY: 10,
+          offsetX: 0,
+          offsetY: 0,
           affectStroke: false,
-          color: "grey",
+          color: "#51FFFF",
         });
       }
 
@@ -360,39 +360,39 @@ export default {
 }
 
 #canvas, .upper-canvas {
-    border-radius: 55px;
-    /* position: inherit; */
+    border-radius: 20px;
+    border: 1px solid rgba(81, 255, 255, 0.6);
+    box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
 }
 
 .group_button {
-    width: 45px;
-    height: 90px;
-    position: absolute;
-    margin-top: -50px;
-    margin-left: 10px;
-    top: 50%;
-    z-index: 100;
-    border-radius: 15px;
-    box-shadow: 0px 0px 20px 0px #0000003b;
+  width: 45px;
+  height: 90px;
+  position: absolute;
+  margin-top: -50px;
+  margin-left: 10px;
+  top: 50%;
+  right: 10px;
+  z-index: 100;
 }
 
 #brush, #eraser {
-    width: 45px;
-    height: 45px;
-    padding: 10px;
-    cursor: pointer;
-    background: white;
+  width: 45px;
+  height: 45px;
+  padding: 10px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
 }
 #brush {
-    border-radius: 15px 15px 0 0;
+    border-radius: 30px 30px 0 0;
 }
 #eraser {
-    border-radius: 0 0 15px 15px;
+    border-radius: 0 0 30px 30px;
 }
 #brush:hover, #eraser:hover {
-    background: rgb(227, 227, 227);
+    background: rgba(255, 255, 255, 0.2);
 }
 #brush:active, #eraser:active {
-    background: rgb(195, 195, 195);
+    background: rgba(255, 255, 255, 0.2);
 }
 </style>

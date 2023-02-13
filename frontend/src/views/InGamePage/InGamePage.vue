@@ -2,24 +2,23 @@
   <SettingDialog v-show="state.setDialog" />
   <div
     class="bg-dark"
-    :class="state.setDialog ? 'active':''"
+    :class="state.setDialog ? 'active' : ''"
     @click="closeDialog"
   ></div>
   <div class="wrap-page">
     <!----------------------------------- 개발용 버튼 -------------------------------------->
-    <p style="position:absolute; top:0;">
+    <p style="position: absolute; top: 0; opacity: 0.2; z-index: 3">
       <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
       <v-btn @click="state.isTeamBattle = !state.isTeamBattle"
         >팀/개인전 변경</v-btn
       >
       <v-btn>게임 순서 변경</v-btn>
+      <v-btn @click="forceRender">시계</v-btn>
     </p>
     <!------------------------------------------------------------------------------------->
 
-
-
     <!-- 아래부터 대기방 페이지 관련 코드-->
-    <div class="waiting-component" v-if="!readyAll">
+    <div class="component-waiting" v-if="!readyAll">
       <div class="users-component">
         <p id="title">제목입니다</p>
         <WaitingPage
@@ -31,86 +30,50 @@
         />
       </div>
       <div class="content-component">
-        <ChattingBox class="box-chat"/>
+        <ChattingBox class="box-chat" />
         <div class="box-btn">
-          <!-- <div class="box-blank"></div> --> <!-- 추후 업데이트 시 사용 예정 -->
-          <button class="btn-ready" :class="state.ready?'ready':''" @click="clickReady">READY</button>
+          <!-- <div class="box-blank"></div> -->
+          <!-- 추후 업데이트 시 사용 예정 -->
+          <button
+            class="btn-ready"
+            :class="state.ready ? 'ready' : ''"
+            @click="clickReady"
+          >
+            READY
+          </button>
           <button class="btn-profile">내 프로필</button>
         </div>
       </div>
       <footer>
         <div class="inner-footer">
-            <button class="btn-main" @click="clickExit">메인</button>
-            <input class="notice" type="text" disabled value="notice">
-            <button class="btn-store">상점</button>
-            <button class="btn-set" @click="state.setDialog=!state.setDialog">설정</button>
+          <button class="btn-exit" @click="clickExit">나가기</button>
+          <input class="notice" type="text" disabled value="notice" />
+          <button class="btn-store">상점</button>
+          <button class="btn-set" @click="state.setDialog = !state.setDialog">
+            설정
+          </button>
         </div>
       </footer>
+      <!-- 배경 -->
+      <div class="background">
+        <div id="stars" class="rotating"></div>
+      </div>
     </div>
 
+    <!-- 아래부터 게임 진행 페이지 관련 코드-->
+    <div class="component-ingame" v-else>
+      <header>
+        <!-- <RoundResult /> -->
+        <!-- <GameResult v-show="endGame" /> -->
+        <GameTimer :key="gameTimer" id="timer" />
+        <!-- <GameScore/> -->
+        <!-- <h1>{{ round }} 라운드</h1> -->
+      </header>
 
-
-
-
-
-<!-- 아래부터 게임 진행 페이지 관련 코드-->
-
-    <div class="in_game_component" v-else>
-      <RoundResult />
-      <GameResult v-show="endGame"/>
-      <GameTimer :key="gameTimer"/>
-      <v-btn @click="forceRender">시계</v-btn>
-      <h1>{{ round + 1}} 라운드</h1>
-      <GameScore />
-      <v-container>
-        <v-row>
-          <v-col>
-            <h1>상대 팀</h1>
-            <user-video
-              v-for="sub in opponents"
-              :key="sub.stream.connection.connectionId"
-              :stream-manager="sub"
-            />
-          </v-col>
-          <v-col>
-            <div id="video-container" class="col-md-6">
-              <div class="me">
-                <h1>나</h1>
-                <div class="drawing_sec" v-if="!amIDescriber">
-                  <MyCanvasBox />
-                  <user-video :stream-manager="publisher" />
-                </div>
-                <div class="displaying_sec" v-else>
-                  <user-video :stream-manager="publisher" />
-                </div>
-              </div>
-              <div class="our_team">
-                <h1>우리 팀</h1>
-                <div class="drawing_sec" v-if="amIDescriber">
-                  <user-video
-                    v-for="opp in opponents"
-                    :key="opp.stream.connection.connectionId"
-                    :stream-manager="opp"
-                  />
-                  <MyCanvasBox />
-                </div>
-                <div class="displaying_sec" v-else>
-                  <user-video
-                    v-for="opp in opponents"
-                    :key="opp.stream.connection.connectionId"
-                    :stream-manager="opp"
-                  />
-                </div>
-              </div>
-            </div>
-          </v-col>
-        </v-row>
-      </v-container>
-    </div>
-    <!-- <div class="ingame_component_content">
-      <div class="opponent_container">
+      <!-- 상대 팀 -->
+      <div class="area-opponents">
         <user-video
-          class="opp_stream"
+          class="stream-opponent"
           v-for="sub in opponents"
           :key="sub.stream.connection.connectionId"
           :stream-manager="sub"
@@ -121,57 +84,65 @@
           "
         />
       </div>
-      <div class="ourteam_container">
+
+      <!-- 우리 팀 -->
+      <div class="area-ourteam">
         <div class="me">
-          <div class="draw_sec" v-if="!amIDescriber">
+          <div class="sec-draw" v-if="amIDescriber">
             <MyCanvasBox class="canvas" />
-            <user-video :stream-manager="publisher" class="my_stream" />
+            <user-video :stream-manager="publisher" class="stream-me" />
           </div>
-          <div class="display_sec" v-else>
-            <user-video :stream-manager="publisher" class="my_stream" />
+          <div class="sec-display" v-else>
+            <user-video :stream-manager="publisher" class="stream-me" />
+          </div>
+          <div class="wrap-robot">
+            <v-img id="robot" src="@/assets/images/character.svg" alt="robot" />
           </div>
         </div>
-        <div class="ourteam_members">
-          <div class="draw_sec" v-if="amIDescriber">
+        <div class="ourteam-members">
+          <div class="sec-draw" v-if="!amIDescriber">
             <user-video
               v-for="sub in myTeams"
               :key="sub.stream.connection.connectionId"
               :stream-manager="sub"
-              class="our_stream"
+              class="our-stream"
             />
             <MyCanvasBox class="canvas" />
           </div>
-          <div class="display_sec" v-else>
+          <div class="sec-display" v-else>
             <user-video
               v-for="sub in myTeams"
               :key="sub.stream.connection.connectionId"
               :stream-manager="sub"
-              class="our_stream"
+              class="our-stream"
             />
           </div>
         </div>
       </div>
-    </div> -->
+      <footer></footer>
+      
+      <!-- 배경 -->
+      <div class="background-ingame"></div>
+    </div>
   </div>
 </template>
 
 <script>
-import GameTimer from "./components/GameTimer.vue";
 import UserVideo from "./components/UserVideo.vue";
 import MyCanvasBox from "./components/MyCanvasBox.vue";
-import GameScore from "./components/GameScore.vue";
 import WaitingPage from "@/views/WaitingPage/WaitingPage.vue";
 import ChattingBox from "@/views/WaitingPage/components/ChattingBox.vue";
-import RoundResult from "./components/RoundResult.vue";
-import SettingDialog from "@/views/SettingDialog.vue"
+import SettingDialog from "@/views/SettingDialog.vue";
 import $axios from "axios";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { GetPlayerList } from "@/common/api/gameAPI";
 import { reactive, ref } from "@vue/reactivity";
 import { onBeforeMount, computed } from "vue";
-import GameResult from "../InGamePage/components/GameResult.vue";
-
+import GameTimer from "./components/GameTimer.vue";
+// import GameScore from "./components/GameScore.vue";
+// import RoundResult from "./components/RoundResult.vue";
+// import GameResult from "../InGamePage/components/GameResult.vue";
 
 //=================OpenVdue====================
 $axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -185,10 +156,10 @@ export default {
     MyCanvasBox,
     WaitingPage,
     ChattingBox,
-    GameScore,
-    RoundResult,
+    // GameScore,
+    // RoundResult,
     SettingDialog,
-    GameResult,
+    // GameResult,
   },
   props: {
     ready: Boolean,
@@ -227,7 +198,6 @@ export default {
 
       // 모달 관련
       setDialog: false,
-
     });
 
     // == OpenVidu State ==
@@ -251,9 +221,9 @@ export default {
       //   }
       // }
       store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
-      console.log("여기까지")
+      console.log("여기까지");
       await store.dispatch("gameStore/joinSession", state.sessionId);
-      console.log("여기까지 완료")
+      console.log("여기까지 완료");
     };
     const leaveSession = async function () {
       store.dispatch("gameStore/leaveSession");
@@ -278,7 +248,7 @@ export default {
     };
 
     const clickReady = () => {
-      console.log("ready")
+      console.log("ready");
       store.dispatch("gameStore/changeReady");
     };
 
@@ -299,11 +269,11 @@ export default {
       state.setDialog = false;
     };
 
-    const gameTimer = ref(0)
+    const gameTimer = ref(0);
 
-    const forceRender = function() {
-      gameTimer.value += 1
-    }
+    const forceRender = function () {
+      gameTimer.value += 1;
+    };
     return {
       router,
       state,
@@ -334,8 +304,22 @@ export default {
 </script>
 
 <style scoped>
-/* ======= waiting_component ================================================================= */
-
+/* ======= component-waiting ================================================================= */
+.background-ingame {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  background: rgb(0, 0, 0);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(85, 140, 164, 1) 50%,
+    rgba(0, 0, 0, 1) 100%
+  );
+}
 .wrap-page {
   height: 100vh;
   width: 100%;
@@ -345,18 +329,18 @@ export default {
   flex-direction: column;
   z-index: 0;
 }
-.waiting-component {
+.component-waiting {
   width: 800px;
   height: 550px;
   background: white;
   border-radius: 60px;
-  padding:40px;
+  padding: 40px;
 }
 .users-component {
   width: 100%;
   padding: 10px;
   border-radius: 30px;
-  background: #D9D9D9;
+  background: #d9d9d9;
   box-shadow: inset 0 0 5px rgb(0 0 0 / 25%);
 }
 .content-component {
@@ -369,9 +353,9 @@ export default {
 .box-chat {
   width: 100%;
   height: 225px;
-  background: #F9F9F9;
+  background: #f9f9f9;
   border-radius: 30px;
-  border: 1px solid #E6E6E6;
+  border: 1px solid #e6e6e6;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -389,18 +373,18 @@ export default {
   border-radius: 30px;
   box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.25);
 }
-.box-btn>button {
+.box-btn > button {
   width: 170px;
   height: 70px;
   border-radius: 30px;
   margin: 7px 0;
   transition: 0.1s;
 }
-.box-btn>button:hover {
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+.box-btn > button:hover {
+  box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.5);
 }
-.box-btn>button:active {
-  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.5);
+.box-btn > button:active {
+  box-shadow: inset 0 2px 3px 1px rgba(0, 0, 0, 0.5);
 }
 .btn-ready {
   background: #24cb83;
@@ -408,14 +392,14 @@ export default {
   font-size: 25px;
 }
 .btn-ready:hover {
-  background: #ddc300;
+  background: #fadd00;
   font-size: 30px;
 }
 .btn-ready:active {
-  background: #b49f00;
+  background: rgb(221, 196, 0);
 }
 .btn-profile {
-  background: #C6C6C6;
+  background: #c6c6c6;
   color: white;
   font-size: 20px;
 }
@@ -432,83 +416,9 @@ export default {
   height: 20px;
   text-align: left;
   margin: 7px 20px;
-  color: #5b5b5b;
   font-weight: 600;
   font-size: 15px;
-}
-
-
-/* ----------------------------------- */
-
-.chat_box {
-  flex: auto;
-  border-radius: 30px;
-  height: 500px;
-  background-color: #ffffffeb;
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: space-between;
-  padding: 20px 30px;
-}
-/* =========================================================================================== */
-
-/* ======= in_game_component ================================================================= */
-.in_game_component {
-  display: flex;
-  flex-direction: column;
-  width: 100vw;
-}
-.ingame_component_content {
-  display: flex;
-  flex-direction: row;
-  width: 100vw;
-  height: 100vh;
-}
-.opponent_container,
-.ourteam_container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 50%;
-  min-width: 300px;
-}
-.display_sec {
-  width: 100%;
-}
-.display_sec .my_stream {
-  width: 100%;
-  overflow: hidden;
-  box-shadow: 0px 0px 20px 0px #0000003b;
-}
-.draw_sec {
-  position: relative;
-}
-.opp_stream {
-  transition-duration: 0.3s;
-  height: 225px;
-  margin: 10px 0;
-  width: 300px;
-  border-radius: 43px;
-  box-shadow: 0px 0px 20px 0px #0000005c;
-}
-.presenter {
-  height: 315px;
-  margin: 10px 0;
-  width: 420px;
-}
-.draw_sec .my_stream {
-  height: 100px;
-  width: 100px;
-  right: 10px;
-  bottom: 10px;
-  position: absolute;
-  border-radius: 100px;
-  overflow: hidden;
-  box-shadow: 0px 0px 20px 0px #0000005c;
-}
-.canvas {
-  width: 100%;
+  color: #8b8b8b;
 }
 footer {
   width: 100%;
@@ -529,26 +439,149 @@ footer {
   border-top-right-radius: 60px;
   padding: 10px;
 }
-.inner-footer>button, .inner-footer>.notice {
+.inner-footer > button,
+.inner-footer > .notice {
   padding: 3px 20px;
   margin: 0 10px;
   border-radius: 10px;
   height: 30px;
 }
-.btn-main {
+.btn-exit {
   background: #e3ac00;
   color: white;
 }
+.btn-exit:hover {
+  background: #ffbf00;
+}
+.btn-exit:active {
+  background: rgb(214, 160, 0);
+}
 .notice {
   width: 400px;
-  background: #4F4F4F;
+  background: #4f4f4f;
   display: inline-block;
-  padding: 3px 10px;
-  color: white;
+  color: #c2c2c2;
 }
-.btn-store, .btn-set {
-  border: 1px solid #4B4B4B;
-  color: #EFEDED;
+.btn-store,
+.btn-set {
+  border: 1px solid #4b4b4b;
+  color: #efeded;
+}
+.btn-store:hover,
+.btn-set:hover {
+  background: #787878;
+}
+.btn-store:active,
+.btn-set:active {
+  background: #656565;
+}
+
+/* ----------------------------------- */
+
+/* ======= component-ingame ================================================================= */
+.component-ingame {
+  width: 100%;
+  max-width: 1000px;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+header {
+  width: 100%;
+  height: 60px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+#timer {
+  font-size: 35px;
+  color: white;
+  font-family: "Orbitron", sans-serif;
+}
+.area-opponents {
+  width: 40%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  max-height: 100vh;
+  min-width: 390px;
+  overflow: hidden;
+}
+.area-ourteam {
+  width: 60%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  max-height: 100vh;
+}
+.me {
+  position: relative;
+}
+/* ------------------------------------------------------------ */
+.wrap-robot {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 120%;
+  width: 100%;
+  min-width: 300px;
+  z-index: 0;
+}
+#robot {
+  width: 300px;
+}
+/* ------------------------------------------------------------ */
+.sec-display {
+  width: 100%;
+}
+.sec-display > .stream-me {
+  width: 100%;
+  overflow: hidden;
+}
+.sec-draw {
+  position: relative;
+}
+.stream-opponent {
+  transition-duration: 0.3s;
+  height: 140.63px;
+  margin: 10px 0;
+  width: 250px;
+  border-radius: 30px;
+  opacity: 0.5;
+  border: 1px solid rgba(81, 255, 255, 0.5);
+}
+.stream-opponent.presenter {
+  height: 196.8px;
+  margin: 10px 0;
+  width: 350px;
+  opacity: 0.9;
+  box-shadow: 0 0 10px 3px rgba(81, 255, 255, 0.5);
+}
+.sec-draw .stream-me {
+  /* 그림 그릴 때 내 모습 */
+  height: 80px;
+  width: auto;
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  border-radius: 12px;
+  box-shadow: 0px 0px 20px 0px #0000005c;
+  opacity: 0.8;
+  z-index: 1;
+}
+.canvas {
+  width: 100%;
+  z-index: 1;
 }
 /* =========================================================================================== */
 </style>
