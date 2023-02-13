@@ -50,7 +50,7 @@ import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 // import { getCurrentInstance } from "vue";
 import { reactive, onMounted, computed } from "vue";
-import { roomList } from "@/common/api/gameAPI";
+import { roomList, room } from "@/common/api/gameAPI";
 import RoomListItem from "@/views/MainPage/Components/RoomListItem.vue";
 import PasswordInput from "@/views/WaitingPage/components/PasswordInput.vue";
 
@@ -79,25 +79,37 @@ export default {
       passwordDialog: false,
     });
 
-    const getInRoom = function (params) {
+    const getInRoom = async function (params) {
       const roominfo = JSON.parse(JSON.stringify(params));
-      if (roominfo.isSecret) {
-        state.passwordDialog = true
-        
-      } else {
-      // state.password = prompt('비밀번호를 입력해주세요.');
-      console.log(state.password)
-      console.log(roominfo.isTeamBattle)
-      store.commit("gameStore/setTitle", roominfo.title);
-      store.commit("gameStore/setTeam", roominfo.isTeamBattle);
-      store.commit("gameStore/setSecret", roominfo.isSecret);
-      store.commit("gameStore/setPassword", roominfo.password);
-      router.push({
-        name: "gameroom",
-        params: { sessionId: roominfo.sessionId },
-      });
-    }
+      const isExistRoom=await getRoom(roominfo.sessionId);
+      if(!isExistRoom) {
+        alert('존재하지 않는 방입니다');
+        return;
+      }
+      else {
+        if (roominfo.isSecret) {
+          state.passwordDialog = true
+          
+        } else {
+          // state.password = prompt('비밀번호를 입력해주세요.');
+          console.log(state.password)
+          console.log(roominfo.isTeamBattle)
+          store.commit("gameStore/setTitle", roominfo.title);
+          store.commit("gameStore/setTeam", roominfo.isTeamBattle);
+          store.commit("gameStore/setSecret", roominfo.isSecret);
+          store.commit("gameStore/setPassword", roominfo.password);
+          router.push({
+            name: "gameroom",
+            params: { sessionId: roominfo.sessionId },
+          });
+        }
+      }
     };
+
+    const getRoom=(sessionId) => {
+      const response= room(sessionId);
+      return response;
+    }
 
     // 방 리스트 조회
     onMounted(async () => {
