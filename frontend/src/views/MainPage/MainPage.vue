@@ -80,10 +80,11 @@ export default {
       });
     };
 
-    onMounted(() => 
-      store.dispatch('accountStore/getMeAction') // 메인페이지에서 닉네임 사라지지 않도록 처리
+    onMounted(() => {
+        store.dispatch('accountStore/getMeAction') // 메인페이지에서 닉네임 사라지지 않도록 처리
+        store.dispatch("gameStore/leaveSession");
+      }
     )
-
 
     return {
       store,
