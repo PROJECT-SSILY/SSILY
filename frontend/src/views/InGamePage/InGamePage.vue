@@ -7,7 +7,7 @@
   ></div>
   <div class="wrap-page">
     <!----------------------------------- 개발용 버튼 -------------------------------------->
-    <p style="position: absolute; top: 0; opacity:0.2;">
+    <p style="position: absolute; top: 0; opacity:0.2;z-index: 3;">
       <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
       <v-btn @click="state.isTeamBattle = !state.isTeamBattle"
         >팀/개인전 변경</v-btn
@@ -97,7 +97,7 @@
         </div>
         </div>
         <div class="ourteam-members">
-          <div class="sec-draw" v-if="amIDescriber">
+          <div class="sec-draw" v-if="!amIDescriber">
             <user-video
               v-for="sub in myTeams"
               :key="sub.stream.connection.connectionId"
