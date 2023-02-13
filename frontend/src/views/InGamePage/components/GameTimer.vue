@@ -8,7 +8,7 @@
   import { mapState } from 'vuex';
 
 
-  const TIME_LIMIT = 60;
+  const TIME_LIMIT =  7;
   
   export default {
     data() {
@@ -62,10 +62,12 @@
       },
       endRound(newValue) {
         if (newValue == true) {
+          console.log('타이머 리셋')
           // 라운드가 끝나면 타이머 리셋 - 수연
           this.onTimesUp();
           this.timePassed = 0
         } else {
+          console.log('타이머 시작')
           // 라운드가 시작되면 타이머 시작
           this.startTimer();
         }

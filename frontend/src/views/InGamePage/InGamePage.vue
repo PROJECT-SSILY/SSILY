@@ -88,12 +88,12 @@
       <!-- 우리 팀 -->
       <div class="area-ourteam">
         <div class="me">
-          <div class="sec-draw" v-if="amIDescriber">
-            <h1>설명해야할 단어: {{ word }}</h1>>
+          <div class="sec-draw" v-if="!amIDescriber">
             <MyCanvasBox class="canvas" />
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="sec-display" v-else>
+            <h1>설명해야할 단어: {{ word }}</h1>>
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="wrap-robot">
