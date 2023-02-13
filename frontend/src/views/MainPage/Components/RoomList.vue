@@ -90,7 +90,7 @@ export default {
       console.log(roominfo.isTeamBattle)
       store.commit("gameStore/setTitle", roominfo.title);
       store.commit("gameStore/setTeam", roominfo.isTeamBattle);
-      store.commit("gameStore/setIsSecret", roominfo.isSecret);
+      store.commit("gameStore/setSecret", roominfo.isSecret);
       store.commit("gameStore/setPassword", roominfo.password);
       router.push({
         name: "gameroom",

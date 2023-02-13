@@ -186,9 +186,6 @@ const mutations = {
     setIsHost: (state, data) => {
       state.isHost = data
     },
-    setIsSecret: (state, data) => {
-      state.isSecret = data
-    },
     setMyConnectionId: (state, data) => {
       state.myConnectionId = data
     },

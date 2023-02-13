@@ -76,7 +76,7 @@
           store.commit("gameStore/setPassword", state.input);
           store.commit("gameStore/setTitle", roominfo.value.title);
           store.commit("gameStore/setTeam", roominfo.value.isTeamBattle);
-          store.commit("gameStore/setIsSecret", roominfo.value.isSecret);
+          store.commit("gameStore/setSecret", roominfo.value.isSecret);
           store.commit("gameStore/setPassword", roominfo.value.password);
           router.push({
             name: "gameroom",
