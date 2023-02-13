@@ -7,7 +7,7 @@
   ></div>
   <div class="wrap-page">
     <!----------------------------------- 개발용 버튼 -------------------------------------->
-    <p style="position: absolute; top: 0; opacity:0.2;z-index: 3;">
+    <p style="position: absolute; top: 0; opacity: 0.2; z-index: 3">
       <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
       <v-btn @click="state.isTeamBattle = !state.isTeamBattle"
         >팀/개인전 변경</v-btn
@@ -55,18 +55,17 @@
         </div>
       </footer>
       <!-- 배경 -->
-      <div class="background"> 
+      <div class="background">
         <div id="stars" class="rotating"></div>
       </div>
     </div>
-
 
     <!-- 아래부터 게임 진행 페이지 관련 코드-->
     <div class="component-ingame" v-else>
       <header>
         <!-- <RoundResult /> -->
         <!-- <GameResult v-show="endGame" /> -->
-        <GameTimer :key="gameTimer" id="timer"/>
+        <GameTimer :key="gameTimer" id="timer" />
         <!-- <GameScore/> -->
         <!-- <h1>{{ round }} 라운드</h1> -->
       </header>
@@ -78,7 +77,11 @@
           v-for="sub in opponents"
           :key="sub.stream.connection.connectionId"
           :stream-manager="sub"
-          :class="sub.stream.connection.connectionId === currentPresenterId ? 'presenter' : ''"
+          :class="
+            sub.stream.connection.connectionId === currentPresenterId
+              ? 'presenter'
+              : ''
+          "
         />
       </div>
 
@@ -92,9 +95,9 @@
           <div class="sec-display" v-else>
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
-        <div class="wrap-robot">
-          <v-img id="robot" src="@/assets/images/character.svg" alt="robot"/>
-        </div>
+          <div class="wrap-robot">
+            <v-img id="robot" src="@/assets/images/character.svg" alt="robot" />
+          </div>
         </div>
         <div class="ourteam-members">
           <div class="sec-draw" v-if="!amIDescriber">
@@ -116,13 +119,11 @@
           </div>
         </div>
       </div>
-      <footer>
-
-      </footer>
-
+      <footer></footer>
+      
       <!-- 배경 -->
-      <div class="background-ingame"></div> 
-    </div>   
+      <div class="background-ingame"></div>
+    </div>
   </div>
 </template>
 
@@ -303,7 +304,6 @@ export default {
 </script>
 
 <style scoped>
-
 /* ======= component-waiting ================================================================= */
 .background-ingame {
   width: 100vw;
@@ -312,8 +312,13 @@ export default {
   top: 0;
   left: 0;
   z-index: -1;
-  background: rgb(0,0,0);
-  background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(85,140,164,1) 50%, rgba(0,0,0,1) 100%);
+  background: rgb(0, 0, 0);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(85, 140, 164, 1) 50%,
+    rgba(0, 0, 0, 1) 100%
+  );
 }
 .wrap-page {
   height: 100vh;
@@ -493,7 +498,7 @@ header {
 #timer {
   font-size: 35px;
   color: white;
-  font-family: 'Orbitron', sans-serif;
+  font-family: "Orbitron", sans-serif;
 }
 .area-opponents {
   width: 40%;
@@ -539,7 +544,7 @@ header {
 .sec-display {
   width: 100%;
 }
-.sec-display>.stream-me {
+.sec-display > .stream-me {
   width: 100%;
   overflow: hidden;
 }
@@ -562,7 +567,8 @@ header {
   opacity: 0.9;
   box-shadow: 0 0 10px 3px rgba(81, 255, 255, 0.5);
 }
-.sec-draw .stream-me {   /* 그림 그릴 때 내 모습 */
+.sec-draw .stream-me {
+  /* 그림 그릴 때 내 모습 */
   height: 80px;
   width: auto;
   position: absolute;
