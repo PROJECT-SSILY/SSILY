@@ -850,16 +850,19 @@ const actions = {
     } catch (err) {
       console.log(err);
     }
-    try {
-      state.session.signal({
-        type: "game",
-        data: {
-          gameStatus: 0,
-        },
-        to: [],
-      });
-    } catch (err) {
-      console.log(err);
+    // 방장만 보내도록 요청 바꿈 -------!!
+    if (state.isHost) {
+      try {
+        state.session.signal({
+          type: "game",
+          data: {
+            gameStatus: 0,
+          },
+          to: [],
+        });
+      } catch (err) {
+        console.log(err);
+      }
     }
   },
   changeRoundEnd : (context, data) => {
