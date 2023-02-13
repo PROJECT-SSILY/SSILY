@@ -1,36 +1,26 @@
 <template>
-  <div class="background">
+  <div id="contents">
     <router-view/>
-    <div></div>
   </div>
 </template>
 
+
+<script>
+
+
+</script>
+
 <style>
+@import '@/assets/css/base.css';
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-.background{
-  height: 100vh;
-  overflow: hidden;
-  margin:0;  background-image: url("./assets/Splash.svg");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-nav {
-  padding: 30px;
+  width: 100vw;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
 
-nav a.router-link-exact-active {
-  color: #42b983;
-}
 </style>

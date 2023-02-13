@@ -3,14 +3,12 @@ package com.appleparty.ssily.service;
 import com.appleparty.ssily.common.util.MailUtil;
 import com.appleparty.ssily.common.util.ValidCheck;
 import com.appleparty.ssily.domain.member.Member;
-import com.appleparty.ssily.dto.member.request.FindPwRequestDto;
-import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
-import com.appleparty.ssily.dto.member.request.UpdateNicknameRequestDto;
+import com.appleparty.ssily.dto.member.request.*;
 import com.appleparty.ssily.dto.member.response.GetMemberResponseDto;
 import com.appleparty.ssily.exception.member.*;
-import com.appleparty.ssily.dto.member.request.UpdatePasswordRequestDto;
 import com.appleparty.ssily.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -130,5 +132,39 @@ public class MemberService {
         Member member = memberRepository.findByEmail(authentication.getName()).orElseThrow(MemberNotFoundException::new);
 
         memberRepository.delete(member);
+    }
+
+    @Transactional
+    public void updateMemberState(MemberStateRequestDto requestDto){
+        List<PlayerRequestDto> player = requestDto.getPlayer();
+
+        List<String> nickNames = player.stream()
+                .map(PlayerRequestDto::getNickname)
+                .collect(Collectors.toList());
+
+        List<Member> players = memberRepository.findMembersByNicknames(nickNames);
+        List<String> winner = requestDto.getWinner();
+
+        for(int i = 0; i < players.size(); i++){
+            Member member = players.get(i);
+            boolean isWin = false;
+
+            String nickname = member.getNickname();
+            for(int j = 0; j < winner.size(); j++){
+                if(winner.get(j).equals(nickname)){
+                    isWin = true;
+                    break;
+                }
+            }
+
+            for(int j = 0; j < player.size(); j++){
+                PlayerRequestDto playerRequestDto = player.get(j);
+                if(playerRequestDto.getNickname().equals(nickname)){
+                    member.updateState(playerRequestDto.getExtraExp(), playerRequestDto.getLevelUp(), isWin);
+                    break;
+                }
+            }
+        }
+
     }
 }

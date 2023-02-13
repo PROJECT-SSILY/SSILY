@@ -6,7 +6,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
 @Configuration
-@PropertySource("classpath:properties/env.properties")
+@PropertySource("classpath:application.properties")
 public class PropertyConfig implements EnvironmentAware {
 
     private static Environment env;

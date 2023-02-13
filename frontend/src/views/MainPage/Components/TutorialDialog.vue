@@ -1,54 +1,27 @@
 <template>
-    <div class="text-center">
-      <v-dialog
-        v-model="state.dialog"
+  <div class="wrap-dialog">
+    <div class="pop">
+      <iframe
         width="500"
-      >
-        <template v-slot:activator="{ attrs }">
-          <v-btn
-            dark
-            v-bind="attrs"
-            @click.stop="state.dialog = true"
-          >
-            튜토리얼
-          </v-btn>
-        </template>
-        <v-card>
-          <v-card-title class="text-h5 grey lighten-2">
-            튜토리얼
-          </v-card-title>
-          <iframe width="500" height="300" src="https://www.youtube.com/embed/zuoSn3ObMz4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-        </v-card>
-      </v-dialog>
+        height="300"
+        src="https://www.youtube.com/embed/zuoSn3ObMz4"
+        title="YouTube video player"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+      ></iframe>
     </div>
-  </template>
+  </div>
+</template>
   
   <script>
-    import { reactive } from 'vue'
-    export default {
-      name: 'TutorialDialog',
-      setup() {
-        const state = reactive({
-          dialog: false,
-        })
-        return {
-          state
-        }
-      }
-      // data () {
-      //   return {
-      //     dialog: false,
-      //     row: null,
-      //     row2: null,
-      //     rules: {
-      //       required: value => !!value || '필수',
-      //     }
-      //   }
-      // },
-      // methods: {
-      //   toWaiting() {
-      //     this.$router.push({name: 'waiting'})
-      //   }
-      // }
-    }
-  </script>
+export default {
+  name: "TutorialDialog",
+};
+</script>
+
+<style scoped>
+.pop {
+  z-index: 3;
+}
+</style>

@@ -3,16 +3,14 @@ package com.appleparty.ssily.controller;
 import com.appleparty.ssily.common.response.ResponseService;
 import com.appleparty.ssily.common.result.Result;
 import com.appleparty.ssily.common.result.SingleResult;
-import com.appleparty.ssily.dto.member.request.FindPwRequestDto;
-import com.appleparty.ssily.dto.member.request.JoinMemberRequestDto;
-import com.appleparty.ssily.dto.member.request.UpdateNicknameRequestDto;
-import com.appleparty.ssily.dto.member.request.UpdatePasswordRequestDto;
+import com.appleparty.ssily.dto.member.request.*;
 import com.appleparty.ssily.dto.member.response.GetMemberResponseDto;
 import com.appleparty.ssily.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = {"*"})
 @RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
@@ -67,6 +65,12 @@ public class MemberController {
     @DeleteMapping
     public Result deleteMember() {
         memberService.deleteMember();
+        return responseService.getSuccessResult();
+    }
+
+    @PutMapping("/state")
+    public Result updateMemberState(@RequestBody MemberStateRequestDto requestDto){
+        memberService.updateMemberState(requestDto);
         return responseService.getSuccessResult();
     }
 }

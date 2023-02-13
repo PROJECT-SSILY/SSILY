@@ -80,7 +80,7 @@ import static io.openvidu.server.exception.ExceptionCode.*;
 @RestController
 @CrossOrigin("*")
 @ConditionalOnMissingBean(name = "sessionRestControllerPro")
-@RequestMapping("/api")
+@RequestMapping("/openvidu/api")
 public class SessionRestController {
 
 	private static final Logger log = LoggerFactory.getLogger(SessionRestController.class);
@@ -332,13 +332,14 @@ public class SessionRestController {
 		String rateString = (String) params.get("rate");
 		double rate = Double.parseDouble(rateString);
 		boolean isHost = (boolean) params.get("isHost");
+		int exp = (int)params.get("exp");
 		Team team = Team.NONE;
 
 		if(sessionProperties.isTeamBattle()){
 			team = setPlayerTeam(session);
 		}
 
-		Player player = new Player(level,nickname, rate, isHost, team);
+		Player player = new Player(level,nickname, rate, isHost, team, exp);
 
 		switch (connectionProperties.getType()) {
 		case WEBRTC:
@@ -408,13 +409,14 @@ public class SessionRestController {
 		String nickname = (String) params.get("nickname");
 		String rateString = (String) params.get("rate");
 		double rate = Double.parseDouble(rateString);
+		int exp = (int)params.get("exp");
 		Team team = Team.NONE;
 
 		if(sessionProperties.isTeamBattle()){
 			team = setPlayerTeam(session);
 		}
 
-		Player player = new Player(level,nickname, rate, false, team);
+		Player player = new Player(level,nickname, rate, false, team, exp);
 
 		switch (connectionProperties.getType()) {
 			case WEBRTC:
@@ -584,7 +586,7 @@ public class SessionRestController {
 	 * 서영탁
 	 * 참여자(플레이어) 준비 상태 변경
 	 */
-	@PutMapping("/rooms/{room-id}/players/{player-id}/ready")
+	/*@PutMapping("/rooms/{room-id}/players/{player-id}/ready")
 	public ResponseEntity<?> changeReadyState(@PathVariable("room-id") String roomId, @PathVariable("player-id") String playerId) {
 
 		log.info("REST API: PUT {}/rooms/{}/players/{}/ready", "/api", roomId, playerId);
@@ -608,7 +610,7 @@ public class SessionRestController {
 		} else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-	}
+	}*/
 
 	/**
 	 * 서영탁

@@ -1,164 +1,184 @@
 <template>
-  <div class="text-center">
-    <v-dialog
-      v-model="state.dialog"
-      width="500"
-    >
-      <template v-slot:activator="{ attrs }">
-        <v-btn
-          dark
-          v-bind="attrs"
-          @click.stop="state.dialog = true"
-        >
-          방 만들기
-        </v-btn>
-      </template>
-
-      <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
-          방 만들기
-        </v-card-title>
-        <v-form
-        ref="form"
-        v-model="valid"
-        lazy-validation
-        >
-          <div id="join" v-if="!state.session">
-            <div id="join-dialog" class="jumbotron vertical-center">
-              <div class="form-group">
-                <v-text-field 
-                v-model="state.title" 
-                class="form-control"
-                label="방 제목" 
-                type="text" 
-                required></v-text-field>
-              </div>
-            </div>
-          </div>
-          <v-radio-group
-            :rules="[state.rules.required]"
-            v-model="state.isTeamBattle"
-            inline
-          >
-            <v-radio
-              label="팀전"
-              color="orange darken-3"
-              value="radio-1"
-            ></v-radio>
-            <v-radio
-              label="개인전"
-              color="orange darken-3"
-              value="radio-2"
-            ></v-radio>
-          </v-radio-group>
-          <v-radio-group
-            :rules="[state.rules.required]"
-            v-model="state.isSecret"
-            inline
-          >
-            <v-radio
-              label="공개"
-              color="orange darken-3"
-              value="radio-1"
-            ></v-radio>
-            <v-radio
-              label="비공개"
-              color="orange darken-3"
-              value="radio-2"
-            ></v-radio>
-          </v-radio-group>
-          <v-text-field 
-            v-if="state.isSecret ==='radio-2'"
-            label="비밀번호 숫자 4자리를 입력하세요."
-            hide-details="auto"
-            v-model="state.password"
+  <div class="wrap-dialog">
+  <div class="dialog">
+    <div class="tit-dialog">방 만들기</div>
+    <v-form 
+    ref="form" 
+    lazy-validation
+    v-model="state.valid" 
+    @submit.prevent="joinSession">
+        <div class="form-group">
+          <v-text-field
+            v-model="state.title"
+            class="inp-txt form-control"
+            label="방 제목"
+            type="text"
+            required
           ></v-text-field>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <p class="text-center">
-              <v-btn 
-              @click="joinSession()">Join!</v-btn>
-            </p>
-          </v-card-actions>
-      </v-form>
-      </v-card>
-    </v-dialog>
+      </div>
+      <!-- <v-radio-group v-model="state.isTeamBattle" inline>
+        <v-radio label="팀전" color="orange darken-3" :value="true"></v-radio>
+        <v-radio
+          label="개인전"
+          color="orange darken-3"
+          :value="false"
+        ></v-radio>
+      </v-radio-group> -->
+      <v-radio-group v-model="state.form.isSecret" inline>
+        <v-radio label="공개" color="orange darken-3" :value="false"></v-radio>
+        <v-radio label="비공개" color="orange darken-3" :value="true"></v-radio>
+      </v-radio-group>
+      <v-text-field
+        v-if="state.form.isSecret == true"
+        label="비밀번호 숫자 4자리를 입력하세요."
+        hide-details="auto"
+        v-model="state.form.password.value"
+        :rules="[state.rules.passwordRules]"
+      ></v-text-field>
+      <alert-dialog v-if="state.alert"/>
+      <v-btn
+      type="submit" 
+      class="btn-dialog">완료</v-btn>
+    </v-form>
+    </div>
   </div>
 </template>
 
 <script>
-  import { useRouter } from 'vue-router'
-  import { reactive } from 'vue'
-  import { useStore } from 'vuex'
-  // import { computed } from 'vue'
-  import $axios from "axios";
+import { useRouter } from "vue-router";
+import { onUpdated, reactive } from "vue";
+// import { watch } from "vue";
+import { useStore } from "vuex";
+import $axios from "axios";
+import AlertDialog from '../../AlertDialog.vue'
 
-  $axios.defaults.headers.post['Content-Type'] = 'application/json';
-  // const OPENVIDU_SERVER_URL = "https://localhost:4443";
-  // const OPENVIDU_SERVER_SECRET = "MY_SECRET";
- 
-  export default {
-    setup() {
-      const router = useRouter()
-      const store = useStore()
-      // const OV = computed(() => store.state.gameStore.OV)
-      // const session = computed(() => store.state.gameStore.session)
-      // const mainStreamManager = computed(() => store.state.gameStore.mainStreamManager ) 
-      // const publisher = computed(() => store.state.gameStore.publisher )
-      // const subscribers = computed(() => store.state.gameStore.subscribers ) 
-      // const mySessionId = computed(() => store.state.gameStore.mySessionId ) 
-      // const myUserName = computed(() => store.state.gameStore.myUserName )
-      
-      const state = reactive({
-        dialog: false,
+$axios.defaults.headers.post["Content-Type"] = "application/json";
+
+export default {
+  components: {
+    AlertDialog
+  },
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+    const state = reactive({
+      form: {
         title: null,
-        isSecret : null,
-        password : null,
-        isTeamBattle : null,
-        rules: {
-          required: value => !!value || '필수',
-        }
-      })
-      const joinSession = async function() {
+        isSecret: false,
+        password:{ value: "", valid: true, status: false },
+        isTeamBattle: false,
+        valid: false,
+        alert:false,
+      },
+      rules: {
+      // required: value => !!value || '필수',
+      passwordRules: value => (
+        /^\d{4}$/.test(value)
+        ) || '비밀번호는 4자리 숫자여야 합니다!',
         
-        if (state.isTeamBattle === "radio-1") {
-          console.log("team 적용됨")
-          state.isTeamBattle = true
-        } else {
-          state.isTeamBattle = false
-        }
-        
-        if (state.isSecret === "radio-1") {
-          state.isSecret = false
-        } else {
-          state.isSecret = true
-        }
-        console.log(state.title);
-        console.log(state.isSecret);
-        console.log(state.password);
-        console.log(state.isTeamBattle);
-        await store.commit('gameStore/setTitle', state.title)
-        await store.commit('gameStore/setSecret', state.isSecret)
-        await store.commit('gameStore/setPassword', state.password)
-        await store.commit('gameStore/setTeam', state.isTeamBattle)
-        await store.dispatch('gameStore/joinSession')
-        router.push('waiting')
       }
-      return {
-        router, 
-        state,
-        joinSession,
-        // == OpenVidu State ==
-        // OV,
-        // session,
-        // mainStreamManager,
-        // publisher,
-        // subscribers,
-        // mySessionId,
-        // myUserName,
-        // =====================
-      }
-    }
-  }
+    });
+    onUpdated(() => {
+      // 방 타이틀 랜덤 생성
+      const titlelist = [
+        "함께 즐겨요",
+        "재미있는 게임 합시다",
+        "매너있는 게임하실 분 구해요!",
+        "스겜합시다!",
+        "어서 들어오세요!",
+      ];
+      state.form.title = titlelist[Math.floor(Math.random() * titlelist.length)];
+    });
+
+    const joinSession = async function () {
+      if (state.form.isSecret) {
+        if (!(/^\d{4}$/.test(state.form.password.value))) 
+      {
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '비밀번호는 4자리 숫자여야 합니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return
+      } else {
+      store.commit("gameStore/setTitle", state.form.title);
+      store.commit("gameStore/setSecret", state.form.isSecret);
+      store.commit("gameStore/setPassword", state.form.password.value);
+      store.commit("gameStore/setTeam", state.form.isTeamBattle);
+      // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
+      const sessionId = await store.dispatch("gameStore/createSession");
+      console.log("sessionId : ", sessionId);
+      router.push({ name: "gameroom", params: { sessionId: sessionId } });
+    }}
+    };
+    return {
+      router,
+      state,
+      joinSession,
+    };
+  },
+};
 </script>
+
+<style scoped>
+.dialog {
+  height: 100%;
+  max-height: 500px;
+  width: 500px;
+}
+.btn-dialog {
+  background: #24CB83;
+  color: #FFFFFF;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* ================ */
+/* .tutorial-planet {
+  font-family: "Akronim", cursive;
+  font-size: 2rem;
+  height: 8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  transform: translate(-9px, -15px);
+}
+@keyframes shake-tutorial-planet {
+  0% {
+    transform: translate(-8px, -14px);
+  }
+  33% {
+    transform: translate(-10px, -14px);
+  }
+  66% {
+    transform: translate(-10px, -16px);
+  }
+  100% {
+    transform: translate(-8px, -16px);
+  }
+}
+
+.tutorial-planet:hover {
+  animation: shake-tutorial-planet 0.1s infinite alternate;
+}
+
+.formbox {
+  padding: 2rem;
+  margin-top: 10%;
+  width: 100%;
+  border-radius: 20px;
+  opacity: 100%;
+  font-family: "MaplestoryOTFBold";
+  font-weight: normal;
+  font-style: normal;
+} */
+</style>
