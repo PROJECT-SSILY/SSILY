@@ -233,13 +233,28 @@ public class GameService   {
             curParticipantList.get(curPresenterIndex).getPlayer().setPresenter(true);
             curPresenterId=curParticipantList.get(curPresenterIndex).getParticipantPublicId();
         }
+
         data.addProperty("curPresenterId", curPresenterId);
         params.add("data", data);
 
+        JsonObject presenterData= (JsonObject) JsonParser.parseString(data.toString());
+        JsonObject presenterParams=params.deepCopy();
+        Integer nowRound=round.get(sessionId);
+        String word=words.get(sessionId).get(nowRound-1);
+
+        presenterData.addProperty("word", word);
+        presenterParams.add("data", presenterData);
+
         //방 참여자들에게 바뀐 데이터 보내주기.
         for (Participant p : gameParticipants) {
-            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
-                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+            if(p.getParticipantPublicId().equals(curPresenterId)) {
+                rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                        ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, presenterParams);
+            }
+            else {
+                rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                        ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+            }
         }
     }
 
@@ -360,13 +375,13 @@ public class GameService   {
 
         Integer nowRound = round.get(sessionId);
 //        String answer = words.get(sessionId).get(nowRound);
-        String answer = "바다(해변)";
+            String answer = "코끼리";
 
         String answers = data.get("answer").toString();
         answers = answers.substring(4, answers.length()-4);
         String[] answerArray = answers.split("\\\\\",\\\\\"");
 
-        boolean isCorrect = false;
+        boolean isCorrect = true ; // 원래 false, 테스트를 위해 잠깐 바꿔놓겠습니다 .. = 수연
 
         for (String a : answerArray) {
             if(a.equals(answer)){
