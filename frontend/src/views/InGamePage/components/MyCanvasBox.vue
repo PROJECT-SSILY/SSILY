@@ -17,7 +17,7 @@
     </canvas>
     <div id="toast"></div>
     <!-- 여기부터 신대득의 테스트 공간..-->
-    <canvas-dialog /> <!-- v-if="answerOn" 넣어줘야함-->
+    <!--canvas-dialog /--> <!-- v-if="answerOn" 넣어줘야함-->
     <!-- <div style="margin: 1rem">
       <canvas
           width="600"
@@ -38,14 +38,14 @@ import { fabric } from "fabric";
 import { disposeTFVariables, TFModel } from "@/utils/model";
 import { CLASS_NAMES } from "@/utils/class_names";
 import { useStore } from "vuex";
-import CanvasDialog from './CanvasDialog.vue';
+//import CanvasDialog from './CanvasDialog.vue';
 // import $axios  from 'axios';
 
 const MY_MODEL_URL = "http://localhost:5500/api/model.json";
 
 export default{
   name: "MyCanvasBox",
-  components: { CanvasDialog },
+  //components: { CanvasDialog },
   setup() {
 
     const answerOn = computed(() => store.state.gameStore.answerOn);
@@ -180,10 +180,11 @@ export default{
 
       const canvasToImage = async function(){
       // toDataURL()사용하여 png타입의 base64인코딩된 data url 형식의 문자열을 반환
+      fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       const canvas = fabricCanvas.value;
       var dataUrl = canvas.toDataURL("image/png");
       console.log(dataUrl);
-
+      fabricCanvas.value.setBackgroundColor("rgba(81, 255, 255, 0.2)", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       // data:image/jpeg;base64,/9j/4AAQSkZJRg...AAAAAB//2Q==
       // data : <type> <;base64> <data>
 
@@ -287,6 +288,7 @@ export default{
       console.log('getTopClassNames = ',getTopClassNames())
       console.log("winClass = ", winClass);
       store.dispatch("gameStore/sendTopFive", topFive.value);
+      canvasToImage();
     };
 
     const getClassNames = function () {
