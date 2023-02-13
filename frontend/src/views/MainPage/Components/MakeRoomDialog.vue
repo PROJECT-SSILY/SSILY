@@ -92,16 +92,16 @@ export default {
     });
 
     const joinSession = async function () {
-      if (state.form.isSecret) {
-        if (!(/^\d{4}$/.test(state.form.password.value))) 
-      {
-        state.alert = false
-        await store.commit('accountStore/setAlertColor', 'error')
-        await store.commit('accountStore/setAlertMessage', '비밀번호는 4자리 숫자여야 합니다.')
-        await store.commit('accountStore/setAlertIcon', 'alert')
-        state.alert = true
-        return
-      } else {
+      // if (state.form.isSecret) {
+      //   if (!(/^\d{4}$/.test(state.form.password.value))) 
+      // {
+      //   state.alert = false
+      //   await store.commit('accountStore/setAlertColor', 'error')
+      //   await store.commit('accountStore/setAlertMessage', '비밀번호는 4자리 숫자여야 합니다.')
+      //   await store.commit('accountStore/setAlertIcon', 'alert')
+      //   state.alert = true
+      //   return
+      // } else {
       store.commit("gameStore/setTitle", state.form.title);
       store.commit("gameStore/setSecret", state.form.isSecret);
       store.commit("gameStore/setPassword", state.form.password.value);
@@ -110,7 +110,7 @@ export default {
       const sessionId = await store.dispatch("gameStore/createSession");
       console.log("sessionId : ", sessionId);
       router.push({ name: "gameroom", params: { sessionId: sessionId } });
-    }}
+    // }}
     };
     return {
       router,

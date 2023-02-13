@@ -327,6 +327,7 @@ const actions = {
           console.log('=========================')
           context.commit("setPresenterId", PresenterId) // 현재 설명자 id 저장 - 이은혁
           console.log('curPresenterId : ', event.data.curPresenterId)
+          console.log("내가받은데이터다", event.data);
           for (var n=0; n < state.userList.length; n++ ) {
             if (state.userList[n].connectionId == PresenterId) {
               context.commit("setIsPresenter", { index: n, value: true });
@@ -389,7 +390,9 @@ const actions = {
           }
           // 모두 레디 했을 때, 게임 시작됨
           if (allready) {
-            context.dispatch("gameStart");
+            if (state.isHost) {
+              context.dispatch("gameStart");
+            }
             context.commit("setIsAllReady", allready);
           }
           break;
