@@ -374,8 +374,8 @@ public class GameService   {
         log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         Integer nowRound = round.get(sessionId);
-//        String answer = words.get(sessionId).get(nowRound);
-        String answer = "바다(해변)";
+        String answer = words.get(sessionId).get(nowRound-1);
+//        String answer = "바다(해변)";
 
         String answers = data.get("answer").toString();
         answers = answers.substring(4, answers.length()-4);
