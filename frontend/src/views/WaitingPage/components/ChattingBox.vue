@@ -23,12 +23,10 @@ import { useStore } from 'vuex';
 import { computed } from 'vue';
 import { reactive } from '@vue/reactivity'
 import { watch } from 'vue'
-import { VueChatScroll } from 'vue-chat-scroll'
 
 // watch,
 export default {
     name:'ChattingBox',
-    components:[VueChatScroll],
     setup() {
         const store = useStore()
         const chat = computed(() =>{
