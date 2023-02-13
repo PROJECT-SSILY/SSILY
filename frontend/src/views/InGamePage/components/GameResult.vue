@@ -61,7 +61,7 @@ export default {
       });
     }
     const clickReturn = () => {
-      store.dispatch('gameStore/changeReady')
+      // store.dispatch('gameStore/changeReady')
       store.commit('gameStore/setIsAllReady', false)
       store.commit('gameStore/setEndGame', false)
       console.log(readyAll, '==>r `eadyAll 바뀌었음??? false여야함')

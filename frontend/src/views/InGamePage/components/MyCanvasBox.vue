@@ -300,9 +300,9 @@ export default {
 
       fabricCanvas.value = new fabric.Canvas(`canvas`, {
         backgroundColor: "rgba(81, 255, 255, 0.2)",
-        isDrawingMode: 1,
+        isDrawingMode: 0,
       });
-
+      allowDrawing()
       // fabricCanvas.value.backgroundColor = "rgba(81, 255, 255, 0.2)";
       // fabricCanvas.value.backgroundColor = "rgba(81, 255, 255, 0.2)";
 

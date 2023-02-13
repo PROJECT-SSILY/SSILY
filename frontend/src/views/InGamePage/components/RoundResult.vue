@@ -41,11 +41,6 @@
         </v-card-title>
         <v-card-text>
           <h1> 정답자가 없습니다! </h1>
-          <div v-for="user in sortedUserList"
-          :user="user"
-          :key="user.id">
-              <h1>{{ user.nickname }} : {{ user.score }}점! </h1>
-          </div>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
