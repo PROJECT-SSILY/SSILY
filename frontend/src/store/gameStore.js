@@ -10,42 +10,43 @@ const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 import { randomTeam, randomPrivate } from "@/common/api/gameAPI";
 
 const state = {
-  title: null,
-  isSecret: false,
-  password: null,
-  isTeamBattle: null,
-  isTeam: null,
-  OV: undefined,
-  session: null,
-  mainStreamManager: undefined,
-  publisher: undefined,
-  subscribers: [],
-  sessionId: null,
-  myUserName: "",
-  isHost: false,
-  playerList: undefined,
-  messages: [],
-  media: 0.5,
-  alarm: 0.5,
-  audio: new Audio(require("../../public/Superhuman.mp3")),
-  isAllReady: false,
-  userList: [],
-  userKey: [],
-  chat: [],
-  myConnectionId: null,
-  amIDescriber: false,
-  winnerNickname: "", // [라운드 결과] 승리 유저
-  winnerId: "",
-  round: 0, // 현재 라운드
-  answer: "",
-  presenterId: null,
-  sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
-  endRound: false, // [라운드 결과] 라운드 끝났을 때 true, 라운드 진행중일 때 false
-  winnerList: [], // [게임 결과] 승리 유저 리스트
-  gameResult: [], // [게임 결과] 유저 리스트 (key: connectionId, extraExp, levelUp, nickname)
-  endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
-  isTimeOut: false,
-};
+    title: null,
+    isSecret: false,
+    password: null,
+    isTeamBattle: null,
+    isTeam: null,
+    OV: undefined,
+    session: null,
+    mainStreamManager: undefined,
+    publisher: undefined,
+    subscribers: [],
+    sessionId: null,
+    myUserName: '',
+    isHost: false,
+    playerList: undefined,
+    messages: [],
+    media: 0.5,
+    alarm: 0.5,
+    audio: new Audio(require('../../public/Superhuman.mp3')),
+    isAllReady: false,
+    userList: [],
+    userKey: [],
+    chat: [],
+    myConnectionId: null,
+    amIDescriber: false,
+    winnerNickname: '', // [라운드 결과] 승리 유저
+    winnerId: '',
+    round: 0, // 현재 라운드
+    answer: '',
+    presenterId: null,
+    sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
+    endRound: false, // [라운드 결과] 라운드 끝났을 때 true, 라운드 진행중일 때 false
+    winnerList: [], // [게임 결과] 승리 유저 리스트
+    gameResult: [], // [게임 결과] 유저 리스트 (key: connectionId, extraExp, levelUp, nickname)
+    endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
+    isTimeOut: false,
+    word: '',
+}
 
 const getters = {
   getTeam: (state) => {
@@ -218,40 +219,39 @@ const mutations = {
   setRound: (state, data) => {
     state.round = data;
   },
-
   setAnswer: (state, data) => {
     state.answer = data;
   },
-
-  setUserScore: (state, data) => {
-    var index = data.index;
-    var value = data.value;
-    state.userList[index].score = value;
-  },
-  setPresenterId: (state, data) => {
-    console.log("여기까지 왔음?");
-    state.presenterId = data;
-  },
-  setSortedUserList: (state, data) => {
-    state.sortedUserList = data;
-  },
-  setEndRound: (state, data) => {
-    state.endRound = data;
-  },
-  setWinnerList: (state, data) => {
-    // 게임 승리 유저 리스트
-    state.winnerList = data;
-  },
-  setGameResult: (state, data) => {
-    // 게임 결과 리스트
-    state.gameResult = data;
-  },
-  setEndGame: (state, data) => {
-    state.endGame = data;
-  },
-  setIsTimeOut: (state, data) => {
-    state.isTimeOut = data;
-  },
+    setUserScore: (state, data) => {
+      var index = data.index
+      var value = data.value
+      state.userList[index].score = value
+    },
+    setPresenterId: (state, data) => {
+      console.log('여기까지 왔음?')
+      state.presenterId = data
+    },
+    setSortedUserList: (state, data) => {
+      state.sortedUserList = data
+    },
+    setEndRound: (state, data) => {
+      state.endRound = data
+    },
+    setWinnerList: (state, data) => { // 게임 승리 유저 리스트
+      state.winnerList = data
+    },
+    setGameResult: (state, data) => { // 게임 결과 리스트
+      state.gameResult = data
+    },
+    setEndGame: (state, data) => {
+      state.endGame = data
+    },
+    setIsTimeOut: (state, data) => {
+      state.isTimeOut = data
+    },
+    setWord: (state, data) => {
+      state.word = data
+    }
 };
 
 const actions = {
@@ -334,10 +334,11 @@ const actions = {
           console.log("=========================");
           context.commit("setPresenterId", PresenterId); // 현재 설명자 id 저장 - 이은혁
           console.log("curPresenterId : ", event.data.curPresenterId);
-          console.log("내가받은데이터다", event.data);
+
           for (var n = 0; n < state.userList.length; n++) {
             if (state.userList[n].connectionId == PresenterId) {
               context.commit("setIsPresenter", { index: n, value: true });
+              context.commit('setWord', event.data.word)
             } else {
               context.commit("setIsPresenter", { index: n, value: false });
             }
@@ -914,6 +915,17 @@ const actions = {
       state.session.signal({
         type: "game",
         data: {
+          gameStatus: 0,
+        },
+        to: [],
+      });
+    } catch (err) {
+      console.log(err);
+    }
+    try {
+      state.session.signal({
+        type: "game",
+        data: {
           gameStatus: 20,
         },
         to: [],
@@ -921,7 +933,7 @@ const actions = {
     } catch (err) {
       console.log(err);
     }
-  },
+  }
 };
 export default {
   namespaced: true,
