@@ -495,6 +495,14 @@ const actions = {
           console.log("endGame 변경");
           context.commit("setEndGame", true);
           console.log("endgame 변경 되었는지 확인 => ?", state.endGame);
+          // 게임 끝나면 userList와 round 초기화
+          context.commit('setRound', 0)
+          for (var w=0; state.userList.length>w;w++) {
+            context.commit('setUserScore', {
+              index: w,
+              value: 0,
+            })
+          }
           break;
         }
       }
