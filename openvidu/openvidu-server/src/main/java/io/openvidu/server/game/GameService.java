@@ -544,7 +544,14 @@ public class GameService   {
 
 
         // TODO : 모든 자원 반납
+        gameThread.remove(sessionId);
+        round.remove(sessionId);
+        words.remove(sessionId);
+        participantList.remove(sessionId);
+        presenterIndex.remove(sessionId);
 
+        HashMap<String, Boolean> ready = readyState.get(sessionId);
+        ready.replaceAll((k, v) -> false);
 
         for (Participant p : participants) {
             p.getPlayer().initPlayerState();  // 상태 초기화 (다시 대기방으로 돌아가기 위해)
