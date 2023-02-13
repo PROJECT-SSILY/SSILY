@@ -29,6 +29,14 @@
           v-for="blank in 5 - state.roomlist.length"
           :key="blank"
         ></div>
+        <div v-if="state.passwordDialog">
+
+          <password-input 
+          
+          v-for="room in state.roomlist"
+          :key="room.id"
+          :room="room"/>
+        </div>
         <div class="btn-paging">
           <button>PREV</button>
           <button>NEXT</button>
@@ -44,11 +52,13 @@ import { useRouter } from "vue-router";
 import { reactive, onMounted, computed } from "vue";
 import { roomList } from "@/common/api/gameAPI";
 import RoomListItem from "@/views/MainPage/Components/RoomListItem.vue";
+import PasswordInput from "@/views/WaitingPage/components/PasswordInput.vue";
 
 export default {
   name: "RoomList",
   components: {
     RoomListItem,
+    PasswordInput
   },
   // emits: ["sendValue"],
   setup() {
@@ -66,11 +76,16 @@ export default {
           return state.privaterooms;
         }
       }),
+      passwordDialog: false,
     });
 
     const getInRoom = function (params) {
       const roominfo = JSON.parse(JSON.stringify(params));
-      state.password = prompt('비밀번호를 입력해주세요.');
+      if (roominfo.isSecret) {
+        state.passwordDialog = true
+        
+      } else {
+      // state.password = prompt('비밀번호를 입력해주세요.');
       console.log(state.password)
       console.log(roominfo.isTeamBattle)
       store.commit("gameStore/setTitle", roominfo.title);
@@ -81,6 +96,7 @@ export default {
         name: "gameroom",
         params: { sessionId: roominfo.sessionId },
       });
+    }
     };
 
     // 방 리스트 조회
