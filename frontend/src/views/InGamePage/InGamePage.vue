@@ -122,6 +122,7 @@
       </div>
       <footer></footer>
       
+      <div id="toast"></div>
       <!-- 배경 -->
       <div class="background-ingame"></div>
     </div>
@@ -176,7 +177,16 @@ export default {
     const endGame = computed(() => store.state.gameStore.endGame);
     const endRound = computed(() => store.state.gameStore.endRound);
     const currentPresenterId = computed(
-      () => store.state.gameStore.presenterId
+      () => {
+        /**
+         * 토스트 실행
+         * 신대득
+         */
+        if(store.state.gameStore.presenterId!=""){
+          excuteToast(store.state.gameStore.presenterId);
+        }
+        return store.state.gameStore.presenterId
+      }
     );
     const router = useRouter();
     const state = reactive({
@@ -276,6 +286,35 @@ export default {
 
     const forceRender = function () {
       gameTimer.value += 1;
+    };
+
+    /**
+     * 토스트 실행 신대득
+     * @param payload
+     * @returns {Promise<void>}
+     */
+    const excuteToast = async function (payload){
+      const players = await GetPlayerList(state.sessionId);
+      console.log("toast 시작할 때 players : ", players);
+      let presenterNickname="";
+      for (let i = 0; i < players.content.length; i++) {
+        if(players.content[i].connectionId==payload){
+          presenterNickname=players.content[i].player.nickname;
+        }
+      }
+      console.log("발표자 닉네임은?? : ", presenterNickname);
+
+      let removeToast;
+      const toast = document.getElementById("toast");
+      toast.classList.contains("reveal") ?
+      (clearTimeout(removeToast), removeToast = setTimeout(function () {
+        document.getElementById("toast").classList.remove("reveal")
+      }, 2000)) :
+      removeToast = setTimeout(function () {
+            document.getElementById("toast").classList.remove("reveal")
+            }, 2000)
+    toast.classList.add("reveal"),
+        toast.innerText = "설명자 : "+ presenterNickname;
     };
     return {
       router,
@@ -586,6 +625,28 @@ header {
 .canvas {
   width: 100%;
   z-index: 1;
+}
+#toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    padding: 15px 20px;
+    transform: translate(-50%, 10px);
+    border-radius: 30px;
+    overflow: hidden;
+    font-size: .8rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s, visibility .5s, transform .5s;
+    background: rgba(0, 0, 0, .35);
+    color: #fff;
+    z-index: 10000;
+}
+
+#toast.reveal {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0)
 }
 /* =========================================================================================== */
 </style>

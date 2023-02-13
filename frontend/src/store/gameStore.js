@@ -29,6 +29,7 @@ const state = {
     alarm: 0.5,
     audio: new Audio(require('../../public/Superhuman.mp3')),
     isAllReady: false,
+    answerOn: false,
     userList: [],
     userKey: [],
     chat: [],
@@ -174,6 +175,9 @@ const mutations = {
     setIsAllReady: (state, data) => {
       console.log('setIsAllReady 찍힘', data)
       state.isAllReady = data
+    },
+    setAnswerOn: (state, data) => {
+    state.answerOn = data;
     },
     setUserKey: (state, data) => {
       state.userKey.push(data)
