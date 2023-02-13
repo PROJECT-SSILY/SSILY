@@ -27,6 +27,7 @@
             {{ state.nickname }} 님
             </router-link>
         </div>
+        <alert-dialog v-if="state.alert"/>
         <div class="sec-btn">
           <button @click="state.roomDialog = !state.roomDialog">방 만들기</button>
           <button @click="randomPrivate">바로 입장</button>
@@ -41,6 +42,7 @@ import MakeRoomDialog from "./Components/MakeRoomDialog.vue";
 import SettingDialog from "../SettingDialog.vue";
 import TutorialDialog from "./Components/TutorialDialog.vue";
 import RoomList from "./Components/RoomList.vue";
+import AlertDialog from '../AlertDialog.vue'
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { computed, reactive, onMounted } from "vue";
@@ -53,6 +55,7 @@ export default {
     TutorialDialog,
     SettingDialog,
     RoomList,
+    AlertDialog
   },
   setup() {
     const store = useStore();
@@ -63,6 +66,7 @@ export default {
       tutorDialog: false,
       settingDialog: false,
       nickname: computed(() => store.getters["accountStore/getUser"].nickname),
+      alert: false
     });
 
     const closeDialog = () => {
@@ -73,11 +77,34 @@ export default {
 
     const randomPrivate = async function () {
       const response = await store.dispatch('gameStore/randomPrivateAction')
-      console.log('response : ', response)
-      router.push({
-        name: "gameroom",
-        params: { sessionId: response.sessionId },
-      });
+      console.log('response : ', response.status)
+      if (response == -404) {
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '바로 입장 가능한 방이 없습니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return;
+      } else if (response == -400){
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '이미 가득 찬 방입니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return;
+      } else if (response == -401){
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '이미 게임이 진행중인 방입니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return;
+      } else {
+      // router.push({
+      //   name: "gameroom",
+      //   params: { sessionId: response.data.sessionId },
+      // });
+    }
     };
 
     onMounted(() => 
@@ -90,7 +117,7 @@ export default {
       router,
       state,
       closeDialog,
-      randomPrivate
+      randomPrivate,
     };
   },
 };

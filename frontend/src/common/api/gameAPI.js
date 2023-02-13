@@ -57,10 +57,11 @@ const randomPrivate = (payload) => {
     })
     .then(res => {
         console.log(res)
-        return res.data
+        return res
     })
     .catch(error => {
-        return error.response.data
+        console.log("code : ", error.response.data.code);
+        return error.response.data.code
     });
 }
 
