@@ -9,7 +9,7 @@
     @submit.prevent="joinSession">
         <div class="form-group">
           <v-text-field
-            v-model="state.title"
+            v-model="state.form.title"
             class="inp-txt form-control"
             label="방 제목"
             type="text"
