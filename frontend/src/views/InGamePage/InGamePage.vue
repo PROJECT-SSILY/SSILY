@@ -20,7 +20,7 @@
     <!-- 아래부터 대기방 페이지 관련 코드-->
     <div class="component-waiting" v-if="!readyAll">
       <div class="users-component">
-        <p id="title">제목입니다</p>
+        <p id="title">{{state.title}}</p>
         <WaitingPage
           :sessionId="state.sessionId"
           :playerList="state.playerList"
@@ -88,18 +88,19 @@
       <!-- 우리 팀 -->
       <div class="area-ourteam">
         <div class="me">
-          <div class="sec-draw" v-if="amIDescriber">
+          <div class="sec-draw" v-if="!amIDescriber">
             <MyCanvasBox class="canvas" />
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="sec-display" v-else>
+            <h1>설명해야할 단어: {{ word }}</h1>>
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="wrap-robot">
             <v-img id="robot" src="@/assets/images/character.svg" alt="robot" />
           </div>
         </div>
-        <div class="ourteam-members">
+        <!-- <div class="ourteam-members">
           <div class="sec-draw" v-if="!amIDescriber">
             <user-video
               v-for="sub in myTeams"
@@ -117,7 +118,7 @@
               class="our-stream"
             />
           </div>
-        </div>
+        </div> -->
       </div>
       <footer></footer>
       
@@ -170,6 +171,7 @@ export default {
     const userList = computed(() => store.state.gameStore.userList);
     const readyAll = computed(() => store.state.gameStore.isAllReady);
     const amIDescriber = computed(() => store.state.gameStore.amIDescriber);
+    const word = computed(() => store.state.gameStore.word);
     const round = computed(() => store.state.gameStore.round);
     const endGame = computed(() => store.state.gameStore.endGame);
     const endRound = computed(() => store.state.gameStore.endRound);
@@ -178,7 +180,7 @@ export default {
     );
     const router = useRouter();
     const state = reactive({
-      title: null,
+      title: computed(() => store.state.gameStore.title ),
       isSecret: false,
       password: null,
       isTeamBattle: null,
@@ -233,6 +235,7 @@ export default {
     onBeforeMount(async () => {
       await store.dispatch("accountStore/getMeAction");
       console.log("join start");
+
       joinSession();
     });
 
@@ -298,6 +301,7 @@ export default {
       gameTimer,
       forceRender,
       endRound,
+      word
     };
   },
 };

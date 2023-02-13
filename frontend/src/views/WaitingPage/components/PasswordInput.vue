@@ -2,8 +2,6 @@
   <div class="text-center">
     <v-dialog
       v-model="state.dialog"
-      persistent
-      fullscreen
       hide-overlay
       transition="dialog-bottom-transition"
     >      
@@ -39,10 +37,11 @@
 
 <script>
   import { useRouter } from 'vue-router'
-  import { reactive, computed } from 'vue'
+  import { reactive } from 'vue'
   import { useStore } from 'vuex'
   import $axios from "axios";
   import AlertDialog from '../../AlertDialog.vue'
+  import { ref } from '@vue/reactivity'
 
   $axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -53,9 +52,10 @@
       AlertDialog
     },
     props: {
-      dialog: Object
+      dialog: Object,
+      room: Object
     },
-    setup() {
+    setup(props) {
       const router = useRouter()
       const store = useStore()      
       const state = reactive({
@@ -63,23 +63,30 @@
         dialog : true,
         alert: false
       })
-      const password = computed(() => store.state.gameStore.password)
+      const roominfo = ref(props.room);
       const checkPassword = async function() {
-        state.alert = false
-        if (state.input != password.value) {
+        if (state.input != roominfo.value.password) {
+          state.alert = false
           await store.commit('accountStore/setAlertColor', 'error')
           await store.commit('accountStore/setAlertMessage', '비밀번호가 틀렸습니다.')
           await store.commit('accountStore/setAlertIcon', 'alert')
           state.alert = true
           return
         } else {
-          state.dialog = false
+          store.commit("gameStore/setPassword", state.input);
+          store.commit("gameStore/setTitle", roominfo.value.title);
+          store.commit("gameStore/setTeam", roominfo.value.isTeamBattle);
+          store.commit("gameStore/setSecret", roominfo.value.isSecret);
+          store.commit("gameStore/setPassword", roominfo.value.password);
+          router.push({
+            name: "gameroom",
+            params: { sessionId: roominfo.value.sessionId },
+          });
         }
       }
       return {
         router, 
         state,
-        password,
         checkPassword,
 
       }

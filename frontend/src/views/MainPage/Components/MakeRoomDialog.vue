@@ -7,14 +7,14 @@
     lazy-validation
     v-model="state.valid" 
     @submit.prevent="joinSession">
-      <div class="form-group">
-        <v-text-field
-          v-model="state.form.title"
-          class="inp-txt form-control"
-          label="방 제목"
-          type="text"
-          required
-        ></v-text-field>
+        <div class="form-group">
+          <v-text-field
+            v-model="state.form.title"
+            class="inp-txt form-control"
+            label="방 제목"
+            type="text"
+            required
+          ></v-text-field>
       </div>
       <!-- <v-radio-group v-model="state.isTeamBattle" inline>
         <v-radio label="팀전" color="orange darken-3" :value="true"></v-radio>
@@ -46,7 +46,7 @@
 
 <script>
 import { useRouter } from "vue-router";
-import { onUpdated, reactive } from "vue";
+import { onMounted, reactive } from "vue";
 // import { watch } from "vue";
 import { useStore } from "vuex";
 import $axios from "axios";
@@ -79,7 +79,7 @@ export default {
         },
       }
     });
-    onUpdated(() => {
+    onMounted(() => {
       // 방 타이틀 랜덤 생성
       const titlelist = [
         "함께 즐겨요",
@@ -92,16 +92,15 @@ export default {
     });
 
     const joinSession = async function () {
-      // if (state.form.isSecret) {
-      //   if (!(/^\d{4}$/.test(state.form.password.value))) 
-      // {
-      //   state.alert = false
-      //   await store.commit('accountStore/setAlertColor', 'error')
-      //   await store.commit('accountStore/setAlertMessage', '비밀번호는 4자리 숫자여야 합니다.')
-      //   await store.commit('accountStore/setAlertIcon', 'alert')
-      //   state.alert = true
-      //   return
-      // } else {
+      if (state.form.isSecret && !(/^\d{4}$/.test(state.form.password.value))) {
+      
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '비밀번호는 4자리 숫자여야 합니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return
+      } else {
       store.commit("gameStore/setTitle", state.form.title);
       store.commit("gameStore/setSecret", state.form.isSecret);
       store.commit("gameStore/setPassword", state.form.password.value);
@@ -110,7 +109,7 @@ export default {
       const sessionId = await store.dispatch("gameStore/createSession");
       console.log("sessionId : ", sessionId);
       router.push({ name: "gameroom", params: { sessionId: sessionId } });
-    // }}
+      }
     };
     return {
       router,

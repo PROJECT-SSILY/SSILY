@@ -16,6 +16,7 @@
           팀전
         </button>
       </div>
+      <alert-dialog v-if="state.alert"/>
       <div class="wrap-list">
         <RoomListItem
           v-for="room in state.roomlist"
@@ -29,6 +30,14 @@
           v-for="blank in 5 - state.roomlist.length"
           :key="blank"
         ></div>
+        <div v-if="state.passwordDialog">
+
+          <password-input 
+          
+          v-for="room in state.roomlist"
+          :key="room.id"
+          :room="room"/>
+        </div>
         <div class="btn-paging">
           <button>PREV</button>
           <button>NEXT</button>
@@ -42,13 +51,17 @@ import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 // import { getCurrentInstance } from "vue";
 import { reactive, onMounted, computed } from "vue";
-import { roomList } from "@/common/api/gameAPI";
+import { roomList, room } from "@/common/api/gameAPI";
 import RoomListItem from "@/views/MainPage/Components/RoomListItem.vue";
+import PasswordInput from "@/views/WaitingPage/components/PasswordInput.vue";
+import AlertDialog from '../../AlertDialog.vue'
 
 export default {
   name: "RoomList",
   components: {
     RoomListItem,
+    PasswordInput,
+    AlertDialog
   },
   // emits: ["sendValue"],
   setup() {
@@ -66,21 +79,43 @@ export default {
           return state.privaterooms;
         }
       }),
+      passwordDialog: false,
+      alert: false
     });
 
-    const getInRoom = function (params) {
+    const getInRoom = async function (params) {
       const roominfo = JSON.parse(JSON.stringify(params));
-      state.password = prompt('비밀번호를 입력해주세요.');
-      console.log(state.password)
-      console.log(roominfo.isTeamBattle)
-      store.commit("gameStore/setTitle", roominfo.title);
-      store.commit("gameStore/setTeam", roominfo.isTeamBattle);
-      store.commit("gameStore/setPassword", state.password);
-      router.push({
-        name: "gameroom",
-        params: { sessionId: roominfo.sessionId },
-      });
+      const isExistRoom=await getRoom(roominfo.sessionId);
+      if(!isExistRoom) {
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '존재하지 않는 방입니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return;
+      }
+      else {
+        if (roominfo.isSecret) {
+          state.passwordDialog = true
+        } else {
+          console.log(state.password)
+          console.log(roominfo.isTeamBattle)
+          store.commit("gameStore/setTitle", roominfo.title);
+          store.commit("gameStore/setTeam", roominfo.isTeamBattle);
+          store.commit("gameStore/setSecret", roominfo.isSecret);
+          store.commit("gameStore/setPassword", roominfo.password);
+          router.push({
+            name: "gameroom",
+            params: { sessionId: roominfo.sessionId },
+          });
+        }
+      }
     };
+
+    const getRoom=(sessionId) => {
+      const response= room(sessionId);
+      return response;
+    }
 
     // 방 리스트 조회
     onMounted(async () => {

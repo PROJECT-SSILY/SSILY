@@ -10,42 +10,43 @@ const OPENVIDU_SERVER_SECRET = "MY_SECRET";
 import { randomTeam, randomPrivate } from "@/common/api/gameAPI";
 
 const state = {
-  title: null,
-  isSecret: false,
-  password: null,
-  isTeamBattle: null,
-  isTeam: null,
-  OV: undefined,
-  session: null,
-  mainStreamManager: undefined,
-  publisher: undefined,
-  subscribers: [],
-  sessionId: null,
-  myUserName: "",
-  isHost: false,
-  playerList: undefined,
-  messages: [],
-  media: 0.5,
-  alarm: 0.5,
-  audio: new Audio(require("../../public/Superhuman.mp3")),
-  isAllReady: false,
-  userList: [],
-  userKey: [],
-  chat: [],
-  myConnectionId: null,
-  amIDescriber: false,
-  winnerNickname: "", // [라운드 결과] 승리 유저
-  winnerId: "",
-  round: 0, // 현재 라운드
-  answer: "",
-  presenterId: null,
-  sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
-  endRound: false, // [라운드 결과] 라운드 끝났을 때 true, 라운드 진행중일 때 false
-  winnerList: [], // [게임 결과] 승리 유저 리스트
-  gameResult: [], // [게임 결과] 유저 리스트 (key: connectionId, extraExp, levelUp, nickname)
-  endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
-  isTimeOut: false,
-};
+    title: null,
+    isSecret: false,
+    password: null,
+    isTeamBattle: null,
+    isTeam: null,
+    OV: undefined,
+    session: null,
+    mainStreamManager: undefined,
+    publisher: undefined,
+    subscribers: [],
+    sessionId: null,
+    myUserName: '',
+    isHost: false,
+    playerList: undefined,
+    messages: [],
+    media: 0.5,
+    alarm: 0.5,
+    audio: new Audio(require('../../public/Superhuman.mp3')),
+    isAllReady: false,
+    userList: [],
+    userKey: [],
+    chat: [],
+    myConnectionId: null,
+    amIDescriber: false,
+    winnerNickname: '', // [라운드 결과] 승리 유저
+    winnerId: '',
+    round: 0, // 현재 라운드
+    answer: '',
+    presenterId: null,
+    sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
+    endRound: false, // [라운드 결과] 라운드 끝났을 때 true, 라운드 진행중일 때 false
+    winnerList: [], // [게임 결과] 승리 유저 리스트
+    gameResult: [], // [게임 결과] 유저 리스트 (key: connectionId, extraExp, levelUp, nickname)
+    endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
+    isTimeOut: false,
+    word: '',
+}
 
 const getters = {
   getTeam: (state) => {
@@ -108,92 +109,95 @@ const getters = {
 };
 
 const mutations = {
-  setTitle: (state, data) => {
-    state.title = data;
-    console.log("set적용되는지확인" + state.title);
-  },
-  setSecret: (state, payload) => {
-    state.isSecret = payload;
-  },
-  setPassword: (state, payload) => {
-    state.password = payload;
-  },
-  setTeam: (state, payload) => {
-    state.isTeamBattle = payload;
-    console.log("set적용되는지확인" + state.isTeamBattle);
-  },
-  setOV: (state, data) => {
-    state.OV = data;
-  },
-  setSession: (state, data) => {
-    state.session = data;
-  },
-  SET_PUBLISHER(state, data) {
-    state.publisher = data;
-  },
-  setMainStreamManager: (state, data) => {
-    state.mainStreamManager = data;
-  },
-  setSubscribers: (state, data) => {
-    state.subscribers = data;
-  },
-  setSessionId: (state, id) => {
-    state.sessionId = id;
-  },
-  setMyUserName: (state, name) => {
-    state.myUserName = name;
-  },
-  changeMode: (state) => {
-    state.isTeam = !state.isTeam;
-  },
-  setPlayerList: (state, data) => {
-    state.playerList = data;
-  },
-  setVolume1: (state, volume) => {
-    state.media = volume;
-  },
-  setVolume2: (state, volume) => {
-    state.alarm = volume;
-  },
-  SET_MESSAGES: (state, data) => {
-    state.messages = data;
-  },
-  setChat: (state, data) => {
-    state.chat.push(data);
-  },
-  setUserList: (state, data) => {
-    state.userList.push(data);
-  },
-  setClearUserList: (state) => {
-    state.userList = [];
-  },
-  setIsAllReady: (state, data) => {
-    console.log("setIsAllReady 찍힘", data);
-    state.isAllReady = data;
-  },
-  setUserKey: (state, data) => {
-    state.userKey.push(data);
-  },
-  setClearUserKey: (state) => {
-    state.userKey = [];
-  },
-  setReady: (state, data) => {
-    console.log("data:", data);
-    var index = data.index;
-    var ready = data.ready;
-    state.userList[index].isReady = ready;
-  },
-  setIsHost: (state, data) => {
-    state.isHost = data;
-  },
-  setMyConnectionId: (state, data) => {
-    state.myConnectionId = data;
-  },
-  setIsPresenter: (state, data) => {
-    var index = data.index;
-    var value = data.value;
-    state.userList[index].isPresenter = value;
-  },
+    setTitle: (state, data) => {
+        state.title = data
+        console.log('set적용되는지확인' + state.title);
+    },
+    setSecret: (state, payload) => {
+        state.isSecret = payload
+    },
+    setPassword: (state, payload) => {
+        state.password = payload
+    },
+    setTeam: (state, payload) => {
+        state.isTeamBattle = payload
+        console.log('set적용되는지확인' + state.isTeamBattle);
+    },
+    setOV: (state, data) => {
+        state.OV = data;
+    },
+    setSession: (state, data) => {
+        state.session = data;
+    },
+    SET_PUBLISHER (state, data) {
+        state.publisher = data
+    },
+    setMainStreamManager: (state, data) => {
+        state.mainStreamManager = data;
+    },
+    setSubscribers: (state, data) => {
+        state.subscribers = data;
+    },
+    setSessionId: (state, id) => {
+        state.sessionId = id;
+    },
+    setMyUserName: (state, name) => {
+        state.myUserName = name;
+    },
+    changeMode: (state) => {
+      state.isTeam = !state.isTeam
+    },
+    setPlayerList: (state, data) => {
+        state.playerList = data
+    },
+    setVolume1: (state, volume) => {
+      state.media = volume
+    },
+    setVolume2: (state, volume) => {
+      state.alarm = volume
+    },
+    SET_MESSAGES: (state, data) => {
+        state.messages = data
+    },
+    setChat: (state, data) => {
+      state.chat.push(data)
+    },
+    setChatClear: (state) => {
+      state.chat = []
+    },
+    setUserList: (state, data) => {
+      state.userList.push(data)
+    },
+    setClearUserList: (state) => {
+      state.userList = []
+    },
+    setIsAllReady: (state, data) => {
+      console.log('setIsAllReady 찍힘', data)
+      state.isAllReady = data
+    },
+    setUserKey: (state, data) => {
+      state.userKey.push(data)
+    },
+    setClearUserKey: (state) => {
+      state.userKey = []
+    },
+    setReady: (state, data) => {
+      console.log('data:', data)
+      var index = data.index
+      var ready = data.ready
+      state.userList[index].isReady = ready
+    },
+    setIsHost: (state, data) => {
+      state.isHost = data
+    },
+    setMyConnectionId: (state, data) => {
+      state.myConnectionId = data
+    },
+    setIsPresenter: (state, data) => {
+      var index = data.index
+      var value = data.value
+      state.userList[index].isPresenter = value
+    },
     setAmIDescriber: (state, data) => {
       state.amIDescriber = data
     },
@@ -218,40 +222,39 @@ const mutations = {
   setRound: (state, data) => {
     state.round = data;
   },
-
   setAnswer: (state, data) => {
     state.answer = data;
   },
-
-  setUserScore: (state, data) => {
-    var index = data.index;
-    var value = data.value;
-    state.userList[index].score = value;
-  },
-  setPresenterId: (state, data) => {
-    console.log("여기까지 왔음?");
-    state.presenterId = data;
-  },
-  setSortedUserList: (state, data) => {
-    state.sortedUserList = data;
-  },
-  setEndRound: (state, data) => {
-    state.endRound = data;
-  },
-  setWinnerList: (state, data) => {
-    // 게임 승리 유저 리스트
-    state.winnerList = data;
-  },
-  setGameResult: (state, data) => {
-    // 게임 결과 리스트
-    state.gameResult = data;
-  },
-  setEndGame: (state, data) => {
-    state.endGame = data;
-  },
-  setIsTimeOut: (state, data) => {
-    state.isTimeOut = data;
-  },
+    setUserScore: (state, data) => {
+      var index = data.index
+      var value = data.value
+      state.userList[index].score = value
+    },
+    setPresenterId: (state, data) => {
+      console.log('여기까지 왔음?')
+      state.presenterId = data
+    },
+    setSortedUserList: (state, data) => {
+      state.sortedUserList = data
+    },
+    setEndRound: (state, data) => {
+      state.endRound = data
+    },
+    setWinnerList: (state, data) => { // 게임 승리 유저 리스트
+      state.winnerList = data
+    },
+    setGameResult: (state, data) => { // 게임 결과 리스트
+      state.gameResult = data
+    },
+    setEndGame: (state, data) => {
+      state.endGame = data
+    },
+    setIsTimeOut: (state, data) => {
+      state.isTimeOut = data
+    },
+    setWord: (state, data) => {
+      state.word = data
+    }
 };
 
 const actions = {
@@ -334,9 +337,11 @@ const actions = {
           console.log("=========================");
           context.commit("setPresenterId", PresenterId); // 현재 설명자 id 저장 - 이은혁
           console.log("curPresenterId : ", event.data.curPresenterId);
+
           for (var n = 0; n < state.userList.length; n++) {
             if (state.userList[n].connectionId == PresenterId) {
               context.commit("setIsPresenter", { index: n, value: true });
+              context.commit('setWord', event.data.word)
             } else {
               context.commit("setIsPresenter", { index: n, value: false });
             }
@@ -346,6 +351,11 @@ const actions = {
             context.commit("setAmIDescriber", true);
           } else {
             context.commit("setAmIDescriber", false);
+          }
+          // 게임 시작 시 참여자들 음소거  ===> 아직 되는지 확실하지 않음
+          state.publisher.publishAudio(false);
+          for (var j=0; state.subscribers.length > j; j++ ){
+            state.subscribers[j].subscribeToAudio(false)
           }
           break;
         }
@@ -421,6 +431,9 @@ const actions = {
         case 10: {
           // 라운드별 경험치 누적
           console.log("10번 시그널 수신 - 라운드 끝");
+          if (event.data.round != 8) {
+            context.commit("setEndRound", true);
+          }
           var scoreList = event.data.player;
           console.log("10번 event data : ", event.data);
           context.commit("setRound", event.data.round);
@@ -446,9 +459,6 @@ const actions = {
                   return 0;
                 });
                 context.commit("setSortedUserList", sortList);
-                if (event.data.round != 8) {
-                  context.commit("setEndRound", true);
-                }
                 break;
               }
             }
@@ -461,12 +471,12 @@ const actions = {
         }
         case 20: {
           console.log("20번 시그널 수신 - 시간초과");
-          console.log(event.data);
-          context.commit("setRound", event.data.round);
-          context.commit("setIsTimeOut", true);
           if (event.data.round != 8) {
             context.commit("setEndRound", true);
           }
+          console.log(event.data);
+          context.commit("setRound", event.data.round);
+          context.commit("setIsTimeOut", true);
           // 라운드를 8번 돌면 게임을 종료한다.
           if (event.data.round == 8 && state.isHost == true) {
             context.dispatch("finishGame");
@@ -488,6 +498,14 @@ const actions = {
           console.log("endGame 변경");
           context.commit("setEndGame", true);
           console.log("endgame 변경 되었는지 확인 => ?", state.endGame);
+          // 게임 끝나면 userList와 round 초기화
+          context.commit('setRound', 0)
+          for (var w=0; state.userList.length>w;w++) {
+            context.commit('setUserScore', {
+              index: w,
+              value: 0,
+            })
+          }
           break;
         }
       }
@@ -661,6 +679,8 @@ const actions = {
     context.commit("SET_PUBLISHER", undefined);
     context.commit("setClearUserList");
     context.commit("setClearUserKey");
+    context.commit("setClearUserKey");
+    context.commit("setChatClear");
   },
 
   updateMainVideoStreamManager: (commit, stream) => {
@@ -693,7 +713,12 @@ const actions = {
         gameStatus: 0,
       },
       to: [],
-    });
+    })
+    // 라운드 종료시 참여자 소리 들림  ====> 아직 되는지 확실하지 않음
+    state.publisher.publishAudio(true);
+    for (var r=0; state.subscribers.length > r; r++ ){
+      state.subscribers[r].subscribeToAudio(true)
+    }
   },
   // 게임 끝냄 - 수연
   finishGame: () => {
@@ -903,6 +928,17 @@ const actions = {
       state.session.signal({
         type: "game",
         data: {
+          gameStatus: 0,
+        },
+        to: [],
+      });
+    } catch (err) {
+      console.log(err);
+    }
+    try {
+      state.session.signal({
+        type: "game",
+        data: {
           gameStatus: 20,
         },
         to: [],
@@ -910,7 +946,7 @@ const actions = {
     } catch (err) {
       console.log(err);
     }
-  },
+  }
 };
 export default {
   namespaced: true,

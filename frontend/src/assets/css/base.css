@@ -1,13 +1,16 @@
 /* App 공통 css */
 #contents {
-  height: 100%;
+  height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-
+a {
+  text-decoration: none;
+  color: inherit;
+}
 /* 배경  */
 .background{
   width: 100vw;
@@ -50,7 +53,6 @@ input:focus {
 /* dialog 관련 css */
 .wrap-dialog {
     position: absolute;
-    width: 300px;
     z-index: 3;
     width: 500px;
   }
