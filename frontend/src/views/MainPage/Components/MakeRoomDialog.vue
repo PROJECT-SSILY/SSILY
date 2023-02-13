@@ -46,7 +46,7 @@
 
 <script>
 import { useRouter } from "vue-router";
-import { onUpdated, reactive } from "vue";
+import { onMounted, reactive } from "vue";
 // import { watch } from "vue";
 import { useStore } from "vuex";
 import $axios from "axios";
@@ -79,7 +79,7 @@ export default {
         },
       }
     });
-    onUpdated(() => {
+    onMounted(() => {
       // 방 타이틀 랜덤 생성
       const titlelist = [
         "함께 즐겨요",

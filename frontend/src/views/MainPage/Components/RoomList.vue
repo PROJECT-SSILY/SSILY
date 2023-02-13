@@ -16,6 +16,7 @@
           팀전
         </button>
       </div>
+      <alert-dialog v-if="state.alert"/>
       <div class="wrap-list">
         <RoomListItem
           v-for="room in state.roomlist"
@@ -53,12 +54,14 @@ import { reactive, onMounted, computed } from "vue";
 import { roomList, room } from "@/common/api/gameAPI";
 import RoomListItem from "@/views/MainPage/Components/RoomListItem.vue";
 import PasswordInput from "@/views/WaitingPage/components/PasswordInput.vue";
+import AlertDialog from '../../AlertDialog.vue'
 
 export default {
   name: "RoomList",
   components: {
     RoomListItem,
-    PasswordInput
+    PasswordInput,
+    AlertDialog
   },
   // emits: ["sendValue"],
   setup() {
@@ -77,21 +80,24 @@ export default {
         }
       }),
       passwordDialog: false,
+      alert: false
     });
 
     const getInRoom = async function (params) {
       const roominfo = JSON.parse(JSON.stringify(params));
       const isExistRoom=await getRoom(roominfo.sessionId);
       if(!isExistRoom) {
-        alert('존재하지 않는 방입니다');
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '존재하지 않는 방입니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
         return;
       }
       else {
         if (roominfo.isSecret) {
           state.passwordDialog = true
-          
         } else {
-          // state.password = prompt('비밀번호를 입력해주세요.');
           console.log(state.password)
           console.log(roominfo.isTeamBattle)
           store.commit("gameStore/setTitle", roominfo.title);
