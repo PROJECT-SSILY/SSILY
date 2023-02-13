@@ -9,12 +9,10 @@
         <v-card-title>
           {{ round }}round 결과
         </v-card-title>
-
       <canvas class="canvas"
       width="600"
       height="300"
       id="aCanvas"></canvas>
-
         <v-card-text>
           <h1> {{ winnerNickname }} WON! </h1>
           <div v-for="user in sortedUserList"
@@ -25,12 +23,12 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
+          <!-- <v-btn
             color="green darken-1"
             text
           >
           다음 라운드로!
-          </v-btn>
+          </v-btn> -->
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -50,12 +48,12 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
+          <!-- <v-btn
             color="green darken-1"
             text
           >
           다음 라운드로!
-          </v-btn>
+          </v-btn> -->
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -72,13 +70,14 @@ export default {
     setup() {
     const store = useStore()
     const sortedUserList = computed(() => store.state.gameStore.sortedUserList)
-    const winnerNickname = computed(() => {
-      imageToCanvas();
-      return store.state.gameStore.winnerNickname
-    })
+    const winnerNickname = computed(() => store.state.gameStore.winnerNickname)
     const gameResult = computed(() => store.state.gameStore.gameResult)
-    const endRound = computed(() => store.state.gameStore.endRound)
-    const round = computed(() => store.state.gameStore.round)
+    const endRound = computed(() => {
+      return store.state.gameStore.endRound})
+    const round = computed(() => {
+      imageToCanvas();
+      return store.state.gameStore.round;
+    })
     const endGame = computed(() => store.state.gameStore.endGame)
     const isTimeOut = computed(() => store.state.gameStore.isTimeOut)
     const state = reactive({

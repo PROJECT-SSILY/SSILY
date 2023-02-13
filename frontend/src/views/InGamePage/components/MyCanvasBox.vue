@@ -109,7 +109,6 @@ export default{
         submitPossible=false;
         submitCanvas();
         submitDrawing();
-        canvasToImage();
       }
     };
 
@@ -289,6 +288,7 @@ export default{
       console.log('getTopClassNames = ',getTopClassNames())
       console.log("winClass = ", winClass);
       store.dispatch("gameStore/sendTopFive", topFive.value);
+      canvasToImage();
     };
 
     const getClassNames = function () {
