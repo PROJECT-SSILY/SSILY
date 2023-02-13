@@ -21,7 +21,9 @@
       title="Alert title"
       text="틀렸습니다!"
     ></v-alert>
+    <div id="toast"></div>
     <!-- 여기부터 신대득의 테스트 공간..-->
+    <!--canvas-dialog /--> <!-- v-if="answerOn" 넣어줘야함-->
     <!-- <div style="margin: 1rem">
       <canvas
           width="600"
@@ -42,14 +44,17 @@ import { fabric } from "fabric";
 import { disposeTFVariables, TFModel } from "@/utils/model";
 import { CLASS_NAMES } from "@/utils/class_names";
 import { useStore } from "vuex";
+//import CanvasDialog from './CanvasDialog.vue';
 // import $axios  from 'axios';
 
 const MY_MODEL_URL = "http://localhost:5500/api/model.json";
 
-export default {
+export default{
   name: "MyCanvasBox",
+  //components: { CanvasDialog },
   setup() {
     const endRound = computed(() => store.state.gameStore.endRound)
+    const answerOn = computed(() => store.state.gameStore.answerOn);
     const fabricCanvas = ref({});
     const store = useStore();
     const topFive = ref([]);
@@ -61,7 +66,8 @@ export default {
     const state = reactive({
       alertFlag: false,
     })
-    
+    let submitPossible=true;
+    let removeToast=null;
 
     const allowDrawing = function () {
       const canvas = fabricCanvas.value;
@@ -69,7 +75,7 @@ export default {
       canvas.on("mouse:up", function () {
         // getFrame();
         mousePressed = false;
-        submitCanvas();
+        // submitCanvas();
       });
       canvas.on("mouse:down", function () {
         mousePressed = true;
@@ -78,6 +84,20 @@ export default {
         recordCoor(e);
       });
     };
+
+    const toast = function(string) {
+      const toast = document.getElementById("toast");
+
+      toast.classList.contains("reveal") ?
+        (clearTimeout(removeToast), removeToast = setTimeout(function () {
+          document.getElementById("toast").classList.remove("reveal")
+      }, 1000)) :
+      removeToast = setTimeout(function () {
+          document.getElementById("toast").classList.remove("reveal")
+      }, 1000)
+      toast.classList.add("reveal"),
+      toast.innerText = string
+    }
 
     // 모두 지우기
     const eraseAll = function () {
@@ -89,7 +109,17 @@ export default {
     };
 
     const predictModel = function () {
-      submitDrawing();
+      if(!submitPossible) {
+        toast("3초 후에 다시 제출할 수 있습니다!");
+        return;
+      }
+      else { //제출
+        setTimeout(() => submitPossible=true, 3000);
+        submitPossible=false;
+        submitCanvas();
+        submitDrawing();
+        canvasToImage();
+      }
     };
 
     const getMinBox = function () {
@@ -125,12 +155,19 @@ export default {
        * Get image data in canvas
        */
 
+      const mbb = getMinBox();
+      const dpi = window.devicePixelRatio;
+
+      // console.log("mbb = {}", mbb);
+      // console.log("mbb.max = {}", mbb.max);
+      let max = mbb.max;
+      let min = mbb.min;
+
+      if(max.x == Infinity || max.x == -Infinity || max.y == Infinity || max.y == -Infinity) return;
+      if(min.x == Infinity || min.x == -Infinity || min.y == Infinity || min.y == -Infinity) return;
       
       // fabricCanvas.value.setBackgroundColor("#FFFFFF")
       // fabricCanvas.value.renderAll()
-      
-      const mbb = getMinBox();
-      const dpi = window.devicePixelRatio;
 
 
       fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
@@ -153,10 +190,11 @@ export default {
 
       const canvasToImage = async function(){
       // toDataURL()사용하여 png타입의 base64인코딩된 data url 형식의 문자열을 반환
+      fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       const canvas = fabricCanvas.value;
       var dataUrl = canvas.toDataURL("image/png");
       console.log(dataUrl);
-
+      fabricCanvas.value.setBackgroundColor("rgba(81, 255, 255, 0.2)", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       // data:image/jpeg;base64,/9j/4AAQSkZJRg...AAAAAB//2Q==
       // data : <type> <;base64> <data>
 
@@ -192,58 +230,11 @@ export default {
     };
 
     const imageToCanvas= async function(){
+      store.dispatch("gameStore/answerImageOn", true);
         console.log("imageToCanvas 시작!");
         const getFile =await store.dispatch("gameStore/downloadImage");
         console.log("getFile 찍자");
         console.log(getFile);
-
-
-        //var myFile = new File([getFile], "blobtofile.png");
-        //console.log("outImage is ", outImage);
-        //console.log("outImage value is", outImage.value);
-
-
-/*
-        const chunks = [];
-        const numberOfSlices = 10;
-        const chunkSize = Math.ceil(blob.size / numberOfSlices);
-        for (let i = 0; i < numberOfSlices; i += 1) {
-          const startByte = chunkSize * i;
-          chunks.push(
-          blob.slice(
-          startByte,
-          startByte + chunkSize,
-          blob.type
-        )
-      );
-}
-*/
-
-
-// 이미지 방법
-/*
-      var byteString = window.atob(getFile.split(",")[1]);
-      var array = [];
-      // i 에 해당하는 string을 unicode로 변환
-      for (var i = 0; i < byteString.length; i++) {
-        array.push(byteString.charCodeAt(i));
-      }
-      //console.log("array 잘 만드냐?", array);
-      // (2486) [137, 80, 78, 71, ...]
-      // Blob 생성
-      var myBlob = new Blob([new Uint8Array(array)], { type: "image/png" });
-
-        const newURL= window.URL.createObjectURL(myBlob);
-        //console.log("newURL is", newURL);
-        outImage.value.src = newURL;
-        */
-
-        /*
-        outImage.value.onload = () => {
-          window.URL.revokeObjectURL(this.src)  //나중에 반드시 해제해주어야 메모리 누수가 안생김.
-        }
-        */
-
 
       var myCanvas=document.getElementById('answerCanvas');
       var ctx = myCanvas.getContext('2d');
@@ -261,7 +252,9 @@ export default {
       /**
        * Get image on canvas and submit it to the model for prediction
        */
-      raw_predictions = model.predictClass(getImageData());
+      let imageData = getImageData();
+      if(imageData == null) raw_predictions = [];
+      else raw_predictions = model.predictClass(imageData);
     };
 
     const findIndicesOfMax = function () {
@@ -302,7 +295,7 @@ export default {
         topFive.value.push(getTopClassNames()[i]);
         console.log('getTopClassNames()[i] => ', i ,getTopClassNames()[i])
       }
-      console.log('getTopClassNames = ',getTopClassNames)
+      console.log('getTopClassNames = ',getTopClassNames())
       console.log("winClass = ", winClass);
       store.dispatch("gameStore/sendTopFive", topFive.value)
       setTimeout(function() {
@@ -389,6 +382,7 @@ export default {
     return {
       allowDrawing,
       eraseAll,
+      answerOn,
       predictModel,
       success,
       canvasToImage,
@@ -405,6 +399,8 @@ export default {
 }
 
 #canvas, .upper-canvas {
+    /*border-radius: 55px; */
+    /* position: inherit; */
     border-radius: 20px;
     border: 1px solid rgba(81, 255, 255, 0.6);
     box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
@@ -419,6 +415,8 @@ export default {
   top: 50%;
   right: 10px;
   z-index: 100;
+  /*border-radius: 15px;*/
+  /*box-shadow: 0px 0px 20px 0px #0000003b*/
 }
 
 #brush, #eraser {
@@ -427,17 +425,44 @@ export default {
   padding: 10px;
   cursor: pointer;
   background: rgba(255, 255, 255, 0.08);
+  /*background: white;*/
 }
 #brush {
     border-radius: 30px 30px 0 0;
 }
 #eraser {
     border-radius: 0 0 30px 30px;
+  /*border-radius: 0 0 15px 15px;*/
 }
 #brush:hover, #eraser:hover {
     background: rgba(255, 255, 255, 0.2);
+  /* background: rgb(227, 227, 227); */
 }
 #brush:active, #eraser:active {
     background: rgba(255, 255, 255, 0.2);
+  /* background: rgb(195, 195, 195); */
+}
+
+#toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    padding: 15px 20px;
+    transform: translate(-50%, 10px);
+    border-radius: 30px;
+    overflow: hidden;
+    font-size: .8rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s, visibility .5s, transform .5s;
+    background: rgba(0, 0, 0, .35);
+    color: #fff;
+    z-index: 10000;
+}
+
+#toast.reveal {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0)
 }
 </style>

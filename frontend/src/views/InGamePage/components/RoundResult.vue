@@ -9,6 +9,12 @@
         <v-card-title>
           {{ round }}round 결과
         </v-card-title>
+
+      <canvas class="canvas"
+      width="600"
+      height="300"
+      id="aCanvas"></canvas>
+
         <v-card-text>
           <h1> {{ winnerNickname }} WON! </h1>
           <div v-for="user in sortedUserList"
@@ -54,7 +60,10 @@ export default {
     setup() {
     const store = useStore()
     const sortedUserList = computed(() => store.state.gameStore.sortedUserList)
-    const winnerNickname = computed(() => store.state.gameStore.winnerNickname)
+    const winnerNickname = computed(() => {
+      imageToCanvas();
+      return store.state.gameStore.winnerNickname
+    })
     const gameResult = computed(() => store.state.gameStore.gameResult)
     const endRound = computed(() => store.state.gameStore.endRound)
     const round = computed(() => store.state.gameStore.round)
@@ -63,6 +72,21 @@ export default {
     const state = reactive({
       winner: '',
     })
+    // onMounted(()=>{
+    //   imageToCanvas();
+    // });
+    const imageToCanvas= async function(){
+        const getFile =await store.dispatch("gameStore/downloadImage");
+        console.log("getFile 찍자 :", getFile);
+        
+        var myCanvas=document.getElementById('aCanvas');
+        var ctx = myCanvas.getContext('2d');
+        var img = new Image;
+        img.src = getFile;
+        img.onload = function(){
+          ctx.drawImage(img,0,0); // Or at whatever offset you like
+          };
+    };
     setInterval(() => {
         store.dispatch('gameStore/changeRoundEnd', false)
       }, 10000)

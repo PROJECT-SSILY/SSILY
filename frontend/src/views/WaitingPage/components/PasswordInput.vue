@@ -65,8 +65,8 @@
       })
       const roominfo = ref(props.room);
       const checkPassword = async function() {
-        state.alert = false
         if (state.input != roominfo.value.password) {
+          state.alert = false
           await store.commit('accountStore/setAlertColor', 'error')
           await store.commit('accountStore/setAlertMessage', '비밀번호가 틀렸습니다.')
           await store.commit('accountStore/setAlertIcon', 'alert')
