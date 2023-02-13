@@ -17,6 +17,7 @@
     </canvas>
     <div id="toast"></div>
     <!-- 여기부터 신대득의 테스트 공간..-->
+    <canvas-dialog /> <!-- v-if="answerOn" 넣어줘야함-->
     <!-- <div style="margin: 1rem">
       <canvas
           width="600"
@@ -32,19 +33,22 @@
 <script>
 import className from "!raw-loader!@/assets/model/class_names.txt"; // computed()에서 바로 가져와 categorys에 바로 할당한다.
 
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { fabric } from "fabric";
 import { disposeTFVariables, TFModel } from "@/utils/model";
 import { CLASS_NAMES } from "@/utils/class_names";
 import { useStore } from "vuex";
+import CanvasDialog from './CanvasDialog.vue';
 // import $axios  from 'axios';
 
 const MY_MODEL_URL = "http://localhost:5500/api/model.json";
 
-export default {
+export default{
   name: "MyCanvasBox",
+  components: { CanvasDialog },
   setup() {
 
+    const answerOn = computed(() => store.state.gameStore.answerOn);
     const fabricCanvas = ref({});
     const store = useStore();
     const topFive = ref([]);
@@ -215,58 +219,11 @@ export default {
     };
 
     const imageToCanvas= async function(){
+      store.dispatch("gameStore/answerImageOn", true);
         console.log("imageToCanvas 시작!");
         const getFile =await store.dispatch("gameStore/downloadImage");
         console.log("getFile 찍자");
         console.log(getFile);
-
-
-        //var myFile = new File([getFile], "blobtofile.png");
-        //console.log("outImage is ", outImage);
-        //console.log("outImage value is", outImage.value);
-
-
-/*
-        const chunks = [];
-        const numberOfSlices = 10;
-        const chunkSize = Math.ceil(blob.size / numberOfSlices);
-        for (let i = 0; i < numberOfSlices; i += 1) {
-          const startByte = chunkSize * i;
-          chunks.push(
-          blob.slice(
-          startByte,
-          startByte + chunkSize,
-          blob.type
-        )
-      );
-}
-*/
-
-
-// 이미지 방법
-/*
-      var byteString = window.atob(getFile.split(",")[1]);
-      var array = [];
-      // i 에 해당하는 string을 unicode로 변환
-      for (var i = 0; i < byteString.length; i++) {
-        array.push(byteString.charCodeAt(i));
-      }
-      //console.log("array 잘 만드냐?", array);
-      // (2486) [137, 80, 78, 71, ...]
-      // Blob 생성
-      var myBlob = new Blob([new Uint8Array(array)], { type: "image/png" });
-
-        const newURL= window.URL.createObjectURL(myBlob);
-        //console.log("newURL is", newURL);
-        outImage.value.src = newURL;
-        */
-
-        /*
-        outImage.value.onload = () => {
-          window.URL.revokeObjectURL(this.src)  //나중에 반드시 해제해주어야 메모리 누수가 안생김.
-        }
-        */
-
 
       var myCanvas=document.getElementById('answerCanvas');
       var ctx = myCanvas.getContext('2d');
@@ -327,7 +284,7 @@ export default {
         topFive.value.push(getTopClassNames()[i]);
         console.log('getTopClassNames()[i] => ', i ,getTopClassNames()[i])
       }
-      console.log('getTopClassNames = ',getTopClassNames)
+      console.log('getTopClassNames = ',getTopClassNames())
       console.log("winClass = ", winClass);
       store.dispatch("gameStore/sendTopFive", topFive.value);
     };
@@ -405,6 +362,7 @@ export default {
     return {
       allowDrawing,
       eraseAll,
+      answerOn,
       predictModel,
       success,
       canvasToImage,
@@ -419,6 +377,8 @@ export default {
 }
 
 #canvas, .upper-canvas {
+    /*border-radius: 55px; */
+    /* position: inherit; */
     border-radius: 20px;
     border: 1px solid rgba(81, 255, 255, 0.6);
     box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
@@ -433,6 +393,8 @@ export default {
   top: 50%;
   right: 10px;
   z-index: 100;
+  /*border-radius: 15px;*/
+  /*box-shadow: 0px 0px 20px 0px #0000003b*/
 }
 
 #brush, #eraser {
@@ -441,18 +403,22 @@ export default {
   padding: 10px;
   cursor: pointer;
   background: rgba(255, 255, 255, 0.08);
+  /*background: white;*/
 }
 #brush {
     border-radius: 30px 30px 0 0;
 }
 #eraser {
     border-radius: 0 0 30px 30px;
+  /*border-radius: 0 0 15px 15px;*/
 }
 #brush:hover, #eraser:hover {
     background: rgba(255, 255, 255, 0.2);
+  /* background: rgb(227, 227, 227); */
 }
 #brush:active, #eraser:active {
     background: rgba(255, 255, 255, 0.2);
+  /* background: rgb(195, 195, 195); */
 }
 
 #toast {
