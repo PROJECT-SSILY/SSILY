@@ -233,13 +233,28 @@ public class GameService   {
             curParticipantList.get(curPresenterIndex).getPlayer().setPresenter(true);
             curPresenterId=curParticipantList.get(curPresenterIndex).getParticipantPublicId();
         }
+
         data.addProperty("curPresenterId", curPresenterId);
         params.add("data", data);
 
+        JsonObject presenterData= (JsonObject) JsonParser.parseString(data.toString());
+        JsonObject presenterParams=params.deepCopy();
+        Integer nowRound=round.get(sessionId);
+        String word=words.get(sessionId).get(nowRound-1);
+
+        presenterData.addProperty("word", word);
+        presenterParams.add("data", presenterData);
+
         //방 참여자들에게 바뀐 데이터 보내주기.
         for (Participant p : gameParticipants) {
-            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
-                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+            if(p.getParticipantPublicId().equals(curPresenterId)) {
+                rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                        ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, presenterParams);
+            }
+            else {
+                rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                        ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+            }
         }
     }
 
@@ -359,8 +374,8 @@ public class GameService   {
         log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         Integer nowRound = round.get(sessionId);
-//        String answer = words.get(sessionId).get(nowRound);
-        String answer = "바다(해변)";
+        String answer = words.get(sessionId).get(nowRound-1);
+//        String answer = "바다(해변)";
 
         String answers = data.get("answer").toString();
         answers = answers.substring(4, answers.length()-4);
@@ -544,7 +559,14 @@ public class GameService   {
 
 
         // TODO : 모든 자원 반납
+        gameThread.remove(sessionId);
+        round.remove(sessionId);
+        words.remove(sessionId);
+        participantList.remove(sessionId);
+        presenterIndex.remove(sessionId);
 
+        HashMap<String, Boolean> ready = readyState.get(sessionId);
+        ready.replaceAll((k, v) -> false);
 
         for (Participant p : participants) {
             p.getPlayer().initPlayerState();  // 상태 초기화 (다시 대기방으로 돌아가기 위해)
