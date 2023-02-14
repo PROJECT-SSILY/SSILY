@@ -27,7 +27,7 @@ const state = {
     messages: [],
     media: 0.5,
     alarm: 0.5,
-    audio: new Audio(require('../../public/creativeminds.mp3')),
+    audio: new Audio(require('../../public/perception.mp3')),
     isAllReady: false,
     answerOn: false,
     userList: [],
@@ -738,18 +738,17 @@ const actions = {
 
   leaveSession: (context) => {
     if (state.session) {
-      
-
-      state.session.disconnect();
-
       state.session.signal({
         type: "game",
         data: {
-          gameStatus: 3,
+          gameStatus: 6,
         },
         to: [],
       });
+
+      state.session.disconnect();
     }
+    
     context.commit("setSession", undefined);
     context.commit("setMainStreamManager", undefined);
     context.commit("setSubscribers", []);
@@ -760,6 +759,7 @@ const actions = {
     context.commit("setClearUserKey");
     context.commit("setChatClear");
     context.commit("setEndGame", false);
+    context.commit("setIsHost", false);
   },
 
   updateMainVideoStreamManager: (commit, stream) => {
