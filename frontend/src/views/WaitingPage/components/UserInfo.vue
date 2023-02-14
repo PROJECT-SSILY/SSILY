@@ -2,11 +2,10 @@
 <div class="wrapper-item-userinfo ">
   <div class="item-userinfo">
     <div class="box-char">
-      <v-img id="character" src="@/assets/images/character.svg" alt=""/>
+      <v-img id="character" :src="state.image" alt=""/>
     </div>
     <div class="box-nickname">
       <p>{{ user.nickname }}</p>
-      <p>{{ user.connectionId }}</p>
     </div>
     <!-- <p>레벨: {{ user.level }}</p>
     <p>팀: {{ user.team }}</p>
@@ -19,6 +18,7 @@
 
 <script>
 import { useStore } from "vuex"
+import { reactive } from "vue"
 
 
 export default {
@@ -26,17 +26,27 @@ export default {
   props: {
     user: Object
   },
-  setup() {
+  setup(props) {
     const store = useStore()
-
+    const state = reactive({
+      image: null
+    })
+    if (props.user.level > -1 && props.user.level < 6)  {
+        state.image = "../ssily1.svg"
+    } else if (props.user.level > 5 && props.user.level < 11) {
+        state.image = "../ssily2.svg"
+    } else {
+        state.image = "../ssily3.svg"
+    }
     return {
-      store
+      store,
+      state,
     }
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .box-char {
   height: 100%;
   padding: 10px;
@@ -50,8 +60,17 @@ export default {
   padding: 10px;
   color: #e8e8e8;
 }
+$hover_top: 20px;
+$hover_bottom: 0px;  
+
 #character {
   height: 140px;
+  animation:hover 1.1s ease-in-out 0s infinite alternate;
+}
+
+@keyframes hover { 
+    0% { transform: translate3d(0,$hover_top,0) }
+    100% { transform: translate3d(0,$hover_bottom,0) }
 }
 #ready {
   font-size: 30px;

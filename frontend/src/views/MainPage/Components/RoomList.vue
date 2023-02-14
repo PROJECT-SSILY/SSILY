@@ -1,6 +1,6 @@
 <template>
-  <div class="roomlist">
-    <div class="inner-roomlist">
+  <div class="roomlist" >
+    <div class="inner-roomlist" >
       <v-img src="@/assets/images/earth.png" id="earth" alt="earth" />
       <div class="wrap-btn">
         <button
@@ -19,60 +19,89 @@
       <alert-dialog v-if="state.alert"/>
       <div class="wrap-list">
         <RoomListItem
-          v-for="room in state.roomlist"
+          v-for="room in paginatedData"
           :key="room.id"
           :room="room"
           @click="getInRoom(room)"
           class="list-item"
         />
         <div
-          class="list-item blank"
-          v-for="blank in 5 - state.roomlist.length"
-          :key="blank"
+        class="list-item blank"
+        v-for="blank in 5 - paginatedData.length"
+        :key="blank"
         ></div>
-        <div v-if="state.passwordDialog">
-
-          <password-input 
-          
-          v-for="room in state.roomlist"
-          :key="room.id"
-          :room="room"/>
-        </div>
-        <paginationItem :rooms="state.roomlist" />
         <div class="btn-paging">
-          <button @click="prevPage" >PREV</button>
-          <button @click="nextPage" >NEXT</button>
+          <button 
+          @click="prevPage" 
+          v-if="!prevButtonDisabled"
+          >PREV</button>
+          <button 
+          @click="nextPage"
+          v-if="!nextButtonDisabled" 
+          >NEXT</button>
         </div>
       </div>
+    </div>
+  </div>
+  <!-- 비밀번호 모달 -->
+  <div class="wrap-page" v-show="state.passwordDialog">
+    <div class="wrap-dialog">
+      <div class="dialog">
+      <v-form
+        ref="form"
+        v-model="valid"
+        lazy-validation
+        @submit.prevent="submitPw"
+        >
+          <v-text-field 
+            label="비밀번호 숫자 4자리를 입력하세요."
+            hide-details="auto"
+            v-model="state.input"
+          ></v-text-field>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <p class="text-center">
+              <button type="submit" class="btn-dialog">참가하기</button>
+            </p>
+            <alert-dialog v-if="state.alert"/>
+          </v-card-actions>
+      </v-form>
+    </div>
+      <div
+        class="bg-dark"
+        :class="state.passwordDialog ? 'active':''"
+        @click="closeDialog"
+      ></div>
     </div>
   </div>
 </template>
 <script>
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-// import { getCurrentInstance } from "vue";
 import { reactive, onMounted, computed } from "vue";
 import { roomList, room } from "@/common/api/gameAPI";
 import RoomListItem from "@/views/MainPage/Components/RoomListItem.vue";
-import paginationItem from "@/views/MainPage/Components/paginationItem.vue";
-import PasswordInput from "@/views/WaitingPage/components/PasswordInput.vue";
-import AlertDialog from '../../AlertDialog.vue'
+// import AlertDialog from '../../AlertDialog.vue'
 
 export default {
   name: "RoomList",
   components: {
     RoomListItem,
-    paginationItem,
-    PasswordInput,
-    AlertDialog
   },
-  // emits: ["sendValue"],
   setup() {
     const router = useRouter();
     const store = useStore();
     const state = reactive({
+      room: {
+        title: null,
+        password: null,
+        isTeamBattle: null,
+        isSecret: false,
+        sessionId: null,
+      },
+      input: null,
       isTeamBattle: false,
-      password: null,
       teamrooms: [],
       privaterooms: [],
       roomlist: computed(() => {
@@ -83,43 +112,55 @@ export default {
         }
       }),
       passwordDialog: false,
-      alert: false,
       pageNum: 0
     });
 
     const getInRoom = async function (params) {
       const roominfo = JSON.parse(JSON.stringify(params));
-      const isExistRoom=await getRoom(roominfo.sessionId);
+      state.room.title = roominfo.title
+      state.room.password = roominfo.password
+      state.room.isTeamBattle = roominfo.isTeamBattle
+      state.room.isSecret = roominfo.isSecret
+      state.room.sessionId = roominfo.sessionId
+  
+      const isExistRoom = await getRoom(roominfo.sessionId);
       if(!isExistRoom) {
-        state.alert = false
-        await store.commit('accountStore/setAlertColor', 'error')
-        await store.commit('accountStore/setAlertMessage', '존재하지 않는 방입니다.')
-        await store.commit('accountStore/setAlertIcon', 'alert')
-        state.alert = true
-        return;
-      }
-      else {
-        if (roominfo.isSecret) {
-          state.passwordDialog = true
-        } else {
-          console.log(state.password)
-          console.log(roominfo.isTeamBattle)
-          store.commit("gameStore/setTitle", roominfo.title);
-          store.commit("gameStore/setTeam", roominfo.isTeamBattle);
-          store.commit("gameStore/setSecret", roominfo.isSecret);
-          store.commit("gameStore/setPassword", roominfo.password);
-          router.push({
-            name: "gameroom",
-            params: { sessionId: roominfo.sessionId },
-          });
-        }
-      }
-    };
+        // 존재하지 않는 방 입장 시
+        alert("존재하지 않는 방입니다.")
 
-    const getRoom=(sessionId) => {
+      } else if (roominfo.isSecret && !state.passwordDialog) { 
+        // 비밀번호 입력이 필요한 방에 입장하는 경우
+        state.passwordDialog = true
+
+      } else { 
+        // 입장이 가능한 경우
+        store.commit("gameStore/setTitle", state.room.title);
+        store.commit("gameStore/setTeam", state.room.isTeamBattle);
+        store.commit("gameStore/setSecret", state.room.isSecret);
+        store.commit("gameStore/setPassword", state.room.password);
+
+        router.push({name: "gameroom", params: { sessionId: state.room.sessionId },});
+      } 
+    };
+    const submitPw = () => {
+      const pw = state.input
+      if (pw===state.room.password) {
+        store.commit("gameStore/setTitle", state.room.title);
+        store.commit("gameStore/setTeam", state.room.isTeamBattle);
+        store.commit("gameStore/setSecret", state.room.isSecret);
+        store.commit("gameStore/setPassword", state.room.password);
+        router.push({name: "gameroom", params: { sessionId: state.room.sessionId },});
+      } else {
+        alert("비밀번호가 틀렸습니다.")
+      }
+    }
+    // 없는 방 조회시 오류 반환
+    const getRoom = (sessionId) => {
       const response= room(sessionId);
       return response;
     }
+
+    // 페이지네이션
     const pageList = computed(() => {
         let listLeng = state.roomlist.length;
         let listSize = 5;
@@ -140,6 +181,14 @@ export default {
     const prevPage = function() {
         state.pageNum -= 1
     }
+    const nextButtonDisabled = computed(() => state.pageNum >= Math.floor(state.roomlist.length / 5));
+    
+    const prevButtonDisabled = computed(() => state.pageNum < 1);
+
+    // 모달창 닫기
+    const closeDialog = () => {
+      state.passwordDialog = false;
+    };
     // 방 리스트 조회
     onMounted(async () => {
       // 팀 분류하기 - 이은혁
@@ -162,17 +211,20 @@ export default {
     return {
       state,
       getInRoom,
+      submitPw,
       pageList,
       paginatedData,
       nextPage,
-      prevPage
+      prevPage,
+      nextButtonDisabled,
+      prevButtonDisabled,
+      closeDialog
     };
   },
 };
 </script>
 <style scoped>
 .roomlist {
-  height: 510rem;
   background: white;
   border-radius: 60px;
   overflow: hidden;
@@ -248,4 +300,28 @@ export default {
   font-size: 15px;
   margin: 0 10px;
 }
+.wrap-page {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.bg-dark {
+  transition: .2s;
+}
+.bg-dark.active {
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
 </style>

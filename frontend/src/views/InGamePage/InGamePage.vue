@@ -65,7 +65,7 @@
       <header>
         <GameTimer :key="gameTimer" id="timer" />
       </header>
-      <p class="gameround">{{ round + 1 }} 라운드</p>
+      <p class="gameround">{{ round }} 라운드</p>
       <RoundResult />
       <GameResult v-show="endGame"/>
       <GameScore class="gamescore"/>
@@ -93,7 +93,7 @@
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="wrap-robot" v-if="!amIDescriber">
-            <v-img id="robot" src="@/assets/images/character.svg" alt="robot" />
+            <v-img id="robot" :src="state.robot" alt="robot" />
           </div>
         </div>
         <!-- <div class="ourteam-members">
@@ -196,6 +196,8 @@ export default {
       isHost: true,
       connectionId: null,
       nickname: computed(() => store.state.accountStore.user.nickname),
+      level: computed(() => store.state.accountStore.user.level),
+      robot: null,
 
       // 팀 분류
       myTeam: null,
@@ -242,6 +244,13 @@ export default {
     onBeforeMount(async () => {
       await store.dispatch("accountStore/getMeAction");
       console.log("join start");
+      if (state.level > -1 && state.level < 6)  {
+          state.robot = "../ssily1.svg"
+      } else if (state.level > 5 && state.level < 11) {
+          state.robot = "../ssily2.svg"
+      } else {
+          state.robot = "../ssily3.svg"
+      }
 
       joinSession();
     });
@@ -343,7 +352,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* ======= component-waiting ================================================================= */
 .background-ingame {
   width: 100vw;
@@ -611,6 +620,14 @@ header {
 }
 #robot {
   width: 300px;
+  animation:hover 1.1s ease-in-out 0s infinite alternate;
+}
+$hover_top: 30px;
+$hover_bottom: 50px;  
+
+@keyframes hover { 
+    0% { transform: translate3d(0,$hover_top,0) }
+    100% { transform: translate3d(0,$hover_bottom,0) }
 }
 .sec-display {
   width: 100%;
