@@ -437,7 +437,7 @@ const actions = {
           }
           // 모두 레디 했을 때, 게임 시작됨
           if (allready) {
-            // context.commit("setInGame", true) // 타이머 사용 하려고 여기서 뺌
+            // context.commit("setInGame", true)
             if (state.isHost) {
               context.dispatch("gameStart");
             }
@@ -737,7 +737,19 @@ const actions = {
   },
 
   leaveSession: (context) => {
-    if (state.session) state.session.disconnect();
+    if (state.session) {
+      
+
+      state.session.disconnect();
+
+      state.session.signal({
+        type: "game",
+        data: {
+          gameStatus: 3,
+        },
+        to: [],
+      });
+    }
     context.commit("setSession", undefined);
     context.commit("setMainStreamManager", undefined);
     context.commit("setSubscribers", []);

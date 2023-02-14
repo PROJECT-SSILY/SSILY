@@ -62,6 +62,10 @@ public class Player {
 //        this.isReady = false;
     }
 
+    public void changeHost(){
+        this.isHost = true;
+    }
+
     public void addExp(int exp){
         this.exp += exp;
     }
