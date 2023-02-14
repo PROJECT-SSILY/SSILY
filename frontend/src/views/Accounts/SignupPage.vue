@@ -58,6 +58,7 @@
           label="비밀번호 확인"
           hint=""
           @click:append="state.show2 = !state.show2"
+          @keyup.enter="clickSignup"
         ></v-text-field>
         <button
           type="submit"
