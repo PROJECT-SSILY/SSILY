@@ -685,6 +685,7 @@ const actions = {
     context.commit("setClearUserKey");
     context.commit("setClearUserKey");
     context.commit("setChatClear");
+    context.commit("setEndGame", false);
   },
 
   updateMainVideoStreamManager: (commit, stream) => {
