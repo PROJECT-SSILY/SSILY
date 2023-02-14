@@ -282,6 +282,12 @@ const mutations = {
           state.subscribers[j].subscribeToAudio(false)
         }
       }
+    },
+    setUserIsHost: (state, data) => {
+      var index = data.index
+      var value = data.value
+      state.userList[index].isHost = value
+
     }
 };
 
@@ -403,7 +409,7 @@ const actions = {
               context.commit("setMyConnectionId", key);
             }
             user.connectionId = key;
-            user.isReady = data[key].isReady;
+            user.isReady = data[key].isReady;          
             user.exp = data[key].player.exp;
             user.isHost = data[key].player.isHost;
             user.isPresenter = data[key].player.isPresenter;
@@ -417,6 +423,8 @@ const actions = {
               console.log("state.userKey: ", state.userKey);
               context.commit("setUserKey", user.connectionId);
               context.commit("setUserList", user);
+              context.commit("setIsHost", user.isHost);
+
             }
             console.log("UserList: ", state.userList);
           }
@@ -459,6 +467,16 @@ const actions = {
             context.dispatch("finishRound");
           }
           break;
+        }
+        case 6: {
+          console.log('6번')
+          console.log(event.data.host)
+          for (var g=0;g<state.userList.length;g++) {
+            if (state.userList[g].connectionId == event.data.host) {
+              context.commit("setUserIsHost", {index: g, value: true})
+            }
+          }
+          break
         }
         case 10: {
           // 라운드별 경험치 누적
@@ -750,6 +768,7 @@ const actions = {
     }
     
     context.commit("setSession", undefined);
+    context.commit("setIsHost", false);
     context.commit("setMainStreamManager", undefined);
     context.commit("setSubscribers", []);
     context.commit("setOV", undefined);
@@ -761,7 +780,6 @@ const actions = {
     context.commit("setEndGame", false);
     context.commit("setIsHost", false);
   },
-
   updateMainVideoStreamManager: (commit, stream) => {
     if (state.mainStreamManager === stream) return;
     commit("setMainStreamManager", stream);
@@ -1022,7 +1040,7 @@ const actions = {
     } catch (err) {
       console.log(err);
     }
-  }
+  },
 };
 export default {
   namespaced: true,
