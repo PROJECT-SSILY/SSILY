@@ -63,12 +63,12 @@
     <!-- 아래부터 게임 진행 페이지 관련 코드-->
     <div class="component-ingame" v-else>
       <header>
-        <RoundResult />
-        <GameResult v-show="endGame" />
         <GameTimer :key="gameTimer" id="timer" />
-        <GameScore/>
-        <h1>{{ round + 1 }} 라운드</h1>
       </header>
+      <p class="gameround">{{ round + 1 }} 라운드</p>
+      <RoundResult />
+      <GameResult v-show="endGame" />
+      <GameScore class="gamescore"/>
 
       <!-- 상대 팀 -->
       <div class="area-opponents">
@@ -522,6 +522,22 @@ footer {
 /* ----------------------------------- */
 
 /* ======= component-ingame ================================================================= */
+.gamescore {
+  width: 200px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 30px;
+}
+.gameround {
+  font-size: 20px;
+  position: absolute;
+  width: 100px;
+  right: 0;
+  top: 0;
+  margin: 30px;
+  color: white;
+}
 .component-ingame {
   width: 100%;
   max-width: 1000px;
@@ -567,7 +583,6 @@ header {
 .me {
   position: relative;
 }
-/* ------------------------------------------------------------ */
 .wrap-robot {
   position: absolute;
   top: 45px;
@@ -583,7 +598,6 @@ header {
 #robot {
   width: 300px;
 }
-/* ------------------------------------------------------------ */
 .sec-display {
   width: 100%;
 }
