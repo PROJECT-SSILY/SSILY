@@ -1,37 +1,36 @@
 <template>
-  <div class="text-center">
-    <v-dialog
-      v-model="state.dialog"
-      hide-overlay
-      transition="dialog-bottom-transition"
-    >      
-      <v-card class="formbox">
-        <v-card-title>
-          비밀번호 입력
-        </v-card-title>
-        <v-form
-        ref="form"
-        v-model="valid"
-        lazy-validation
-        >
-          <v-text-field 
-            label="비밀번호 숫자 4자리를 입력하세요."
-            hide-details="auto"
-            v-model="state.input"
-          ></v-text-field>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-
-            <p class="text-center">
-              <v-btn 
-              @click="checkPassword">참가하기</v-btn>
-            </p>
-            <alert-dialog v-if="state.alert"/>
-          </v-card-actions>
-      </v-form>
-      </v-card>
-    </v-dialog>
+  <div class="wrap-dialog">
+    <div class="dialog"
+    v-if="room.isSecret && tmp==room.sessionId">
+      <!-- <v-dialog
+        v-model="state.dialog"
+        v-if="room.isSecret && tmp==room.sessionId"
+        hide-overlay
+        transition="dialog-bottom-transition"
+      >  -->
+      <div class="tit-dialog">비밀번호 입력</div>
+          <v-form
+          ref="form"
+          v-model="valid"
+          lazy-validation
+          >
+            <v-text-field 
+              label="비밀번호 숫자 4자리를 입력하세요."
+              hide-details="auto"
+              v-model="state.input"
+            ></v-text-field>
+            <v-divider></v-divider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <p class="text-center">
+                <button class="btn-dialog"
+                @click="checkPassword">참가하기</button>
+              </p>
+              <alert-dialog v-if="state.alert"/>
+            </v-card-actions>
+        </v-form>
+    <!-- </v-dialog> -->
+  </div>
   </div>
 </template>
 
@@ -52,8 +51,9 @@
       AlertDialog
     },
     props: {
-      dialog: Object,
-      room: Object
+      // Dialog: Boolean,
+      room: Object,
+      tmp: String,
     },
     setup(props) {
       const router = useRouter()
@@ -65,6 +65,7 @@
       })
       const roominfo = ref(props.room);
       const checkPassword = async function() {
+        // console.log(Dialog);
         console.log(roominfo.value);
         if (state.input != roominfo.value.password) {
           state.alert = false
@@ -97,18 +98,14 @@
 
 <style scoped>
 
-.formbox {
-  padding: 2rem;
-  width: 100%;
-  border-radius: 20px;
-  opacity: 100%;
-  font-family: 'MaplestoryOTFBold';
-  font-weight: normal;
-  font-style: normal;
+.dialog {
+  background: #FFFFFF;
+  height: 100%;
+  max-height: 500px;
+  width: 500px;
 }
-
-.my-custom-dialog {
-  position: absolute;
-  top: -70%
+.btn-dialog {
+  background: #24CB83;
+  color: #FFFFFF;
 }
 </style>

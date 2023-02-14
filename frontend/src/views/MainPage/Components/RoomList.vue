@@ -1,6 +1,6 @@
 <template>
-  <div class="roomlist">
-    <div class="inner-roomlist">
+  <div class="roomlist" >
+    <div class="inner-roomlist" >
       <v-img src="@/assets/images/earth.png" id="earth" alt="earth" />
       <div class="wrap-btn">
         <button
@@ -44,8 +44,10 @@
           <password-input
           v-for="room in state.roomlist"
           :key="room.id"
+          :tmp="state.tmp"
+          :dialog="state.passwordDialog"
           :room="room"/>
-        </div>
+      </div>
       </div>
     </div>
   </div>
@@ -56,7 +58,7 @@ import { useRouter } from "vue-router";
 import { reactive, onMounted, computed } from "vue";
 import { roomList, room } from "@/common/api/gameAPI";
 import RoomListItem from "@/views/MainPage/Components/RoomListItem.vue";
-import PasswordInput from "@/views/WaitingPage/components/PasswordInput.vue";
+import PasswordInput from "@/views/MainPage/Components/PasswordInput.vue";
 import AlertDialog from '../../AlertDialog.vue'
 
 export default {
@@ -70,8 +72,8 @@ export default {
     const router = useRouter();
     const store = useStore();
     const state = reactive({
+      tmp: '',
       isTeamBattle: false,
-       
       teamrooms: [],
       privaterooms: [],
       roomlist: computed(() => {
@@ -99,9 +101,9 @@ export default {
       }
       else {
         if (roominfo.isSecret) {
-          state.passwordDialog = true
+          state.passwordDialog = !state.passwordDialog
+          state.tmp = roominfo.sessionId
         } else {
-          console.log(state.password)
           console.log(roominfo.isTeamBattle)
           store.commit("gameStore/setTitle", roominfo.title);
           store.commit("gameStore/setTeam", roominfo.isTeamBattle);
@@ -143,6 +145,10 @@ export default {
     const nextButtonDisabled = computed(() => state.pageNum >= Math.floor(state.roomlist.length / 5));
     
     const prevButtonDisabled = computed(() => state.pageNum < 1);
+
+    const closeDialog = () => {
+      state.passwordDialog = false;
+    };
     // 방 리스트 조회
     onMounted(async () => {
       // 팀 분류하기 - 이은혁
@@ -171,6 +177,7 @@ export default {
       prevPage,
       nextButtonDisabled,
       prevButtonDisabled,
+      closeDialog
     };
   },
 };
@@ -252,4 +259,19 @@ export default {
   font-size: 15px;
   margin: 0 10px;
 }
+.wrap-dialog {
+}
+.bg-dark {
+  z-index: -11;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.bg-dark.active {
+  z-index: 1;
+}
+
 </style>
