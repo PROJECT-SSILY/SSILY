@@ -37,7 +37,7 @@ const state = {
     amIDescriber: false,
     winnerNickname: '', // [라운드 결과] 승리 유저
     winnerId: '',
-    round: 0, // 현재 라운드
+    round: 1, // 현재 라운드
     answer: '',
     presenterId: null,
     sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
@@ -358,6 +358,7 @@ const actions = {
           for (var n = 0; n < state.userList.length; n++) {
             if (state.userList[n].connectionId == PresenterId) {
               context.commit("setIsPresenter", { index: n, value: true });
+              console.log('설명해야할 단어 ===>>' , event.data)
               context.commit('setWord', event.data.word)
             } else {
               context.commit("setIsPresenter", { index: n, value: false });
@@ -383,7 +384,6 @@ const actions = {
             if (state.myUserName == data[key].player.nickname) {
               context.commit("setMyConnectionId", key);
             }
-
             user.connectionId = key;
             user.isReady = data[key].isReady;
             user.exp = data[key].player.exp;
@@ -442,13 +442,12 @@ const actions = {
         }
         case 10: {
           // 라운드별 경험치 누적
-          console.log("10번 시그널 수신 - 라운드 끝");
-          if (event.data.round != 8) {
+          console.log("10번 event data : ", event.data);
+          if (event.data.round != 8) { 
             context.commit("setEndRound", true);
           }
-
+          console.log("10번 시그널 수신 - 라운드 끝 ===> ", event.data.round);
           var scoreList = event.data.player;
-          console.log("10번 event data : ", event.data);
           context.commit("setRound", event.data.round);
           var maxScore = -1;
           var maxScoreUser = undefined;
@@ -483,17 +482,18 @@ const actions = {
           break;
         }
         case 20: {
-          console.log("20번 시그널 수신 - 시간초과");
+          console.log("20번 시그널 수신 - 시간초과 ==>",event.data.round);
           if (event.data.round != 8) {
             context.commit("setEndRound", true);
           }
           console.log(event.data);
-          context.commit("setRound", event.data.round);
           context.commit("setIsTimeOut", true);
+          context.commit("setRound", event.data.round);
           // 라운드를 8번 돌면 게임을 종료한다.
           if (event.data.round == 8 && state.isHost == true) {
             context.dispatch("finishGame");
           }
+
           break;
         }
         case 100: {
@@ -507,18 +507,47 @@ const actions = {
             winnerList.push(event.data.winner[a].nickname);
           }
           context.commit("setWinnerList", winnerList);
+          console.log('event.data.gameResult.length = ', event.data.gameResult.length)
+          console.log('event.data.gameResult :',event.data.gameResult)
+          // for (var h=0; h<state.userList.length; h++) {
+          //   console.log('제 발', event.data.gameResult[h].extraExp)
+          //   context.commit("setUserScore", {
+          //     index: h,
+          //     value: state.userList[h].score + event.data.gameResult[h].extraExp 
+          //   });            
+          // }
+          // var tmpList = state.userList;
+          // tmpList.sort((a, b) => {
+          //   if (a.score > b.score) return -1;
+          //   if (a.score < b.score) return 1;
+          //   return 0;
+          // });
+          // console.log('tmpList::::', tmpList)
+          // context.commit("setSortedUserList", tmpList);
+          // 정렬 해보기 
+          // context.commit("setUserScore", {
+          //   index: y,
+          //   value: scoreList[x].score,
+          // });
+          // var sortList = state.userList;
+          // sortList.sort((a, b) => {
+          //   if (a.score > b.score) return -1;
+          //   if (a.score < b.score) return 1;
+          //   return 0;
+          // });
           context.commit("setGameResult", event.data.gameResult);
           console.log("endGame 변경");
           context.commit("setEndGame", true);
           console.log("endgame 변경 되었는지 확인 => ?", state.endGame);
           // 게임 끝나면 userList와 round 초기화
-          context.commit('setRound', 0)
+          context.commit('setRound', 1)
           for (var w=0; state.userList.length>w;w++) {
             context.commit('setUserScore', {
               index: w,
               value: 0,
             })
           }
+          // console.log('state.sortedUserList ::::: ', state.sortedUserList)
           break;
         }
       }

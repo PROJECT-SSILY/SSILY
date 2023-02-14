@@ -4,10 +4,11 @@
       v-model="endRound"
       persistent
       max-width="1000"
+      v-if="!endGame"
     >
       <v-card class="formbox">
         <v-card-title>
-          {{ round }}round 결과
+          {{ round-1 }}round 결과
         </v-card-title>
       <canvas class="canvas"
       width="600"
