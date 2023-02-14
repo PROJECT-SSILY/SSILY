@@ -10,9 +10,8 @@
     <!-- <p>레벨: {{ user.level }}</p>
     <p>팀: {{ user.team }}</p>
     <p>방장여부: {{ user.isHost }}</p>
-    <p>경험치: {{ user.exp }}</p>
-    <p>레디: {{ user.isReady }}</p>
-    <p>설명자여부: {{ user.isPresenter }}</p> -->
+    <p>경험치: {{ user.exp }}</p> -->
+    <!-- <p>레디: {{ user.isReady }}</p>-->
   </div>
 </div>
 </template>
