@@ -15,6 +15,7 @@
         id="canvas"
     >
     </canvas>
+    <div id="toast"></div>
     <!-- 여기부터 신대득의 테스트 공간..-->
     <!--canvas-dialog /--> <!-- v-if="answerOn" 넣어줘야함-->
     <!-- <div style="margin: 1rem">
@@ -56,6 +57,8 @@ export default{
     let coords = []; // 현재 그림의 좌표를 기록
     let raw_predictions = {};
     let model = null;
+    let submitPossible=true;
+    let removeToast=null;
 
     const allowDrawing = function () {
       const canvas = fabricCanvas.value;
@@ -63,7 +66,7 @@ export default{
       canvas.on("mouse:up", function () {
         // getFrame();
         mousePressed = false;
-        submitCanvas();
+        // submitCanvas();
       });
       canvas.on("mouse:down", function () {
         mousePressed = true;
@@ -73,19 +76,19 @@ export default{
       });
     };
 
-    // const toast = function(string) {
-    //   const toast = document.getElementById("toast");
+    const toast = function(string) {
+      const toast = document.getElementById("toast");
 
-    //   toast.classList.contains("reveal") ?
-    //     (clearTimeout(removeToast), removeToast = setTimeout(function () {
-    //       document.getElementById("toast").classList.remove("reveal")
-    //   }, 1000)) :
-    //   removeToast = setTimeout(function () {
-    //       document.getElementById("toast").classList.remove("reveal")
-    //   }, 1000)
-    //   toast.classList.add("reveal"),
-    //   toast.innerText = string
-    // }
+      toast.classList.contains("reveal") ?
+        (clearTimeout(removeToast), removeToast = setTimeout(function () {
+          document.getElementById("toast").classList.remove("reveal")
+      }, 1000)) :
+      removeToast = setTimeout(function () {
+          document.getElementById("toast").classList.remove("reveal")
+      }, 1000)
+      toast.classList.add("reveal"),
+      toast.innerText = string
+    }
 
     // 모두 지우기
     const eraseAll = function () {
@@ -97,7 +100,16 @@ export default{
     };
 
     const predictModel = function () {
-      submitDrawing();
+      if(!submitPossible) {
+        toast("3초 후에 다시 제출할 수 있습니다!");
+        return;
+      }
+      else { //제출
+        setTimeout(() => submitPossible=true, 3000);
+        submitPossible=false;
+        submitCanvas();
+        submitDrawing();
+      }
     };
 
     const getMinBox = function () {
@@ -139,6 +151,14 @@ export default{
       
       const mbb = getMinBox();
       const dpi = window.devicePixelRatio;
+
+      // console.log("mbb = {}", mbb);
+      // console.log("mbb.max = {}", mbb.max);
+      let max = mbb.max;
+      let min = mbb.min;
+
+      if(max.x == Infinity || max.x == -Infinity || max.y == Infinity || max.y == -Infinity) return;
+      if(min.x == Infinity || min.x == -Infinity || min.y == Infinity || min.y == -Infinity) return;
 
 
       fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
@@ -234,7 +254,9 @@ export default{
       /**
        * Get image on canvas and submit it to the model for prediction
        */
-      raw_predictions = model.predictClass(getImageData());
+      let imageData = getImageData();
+      if(imageData == null) raw_predictions = [];
+      else raw_predictions = model.predictClass(imageData);
     };
 
     const findIndicesOfMax = function () {
@@ -411,5 +433,28 @@ export default{
 #brush:active, #eraser:active {
     background: rgba(255, 255, 255, 0.2);
   /* background: rgb(195, 195, 195); */
+}
+
+#toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    padding: 15px 20px;
+    transform: translate(-50%, 10px);
+    border-radius: 30px;
+    overflow: hidden;
+    font-size: .8rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s, visibility .5s, transform .5s;
+    background: rgba(0, 0, 0, .35);
+    color: #fff;
+    z-index: 10000;
+}
+
+#toast.reveal {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0)
 }
 </style>

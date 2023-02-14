@@ -345,6 +345,7 @@ const actions = {
           for (var n = 0; n < state.userList.length; n++) {
             if (state.userList[n].connectionId == PresenterId) {
               context.commit("setIsPresenter", { index: n, value: true });
+              console.log('설명해야할 단어 ===>>' , event.data)
               context.commit('setWord', event.data.word)
             } else {
               context.commit("setIsPresenter", { index: n, value: false });
@@ -685,6 +686,7 @@ const actions = {
     context.commit("setClearUserKey");
     context.commit("setClearUserKey");
     context.commit("setChatClear");
+    context.commit("setEndGame", false);
   },
 
   updateMainVideoStreamManager: (commit, stream) => {

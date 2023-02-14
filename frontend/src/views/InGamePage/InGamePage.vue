@@ -63,12 +63,12 @@
     <!-- 아래부터 게임 진행 페이지 관련 코드-->
     <div class="component-ingame" v-else>
       <header>
-        <RoundResult />
-        <GameResult v-show="endGame" />
         <GameTimer :key="gameTimer" id="timer" />
-        <GameScore/>
-        <h1>{{ round + 1 }} 라운드</h1>
       </header>
+      <p class="gameround">{{ round + 1 }} 라운드</p>
+      <RoundResult />
+      <GameResult v-show="endGame"/>
+      <GameScore class="gamescore"/>
 
       <!-- 상대 팀 -->
       <div class="area-opponents">
@@ -77,14 +77,8 @@
           v-for="sub in opponents"
           :key="sub.stream.connection.connectionId"
           :stream-manager="sub"
-          :class="
-            sub.stream.connection.connectionId === currentPresenterId
-              ? 'presenter'
-              : ''
-          "
-        />
+          :class="sub.stream.connection.connectionId === currentPresenterId ? 'presenter': ''"/>
       </div>
-
       <!-- 우리 팀 -->
       <div class="area-ourteam">
         <div class="me">
@@ -93,10 +87,12 @@
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="sec-display" v-else>
-            <h1>설명해야할 단어: {{ word }}</h1>>
+            <div id="word">
+              <p>제시어 : {{ word }}</p>
+              </div>
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
-          <div class="wrap-robot">
+          <div class="wrap-robot" v-if="!amIDescriber">
             <v-img id="robot" src="@/assets/images/character.svg" alt="robot" />
           </div>
         </div>
@@ -270,12 +266,6 @@ export default {
       store.dispatch("gameStore/changeTeamAction", color);
     };
 
-    const clickTest = () => {
-      console.log("clickTest 클릭");
-      store.dispatch("gameStore/changeTest", true);
-      store.dispatch("gameStore/gameStart");
-    };
-
     const gameStart = () => {
       store.dispatch("gameStore/gameStart");
     };
@@ -330,7 +320,6 @@ export default {
       currentPresenterId,
       endGame,
       clickExit,
-      clickTest,
       clickReady,
       clickTeam,
       gameStart,
@@ -425,35 +414,37 @@ export default {
   transition: 0.1s;
 }
 .box-btn > button:hover {
-  box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.5);
+  /* box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.5); */
 }
 .box-btn > button:active {
-  box-shadow: inset 0 2px 3px 1px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 2px 4px 3px rgb(72, 72, 72);
 }
 .btn-ready {
-  background: #cb2424;
+  background: #24cb83;
   color: white;
   font-size: 25px;
-  box-shadow : 3px 3px 3px rgb(72, 72, 72);
+  box-shadow : 1px 3px 3px rgb(72, 72, 72);
 }
 .btn-ready:hover {
   background: #24cb83;
   font-size: 30px;
 }
+.btn-ready:active {
+  background: #80a000;;
+}
 .btn-ready.active {
-  background: #24cb83;
-  box-shadow : none
+  background: #98be00;;
+  box-shadow : inset 0 3px 3px 0px #484848c2;
 
 }
 .btn-profile {
   background: #c6c6c6;
   color: white;
   font-size: 20px;
-  box-shadow : 3px 3px 3px rgb(72, 72, 72);
+  box-shadow : 1px 3px 3px rgb(72, 72, 72);
 }
 .btn-profile:hover {
   background: #b7b7b7;
-  font-size: 25px;
 }
 .btn-profile:active {
   background: rgb(172, 172, 172);
@@ -527,6 +518,33 @@ footer {
 /* ----------------------------------- */
 
 /* ======= component-ingame ================================================================= */
+.gamescore {
+  width: 200px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 30px;
+}
+.gameround {
+  font-size: 20px;
+  position: absolute;
+  width: 100px;
+  right: 0;
+  top: 0;
+  margin: 30px;
+  color: white;
+}
+#word {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: rgb(81 255 255 / 67%);
+  font-size: 25px;
+  padding: 5px;
+  font-weight: 600;
+}
 .component-ingame {
   width: 100%;
   max-width: 1000px;
@@ -572,7 +590,6 @@ header {
 .me {
   position: relative;
 }
-/* ------------------------------------------------------------ */
 .wrap-robot {
   position: absolute;
   top: 45px;
@@ -588,7 +605,6 @@ header {
 #robot {
   width: 300px;
 }
-/* ------------------------------------------------------------ */
 .sec-display {
   width: 100%;
 }
@@ -626,6 +642,13 @@ header {
   box-shadow: 0px 0px 20px 0px #0000005c;
   opacity: 0.8;
   z-index: 1;
+}
+.sec-display .stream-me {
+  /* 그림 그릴 때 내 모습 */
+  height: 300px;
+  width: auto;
+  border-radius: 30px;
+  box-shadow: 0 0 50px 1px rgb(81 255 255 / 50%);
 }
 .canvas {
   width: 100%;
