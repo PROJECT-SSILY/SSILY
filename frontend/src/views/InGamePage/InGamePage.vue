@@ -36,7 +36,7 @@
           <!-- 추후 업데이트 시 사용 예정 -->
           <button
             class="btn-ready"
-            :class="state.ready ? 'ready' : ''"
+            :class="state.ready ? 'active' : ''"
             @click="clickReady"
           >
             READY
@@ -262,6 +262,7 @@ export default {
 
     const clickReady = () => {
       console.log("ready");
+      state.ready = !state.ready
       store.dispatch("gameStore/changeReady");
     };
 
@@ -423,13 +424,13 @@ export default {
   box-shadow: inset 2px 4px 3px rgb(72, 72, 72);
 }
 .btn-ready {
-  background: #24cb83;
+  background: #cb2424;
   color: white;
   font-size: 25px;
   box-shadow : 1px 3px 3px rgb(72, 72, 72);
 }
 .btn-ready:hover {
-  background: #fadd00;
+  background: #24cb83;
   font-size: 30px;
 }
 .btn-ready:active {
@@ -495,7 +496,7 @@ footer {
 .btn-exit:hover {
   background: #ffbf00;
 }
-.btn-exit:active {
+.btn-exit.active {
   background: rgb(214, 160, 0);
 }
 .notice {

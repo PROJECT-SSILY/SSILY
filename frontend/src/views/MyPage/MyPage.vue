@@ -49,7 +49,8 @@
                             <changePasswordDialog/>
                         </v-col>
                         <v-col cols="6">
-                            <v-btn 
+                            <v-btn
+                            id="logout-btn" 
                             x-large
                             block
                             @click="logOut">                                
@@ -58,6 +59,7 @@
                         </v-col>
                         <v-col cols="6">
                             <v-btn
+                            id="delete-btn"
                             x-large
                             block
                             color="error"
@@ -72,7 +74,7 @@
                                 >
                                 <v-card class="formbox">
                                     <v-card-text>
-                                    정말 탈퇴하시렵니까?
+                                    정말 탈퇴하시겠습니까?
                                     </v-card-text>
                                     <v-card-actions>
                                         <v-spacer></v-spacer>
@@ -304,7 +306,23 @@ export default {
   font-style: normal;
   color:#ffffff;
 }
-v-col > v-btn {
+#delete-btn {
+    height:3rem;
+    font-size: 1.5rem;
+    opacity: 89%;
+    border-radius:10px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.11), 
+                0 2px 2px rgba(0,0,0,0.11), 
+                0 4px 4px rgba(0,0,0,0.11), 
+                0 8px 8px rgba(0,0,0,0.11), 
+                0 16px 16px rgba(0,0,0,0.11), 
+                0 32px 32px rgba(0,0,0,0.11);
+}
+#logout-btn {
+    height:3rem;
+    font-size: 1.5rem;
+    opacity: 89%;
+    border-radius:10px;
     box-shadow: 0 1px 1px rgba(0,0,0,0.11), 
                 0 2px 2px rgba(0,0,0,0.11), 
                 0 4px 4px rgba(0,0,0,0.11), 

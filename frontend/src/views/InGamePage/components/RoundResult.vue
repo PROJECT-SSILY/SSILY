@@ -21,15 +21,6 @@
               <h1>{{ user.nickname }} : {{ user.score }}점! </h1>
           </div>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <!-- <v-btn
-            color="green darken-1"
-            text
-          >
-          다음 라운드로!
-          </v-btn> -->
-        </v-card-actions>
       </v-card>
     </v-dialog>
   </v-row>
