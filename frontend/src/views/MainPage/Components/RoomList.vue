@@ -25,24 +25,43 @@
       <div class="wrap-list">
         <RoomListItem
           v-for="room in paginatedData"
-          :key="room.id"
+          :key="room.createdAt"
           :room="room"
           @click="getInRoom(room)"
           class="list-item"
         />
-        <div
-        class="list-item blank"
-        v-for="blank in 5 - paginatedData.length"
-        :key="blank"
-        ></div>
+        <div v-if="state.roomlist.length == 0">
+          <div
+          class="list-item blank"
+          > 
+            <p class="wrap-item">
+              <span id="tit-room">입장 가능한 방이 없습니다😥</span>
+            </p>
+          </div>
+          <div 
+          class="list-item blank"
+          v-for="blank in 4 - paginatedData.length"
+          :key="blank"
+          ></div>
+        </div>
+        <div v-else>
+          <div 
+          class="list-item blank"
+          v-for="blank in 5 - paginatedData.length"
+          :key="blank"
+          ></div>
+        </div>
         <div class="btn-paging">
           <button 
           @click="prevPage" 
-          v-if="!prevButtonDisabled"
+          :disabled="prevButtonDisabled"
           >PREV</button>
+          <button>
+            <v-icon @click="refreshRoom">mdi-refresh</v-icon>
+          </button>
           <button 
           @click="nextPage"
-          v-if="!nextButtonDisabled" 
+          :disabled="nextButtonDisabled" 
           >NEXT</button>
         </div>
       </div>
@@ -69,9 +88,8 @@
             <p class="text-center">
               <button type="submit" class="btn-dialog">참가하기</button>
             </p>
-            <alert-dialog v-if="state.alert"/>
           </v-card-actions>
-      </v-form>
+        </v-form>
     </div>
       <div
         class="bg-dark"
@@ -87,12 +105,13 @@ import { useRouter } from "vue-router";
 import { reactive, onMounted, computed } from "vue";
 import { roomList, room } from "@/common/api/gameAPI";
 import RoomListItem from "@/views/MainPage/Components/RoomListItem.vue";
-// import AlertDialog from '../../AlertDialog.vue'
+import AlertDialog from '../../AlertDialog.vue'
 
 export default {
   name: "RoomList",
   components: {
     RoomListItem,
+    AlertDialog
   },
   setup() {
     const router = useRouter();
@@ -131,7 +150,12 @@ export default {
       const isExistRoom = await getRoom(roominfo.sessionId);
       if(!isExistRoom) {
         // 존재하지 않는 방 입장 시
-        alert("존재하지 않는 방입니다.")
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '존재하지 않는 방입니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return
 
       } else if (roominfo.isSecret && !state.passwordDialog) { 
         // 비밀번호 입력이 필요한 방에 입장하는 경우
@@ -156,7 +180,12 @@ export default {
         store.commit("gameStore/setPassword", state.room.password);
         router.push({name: "gameroom", params: { sessionId: state.room.sessionId },});
       } else {
-        alert("비밀번호가 틀렸습니다.")
+        state.alert = false
+        store.commit('accountStore/setAlertColor', 'error')
+        store.commit('accountStore/setAlertMessage', '비밀번호가 틀렸습니다.')
+        store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return
       }
     }
     // 없는 방 조회시 오류 반환
@@ -186,7 +215,7 @@ export default {
     const prevPage = function() {
         state.pageNum -= 1
     }
-    const nextButtonDisabled = computed(() => state.pageNum >= Math.floor(state.roomlist.length / 5));
+    const nextButtonDisabled = computed(() => state.pageNum >= (Math.ceil(state.roomlist.length / 5) - 1) );
     
     const prevButtonDisabled = computed(() => state.pageNum < 1);
 
@@ -196,6 +225,25 @@ export default {
     };
     const comingsoon = (message) => {
       alert(`${message} 기능은 추후 공개될 예정입니다. \n조금만 기다려주세요!`)
+    }
+    // 방 목록 새로고침
+
+    const refreshRoom = async function () {
+      const response = await roomList();
+      console.log(response);
+      state.privaterooms = []
+      for (let i = 0; i < response.content.length; i++) {
+        if (
+          !response.content[i].isPlaying &&
+          response.content[i].connections.numberOfElements < 4
+        ) {
+          if (response.content[i].isTeamBattle) {
+            state.teamrooms.push(response.content[i]);
+          } else {
+            state.privaterooms.push(response.content[i]);
+          }
+        }
+      }
     }
     // 방 리스트 조회
     onMounted(async () => {
@@ -227,7 +275,8 @@ export default {
       nextButtonDisabled,
       prevButtonDisabled,
       closeDialog,
-      comingsoon
+      comingsoon,
+      refreshRoom
     };
   },
 };
@@ -332,5 +381,15 @@ export default {
   top: 0;
   left: 0;
 }
+.wrap-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 
+#tit-room {
+  font-size: 15px;
+  line-height: initial;
+  font-weight: 600;
+}
 </style>

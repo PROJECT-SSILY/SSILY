@@ -16,6 +16,9 @@ const state = {
             draws: null,
         }
     },
+    alertColor: null,
+    alertMessage: null,
+    alertIcon: null,
 }
 
 const getters = {
@@ -48,6 +51,15 @@ const mutations = {
     },
     setNickname: (state, nickname) => {
         state.nickname = nickname;
+    },
+    setAlertColor: (state, data) => {
+        state.alertColor = data;
+    },
+    setAlertMessage: (state, data) => {
+        state.alertMessage = data;
+    },
+    setAlertIcon: (state, data) => {
+        state.alertIcon = data;
     },
 }
 
