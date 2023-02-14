@@ -832,7 +832,6 @@ const actions = {
         console.log(res);
       })
       .catch((err) => {
-        alert("실패");
         console.log(err);
       });
   },
