@@ -7,10 +7,11 @@
     <div class="box-nickname">
       <p>{{ user.nickname }}</p>
     </div>
+    <v-img src="@/assets/images/star.svg" alt="host" v-if="user.isHost" id="host"/>
     <!-- <p>레벨: {{ user.level }}</p>
-    <p>팀: {{ user.team }}</p>
-    <p>방장여부: {{ user.isHost }}</p>
-    <p>경험치: {{ user.exp }}</p> -->
+    <p>팀: {{ user.team }}</p> -->
+    
+    <!--<p>경험치: {{ user.exp }}</p> -->
     <p id="ready" v-if="user.isReady">READY</p>
   </div>
 </div>
@@ -80,5 +81,14 @@ $hover_bottom: 0px;
   bottom: 59px;
   text-shadow: -1px 0px 10px #e4ff00, 0 1px #e4ff00, 1px 0 #e4ff00, 0 -1px #e4ff00;
   width: 100%;
+}
+#host {
+  position: absolute;
+  left: 15px;
+  top: 15px;
+  width: 20px;
+  background: #edb100;
+  height: 20px;
+  border-radius: 10px;
 }
 </style>
