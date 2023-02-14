@@ -100,10 +100,10 @@ export default {
         state.alert = true
         return;
       } else {
-      // router.push({
-      //   name: "gameroom",
-      //   params: { sessionId: response.data.sessionId },
-      // });
+      router.push({
+        name: "gameroom",
+        params: { sessionId: response.data.sessionId },
+      });
     }
     };
 
