@@ -18,7 +18,7 @@
     <!------------------------------------------------------------------------------------->
 
     <!-- 아래부터 대기방 페이지 관련 코드-->
-    <div class="component-waiting" v-if="!readyAll">
+    <div class="component-waiting" v-if="!inGame">
       <div class="users-component">
         <p id="title">{{state.title}}</p>
         <WaitingPage
@@ -136,7 +136,7 @@ import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { GetPlayerList } from "@/common/api/gameAPI";
 import { reactive, ref } from "@vue/reactivity";
-import { onBeforeMount, computed } from "vue";
+import { onBeforeMount, computed, watch } from "vue";
 import GameTimer from "./components/GameTimer.vue";
 import GameScore from "./components/GameScore.vue";
 import RoundResult from "./components/RoundResult.vue";
@@ -172,6 +172,7 @@ export default {
     const round = computed(() => store.state.gameStore.round);
     const endGame = computed(() => store.state.gameStore.endGame);
     const endRound = computed(() => store.state.gameStore.endRound);
+    const inGame = computed(() => store.state.gameStore.inGame); 
     const currentPresenterId = computed(
       () => {
         /**
@@ -307,6 +308,11 @@ export default {
     toast.classList.add("reveal"),
         toast.innerText = "설명자 : "+ presenterNickname;
     };
+    watch(inGame, (newValue) => { // 게임 시작했을 때, ready 버튼 모양 다시 초기화 
+      if (newValue == true) {
+        state.ready = false
+      }
+    })
     return {
       router,
       state,
@@ -330,7 +336,8 @@ export default {
       gameTimer,
       forceRender,
       endRound,
-      word
+      word,
+      inGame
     };
   },
 };

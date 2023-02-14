@@ -47,6 +47,7 @@ const state = {
     endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
     isTimeOut: false,
     word: '',
+    inGame: false,
 }
 
 const getters = {
@@ -272,6 +273,9 @@ const mutations = {
     setWord: (state, data) => {
       state.word = data
     },
+    setInGame: (state,data) => {
+      state.inGame = data
+    }
 };
 
 const actions = {
@@ -406,7 +410,7 @@ const actions = {
         }
         case 4: {
           // 참여자 ready 정보 경신
-          console.log("4번 시그널 받음", event.data);
+          console.log("4번 시그널 받음 : ", event.data);
           var allready = event.data.isAllReady;
           context.commit("setIsAllReady", allready);
           var readyData = event.data;
@@ -418,6 +422,7 @@ const actions = {
           }
           // 모두 레디 했을 때, 게임 시작됨
           if (allready) {
+            context.commit("setInGame", true)
             if (state.isHost) {
               context.dispatch("gameStart");
             }
@@ -546,6 +551,10 @@ const actions = {
               index: w,
               value: 0,
             })
+            context.commit("setReady", {
+              index: w,
+              ready: false,
+            });
           }
           // console.log('state.sortedUserList ::::: ', state.sortedUserList)
           break;
