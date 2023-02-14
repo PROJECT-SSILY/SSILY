@@ -353,7 +353,7 @@ public class GameService   {
 
     /**
      * 김윤미
-     * 12개의 제시어 목록 반환
+     * 8개의 제시어 목록 반환
      * @return
      */
     private List<String> pickWords() {
@@ -361,7 +361,7 @@ public class GameService   {
             return null;
         }
         List<String> pickedWords=new ArrayList<>();
-        ThreadLocalRandom.current().ints(0, allWords.size()).distinct().limit(12).forEach(index -> pickedWords.add(allWords.get(index).toString()));
+        ThreadLocalRandom.current().ints(0, allWords.size()).distinct().limit(8).forEach(index -> pickedWords.add(allWords.get(index).toString()));
         return pickedWords;
     }
 
