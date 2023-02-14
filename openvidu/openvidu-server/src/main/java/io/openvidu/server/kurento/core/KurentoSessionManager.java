@@ -239,22 +239,6 @@ public class KurentoSessionManager extends SessionManager {
                         GameService.readyState.computeIfPresent(sessionId, (k, v) -> v = readyState);
                     }
 
-                    log.info("{} is host = {}", participant.getPlayer().getNickname(), participant.getPlayer().isHost());
-                    // 퇴장 플레이어가 방장이면 아무나 방장 위임.
-                    if(participant.getPlayer().isHost()){
-                        Set<Participant> participants = session.getParticipants();
-                        log.info("size = {}", participants.size());
-                        if(participants.size() >= 2){
-                            Participant p = participants.stream()
-                                    .filter(pa -> !pa.getPlayer().isHost())
-                                    .findFirst()
-                                    .get();
-                            p.getPlayer().changeHost();
-                            log.info("new host = {}", p.getPlayer().getNickname());
-                            log.info("host = {}", p.getPlayer().isHost());
-                        }
-                    }
-
                     session.leave(participant.getParticipantPrivateId(), reason);
 
                     // Update control data structures
