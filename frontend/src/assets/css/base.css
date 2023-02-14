@@ -55,6 +55,18 @@ input:focus {
 
 
 /* dialog 관련 css */
+.wrap-page {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
 .wrap-dialog {
     position: absolute;
     z-index: 3;
@@ -83,6 +95,7 @@ input:focus {
     top: 0;
     left: 0;
     transition: 0.2s;
+    z-index: -1;
   }
   .bg-dark.active {
     z-index: 2;

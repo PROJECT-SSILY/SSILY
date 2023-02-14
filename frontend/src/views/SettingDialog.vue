@@ -62,9 +62,6 @@ export default {
 </script>
   
 <style scoped>
-.dialog {
-  width: 400px;
-}
 .text-caption {
   margin-bottom: 10px;
 }
