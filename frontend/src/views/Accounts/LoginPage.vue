@@ -12,11 +12,13 @@
           type="email"
           :rules="emailRules"
           label="이메일(아이디)"
+          variant="underlined"
         />
         <v-text-field
           v-model="state.form.password"
           type="password"
           label="비밀번호"
+          variant="underlined"
         />
       </v-form>
       <button type="submit" class="btn-dialog" @click="clickLogIn">로그인</button>
@@ -134,4 +136,5 @@ export default {
   font-size: 14px;
   color: #6e6e6e;
 }
+
 </style>
