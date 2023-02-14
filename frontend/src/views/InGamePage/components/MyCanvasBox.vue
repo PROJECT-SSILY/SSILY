@@ -73,19 +73,19 @@ export default{
       });
     };
 
-    const toast = function(string) {
-      const toast = document.getElementById("toast");
+    // const toast = function(string) {
+    //   const toast = document.getElementById("toast");
 
-      toast.classList.contains("reveal") ?
-        (clearTimeout(removeToast), removeToast = setTimeout(function () {
-          document.getElementById("toast").classList.remove("reveal")
-      }, 1000)) :
-      removeToast = setTimeout(function () {
-          document.getElementById("toast").classList.remove("reveal")
-      }, 1000)
-      toast.classList.add("reveal"),
-      toast.innerText = string
-    }
+    //   toast.classList.contains("reveal") ?
+    //     (clearTimeout(removeToast), removeToast = setTimeout(function () {
+    //       document.getElementById("toast").classList.remove("reveal")
+    //   }, 1000)) :
+    //   removeToast = setTimeout(function () {
+    //       document.getElementById("toast").classList.remove("reveal")
+    //   }, 1000)
+    //   toast.classList.add("reveal"),
+    //   toast.innerText = string
+    // }
 
     // 모두 지우기
     const eraseAll = function () {
@@ -175,7 +175,7 @@ export default{
       fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       const canvas = fabricCanvas.value;
       var dataUrl = canvas.toDataURL("image/png");
-      console.log(dataUrl);
+      // console.log(dataUrl);
       fabricCanvas.value.setBackgroundColor("rgba(81, 255, 255, 0.2)", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       // data:image/jpeg;base64,/9j/4AAQSkZJRg...AAAAAB//2Q==
       // data : <type> <;base64> <data>
