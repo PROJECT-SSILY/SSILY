@@ -9,9 +9,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://i8c104.p.ssafy.io:3306/ssily?serverTimezone=UTC&characterEncoding=UTF-8
-    username: ssily
-    password: ssily
+    url: jdbc:mysql://ssily.site:3306/ssily?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: root
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
