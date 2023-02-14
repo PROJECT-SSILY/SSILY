@@ -32,7 +32,7 @@
         const minutes = Math.floor(timeLeft / 60);
         let seconds = timeLeft % 60;
   
-        if (seconds < 10) {
+        if (seconds < 60) {
           seconds = `0${seconds}`;
         }
   

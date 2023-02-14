@@ -6,6 +6,7 @@
       >
         <template v-slot:activator="{ attrs }">
           <v-btn
+            id="password-btn"
             block
             x-large
             dark
@@ -173,5 +174,12 @@
     font-family: 'MaplestoryOTFBold';
     font-weight: normal;
     font-style: normal;
+  }
+
+  #password-btn {
+    height:3rem;
+    font-size: 1.5rem;
+    opacity: 89%;
+    border-radius:10px
   }
   </style>

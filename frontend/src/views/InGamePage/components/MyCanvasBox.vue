@@ -66,16 +66,15 @@ export default{
     const state = reactive({
       alertFlag: false,
     })
-    let submitPossible=true;
-    let removeToast=null;
-
+    let submitPossible = true;
+    let removeToast = null;
     const allowDrawing = function () {
       const canvas = fabricCanvas.value;
       canvas.isDrawingMode = 1;
       canvas.on("mouse:up", function () {
         // getFrame();
         mousePressed = false;
-        // submitCanvas();
+        submitCanvas();
       });
       canvas.on("mouse:down", function () {
         mousePressed = true;
@@ -109,16 +108,7 @@ export default{
     };
 
     const predictModel = function () {
-      if(!submitPossible) {
-        toast("3초 후에 다시 제출할 수 있습니다!");
-        return;
-      }
-      else { //제출
-        setTimeout(() => submitPossible=true, 3000);
-        submitPossible=false;
-        submitCanvas();
-        submitDrawing();
-      }
+      submitDrawing();
     };
 
     const getMinBox = function () {
@@ -154,19 +144,12 @@ export default{
        * Get image data in canvas
        */
 
-      const mbb = getMinBox();
-      const dpi = window.devicePixelRatio;
-
-      // console.log("mbb = {}", mbb);
-      // console.log("mbb.max = {}", mbb.max);
-      let max = mbb.max;
-      let min = mbb.min;
-
-      if(max.x == Infinity || max.x == -Infinity || max.y == Infinity || max.y == -Infinity) return;
-      if(min.x == Infinity || min.x == -Infinity || min.y == Infinity || min.y == -Infinity) return;
       
       // fabricCanvas.value.setBackgroundColor("#FFFFFF")
       // fabricCanvas.value.renderAll()
+      
+      const mbb = getMinBox();
+      const dpi = window.devicePixelRatio;
 
 
       fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
@@ -182,6 +165,17 @@ export default{
         (mbb.max.x - mbb.min.x) * dpi,
         (mbb.max.y - mbb.min.y) * dpi
       );
+      // const imageData = fabricCanvas.value.contextContainer.getImageData(0, 0, fabricCanvas.value.width, fabricCanvas.value.height);
+      const data = imageData.data
+      for (var i = 0; i < data.length; i+= 4) {
+        if (data[i]!=255 || data[i+1]!=255 || data[i+2]!=255) {
+          // console.log("DDDD")
+          data[i] = 0; // Red
+          data[i+1] = 0; // Green
+          data[i+2] = 0; // Blue
+        }
+      }
+
       fabricCanvas.value.setBackgroundColor("rgba(81, 255, 255, 0.2)", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
 
       return imageData;
@@ -192,7 +186,7 @@ export default{
       fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       const canvas = fabricCanvas.value;
       var dataUrl = canvas.toDataURL("image/png");
-      console.log(dataUrl);
+      // console.log(dataUrl);
       fabricCanvas.value.setBackgroundColor("rgba(81, 255, 255, 0.2)", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       // data:image/jpeg;base64,/9j/4AAQSkZJRg...AAAAAB//2Q==
       // data : <type> <;base64> <data>
@@ -251,9 +245,7 @@ export default{
       /**
        * Get image on canvas and submit it to the model for prediction
        */
-      let imageData = getImageData();
-      if(imageData == null) raw_predictions = [];
-      else raw_predictions = model.predictClass(imageData);
+      raw_predictions = model.predictClass(getImageData());
     };
 
     const findIndicesOfMax = function () {
@@ -336,16 +328,16 @@ export default{
         //   offsetY: 0,
         //   affectStroke: false,
         //   color: "#51FFFF",
-        brush.width = 5;
-        // brush.color = "#AEFFFF";
-        brush.color = "black";
-        brush.shadow = new fabric.Shadow({
-          blur: 30,
-          offsetX: 10,
-          offsetY: 10,
-          affectStroke: false,
-          color: "grey",
-        });
+        brush.width = 10;
+        brush.color = "#AEFFFF";
+        // brush.color = "black";
+        // brush.shadow = new fabric.Shadow({
+        //   blur: 30,
+        //   offsetX: 10,
+        //   offsetY: 10,
+        //   affectStroke: false,
+        //   color: "grey",
+        // });
       }
 
       success();
@@ -389,7 +381,10 @@ export default{
       canvasToImage,
       imageToCanvas,
       endRound,
-      state
+      state,
+      submitPossible,
+      removeToast,
+      toast
     };
   },
 };
@@ -442,28 +437,5 @@ export default{
 #brush:active, #eraser:active {
     background: rgba(255, 255, 255, 0.2);
   /* background: rgb(195, 195, 195); */
-}
-
-#toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    padding: 15px 20px;
-    transform: translate(-50%, 10px);
-    border-radius: 30px;
-    overflow: hidden;
-    font-size: .8rem;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity .5s, visibility .5s, transform .5s;
-    background: rgba(0, 0, 0, .35);
-    color: #fff;
-    z-index: 10000;
-}
-
-#toast.reveal {
-    opacity: 1;
-    visibility: visible;
-    transform: translate(-50%, 0)
 }
 </style>
