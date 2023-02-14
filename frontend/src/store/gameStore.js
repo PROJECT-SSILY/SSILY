@@ -275,6 +275,13 @@ const mutations = {
     },
     setInGame: (state,data) => {
       state.inGame = data
+      if (data == true) {
+        // 게임 시작했을 때 음소거
+        state.publisher.publishAudio(false);
+        for (var j=0; state.subscribers.length > j; j++ ){
+          state.subscribers[j].subscribeToAudio(false)
+        }
+      }
     }
 };
 

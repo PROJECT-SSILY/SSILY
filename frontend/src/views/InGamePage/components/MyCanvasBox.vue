@@ -317,7 +317,6 @@ export default{
       if (state.alertFlag == true) {
         state.alertFlag = false}
       }, 1200);
-      //store.dispatch("gameStore/sendTopFive", topFive.value);
       canvasToImage();
     };
 
