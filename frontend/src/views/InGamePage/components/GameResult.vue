@@ -8,7 +8,6 @@
       <v-card class="formbox">
         <v-card-title>
           게임 결과
-          {{ sortedUserList }}
         </v-card-title>
         <v-card-text>
           <div v-for="winner in winnerList"
@@ -16,11 +15,10 @@
           :key="winner.id">
             <h1>{{ winner }}</h1>
           </div> <h1>WON!</h1>
-          gameResult: {{ gameResult }}
           <div v-for="(user, index) in gameResult"
           :user="user"
           :key="user.id">
-              <h1>{{ parseInt(index) + winnerList.length }}등 {{ user.nickname }} + {{ user.extraExp }} Exp </h1>
+              <h1>{{ parseInt(index) + 1 }}등 {{ user.nickname }} + {{ user.extraExp }} Exp </h1>
           </div>
         </v-card-text>
         <v-card-actions>
@@ -32,13 +30,6 @@
           >
           돌아가기
           </v-btn>
-          <v-btn
-            color="green darken-1"
-            text
-            @click="clickExit"
-          >
-          나가기
-          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -49,39 +40,26 @@
 <script>
 import { useStore } from 'vuex';
 import { computed } from "vue";
-import { useRouter } from "vue-router";
 
 
 export default {
   name: 'GameResult',
   setup() {
     const store = useStore()
-    const router = useRouter();
     const endGame = computed(() => store.state.gameStore.endGame);
     const gameResult = computed(() => store.state.gameStore.gameResult)
     const readyAll = computed(() => store.state.gameStore.isAllReady);
     const winnerList = computed(() => store.state.gameStore.winnerList)
     const sortedUserList = computed(() => store.state.gameStore.sortedUserList)
-    const clickExit = () => {
+    const clickReturn = () => { // 나가기 버튼 없애고, 돌아가기 버튼만 활용
       store.commit('gameStore/setEndGame', false)
-      store.commit('gameStore/setIsAllReady', false)
-      store.dispatch("gameStore/leaveSession");
-      router.push({
-        name: "main",
-      });
-    }
-    const clickReturn = () => {
-      store.commit('gameStore/setEndGame', false)
-      store.dispatch('gameStore/changeReady')
-      store.commit('gameStore/setIsAllReady', false)
-      console.log(readyAll, '==>r `readyAll 바뀌었음??? false여야함')
+      store.commit("gameStore/setInGame", false)
     }
   return {
     gameResult,
     store,
     endGame,
     readyAll,
-    clickExit,
     clickReturn,
     winnerList,
     sortedUserList

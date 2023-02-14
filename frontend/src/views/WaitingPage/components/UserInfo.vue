@@ -6,6 +6,7 @@
     </div>
     <div class="box-nickname">
       <p>{{ user.nickname }}</p>
+      <p>{{ user.connectionId }}</p>
     </div>
     <!-- <p>레벨: {{ user.level }}</p>
     <p>팀: {{ user.team }}</p>
