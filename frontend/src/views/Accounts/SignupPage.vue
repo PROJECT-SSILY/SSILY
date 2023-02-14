@@ -13,6 +13,7 @@
           ]"
           label="이메일"
           variant="underlined"
+          @keyup.enter="checkEmail"
         >
           <template v-slot:append-inner>
             <v-btn variant="text" @click="checkEmail">중복 확인</v-btn>
@@ -30,6 +31,7 @@
           ref="nicknameform"
           :rules="[state.rules.required,state.rules.nicknameRules,state.rules.nicknameCheckRules,]"
           label="닉네임"
+          @keyup.enter="checkNickname"
         >
           <template v-slot:append-inner>
             <v-fade-transition leave-absolute>
@@ -58,6 +60,7 @@
           label="비밀번호 확인"
           hint=""
           @click:append="state.show2 = !state.show2"
+          @keyup.enter="clickSignup"
         ></v-text-field>
         <button
           type="submit"
@@ -140,10 +143,7 @@ export default {
 
     const checkEmail = async function () {
       const result = await store.dispatch("accountStore/checkEmailAction", state.form.email.value);
-      if (state.rules.email) {
-        state.form.email.status = false;
-        alert("이메일이 유효하지 않습니다")
-      } else if (result.data.data) {
+      if (result.data.data) {
         state.form.email.status = true;
         alert("사용 가능한 이메일입니다.")
       } else {
@@ -153,10 +153,11 @@ export default {
     };
 
     const checkNickname = async function () {
-      const result = await store.dispatch("accountStore/checkNicknameAction", state.form.nickname.value);
-      if (state.rules.nicknameRules) {
+      const nickname = state.form.nickname.value
+      const result = await store.dispatch("accountStore/checkNicknameAction", nickname);
+      if (2 > nickname.length || nickname.length > 10) {
         state.form.nickname.status = false;
-        alert("닉네임은 2자 이상 10자 이내로 작성해주세요")
+        alert("닉네임은 2자 이상 10자 이내로 작성해주세요.")
       } else if (result.data.data) {
         state.form.nickname.status = true;
         alert("사용 가능한 닉네임입니다.")
