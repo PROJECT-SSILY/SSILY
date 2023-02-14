@@ -13,12 +13,14 @@
           :rules="emailRules"
           label="이메일(아이디)"
           variant="underlined"
+          @keyup.enter="clickLogIn"
         />
         <v-text-field
           v-model="state.form.password"
           type="password"
           label="비밀번호"
           variant="underlined"
+          @keyup.enter="clickLogIn"
         />
       </v-form>
       <button type="submit" class="btn-dialog" @click="clickLogIn">로그인</button>
