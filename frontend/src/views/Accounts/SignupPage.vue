@@ -15,7 +15,7 @@
           variant="underlined"
         >
           <template v-slot:append-inner>
-            <v-btn variant="text" @click="checkEmail"> 중복 확인 </v-btn>
+            <v-btn variant="text" @click="checkEmail">중복 확인</v-btn>
           </template>
         </v-text-field>
         <v-text-field
@@ -33,7 +33,7 @@
         >
           <template v-slot:append-inner>
             <v-fade-transition leave-absolute>
-              <v-btn variant="text" @click="checkNickname"> 중복 확인 </v-btn>
+              <v-btn variant="text" @click="checkNickname">중복 확인</v-btn>
             </v-fade-transition>
           </template>
         </v-text-field>
@@ -140,7 +140,10 @@ export default {
 
     const checkEmail = async function () {
       const result = await store.dispatch("accountStore/checkEmailAction", state.form.email.value);
-      if (result.data.data) {
+      if (state.rules.email) {
+        state.form.email.status = false;
+        alert("이메일이 유효하지 않습니다")
+      } else if (result.data.data) {
         state.form.email.status = true;
         alert("사용 가능한 이메일입니다.")
       } else {
@@ -151,7 +154,10 @@ export default {
 
     const checkNickname = async function () {
       const result = await store.dispatch("accountStore/checkNicknameAction", state.form.nickname.value);
-      if (result.data.data) {
+      if (state.rules.nicknameRules) {
+        state.form.nickname.status = false;
+        alert("닉네임은 2자 이상 10자 이내로 작성해주세요")
+      } else if (result.data.data) {
         state.form.nickname.status = true;
         alert("사용 가능한 닉네임입니다.")
       } else {
