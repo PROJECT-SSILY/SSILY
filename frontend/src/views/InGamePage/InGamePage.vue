@@ -424,7 +424,7 @@ export default {
   box-shadow: inset 2px 4px 3px rgb(72, 72, 72);
 }
 .btn-ready {
-  background: #cb2424;
+  background: #24cb83;
   color: white;
   font-size: 25px;
   box-shadow : 1px 3px 3px rgb(72, 72, 72);
