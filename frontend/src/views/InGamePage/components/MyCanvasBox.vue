@@ -15,6 +15,12 @@
         id="canvas"
     >
     </canvas>
+    <v-alert
+      v-if="state.alertFlag"
+      type="error"
+      title="Alert title"
+      text="틀렸습니다!"
+    ></v-alert>
     <div id="toast"></div>
     <!-- 여기부터 신대득의 테스트 공간..-->
     <!--canvas-dialog /--> <!-- v-if="answerOn" 넣어줘야함-->
@@ -32,7 +38,7 @@
 
 <script>
 import className from "!raw-loader!@/assets/model/class_names.txt"; // computed()에서 바로 가져와 categorys에 바로 할당한다.
-
+import { reactive } from '@vue/reactivity'
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { fabric } from "fabric";
 import { disposeTFVariables, TFModel } from "@/utils/model";
@@ -47,7 +53,7 @@ export default{
   name: "MyCanvasBox",
   //components: { CanvasDialog },
   setup() {
-
+    const endRound = computed(() => store.state.gameStore.endRound)
     const answerOn = computed(() => store.state.gameStore.answerOn);
     const fabricCanvas = ref({});
     const store = useStore();
@@ -57,9 +63,11 @@ export default{
     let coords = []; // 현재 그림의 좌표를 기록
     let raw_predictions = {};
     let model = null;
-    let submitPossible=true;
-    let removeToast=null;
-
+    const state = reactive({
+      alertFlag: false,
+    })
+    let submitPossible = true;
+    let removeToast = null;
     const allowDrawing = function () {
       const canvas = fabricCanvas.value;
       canvas.isDrawingMode = 1;
@@ -299,6 +307,16 @@ export default{
       }
       console.log('getTopClassNames = ',getTopClassNames())
       console.log("winClass = ", winClass);
+      store.dispatch("gameStore/sendTopFive", topFive.value)
+      setTimeout(function() {
+        if (endRound.value == false) {
+          state.alertFlag = true
+        }
+        }, 300);
+      setTimeout(function() {
+      if (state.alertFlag == true) {
+        state.alertFlag = false}
+      }, 1200);
       store.dispatch("gameStore/sendTopFive", topFive.value);
       canvasToImage();
     };
@@ -381,6 +399,11 @@ export default{
       success,
       canvasToImage,
       imageToCanvas,
+      endRound,
+      state,
+      submitPossible,
+      removeToast,
+      toast
     };
   },
 };

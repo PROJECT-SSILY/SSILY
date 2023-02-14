@@ -4,10 +4,11 @@
       v-model="endRound"
       persistent
       max-width="1000"
+      v-if="!endGame"
     >
       <v-card class="formbox">
         <v-card-title>
-          {{ round }}round 결과
+          {{ round-1 }}round 결과
         </v-card-title>
       <canvas class="canvas"
       width="600"
@@ -21,6 +22,9 @@
               <h1>{{ user.nickname }} : {{ user.score }}점! </h1>
           </div>
         </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </v-row>
@@ -39,12 +43,6 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <!-- <v-btn
-            color="green darken-1"
-            text
-          >
-          다음 라운드로!
-          </v-btn> -->
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -78,8 +76,8 @@ export default {
     //   imageToCanvas();
     // });
     const imageToCanvas= async function(){
+        if(!isTimeOut.value){
         const getFile =await store.dispatch("gameStore/downloadImage");
-        console.log("getFile 찍자 :", getFile);
         
         var myCanvas=document.getElementById('aCanvas');
         var ctx = myCanvas.getContext('2d');
@@ -88,10 +86,11 @@ export default {
         img.onload = function(){
           ctx.drawImage(img,0,0); // Or at whatever offset you like
           };
+        }
     };
     setInterval(() => {
         store.dispatch('gameStore/changeRoundEnd', false)
-      }, 5000)
+      }, 10000)
     
     return {
       store,
