@@ -77,7 +77,7 @@ $hover_bottom: 0px;
   font-size: 30px;
   color: #24cb83;
   font-weight: 700;
-  POSITION: absolute;
+  position: absolute;
   bottom: 59px;
   text-shadow: -1px 0px 10px #e4ff00, 0 1px #e4ff00, 1px 0 #e4ff00, 0 -1px #e4ff00;
   width: 100%;
