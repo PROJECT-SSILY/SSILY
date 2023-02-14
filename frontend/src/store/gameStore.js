@@ -27,7 +27,7 @@ const state = {
     messages: [],
     media: 0.5,
     alarm: 0.5,
-    audio: new Audio(require('../../public/creativeminds.mp3')),
+    audio: new Audio(require('../../public/perception.mp3')),
     isAllReady: false,
     answerOn: false,
     userList: [],
