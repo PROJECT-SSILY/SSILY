@@ -31,6 +31,7 @@ public class GameService   {
     static final int JOIN_ROOM = 3;
     static final int CHANGE_READY_STATE = 4;
     static final int SUBMIT_ANSWER = 5;
+    static final int CHANGE_HOST = 6;
 
     static final int FINISH_ROUND = 10;
     static final int TIME_OVER_ROUND = 20;
@@ -105,6 +106,9 @@ public class GameService   {
                 return;
             case FINISH_GAME:
                 finishGame(participant, sessionId, participants, params, data);
+                return;
+            case CHANGE_HOST:
+                changeHost(participant, sessionId, participants, params, data);
                 return;
         }
     }
@@ -302,9 +306,35 @@ public class GameService   {
     }
 
     /**
-     * 김윤미
-     * @return : 전체 단어 조회
+     * 서영탁
+     * 방장 변경 알리기
      */
+    private void changeHost(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data) {
+
+        log.info("changeHost is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+        if(!participant.getPlayer().isHost() || participants.size() <= 1) return;
+
+        Participant newHost = participants.stream()
+                .filter(p -> !p.getPlayer().isHost())
+                .findAny()
+                .get();
+
+        newHost.getPlayer().changeHost();
+
+        data.addProperty("host", newHost.getParticipantPublicId());
+        params.add("data", data);
+
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
+        /**
+         * 김윤미
+         * @return : 전체 단어 조회
+         */
     private List<String> getAllWords() {
 
         URL url = null;
