@@ -1,0 +1,60 @@
+# 필요한 것들 볼륨 설정
+
+version: "3.7"
+
+services:
+  mysql:
+    container_name: mysql
+    build:
+      context: ./mysqldb
+      dockerfile: Dockerfile
+    ports:
+      - 3306:3306
+    environment:
+      TZ: Asia/Seoul
+    networks:
+      - ssily
+    restart: always
+  redis:
+      image: redis:alpine
+      command: redis-server --port 6380
+      container_name: redis
+      hostname: redis
+      labels:
+        - "name=redis"
+        - "mode=standalone"
+      ports:
+        - 6380:6380
+      networks:
+        - ssily
+  backend:
+    container_name: backend
+    build:
+      context: ./backend/ssily
+      dockerfile: Dockerfile
+    ports:
+      - 5500:5500
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - ssily
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8081
+      - 80:80
+      - 443:443
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - backend
+    networks:
+      - ssily
+
+networks:
+  ssily:
+    driver: bridge
