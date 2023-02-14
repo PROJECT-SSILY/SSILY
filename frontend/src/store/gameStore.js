@@ -27,7 +27,7 @@ const state = {
     messages: [],
     media: 0.5,
     alarm: 0.5,
-    audio: new Audio(require('../../public/Superhuman.mp3')),
+    audio: new Audio(require('../../public/creativeminds.mp3')),
     isAllReady: false,
     answerOn: false,
     userList: [],
@@ -489,7 +489,7 @@ const actions = {
             }
           }
           // 라운드를 8번 돌면 게임을 종료한다.
-          if (event.data.round == 9 && maxScoreUser == state.myConnectionId) {
+          if (event.data.round == 8 && maxScoreUser == state.myConnectionId) {
             context.dispatch("finishGame");
           }
           break;
@@ -503,7 +503,7 @@ const actions = {
           context.commit("setIsTimeOut", true);
           context.commit("setRound", event.data.round);
           // 라운드를 8번 돌면 게임을 종료한다.
-          if (event.data.round == 9 && state.isHost == true) {
+          if (event.data.round == 8 && state.isHost == true) {
             context.dispatch("finishGame");
           }
 
