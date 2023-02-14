@@ -9,9 +9,14 @@
         >
           개인전
         </button>
-        <button
+        <!-- <button
           @click="state.isTeamBattle = true"
           :class="state.isTeamBattle ? 'active' : ''"
+        >
+          팀전
+        </button> -->
+        <button
+          @click="comingsoon('팀전')"
         >
           팀전
         </button>
@@ -189,6 +194,9 @@ export default {
     const closeDialog = () => {
       state.passwordDialog = false;
     };
+    const comingsoon = (message) => {
+      alert(`${message} 기능은 추후 공개될 예정입니다. \n조금만 기다려주세요!`)
+    }
     // 방 리스트 조회
     onMounted(async () => {
       // 팀 분류하기 - 이은혁
@@ -218,7 +226,8 @@ export default {
       prevPage,
       nextButtonDisabled,
       prevButtonDisabled,
-      closeDialog
+      closeDialog,
+      comingsoon
     };
   },
 };
