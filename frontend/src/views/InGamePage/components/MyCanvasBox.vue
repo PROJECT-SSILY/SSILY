@@ -73,19 +73,19 @@ export default{
       });
     };
 
-    const toast = function(string) {
-      const toast = document.getElementById("toast");
+    // const toast = function(string) {
+    //   const toast = document.getElementById("toast");
 
-      toast.classList.contains("reveal") ?
-        (clearTimeout(removeToast), removeToast = setTimeout(function () {
-          document.getElementById("toast").classList.remove("reveal")
-      }, 1000)) :
-      removeToast = setTimeout(function () {
-          document.getElementById("toast").classList.remove("reveal")
-      }, 1000)
-      toast.classList.add("reveal"),
-      toast.innerText = string
-    }
+    //   toast.classList.contains("reveal") ?
+    //     (clearTimeout(removeToast), removeToast = setTimeout(function () {
+    //       document.getElementById("toast").classList.remove("reveal")
+    //   }, 1000)) :
+    //   removeToast = setTimeout(function () {
+    //       document.getElementById("toast").classList.remove("reveal")
+    //   }, 1000)
+    //   toast.classList.add("reveal"),
+    //   toast.innerText = string
+    // }
 
     // 모두 지우기
     const eraseAll = function () {

@@ -269,12 +269,6 @@ export default {
       store.dispatch("gameStore/changeTeamAction", color);
     };
 
-    const clickTest = () => {
-      console.log("clickTest 클릭");
-      store.dispatch("gameStore/changeTest", true);
-      store.dispatch("gameStore/gameStart");
-    };
-
     const gameStart = () => {
       store.dispatch("gameStore/gameStart");
     };
@@ -329,7 +323,6 @@ export default {
       currentPresenterId,
       endGame,
       clickExit,
-      clickTest,
       clickReady,
       clickTeam,
       gameStart,
@@ -424,31 +417,37 @@ export default {
   transition: 0.1s;
 }
 .box-btn > button:hover {
-  box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.5);
+  /* box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.5); */
 }
 .box-btn > button:active {
-  box-shadow: inset 0 2px 3px 1px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 2px 4px 3px rgb(72, 72, 72);
 }
 .btn-ready {
   background: #24cb83;
   color: white;
   font-size: 25px;
+  box-shadow : 1px 3px 3px rgb(72, 72, 72);
 }
 .btn-ready:hover {
   background: #fadd00;
   font-size: 30px;
 }
 .btn-ready:active {
-  background: rgb(221, 196, 0);
+  background: #80a000;;
+}
+.btn-ready.active {
+  background: #98be00;;
+  box-shadow : inset 0 3px 3px 0px #484848c2;
+
 }
 .btn-profile {
   background: #c6c6c6;
   color: white;
   font-size: 20px;
+  box-shadow : 1px 3px 3px rgb(72, 72, 72);
 }
 .btn-profile:hover {
   background: #b7b7b7;
-  font-size: 25px;
 }
 .btn-profile:active {
   background: rgb(172, 172, 172);

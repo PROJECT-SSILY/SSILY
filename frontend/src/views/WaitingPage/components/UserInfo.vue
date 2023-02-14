@@ -10,9 +10,8 @@
     <!-- <p>레벨: {{ user.level }}</p>
     <p>팀: {{ user.team }}</p>
     <p>방장여부: {{ user.isHost }}</p>
-    <p>경험치: {{ user.exp }}</p>
-    <p>레디: {{ user.isReady }}</p>
-    <p>설명자여부: {{ user.isPresenter }}</p> -->
+    <p>경험치: {{ user.exp }}</p> -->
+    <p id="ready" v-if="user.isReady">READY</p>
   </div>
 </div>
 </template>
@@ -52,5 +51,14 @@ export default {
 }
 #character {
   height: 140px;
+}
+#ready {
+  font-size: 30px;
+  color: #24cb83;
+  font-weight: 700;
+  POSITION: absolute;
+  bottom: 59px;
+  text-shadow: 0px 0px 0px #e4ff00, 0 0px #e4ff00, 1px 0 #e4ff00, 0 -1px #e4ff00;
+  width: 100%;
 }
 </style>
