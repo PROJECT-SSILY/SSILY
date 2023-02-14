@@ -62,6 +62,8 @@
             label="비밀번호 숫자 4자리를 입력하세요."
             hide-details="auto"
             v-model="state.input"
+            type="password"
+            maxlength="4"
           ></v-text-field>
           <v-divider></v-divider>
           <v-card-actions>

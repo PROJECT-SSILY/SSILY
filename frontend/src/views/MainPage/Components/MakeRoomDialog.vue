@@ -32,6 +32,8 @@
         v-if="state.form.isSecret == true"
         label="비밀번호 숫자 4자리를 입력하세요."
         hide-details="auto"
+        type="password"
+        maxlength="4"
         v-model="state.form.password.value"
         :rules="[state.rules.passwordRules]"
       ></v-text-field>
