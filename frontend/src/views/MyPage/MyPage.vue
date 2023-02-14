@@ -1,12 +1,8 @@
 <template>
-    
     <changeNicknameDialog />
     <changePasswordDialog />
 <!-- <v-btn id="logout-btn" @click="logOut"> LOGOUT </v-btn>
 <v-btn id="delete-btn" @click.stop="userinfo.dialog = true">회원 탈퇴</v-btn> -->
-
-
-
 <v-dialog v-model="userinfo.dialog" max-width="290">
     <v-card class="formbox">
         <v-card-text> 정말 탈퇴하시겠습니까? </v-card-text>

@@ -352,15 +352,6 @@ export default {
     rgba(0, 0, 0, 1) 100%
   );
 }
-// .wrap-page {
-//   height: 100vh;
-//   width: 100%;
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   flex-direction: column;
-//   z-index: 0;
-// }
 .component-waiting {
   width: 800px;
   height: 550px;
