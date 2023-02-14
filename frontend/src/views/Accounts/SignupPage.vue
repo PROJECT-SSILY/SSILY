@@ -140,10 +140,7 @@ export default {
 
     const checkEmail = async function () {
       const result = await store.dispatch("accountStore/checkEmailAction", state.form.email.value);
-      if (state.rules.email) {
-        state.form.email.status = false;
-        alert("이메일이 유효하지 않습니다")
-      } else if (result.data.data) {
+      if (result.data.data) {
         state.form.email.status = true;
         alert("사용 가능한 이메일입니다.")
       } else {
@@ -154,10 +151,7 @@ export default {
 
     const checkNickname = async function () {
       const result = await store.dispatch("accountStore/checkNicknameAction", state.form.nickname.value);
-      if (state.rules.nicknameRules) {
-        state.form.nickname.status = false;
-        alert("닉네임은 2자 이상 10자 이내로 작성해주세요")
-      } else if (result.data.data) {
+      if (result.data.data) {
         state.form.nickname.status = true;
         alert("사용 가능한 닉네임입니다.")
       } else {
