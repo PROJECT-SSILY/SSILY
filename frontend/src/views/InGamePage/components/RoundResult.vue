@@ -76,8 +76,8 @@ export default {
     //   imageToCanvas();
     // });
     const imageToCanvas= async function(){
+        if(!isTimeOut.value){
         const getFile =await store.dispatch("gameStore/downloadImage");
-        console.log("getFile 찍자 :", getFile);
         
         var myCanvas=document.getElementById('aCanvas');
         var ctx = myCanvas.getContext('2d');
@@ -86,6 +86,7 @@ export default {
         img.onload = function(){
           ctx.drawImage(img,0,0); // Or at whatever offset you like
           };
+        }
     };
     setInterval(() => {
         store.dispatch('gameStore/changeRoundEnd', false)

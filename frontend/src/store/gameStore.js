@@ -443,7 +443,7 @@ const actions = {
         case 10: {
           // 라운드별 경험치 누적
           console.log("10번 event data : ", event.data);
-          if (event.data.round != 8) { 
+          if (event.data.round < 8) { 
             context.commit("setEndRound", true);
           }
           console.log("10번 시그널 수신 - 라운드 끝 ===> ", event.data.round);
@@ -483,7 +483,7 @@ const actions = {
         }
         case 20: {
           console.log("20번 시그널 수신 - 시간초과 ==>",event.data.round);
-          if (event.data.round != 8) {
+          if (event.data.round < 8) {
             context.commit("setEndRound", true);
           }
           console.log(event.data);
