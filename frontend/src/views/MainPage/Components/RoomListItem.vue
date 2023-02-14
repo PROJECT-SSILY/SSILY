@@ -1,7 +1,7 @@
 <template>
   <p class="wrap-item">
     <span id="num-members">{{ room.connections.numberOfElements }} / 4</span>
-    <span id="tit-room">{{ room.title }}</span>
+    <span id="tit-room">{{ room.title }} {{ room.createdAt }}</span>
     <span class="ico-secret" :class="room.isSecret ? 'secret' : ''"><v-img src="@/assets/images/secret.svg" alt="secret"/></span>
   </p>
 </template>
