@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -536,7 +533,7 @@ public class GameService   {
         // 경험치 추가
         JsonObject gameResult = new JsonObject();
         ArrayList<JsonObject> playerList = new ArrayList<>();
-        int cnt = 0;
+
         for (Participant p : participants) {
             int extraExp = calcExp(p, winner);
             p.getPlayer().addExp(extraExp);
@@ -548,15 +545,24 @@ public class GameService   {
             player.addProperty("levelUp", levelUp);
             player.addProperty("nickname", p.getPlayer().getNickname());
 
-            gameResult.add(String.valueOf(cnt), player);
             playerList.add(player);
+        }
+        playerList.sort(new Comparator<JsonObject>() {
+            @Override
+            public int compare(JsonObject o1, JsonObject o2) {
+                return Integer.valueOf(String.valueOf(o2.get("extraExp")))
+                        .compareTo(Integer.valueOf(String.valueOf(o1.get("extraExp"))));
+            }
+        });
+
+        int cnt = 0;
+        for(JsonObject p:playerList) {
+            gameResult.add(String.valueOf(cnt), p);
             cnt++;
         }
 
         // 백엔드 전송
         updateMemberState(winnerNicknames, playerList);
-
-
         // 게임 결과
         data.add("gameResult", gameResult);
 
