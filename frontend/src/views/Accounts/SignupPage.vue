@@ -70,6 +70,7 @@
           회원가입 완료
         </button>
       </v-form>
+      <alert-dialog v-if="state.alert" />
     </div>
   </div>
   <div class="background">
@@ -80,10 +81,14 @@
 import { reactive, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import AlertDialog from "../AlertDialog.vue";
+
 
 export default {
   name: "SignupPage",
-
+  components: {
+    AlertDialog
+  },
   setup() {
     const store = useStore();
     const router = useRouter();
@@ -95,6 +100,7 @@ export default {
         email: { value: "", valid: true, status: false },
         nickname: { value: "", valid: true, status: false },
       },
+      alert: false,
       rules: {
         required: (value) => !!value || "필수",
         emailRules: (value) => /.+@.+\..+/.test(value) || "이메일이 유효하지 않습니다",
@@ -123,10 +129,24 @@ export default {
 
     const clickSignup = async function () {
       if (!state.form.email.status) {
-        alert("이메일 중복 확인이 필요합니다.")
+        state.alert = false;
+        await store.commit("accountStore/setAlertColor", "error");
+        await store.commit(
+          "accountStore/setAlertMessage",
+          "이메일 중복 확인이 필요합니다."
+        );
+        await store.commit("accountStore/setAlertIcon", "alert");
+        state.alert = true;
         return;
       } else if (!state.form.nickname.status) {
-        alert("닉네임 중복 확인이 필요합니다.")
+        state.alert = false;
+        await store.commit("accountStore/setAlertColor", "error");
+        await store.commit(
+          "accountStore/setAlertMessage",
+          "닉네임 중복 확인이 필요합니다."
+        );
+        await store.commit("accountStore/setAlertIcon", "alert");
+        state.alert = true;
         return;
       } else {
         const formData = {
@@ -136,7 +156,14 @@ export default {
           name: state.form.name,
         };
         await store.dispatch('accountStore/registerAction', formData )
-        alert("회원가입 완료")
+        state.alert = false;
+        await store.commit("accountStore/setAlertColor", "success");
+        await store.commit(
+          "accountStore/setAlertMessage",
+          "회원 가입 완료!"
+        );
+        await store.commit("accountStore/setAlertIcon", "check");
+        state.alert = true;
         router.push('login')
       }
     };
@@ -145,10 +172,24 @@ export default {
       const result = await store.dispatch("accountStore/checkEmailAction", state.form.email.value);
       if (result.data.data) {
         state.form.email.status = true;
-        alert("사용 가능한 이메일입니다.")
+        state.alert = false;
+        await store.commit("accountStore/setAlertColor", "success");
+        await store.commit(
+          "accountStore/setAlertMessage",
+          "사용 가능한 이메일입니다."
+        );
+        await store.commit("accountStore/setAlertIcon", "check");
+        state.alert = true;
       } else {
         state.form.email.status = false;
-        alert("이미 사용 중인 이메일입니다.")
+        state.alert = false;
+        await store.commit("accountStore/setAlertColor", "error");
+        await store.commit(
+          "accountStore/setAlertMessage",
+          "이미 사용 중인 이메일입니다."
+        );
+        await store.commit("accountStore/setAlertIcon", "alert");
+        state.alert = true;
       }
     };
 
@@ -157,13 +198,34 @@ export default {
       const result = await store.dispatch("accountStore/checkNicknameAction", nickname);
       if (2 > nickname.length || nickname.length > 10) {
         state.form.nickname.status = false;
-        alert("닉네임은 2자 이상 10자 이내로 작성해주세요.")
+        state.alert = false;
+        await store.commit("accountStore/setAlertColor", "error");
+        await store.commit(
+          "accountStore/setAlertMessage",
+          "닉네임은 2자 이상 10자 이내로 작성해주세요."
+        );
+        await store.commit("accountStore/setAlertIcon", "alert");
+        state.alert = true;
       } else if (result.data.data) {
         state.form.nickname.status = true;
-        alert("사용 가능한 닉네임입니다.")
+        state.alert = false;
+        await store.commit("accountStore/setAlertColor", "success");
+        await store.commit(
+          "accountStore/setAlertMessage",
+          "사용 가능한 닉네임입니다."
+        );
+        await store.commit("accountStore/setAlertIcon", "check");
+        state.alert = true;
       } else {
         state.form.nickname.status = false;
-        alert("이미 사용 중인 닉네임입니다.")
+        state.alert = false;
+        await store.commit("accountStore/setAlertColor", "error");
+        await store.commit(
+          "accountStore/setAlertMessage",
+          "이미 사용 중인 닉네임입니다."
+        );
+        await store.commit("accountStore/setAlertIcon", "alert");
+        state.alert = true;
       }
     };
 

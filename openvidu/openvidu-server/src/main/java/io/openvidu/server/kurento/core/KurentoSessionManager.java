@@ -108,7 +108,9 @@ public class KurentoSessionManager extends SessionManager {
     @Override
     /* Protected by Session.closingLock.readLock */
     public void joinRoom(Participant participant, String sessionId, Integer transactionId) {
-        log.info("participant player = {}", participant.getPlayer().getScore());
+        log.info("participant player = {}", participant.getPlayer().getNickname());
+        log.info("join room player is host = {}", participant.getPlayer().isHost());
+
         Set<Participant> existingParticipants = null;
         try {
 
@@ -202,6 +204,7 @@ public class KurentoSessionManager extends SessionManager {
     /**
      * 서영탁
      * 방에서 나가면 초기화
+     * 방장이 나가면 랜덤으로 방장을 준다.
      */
     @Override
     public boolean leaveRoom(Participant participant, Integer transactionId, EndReason reason,
@@ -235,7 +238,6 @@ public class KurentoSessionManager extends SessionManager {
                         readyState.remove(participant.getParticipantPublicId());
                         GameService.readyState.computeIfPresent(sessionId, (k, v) -> v = readyState);
                     }
-
 
                     session.leave(participant.getParticipantPrivateId(), reason);
 
