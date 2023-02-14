@@ -37,7 +37,7 @@ const state = {
     amIDescriber: false,
     winnerNickname: '', // [라운드 결과] 승리 유저
     winnerId: '',
-    round: 1, // 현재 라운드
+    round: 0, // 현재 라운드
     answer: '',
     presenterId: null,
     sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
@@ -275,6 +275,13 @@ const mutations = {
     },
     setInGame: (state,data) => {
       state.inGame = data
+      if (data == true) {
+        // 게임 시작했을 때 음소거
+        state.publisher.publishAudio(false);
+        for (var j=0; state.subscribers.length > j; j++ ){
+          state.subscribers[j].subscribeToAudio(false)
+        }
+      }
     }
 };
 
