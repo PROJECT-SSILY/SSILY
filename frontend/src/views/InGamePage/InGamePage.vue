@@ -65,7 +65,7 @@
       <header>
         <GameTimer :key="gameTimer" id="timer" />
       </header>
-      <p class="gameround">{{ round + 1 }} 라운드</p>
+      <p class="gameround">{{ round }} 라운드</p>
       <RoundResult />
       <GameResult v-show="endGame"/>
       <GameScore class="gamescore"/>

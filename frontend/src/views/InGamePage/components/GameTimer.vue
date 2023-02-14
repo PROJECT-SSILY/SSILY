@@ -60,7 +60,7 @@
       },
       endRound(newValue) {
         if (newValue == true) {
-          console.log('타이머 리셋')
+          //console.log('타이머 리셋')
           // 라운드가 끝나면 타이머 리셋 - 수연
           this.onTimesUp();
           this.timePassed = 0
@@ -78,14 +78,17 @@
   
     methods: {
       onTimesUp() {
+        console.log("timerCheck : timesUp");
         clearInterval(this.timerInterval);
       },
   
       startTimer() {
+        console.log("timerCheck : start");
         this.timerInterval = setInterval(() => (this.timePassed += 1), 1000);
         this.$store.commit('gameStore/setIsTimeOut', false)
       },
       timeOver() {
+        console.log("timerCheck : Over");
         this.$store.dispatch('gameStore/timeOverRound')
       }
     }
