@@ -19,6 +19,7 @@
             :color="color"
             text
             @click.stop ="state.alert = false"
+            @keyup="enter"
             >
             확인
             </v-btn>
