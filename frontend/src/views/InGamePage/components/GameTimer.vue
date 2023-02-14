@@ -8,7 +8,7 @@
   import { mapState } from 'vuex';
 
 
-  const TIME_LIMIT =  10;
+  const TIME_LIMIT = 600;
   
   export default {
     data() {

@@ -56,6 +56,8 @@ export default{
     let coords = []; // 현재 그림의 좌표를 기록
     let raw_predictions = {};
     let model = null;
+    let submitPossible=true;
+    let removeToast=null;
 
     const allowDrawing = function () {
       const canvas = fabricCanvas.value;
@@ -73,19 +75,19 @@ export default{
       });
     };
 
-    // const toast = function(string) {
-    //   const toast = document.getElementById("toast");
+    const toast = function(string) {
+      const toast = document.getElementById("toast");
 
-    //   toast.classList.contains("reveal") ?
-    //     (clearTimeout(removeToast), removeToast = setTimeout(function () {
-    //       document.getElementById("toast").classList.remove("reveal")
-    //   }, 1000)) :
-    //   removeToast = setTimeout(function () {
-    //       document.getElementById("toast").classList.remove("reveal")
-    //   }, 1000)
-    //   toast.classList.add("reveal"),
-    //   toast.innerText = string
-    // }
+      toast.classList.contains("reveal") ?
+        (clearTimeout(removeToast), removeToast = setTimeout(function () {
+          document.getElementById("toast").classList.remove("reveal")
+      }, 1000)) :
+      removeToast = setTimeout(function () {
+          document.getElementById("toast").classList.remove("reveal")
+      }, 1000)
+      toast.classList.add("reveal"),
+      toast.innerText = string
+    }
 
     // 모두 지우기
     const eraseAll = function () {
@@ -97,7 +99,16 @@ export default{
     };
 
     const predictModel = function () {
-      submitDrawing();
+      if(!submitPossible) {
+        toast("3초 후에 다시 제출할 수 있습니다!");
+        return;
+      }
+      else { //제출
+        setTimeout(() => submitPossible=true, 3000);
+        submitPossible=false;
+        submitCanvas();
+        submitDrawing();
+      }
     };
 
     const getMinBox = function () {
