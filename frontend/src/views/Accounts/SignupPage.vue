@@ -13,6 +13,7 @@
           ]"
           label="이메일"
           variant="underlined"
+          @keyup.enter="checkEmail"
         >
           <template v-slot:append-inner>
             <v-btn variant="text" @click="checkEmail">중복 확인</v-btn>
@@ -30,6 +31,7 @@
           ref="nicknameform"
           :rules="[state.rules.required,state.rules.nicknameRules,state.rules.nicknameCheckRules,]"
           label="닉네임"
+          @keyup.enter="checkNickname"
         >
           <template v-slot:append-inner>
             <v-fade-transition leave-absolute>
