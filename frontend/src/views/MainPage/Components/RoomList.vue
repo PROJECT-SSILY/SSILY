@@ -40,15 +40,39 @@
           v-if="!nextButtonDisabled" 
           >NEXT</button>
         </div>
-        <div v-if="state.passwordDialog">
-          <password-input
-          v-for="room in state.roomlist"
-          :key="room.id"
-          :tmp="state.tmp"
-          :dialog="state.passwordDialog"
-          :room="room"/>
       </div>
-      </div>
+    </div>
+  </div>
+  <!-- 비밀번호 모달 -->
+  <div class="wrap-page" v-show="state.passwordDialog">
+    <div class="wrap-dialog">
+      <div class="dialog">
+      <v-form
+        ref="form"
+        v-model="valid"
+        lazy-validation
+        @submit.prevent="submitPw"
+        >
+          <v-text-field 
+            label="비밀번호 숫자 4자리를 입력하세요."
+            hide-details="auto"
+            v-model="state.input"
+          ></v-text-field>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <p class="text-center">
+              <button type="submit" class="btn-dialog">참가하기</button>
+            </p>
+            <alert-dialog v-if="state.alert"/>
+          </v-card-actions>
+      </v-form>
+    </div>
+      <div
+        class="bg-dark"
+        :class="state.passwordDialog ? 'active':''"
+        @click="closeDialog"
+      ></div>
     </div>
   </div>
 </template>
@@ -58,21 +82,25 @@ import { useRouter } from "vue-router";
 import { reactive, onMounted, computed } from "vue";
 import { roomList, room } from "@/common/api/gameAPI";
 import RoomListItem from "@/views/MainPage/Components/RoomListItem.vue";
-import PasswordInput from "@/views/MainPage/Components/PasswordInput.vue";
-import AlertDialog from '../../AlertDialog.vue'
+// import AlertDialog from '../../AlertDialog.vue'
 
 export default {
   name: "RoomList",
   components: {
     RoomListItem,
-    PasswordInput,
-    AlertDialog
   },
   setup() {
     const router = useRouter();
     const store = useStore();
     const state = reactive({
-      tmp: '',
+      room: {
+        title: null,
+        password: null,
+        isTeamBattle: null,
+        isSecret: false,
+        sessionId: null,
+      },
+      input: null,
       isTeamBattle: false,
       teamrooms: [],
       privaterooms: [],
@@ -84,43 +112,54 @@ export default {
         }
       }),
       passwordDialog: false,
-      alert: false,
       pageNum: 0
     });
 
     const getInRoom = async function (params) {
       const roominfo = JSON.parse(JSON.stringify(params));
-      const isExistRoom=await getRoom(roominfo.sessionId);
+      state.room.title = roominfo.title
+      state.room.password = roominfo.password
+      state.room.isTeamBattle = roominfo.isTeamBattle
+      state.room.isSecret = roominfo.isSecret
+      state.room.sessionId = roominfo.sessionId
+  
+      const isExistRoom = await getRoom(roominfo.sessionId);
       if(!isExistRoom) {
-        state.alert = false
-        await store.commit('accountStore/setAlertColor', 'error')
-        await store.commit('accountStore/setAlertMessage', '존재하지 않는 방입니다.')
-        await store.commit('accountStore/setAlertIcon', 'alert')
-        state.alert = true
-        return;
-      }
-      else {
-        if (roominfo.isSecret) {
-          state.passwordDialog = !state.passwordDialog
-          state.tmp = roominfo.sessionId
-        } else {
-          console.log(roominfo.isTeamBattle)
-          store.commit("gameStore/setTitle", roominfo.title);
-          store.commit("gameStore/setTeam", roominfo.isTeamBattle);
-          store.commit("gameStore/setSecret", roominfo.isSecret);
-          store.commit("gameStore/setPassword", roominfo.password);
-          router.push({
-            name: "gameroom",
-            params: { sessionId: roominfo.sessionId },
-          });
-        }
-      }
+        // 존재하지 않는 방 입장 시
+        alert("존재하지 않는 방입니다.")
+
+      } else if (roominfo.isSecret && !state.passwordDialog) { 
+        // 비밀번호 입력이 필요한 방에 입장하는 경우
+        state.passwordDialog = true
+
+      } else { 
+        // 입장이 가능한 경우
+        store.commit("gameStore/setTitle", state.room.title);
+        store.commit("gameStore/setTeam", state.room.isTeamBattle);
+        store.commit("gameStore/setSecret", state.room.isSecret);
+        store.commit("gameStore/setPassword", state.room.password);
+
+        router.push({name: "gameroom", params: { sessionId: state.room.sessionId },});
+      } 
     };
+    const submitPw = () => {
+      const pw = state.input
+      if (pw===state.room.password) {
+        store.commit("gameStore/setTitle", state.room.title);
+        store.commit("gameStore/setTeam", state.room.isTeamBattle);
+        store.commit("gameStore/setSecret", state.room.isSecret);
+        store.commit("gameStore/setPassword", state.room.password);
+        router.push({name: "gameroom", params: { sessionId: state.room.sessionId },});
+      } else {
+        alert("비밀번호가 틀렸습니다.")
+      }
+    }
     // 없는 방 조회시 오류 반환
     const getRoom = (sessionId) => {
       const response= room(sessionId);
       return response;
     }
+
     // 페이지네이션
     const pageList = computed(() => {
         let listLeng = state.roomlist.length;
@@ -146,6 +185,7 @@ export default {
     
     const prevButtonDisabled = computed(() => state.pageNum < 1);
 
+    // 모달창 닫기
     const closeDialog = () => {
       state.passwordDialog = false;
     };
@@ -171,6 +211,7 @@ export default {
     return {
       state,
       getInRoom,
+      submitPw,
       pageList,
       paginatedData,
       nextPage,
@@ -259,19 +300,28 @@ export default {
   font-size: 15px;
   margin: 0 10px;
 }
-.wrap-dialog {
-}
-.bg-dark {
-  z-index: -11;
+.wrap-page {
   width: 100vw;
   height: 100vh;
   position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.bg-dark {
+  transition: .2s;
+}
+.bg-dark.active {
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  position: fixed;
   top: 0;
   left: 0;
-}
-
-.bg-dark.active {
-  z-index: 1;
 }
 
 </style>

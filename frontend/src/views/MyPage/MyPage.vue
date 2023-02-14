@@ -1,5 +1,8 @@
 <template>
-    <div>
+    <div class="background">
+        <div id="stars" class="rotating"></div>
+      </div>
+      <div class="wrap-page">
         <div id="result" class="d-flex flex-row-reverse mx-4 my-4">
             <v-btn 
             class="v-btn"
@@ -14,16 +17,18 @@
                 <v-col>
                     <v-row>
                         <v-col>
-                            <h1>마이 페이지</h1>                                                             
-                            <div class="robot-circle">
-                                <img class="robot" :src="userinfo.robot" alt="">
-                            </div>
-                            <div class="win-rate">    
-                                <apexchart width="380" type="donut" :options="donutchart.options" :series="donutchart.series"></apexchart>
-                            </div>
-                            <br>
-                            <div class="inner_section1_right">
-                                <h2>{{ userinfo.nickname }}</h2>
+                            <div class="image-box">
+                                <h1>마이 페이지</h1>                                                             
+                                <div class="robot-circle">
+                                    <img class="robot" :src="userinfo.robot" alt="">
+                                </div>
+                                <div class="win-rate">    
+                                    <apexchart width="500" type="donut" :options="donutchart.options" :series="donutchart.series"></apexchart>
+                                </div>
+                                <br>
+                                <div class="inner_section1_right">
+                                    <h2>{{ userinfo.nickname }}</h2>
+                                </div>
                             </div>    
                         </v-col>
                     </v-row>
@@ -35,7 +40,7 @@
                                 <p align="left">LV. {{ userinfo.level }}</p>
                                 <p align="left">경험치</p>
                                 <p align="right">{{ userinfo.exprate }} % </p>
-                                <div class="win-rate">    
+                                <div class="win-rate-bar">    
                                     <apexchart class="chart" width="200" type="bar" :options="linechart.options" :series="linechart.series"></apexchart>
                                 </div>
                             </v-card>
@@ -88,6 +93,7 @@
                 </v-col>
             </v-row>
         </v-container>
+    
     </div>
 </template>
 
@@ -131,7 +137,6 @@ export default {
             options: {
                 chart: {
                     type: "radialBar",
-                    height: 250,
                     offsetX: 0
                 },
                 labels: ["승", "패"],
@@ -151,7 +156,6 @@ export default {
         const linechart = reactive({
             options: {
                 chart: {
-                    height: 70,
                     type: "bar",
                     stacked: true,
                     sparkline: {
@@ -173,12 +177,19 @@ export default {
                         borderRadius: 4,
                         horizontal: true,
                         barHeight: "20%",
+                        columnWidth: "120%",
                         colors: {
                             backgroundBarColors: ["#EAFFF0"],
                             backgroundBarRadius: 5,
                         }
                     }
                 },
+                tooltip: {
+                    enabled: true
+                },
+                yaxis: {
+                    max: 100
+                }
             },
             series: [
                 {
@@ -194,28 +205,28 @@ export default {
             userinfo.nickname = res.nickname
             userinfo.level = res.level
             userinfo.exp = res.exp
-            userinfo.exprate = res.exp / res.level 
+            userinfo.exprate = Math.floor(res.exp / res.level)
             userinfo.record.plays = res.record.plays
             userinfo.record.wins = res.record.wins
             userinfo.record.draws = res.record.draws
             if (res.record.plays == 0) {
                 userinfo.record.winrate =  0
             } else {
-                userinfo.record.winrate =  res.record.wins/res.record.plays*100
+                userinfo.record.winrate =  Math.floor(res.record.wins/res.record.plays)*100
             }
             if (res.level > -1 && res.level < 6)  {
-                userinfo.robot = "./robotface1.svg"
+                userinfo.robot = "./ssily1.svg"
             } else if (res.level > 5 && res.level < 11) {
-                userinfo.robot = "./robotface2.svg"
+                userinfo.robot = "./ssily2.svg"
             } else {
-                userinfo.robot = "./robotface3.svg"
+                userinfo.robot = "./ssily3.svg"
             }
-            donutchart.series.push(2)
-            // donutchart.series.push(donutchart.win)
-            donutchart.series.push(1)
-            // donutchart.series.push(donutchart.lost)
-            linechart.series[0].data.push(80)
-            // linechart.series[0].data.push(userinfo.exp)
+            // donutchart.series.push(2)
+            donutchart.series.push(donutchart.win)
+            // donutchart.series.push(1)
+            donutchart.series.push(donutchart.lost)
+            // linechart.series[0].data.push(80.3453094568306)
+            linechart.series[0].data.push(userinfo.exprate)
         })
         const logOut = async function() {
             await store.dispatch('accountStore/logoutAction')
@@ -239,7 +250,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .game-info {
     align-items: flex-start;
     padding: 2rem;
@@ -255,7 +266,7 @@ export default {
 #result .v-btn {
     min-width: 36px;
     width: 36px;
-    background-color: rgba(255, 255, 255, 0.);
+    background-color: rgba(255, 255, 255, 1);
     box-shadow: 0 1px 1px rgba(0,0,0,0.11), 
                 0 2px 2px rgba(0,0,0,0.11), 
                 0 4px 4px rgba(0,0,0,0.11), 
@@ -263,11 +274,22 @@ export default {
                 0 16px 16px rgba(0,0,0,0.11), 
                 0 32px 32px rgba(0,0,0,0.11);
   }
+
+$hover_top: 30px;
+$hover_bottom: 50px;  
 .robot {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    height: 5rem;
+    height: 15rem;
+    animation:hover 1.1s ease-in-out 0s infinite alternate;
+    position: relative;
+    bottom:9rem;
+}
+
+@keyframes hover { 
+    0% { transform: translate3d(0,$hover_top,0) }
+    100% { transform: translate3d(0,$hover_bottom,0) }
 }
 .robot-circle {
     position: relative; 
@@ -281,12 +303,26 @@ export default {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    position: relative;
     z-index: 1;
     font-family: 'MaplestoryOTFBold';
     font-weight: normal;
     font-style: normal;
-
+    position: relative;
+    bottom:15rem;
+}
+.win-rate-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    font-family: 'MaplestoryOTFBold';
+    font-weight: normal;
+    font-style: normal;
+}
+.inner_section1_right {
+    position: relative;
+    bottom:15rem;
 }
 .game-info > p {
     font-size: 2rem;
@@ -295,7 +331,9 @@ export default {
     font-style: normal;
 
 }
-
+.image-box {
+    padding-bottom:5rem;
+}
 .profile {
   display: flex;
   flex-direction: row;
@@ -305,6 +343,7 @@ export default {
   font-weight: normal;
   font-style: normal;
   color:#ffffff;
+  
 }
 #delete-btn {
     height:3rem;

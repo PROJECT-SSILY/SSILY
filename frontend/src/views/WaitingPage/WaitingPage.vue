@@ -1,17 +1,16 @@
 <template>
   <div class="list-users">
-    <PasswordInput
-    v-if="isSecret "/>
-          <UserInfo
-          class="list-users-item"
-          v-for="user in userList"
-          :user="user"
-          :key="user.id"
-          />
-          <div class="list-users-item blank"
-          v-for="blank in 4-userList.length"
-          :key="blank"></div>
-      </div>
+    <UserInfo
+    class="list-users-item"
+    v-for="user in userList"
+    :user="user"
+    :key="user.id"
+    />
+    <div class="list-users-item blank"
+    v-for="blank in 4-userList.length"
+    :key="blank">
+    </div>
+  </div>
 </template>
 <script>
 import { ref } from '@vue/reactivity'
