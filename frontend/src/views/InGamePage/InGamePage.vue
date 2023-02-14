@@ -28,6 +28,7 @@
           :myConnectionId="state.connectionId"
           :team="state.team"
         />
+        <StartTimer v-if="state.startTimer"/>
       </div>
       <div class="content-component">
         <ChattingBox class="box-chat" />
@@ -141,7 +142,7 @@ import GameTimer from "./components/GameTimer.vue";
 import GameScore from "./components/GameScore.vue";
 import RoundResult from "./components/RoundResult.vue";
 import GameResult from "../InGamePage/components/GameResult.vue";
-
+import StartTimer from "@/views/InGamePage/components/StartTimer.vue"
 //=================OpenVdue====================
 $axios.defaults.headers.post["Content-Type"] = "application/json";
 //=============================================
@@ -158,6 +159,7 @@ export default {
     RoundResult,
     SettingDialog,
     GameResult,
+    StartTimer
   },
   props: {
     ready: Boolean,
@@ -198,6 +200,7 @@ export default {
       nickname: computed(() => store.state.accountStore.user.nickname),
       level: computed(() => store.state.accountStore.user.level),
       robot: null,
+      startTimer: false,
 
       // 팀 분류
       myTeam: null,
@@ -320,6 +323,15 @@ export default {
     watch(inGame, (newValue) => { // 게임 시작했을 때, ready 버튼 모양 다시 초기화 
       if (newValue == true) {
         state.ready = false
+      }
+    })
+    watch(readyAll, (newValue) => {  
+      if (newValue == true) {
+        state.startTimer = true
+        setTimeout(() => {
+          state.startTimer = false
+          store.commit("gameStore/setInGame", true)
+        }, 5000);
       }
     })
     return {
