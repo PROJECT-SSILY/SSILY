@@ -1,6 +1,6 @@
 <template>
-  <div class="roomlist">
-    <div class="inner-roomlist">
+  <div class="roomlist" >
+    <div class="inner-roomlist" >
       <v-img src="@/assets/images/earth.png" id="earth" alt="earth" />
       <div class="wrap-btn">
         <button
@@ -19,30 +19,35 @@
       <alert-dialog v-if="state.alert"/>
       <div class="wrap-list">
         <RoomListItem
-          v-for="room in state.roomlist"
+          v-for="room in paginatedData"
           :key="room.id"
           :room="room"
           @click="getInRoom(room)"
           class="list-item"
         />
         <div
-          class="list-item blank"
-          v-for="blank in 5 - state.roomlist.length"
-          :key="blank"
+        class="list-item blank"
+        v-for="blank in 5 - paginatedData.length"
+        :key="blank"
         ></div>
+        <div class="btn-paging">
+          <button 
+          @click="prevPage" 
+          v-if="!prevButtonDisabled"
+          >PREV</button>
+          <button 
+          @click="nextPage"
+          v-if="!nextButtonDisabled" 
+          >NEXT</button>
+        </div>
         <div v-if="state.passwordDialog">
-
-          <password-input 
-          
+          <password-input
           v-for="room in state.roomlist"
           :key="room.id"
+          :tmp="state.tmp"
+          :dialog="state.passwordDialog"
           :room="room"/>
-        </div>
-        <paginationItem :rooms="state.roomlist" />
-        <div class="btn-paging">
-          <button @click="prevPage" >PREV</button>
-          <button @click="nextPage" >NEXT</button>
-        </div>
+      </div>
       </div>
     </div>
   </div>
@@ -50,29 +55,25 @@
 <script>
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-// import { getCurrentInstance } from "vue";
 import { reactive, onMounted, computed } from "vue";
 import { roomList, room } from "@/common/api/gameAPI";
 import RoomListItem from "@/views/MainPage/Components/RoomListItem.vue";
-import paginationItem from "@/views/MainPage/Components/paginationItem.vue";
-import PasswordInput from "@/views/WaitingPage/components/PasswordInput.vue";
+import PasswordInput from "@/views/MainPage/Components/PasswordInput.vue";
 import AlertDialog from '../../AlertDialog.vue'
 
 export default {
   name: "RoomList",
   components: {
     RoomListItem,
-    paginationItem,
     PasswordInput,
     AlertDialog
   },
-  // emits: ["sendValue"],
   setup() {
     const router = useRouter();
     const store = useStore();
     const state = reactive({
+      tmp: '',
       isTeamBattle: false,
-      password: null,
       teamrooms: [],
       privaterooms: [],
       roomlist: computed(() => {
@@ -100,9 +101,9 @@ export default {
       }
       else {
         if (roominfo.isSecret) {
-          state.passwordDialog = true
+          state.passwordDialog = !state.passwordDialog
+          state.tmp = roominfo.sessionId
         } else {
-          console.log(state.password)
           console.log(roominfo.isTeamBattle)
           store.commit("gameStore/setTitle", roominfo.title);
           store.commit("gameStore/setTeam", roominfo.isTeamBattle);
@@ -115,11 +116,12 @@ export default {
         }
       }
     };
-
-    const getRoom=(sessionId) => {
+    // 없는 방 조회시 오류 반환
+    const getRoom = (sessionId) => {
       const response= room(sessionId);
       return response;
     }
+    // 페이지네이션
     const pageList = computed(() => {
         let listLeng = state.roomlist.length;
         let listSize = 5;
@@ -140,6 +142,13 @@ export default {
     const prevPage = function() {
         state.pageNum -= 1
     }
+    const nextButtonDisabled = computed(() => state.pageNum >= Math.floor(state.roomlist.length / 5));
+    
+    const prevButtonDisabled = computed(() => state.pageNum < 1);
+
+    const closeDialog = () => {
+      state.passwordDialog = false;
+    };
     // 방 리스트 조회
     onMounted(async () => {
       // 팀 분류하기 - 이은혁
@@ -165,14 +174,16 @@ export default {
       pageList,
       paginatedData,
       nextPage,
-      prevPage
+      prevPage,
+      nextButtonDisabled,
+      prevButtonDisabled,
+      closeDialog
     };
   },
 };
 </script>
 <style scoped>
 .roomlist {
-  height: 510rem;
   background: white;
   border-radius: 60px;
   overflow: hidden;
@@ -248,4 +259,19 @@ export default {
   font-size: 15px;
   margin: 0 10px;
 }
+.wrap-dialog {
+}
+.bg-dark {
+  z-index: -11;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.bg-dark.active {
+  z-index: 1;
+}
+
 </style>
