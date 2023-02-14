@@ -11,6 +11,10 @@ a {
   text-decoration: none;
   color: inherit;
 }
+.v-messages {
+  text-align: left;
+  margin-bottom: 5px;
+}
 /* 배경  */
 .background{
   width: 100vw;

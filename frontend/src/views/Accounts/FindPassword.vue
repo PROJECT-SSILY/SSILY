@@ -8,12 +8,14 @@
           :counter="10"
           :rules="[state.rules.required, state.rules.nameRules]"
           label="Name"
+          variant="underlined"
           required
         ></v-text-field>
         <v-text-field
           v-model="state.form.email.value"
           :rules="[state.rules.required, state.rules.emailRules]"
           label="E-mail"
+          variant="underlined"
           required
         ></v-text-field>
         <alert-dialog v-if="state.alert" />
