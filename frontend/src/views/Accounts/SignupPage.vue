@@ -151,8 +151,12 @@ export default {
     };
 
     const checkNickname = async function () {
-      const result = await store.dispatch("accountStore/checkNicknameAction", state.form.nickname.value);
-      if (result.data.data) {
+      const nickname = state.form.nickname.value
+      const result = await store.dispatch("accountStore/checkNicknameAction", nickname);
+      if (2 > nickname.length || nickname.length > 10) {
+        state.form.nickname.status = false;
+        alert("닉네임은 2자 이상 10자 이내로 작성해주세요.")
+      } else if (result.data.data) {
         state.form.nickname.status = true;
         alert("사용 가능한 닉네임입니다.")
       } else {
