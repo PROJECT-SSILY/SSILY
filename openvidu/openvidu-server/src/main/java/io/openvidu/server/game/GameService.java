@@ -293,9 +293,15 @@ public class GameService   {
         ArrayList<Participant> gameParticipants=new ArrayList<>(participants);
         participantList.putIfAbsent(sessionId, gameParticipants);
 
+        data.addProperty("round", round.get(sessionId));
+        params.add("data", data);
         //설명자 부여
 
         //설명자 누구인지 알려주기
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
     }
 
     /**
@@ -436,7 +442,7 @@ public class GameService   {
         // 라운드 증가
         Integer nowRound = round.get(sessionId);
         round.put(sessionId, nowRound+1);
-        data.addProperty("round", nowRound);
+        data.addProperty("round", round.get(sessionId));
 
         params.add("data", data);
 
@@ -472,7 +478,7 @@ public class GameService   {
         // 라운드 증가
         Integer nowRound = round.get(sessionId);
         round.put(sessionId, nowRound+1);
-        data.addProperty("round", nowRound);
+        data.addProperty("round", round.get(sessionId));
 
         params.add("data", data);
 

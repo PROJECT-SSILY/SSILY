@@ -37,7 +37,7 @@ const state = {
     amIDescriber: false,
     winnerNickname: '', // [라운드 결과] 승리 유저
     winnerId: '',
-    round: 1, // 현재 라운드
+    round: 0, // 현재 라운드
     answer: '',
     presenterId: null,
     sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
@@ -376,6 +376,13 @@ const actions = {
           }
           break;
         }
+        
+        case 2: {
+          // 게임시작 했으니까 라운드 받아오기
+          console.log(event.data);
+          context.commit('setRound', event.data.round);
+          break;
+        }
 
         case 3: {
           // 참여자 정보 정리
@@ -408,6 +415,7 @@ const actions = {
           }
           break;
         }
+        // setIsAllReady 2번 보내게 되어있네?
         case 4: {
           // 참여자 ready 정보 경신
           console.log("4번 시그널 받음 : ", event.data);
@@ -434,15 +442,15 @@ const actions = {
           // 정답 제출 ( sendTopFive ) - 정답이면 응답 옴!
           console.log("5번 시그널 수신 완료");
           var winnerId = event.data.winnerId;
-          // => 여기서 정답자가 10번, 0번 신호 보낸다.
-          if (winnerId == state.myConnectionId) {
-            context.dispatch("finishRound");
-          }
           console.log("5번 data : ", event.data);
           context.commit("setAnswer", event.data.answer);
           context.commit("setWinnerId", event.data.winnerId);
           context.commit("setWinnerNickname", event.data.winnerNickname);
-          //context.commit('setRound', event.data.round)
+          context.commit('setRound', event.data.round)
+          // => 여기서 정답자가 10번, 0번 신호 보낸다.
+          if (winnerId == state.myConnectionId) {
+            context.dispatch("finishRound");
+          }
           break;
         }
         case 10: {
@@ -481,7 +489,7 @@ const actions = {
             }
           }
           // 라운드를 8번 돌면 게임을 종료한다.
-          if (event.data.round == 8 && maxScoreUser == state.myConnectionId) {
+          if (event.data.round == 9 && maxScoreUser == state.myConnectionId) {
             context.dispatch("finishGame");
           }
           break;
@@ -495,7 +503,7 @@ const actions = {
           context.commit("setIsTimeOut", true);
           context.commit("setRound", event.data.round);
           // 라운드를 8번 돌면 게임을 종료한다.
-          if (event.data.round == 8 && state.isHost == true) {
+          if (event.data.round == 9 && state.isHost == true) {
             context.dispatch("finishGame");
           }
 
@@ -545,7 +553,7 @@ const actions = {
           context.commit("setEndGame", true);
           console.log("endgame 변경 되었는지 확인 => ?", state.endGame);
           // 게임 끝나면 userList와 round 초기화
-          context.commit('setRound', 1)
+          context.commit('setRound', 0)
           for (var w=0; state.userList.length>w;w++) {
             context.commit('setUserScore', {
               index: w,
@@ -765,7 +773,7 @@ const actions = {
         gameStatus: 0,
       },
       to: [],
-    })
+    });
   },
   // 게임 끝냄 - 수연
   finishGame: () => {
@@ -944,6 +952,7 @@ const actions = {
   // 게임 시작 시그널 - 수연
   gameStart: () => {
     try {
+      console.log("2번 시그널 보냄!!!");
       state.session.signal({
         type: "game",
         data: {
@@ -971,22 +980,24 @@ const actions = {
   },
   // 시간 초과 시 라운드 종료 시그널 - 수연
   timeOverRound: () => {
+    // 시간초과 시그널 발송
     try {
       state.session.signal({
         type: "game",
         data: {
-          gameStatus: 0,
+          gameStatus: 20,
         },
         to: [],
       });
     } catch (err) {
       console.log(err);
     }
+    // 설명자 변경 시그널 발송
     try {
       state.session.signal({
         type: "game",
         data: {
-          gameStatus: 20,
+          gameStatus: 0,
         },
         to: [],
       });
