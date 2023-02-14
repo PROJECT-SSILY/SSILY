@@ -65,6 +65,7 @@
       })
       const roominfo = ref(props.room);
       const checkPassword = async function() {
+        console.log(roominfo.value);
         if (state.input != roominfo.value.password) {
           state.alert = false
           await store.commit('accountStore/setAlertColor', 'error')
