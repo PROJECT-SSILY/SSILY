@@ -6,6 +6,7 @@
   >
     <template v-slot:activator="{ attrs }">
       <v-btn
+        id="nickname-btn"
         block
         dark
         v-bind="attrs"
@@ -145,5 +146,11 @@
   font-weight: normal;
   font-style: normal;
 }
+#nickname-btn {
+    height:3rem;
+    font-size: 1.5rem;
+    opacity: 89%;
+    border-radius:10px
+  }
 
 </style>

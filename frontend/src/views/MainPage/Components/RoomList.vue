@@ -38,9 +38,10 @@
           :key="room.id"
           :room="room"/>
         </div>
+        <paginationItem :rooms="state.roomlist" />
         <div class="btn-paging">
-          <button>PREV</button>
-          <button>NEXT</button>
+          <button @click="prevPage" >PREV</button>
+          <button @click="nextPage" >NEXT</button>
         </div>
       </div>
     </div>
@@ -53,6 +54,7 @@ import { useRouter } from "vue-router";
 import { reactive, onMounted, computed } from "vue";
 import { roomList, room } from "@/common/api/gameAPI";
 import RoomListItem from "@/views/MainPage/Components/RoomListItem.vue";
+import paginationItem from "@/views/MainPage/Components/paginationItem.vue";
 import PasswordInput from "@/views/WaitingPage/components/PasswordInput.vue";
 import AlertDialog from '../../AlertDialog.vue'
 
@@ -60,6 +62,7 @@ export default {
   name: "RoomList",
   components: {
     RoomListItem,
+    paginationItem,
     PasswordInput,
     AlertDialog
   },
@@ -80,7 +83,8 @@ export default {
         }
       }),
       passwordDialog: false,
-      alert: false
+      alert: false,
+      pageNum: 0
     });
 
     const getInRoom = async function (params) {
@@ -116,7 +120,26 @@ export default {
       const response= room(sessionId);
       return response;
     }
-
+    const pageList = computed(() => {
+        let listLeng = state.roomlist.length;
+        let listSize = 5;
+        let page = Math.floor(listLeng / listSize);
+        if (listLeng % listSize > 0) {
+            page += 1
+        }
+        return page
+        });
+    const paginatedData = computed(() => {
+        const start = state.pageNum * 5;
+        const end = start + 5;
+        return state.roomlist.slice(start, end);
+        })
+    const nextPage = function() {
+        state.pageNum += 1
+    }
+    const prevPage = function() {
+        state.pageNum -= 1
+    }
     // 방 리스트 조회
     onMounted(async () => {
       // 팀 분류하기 - 이은혁
@@ -139,12 +162,17 @@ export default {
     return {
       state,
       getInRoom,
+      pageList,
+      paginatedData,
+      nextPage,
+      prevPage
     };
   },
 };
 </script>
 <style scoped>
 .roomlist {
+  height: 510rem;
   background: white;
   border-radius: 60px;
   overflow: hidden;

@@ -95,7 +95,7 @@ export default {
     display: flex;
     flex-direction: column;
     padding: 5px 25px;
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
     justify-content: flex-first;
 }
