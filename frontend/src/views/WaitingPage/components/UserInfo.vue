@@ -58,7 +58,7 @@ export default {
   font-weight: 700;
   POSITION: absolute;
   bottom: 59px;
-  text-shadow: 0px 0px 0px #e4ff00, 0 0px #e4ff00, 1px 0 #e4ff00, 0 -1px #e4ff00;
+  text-shadow: -1px 0px 10px #e4ff00, 0 1px #e4ff00, 1px 0 #e4ff00, 0 -1px #e4ff00;
   width: 100%;
 }
 </style>

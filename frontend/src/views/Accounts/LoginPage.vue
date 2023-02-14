@@ -75,7 +75,7 @@ export default {
       const response = await store.dispatch(
         "accountStore/loginAction",
         formData
-      );
+        );
       if (response == 401) {
         state.alert = false;
         await store.commit("accountStore/setAlertColor", "error");

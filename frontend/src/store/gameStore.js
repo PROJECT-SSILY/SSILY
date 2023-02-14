@@ -37,7 +37,7 @@ const state = {
     amIDescriber: false,
     winnerNickname: '', // [라운드 결과] 승리 유저
     winnerId: '',
-    round: 0, // 현재 라운드
+    round: 1, // 현재 라운드
     answer: '',
     presenterId: null,
     sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
@@ -243,6 +243,19 @@ const mutations = {
     },
     setEndRound: (state, data) => {
       state.endRound = data
+      if (data == true) {
+        // 라운드 종료시 참여자 소리 들림  ====> 아직 되는지 확실하지 않음
+        state.publisher.publishAudio(true);
+        for (var r=0; state.subscribers.length > r; r++ ){
+          state.subscribers[r].subscribeToAudio(true)
+        }
+      } else {
+        // 게임 시작 시 참여자들 음소거  ===> 아직 되는지 확실하지 않음
+        state.publisher.publishAudio(false);
+        for (var j=0; state.subscribers.length > j; j++ ){
+          state.subscribers[j].subscribeToAudio(false)
+        }
+      }
     },
     setWinnerList: (state, data) => { // 게임 승리 유저 리스트
       state.winnerList = data
@@ -258,7 +271,7 @@ const mutations = {
     },
     setWord: (state, data) => {
       state.word = data
-    }
+    },
 };
 
 const actions = {
@@ -357,11 +370,6 @@ const actions = {
           } else {
             context.commit("setAmIDescriber", false);
           }
-          // 게임 시작 시 참여자들 음소거  ===> 아직 되는지 확실하지 않음
-          state.publisher.publishAudio(false);
-          for (var j=0; state.subscribers.length > j; j++ ){
-            state.subscribers[j].subscribeToAudio(false)
-          }
           break;
         }
 
@@ -376,7 +384,6 @@ const actions = {
             if (state.myUserName == data[key].player.nickname) {
               context.commit("setMyConnectionId", key);
             }
-
             user.connectionId = key;
             user.isReady = data[key].isReady;
             user.exp = data[key].player.exp;
@@ -421,26 +428,26 @@ const actions = {
         case 5: {
           // 정답 제출 ( sendTopFive ) - 정답이면 응답 옴!
           console.log("5번 시그널 수신 완료");
-          console.log("5번 data : ", event.data);
-          context.commit("setAnswer", event.data.answer);
-          context.commit("setWinnerId", event.data.winnerId);
-          context.commit("setWinnerNickname", event.data.winnerNickname);
-          //context.commit('setRound', event.data.round)
           var winnerId = event.data.winnerId;
           // => 여기서 정답자가 10번, 0번 신호 보낸다.
           if (winnerId == state.myConnectionId) {
             context.dispatch("finishRound");
           }
+          console.log("5번 data : ", event.data);
+          context.commit("setAnswer", event.data.answer);
+          context.commit("setWinnerId", event.data.winnerId);
+          context.commit("setWinnerNickname", event.data.winnerNickname);
+          //context.commit('setRound', event.data.round)
           break;
         }
         case 10: {
           // 라운드별 경험치 누적
-          console.log("10번 시그널 수신 - 라운드 끝");
-          if (event.data.round != 8) {
+          console.log("10번 event data : ", event.data);
+          if (event.data.round < 8) { 
             context.commit("setEndRound", true);
           }
+          console.log("10번 시그널 수신 - 라운드 끝 ===> ", event.data.round);
           var scoreList = event.data.player;
-          console.log("10번 event data : ", event.data);
           context.commit("setRound", event.data.round);
           var maxScore = -1;
           var maxScoreUser = undefined;
@@ -475,17 +482,18 @@ const actions = {
           break;
         }
         case 20: {
-          console.log("20번 시그널 수신 - 시간초과");
-          if (event.data.round != 8) {
+          console.log("20번 시그널 수신 - 시간초과 ==>",event.data.round);
+          if (event.data.round < 8) {
             context.commit("setEndRound", true);
           }
           console.log(event.data);
-          context.commit("setRound", event.data.round);
           context.commit("setIsTimeOut", true);
+          context.commit("setRound", event.data.round);
           // 라운드를 8번 돌면 게임을 종료한다.
           if (event.data.round == 8 && state.isHost == true) {
             context.dispatch("finishGame");
           }
+
           break;
         }
         case 100: {
@@ -499,18 +507,47 @@ const actions = {
             winnerList.push(event.data.winner[a].nickname);
           }
           context.commit("setWinnerList", winnerList);
+          console.log('event.data.gameResult.length = ', event.data.gameResult.length)
+          console.log('event.data.gameResult :',event.data.gameResult)
+          // for (var h=0; h<state.userList.length; h++) {
+          //   console.log('제 발', event.data.gameResult[h].extraExp)
+          //   context.commit("setUserScore", {
+          //     index: h,
+          //     value: state.userList[h].score + event.data.gameResult[h].extraExp 
+          //   });            
+          // }
+          // var tmpList = state.userList;
+          // tmpList.sort((a, b) => {
+          //   if (a.score > b.score) return -1;
+          //   if (a.score < b.score) return 1;
+          //   return 0;
+          // });
+          // console.log('tmpList::::', tmpList)
+          // context.commit("setSortedUserList", tmpList);
+          // 정렬 해보기 
+          // context.commit("setUserScore", {
+          //   index: y,
+          //   value: scoreList[x].score,
+          // });
+          // var sortList = state.userList;
+          // sortList.sort((a, b) => {
+          //   if (a.score > b.score) return -1;
+          //   if (a.score < b.score) return 1;
+          //   return 0;
+          // });
           context.commit("setGameResult", event.data.gameResult);
           console.log("endGame 변경");
           context.commit("setEndGame", true);
           console.log("endgame 변경 되었는지 확인 => ?", state.endGame);
           // 게임 끝나면 userList와 round 초기화
-          context.commit('setRound', 0)
+          context.commit('setRound', 1)
           for (var w=0; state.userList.length>w;w++) {
             context.commit('setUserScore', {
               index: w,
               value: 0,
             })
           }
+          // console.log('state.sortedUserList ::::: ', state.sortedUserList)
           break;
         }
       }
@@ -720,11 +757,6 @@ const actions = {
       },
       to: [],
     })
-    // 라운드 종료시 참여자 소리 들림  ====> 아직 되는지 확실하지 않음
-    state.publisher.publishAudio(true);
-    for (var r=0; state.subscribers.length > r; r++ ){
-      state.subscribers[r].subscribeToAudio(true)
-    }
   },
   // 게임 끝냄 - 수연
   finishGame: () => {

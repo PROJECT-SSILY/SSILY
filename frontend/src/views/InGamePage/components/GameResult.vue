@@ -8,13 +8,19 @@
       <v-card class="formbox">
         <v-card-title>
           게임 결과
+          {{ sortedUserList }}
         </v-card-title>
         <v-card-text>
-          <h1> {{ gameResult[0].nickname }} WON! </h1>
+          <div v-for="winner in winnerList"
+          :winner="winner"
+          :key="winner.id">
+            <h1>{{ winner }}</h1>
+          </div> <h1>WON!</h1>
+          gameResult: {{ gameResult }}
           <div v-for="(user, index) in gameResult"
           :user="user"
           :key="user.id">
-              <h1>{{ parseInt(index) + 1}}등 {{ user.nickname }} + {{ user.extraExp }} Exp </h1>
+              <h1>{{ parseInt(index) + winnerList.length }}등 {{ user.nickname }} + {{ user.extraExp }} Exp </h1>
           </div>
         </v-card-text>
         <v-card-actions>
@@ -54,17 +60,21 @@ export default {
     const endGame = computed(() => store.state.gameStore.endGame);
     const gameResult = computed(() => store.state.gameStore.gameResult)
     const readyAll = computed(() => store.state.gameStore.isAllReady);
+    const winnerList = computed(() => store.state.gameStore.winnerList)
+    const sortedUserList = computed(() => store.state.gameStore.sortedUserList)
     const clickExit = () => {
+      store.commit('gameStore/setEndGame', false)
+      store.commit('gameStore/setIsAllReady', false)
       store.dispatch("gameStore/leaveSession");
       router.push({
         name: "main",
       });
     }
     const clickReturn = () => {
-      // store.dispatch('gameStore/changeReady')
-      store.commit('gameStore/setIsAllReady', false)
       store.commit('gameStore/setEndGame', false)
-      console.log(readyAll, '==>r `eadyAll 바뀌었음??? false여야함')
+      store.dispatch('gameStore/changeReady')
+      store.commit('gameStore/setIsAllReady', false)
+      console.log(readyAll, '==>r `readyAll 바뀌었음??? false여야함')
     }
   return {
     gameResult,
@@ -72,7 +82,9 @@ export default {
     endGame,
     readyAll,
     clickExit,
-    clickReturn
+    clickReturn,
+    winnerList,
+    sortedUserList
   }
   }
 }
