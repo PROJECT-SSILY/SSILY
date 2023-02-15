@@ -58,7 +58,8 @@ export default {
 <style scoped>
 .my-custom-dialog {
     position: absolute;
-    top: -70%
+    top: -70%;
+    border-radius: 20px;
   }
 .formbox {
     padding: 2rem;
@@ -68,5 +69,11 @@ export default {
     font-family: 'MaplestoryOTFBold';
     font-weight: normal;
     font-style: normal;
+  }
+
+  .v-dialog .v-overlay__content > .v-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
   }
 </style>

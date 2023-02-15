@@ -20,7 +20,11 @@
         ></v-text-field>
         <alert-dialog v-if="state.alert" />
         <button type="submit" class="btn-dialog" @click="sendNewPw">
-          비밀번호 찾기
+          비밀번호 찾기 <v-progress-circular
+          v-if="state.progress"
+          indeterminate
+          color="deep-orange-lighten-2"
+        ></v-progress-circular>
         </button>
       </v-form>
     </div>
@@ -33,7 +37,7 @@
 <script>
 import { reactive } from "vue";
 import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
 import AlertDialog from "../AlertDialog.vue";
 
 export default {
@@ -43,7 +47,7 @@ export default {
   },
   setup() {
     const store = useStore();
-    const router = useRouter();
+    // const router = useRouter();
     const state = reactive({
       form: {
         name: "",
@@ -70,9 +74,18 @@ export default {
       };
       const result = await store.dispatch("accountStore/sendAction", params);
       if (result == 0) {
+        state.alert = false;
+        store.commit("accountStore/setAlertColor", "success");
+        store.commit(
+          "accountStore/setAlertMessage",
+          "임시 비밀번호를 전송했습니다."
+        );
+        store.commit("accountStore/setAlertIcon", "check");
         state.progress = false;
-        router.push("login");
+        state.alert = true;
+        // router.push("login");
       } else {
+        state.progress = false
         state.alert = false;
         await store.commit("accountStore/setAlertColor", "error");
         await store.commit(

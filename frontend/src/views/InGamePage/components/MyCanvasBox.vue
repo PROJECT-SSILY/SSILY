@@ -1,6 +1,6 @@
 <template>
   <div class="canvas_container">
-    <button @click="predictModel" style="background: white; padding: 5px 10px; position: absolute; z-index: 100; left: 60px;">제출</button>
+    <button @click="predictModel" id="submit">제출</button>
     <div class="group_button">
       <div id="brush" @click="allowDrawing">
         <v-img src="@/assets/canvas/brush.svg" alt="brush"/>
@@ -18,7 +18,6 @@
     <v-alert
       v-if="state.alertFlag"
       type="error"
-      title="Alert title"
       text="틀렸습니다!"
     ></v-alert>
     <div id="toast"></div>
@@ -289,13 +288,13 @@ export default{
       store.dispatch("gameStore/sendTopFive", topFive.value)
       setTimeout(function() {
         if (endRound.value == false) {
-          state.alertFlag = true
+          toast('틀렸습니다!')
         }
         }, 300);
-      setTimeout(function() {
-      if (state.alertFlag == true) {
-        state.alertFlag = false}
-      }, 1200);
+      // setTimeout(function() {
+      // if (state.alertFlag == true) {
+      //   state.alertFlag = false}
+      // }, 1200);
       canvasToImage();
     };
 
@@ -398,7 +397,22 @@ export default{
     border: 1px solid rgba(81, 255, 255, 0.6);
     box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
 }
-
+#submit {
+  background: rgb(255, 255, 255, 0.08); 
+  border-radius: 10px;
+  border: 1px solid rgba(81, 255, 255, 0.6);
+  box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
+  padding: 5px 10px; 
+  position: absolute; 
+  z-index: 100; 
+  left: 490px;
+  top:275px;
+  color: aliceblue;
+}
+#submit:hover {
+  background: rgba(255, 255, 255, 0.2);
+/* background: rgb(227, 227, 227); */
+}
 .group_button {
   width: 45px;
   height: 90px;
