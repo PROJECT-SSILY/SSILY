@@ -39,7 +39,7 @@
             </v-fade-transition>
           </template>
         </v-text-field>
-        <v-text-field
+        <v-text-field class="password-input"
           v-model="state.form.password1"
           :append-icon="state.show1 ? 'mdi-eye' : 'mdi-eye-off'"
           :type="state.show1 ? 'text' : 'password'"
@@ -50,7 +50,7 @@
           hint=""
           @click:append="state.show1 = !state.show1"
         ></v-text-field>
-        <v-text-field
+        <v-text-field class="password-re-input"
           v-model="state.form.password2"
           :append-icon="state.show2 ? 'mdi-eye' : 'mdi-eye-off'"
           :type="state.show2 ? 'text' : 'password'"
@@ -252,4 +252,11 @@ export default {
   background: #838383;
   color: white;
 }
+.password-input {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.password-re-input {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
 </style>
