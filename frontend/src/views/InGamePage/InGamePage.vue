@@ -752,7 +752,7 @@ header {
 .wrap-robot {
   position: absolute;
   top: 45px;
-  left: 0;
+  left: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -761,6 +761,7 @@ header {
   min-width: 300px;
   z-index: 0;
 }
+// 수정 전: left 0 
 #robot {
   width: 300px;
   animation: hover 1.1s ease-in-out 0s infinite alternate;
@@ -800,11 +801,15 @@ $hover_bottom: 50px;
   margin: 10px 0;
   width: 350px;
   opacity: 0.9;
-  box-shadow: 0 0 10px 3px rgba(81, 255, 255, 0.5);
+  box-shadow: 0 0 17px 3px #ffffff;
+  border: 1px solid #ffffff;
+
 }
+// 수정 전 : box-shadow: 0 0 10px 5px gba(81, 255, 255, 0.5);
+// border 없었음   width: 350px;
 .sec-draw .stream-me {
   /* 그림 그릴 때 내 모습 */
-  height: 80px;
+  height: 110px;
   width: auto;
   position: absolute;
   left: 10px;
@@ -814,6 +819,7 @@ $hover_bottom: 50px;
   opacity: 0.8;
   z-index: 1;
 }
+// 수정 전 - height: 80
 .sec-display .stream-me {
   /* 그림 그릴 때 내 모습 */
   height: 300px;
