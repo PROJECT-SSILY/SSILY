@@ -46,6 +46,7 @@ import AlertDialog from '../AlertDialog.vue'
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { computed, reactive, onMounted } from "vue";
+import { room } from "@/common/api/gameAPI";
 
 
 export default {
@@ -101,7 +102,9 @@ export default {
         return;
       } else {
         console.log('=====================================================', response.data);
-        await store.commit('gameStore/setTitle', response.data.title)
+        const roomTitle= await room(response.data.sessionId);
+        console.log("roomTitle 뭐오냐?", roomTitle.title);
+        await store.commit('gameStore/setTitle', roomTitle.title);
         router.push({
           name: "gameroom",
           params: { sessionId: response.data.sessionId },
