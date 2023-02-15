@@ -194,7 +194,7 @@ public class GameService   {
             }
         }
 
-        if(cnt == participants.size()) {
+        if(participants.size() >= 2 && cnt == participants.size()) {
             if(isTeamBattle) data.addProperty("isAllReady", (red == 2 && blue == 2));
             else data.addProperty("isAllReady", true);
         }
