@@ -94,7 +94,7 @@
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="wrap-robot" v-if="!amIDescriber">
-            <v-img id="robot" :src="state.robot" alt="robot" />
+            <v-img id="robot" :src="require(`@/assets/images/${state.robot}.svg`)" alt="robot" />
           </div>
         </div>
         <!-- <div class="ourteam-members">
@@ -204,7 +204,15 @@ export default {
       connectionId: null,
       nickname: computed(() => store.state.accountStore.user.nickname),
       level: computed(() => store.state.accountStore.user.level),
-      robot: null,
+      robot: computed(() => {
+        if (state.level >= 0 && state.level < 6) {
+        return "ssily1"
+      } else if (state.level >= 6 && state.level < 11) {
+        return "ssily2"
+      } else {
+        return "ssily3"
+      }
+      }),
       startTimer: false,
 
       // 팀 분류
@@ -252,15 +260,6 @@ export default {
     onBeforeMount(async () => {
       store.commit("gameStore/setInGame", false)
       await store.dispatch("accountStore/getMeAction");
-      console.log("join start");
-      if (state.level > -1 && state.level < 6) {
-        state.robot = "../ssily1.svg";
-      } else if (state.level > 5 && state.level < 11) {
-        state.robot = "../ssily2.svg";
-      } else {
-        state.robot = "../ssily3.svg";
-      }
-
       joinSession();
     });
 

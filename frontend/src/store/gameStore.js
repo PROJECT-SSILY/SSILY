@@ -47,7 +47,9 @@ const state = {
     endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
     isTimeOut: false,
     word: '',
-    inGame: false,
+  inGame: false,
+  //readyImage: false,
+    myFormData:'',
 }
 
 const getters = {
@@ -288,7 +290,15 @@ const mutations = {
       var value = data.value
       state.userList[index].isHost = value
 
-    }
+  },
+    /*
+  setReadyImage: (state, data) => {
+    state.readyImage = data;
+  },
+  */
+  setMyFormData: (state, data) => {
+    state.myFormData = data;
+  }
 };
 
 const actions = {
@@ -423,6 +433,7 @@ const actions = {
               console.log("state.userKey: ", state.userKey);
               context.commit("setUserKey", user.connectionId);
               context.commit("setUserList", user);
+
             }
             console.log("UserList: ", state.userList);
           }
@@ -462,6 +473,8 @@ const actions = {
           context.commit('setRound', event.data.round)
           // => 여기서 정답자가 10번, 0번 신호 보낸다.
           if (winnerId == state.myConnectionId) {
+              console.log("정답자 FLAG myFormData : ", state.myFormData);
+            context.dispatch("uploadImage", state.myFormData);
             context.dispatch("finishRound");
           }
           break;
@@ -858,6 +871,8 @@ const actions = {
         },
       })
       .then((res) => {
+        //context.commit("setReadyImage", true);
+        console.log("uploadImage 성공!!!!!");
         console.log(res);
       })
       .catch((err) => {
@@ -1024,6 +1039,17 @@ const actions = {
   },
   changeRoundEnd: (context, data) => {
     context.commit("setEndRound", data);
+  },
+  changeAnswerOn: (context, data) => {
+    context.commit("setAnswerOn", data);
+  },
+  /*
+  changeReadyImage: (context, data) => {
+    context.commit("setReadyImage", data);
+  },
+  */
+  saveMyFormData: (context, data) => {
+    context.commit("setMyFormData", data);
   },
   // 시간 초과 시 라운드 종료 시그널 - 수연
   timeOverRound: () => {

@@ -5,6 +5,7 @@
     v-for="user in userList"
     :user="user"
     :key="user.id"
+    :class="clientNickname==user.nickname ?'active':''"
     />
     <div class="list-users-item blank"
     v-for="blank in 4-userList.length"
@@ -35,6 +36,7 @@ export default {
   setup(props) {
     const router = useRouter()
     const store = useStore()
+    const clientNickname= computed(() => store.state.accountStore.user.nickname)
     const userList = computed(() => store.state.gameStore.userList)
     const isSecret = computed(() => store.state.gameStore.isSecret)
     const isHost = computed(() => store.state.gameStore.isHost)
@@ -44,6 +46,7 @@ export default {
     return {
 		router,
     Id,
+    clientNickname,
     myTeam,
     userList,
     isSecret,
@@ -67,6 +70,11 @@ export default {
   margin: 7px;
   box-shadow: 0 -1px 5px #00000025;
   position: relative;
+}
+.list-users-item.active {
+  border: 3px solid #ffffff;
+  background: #d8d8d8;
+  box-shadow: 0 0 17px 3px #ffffff;
 }
 .blank {
   background: #ECECEC;
