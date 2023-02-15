@@ -502,7 +502,7 @@ const actions = {
         case 10: {
           // 라운드별 경험치 누적
           console.log("10번 event data : ", event.data);
-          if (event.data.round < 9) {
+          if (event.data.round <= 9) {
             context.commit("setEndRound", true);
           }
           console.log("10번 시그널 수신 - 라운드 끝 ===> ", event.data.round);
@@ -538,13 +538,13 @@ const actions = {
           }
           // 라운드를 8번 돌면 게임을 종료한다.
           if (event.data.round == 9 && maxScoreUser == state.myConnectionId) {
-            context.dispatch("finishGame");
+            setTimeout(() => context.dispatch("finishGame"), 5000);
           }
           break;
         }
         case 20: {
           console.log("20번 시그널 수신 - 시간초과 ==>",event.data.round);
-          if (event.data.round < 9) {
+          if (event.data.round <= 9) {
             context.commit("setEndRound", true);
           }
           console.log(event.data);
@@ -553,7 +553,7 @@ const actions = {
           context.commit('setWord', event.data.word)
           // 라운드를 8번 돌면 게임을 종료한다.
           if (event.data.round == 9 && state.isHost == true) {
-            context.dispatch("finishGame");
+            setTimeout(() => context.dispatch("finishGame"), 5000);
           }
 
           break;
