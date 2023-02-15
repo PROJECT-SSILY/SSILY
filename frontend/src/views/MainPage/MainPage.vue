@@ -100,10 +100,12 @@ export default {
         state.alert = true
         return;
       } else {
-      router.push({
-        name: "gameroom",
-        params: { sessionId: response.data.sessionId },
-      });
+        console.log('=====================================================', response.data);
+        await store.commit('gameStore/setTitle', response.data.title)
+        router.push({
+          name: "gameroom",
+          params: { sessionId: response.data.sessionId },
+        });
     }
     };
 
