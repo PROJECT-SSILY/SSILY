@@ -788,7 +788,6 @@ const actions = {
     context.commit("setClearUserKey");
     context.commit("setChatClear");
     context.commit("setEndGame", false);
-    context.commit("setIsHost", false);
   },
   updateMainVideoStreamManager: (commit, stream) => {
     if (state.mainStreamManager === stream) return;

@@ -2,18 +2,24 @@
   <div class="wrap-page">
     <FooterBoxVue v-if="!inGame" />
     <!----------------------------------- 개발용 버튼 -------------------------------------->
-    <p style="position: absolute; top: 0; opacity: 0.2; z-index: 3">
+    <!-- <p style="position: absolute; top: 0; opacity: 0.2; z-index: 3">
       <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
       <v-btn @click="state.isTeamBattle = !state.isTeamBattle"
         >팀/개인전 변경</v-btn
       >
       <v-btn>게임 순서 변경</v-btn>
       <v-btn @click="forceRender">시계</v-btn>
-    </p>
+    </p> -->
     <!------------------------------------------------------------------------------------->
 
     <!-- 아래부터 대기방 페이지 관련 코드-->
+    <div class="wrap-timer">
+      <div class="start-timer" v-if="state.startTimer">
+        <StartTimer/>
+      </div>
+    </div>
     <div class="component-waiting" v-if="!inGame">
+      
       <div class="users-component">
         <p id="title">{{ state.title }}</p>
         <WaitingPage
@@ -23,7 +29,6 @@
           :myConnectionId="state.connectionId"
           :team="state.team"
         />
-        <StartTimer v-if="state.startTimer" />
       </div>
       <div class="content-component">
         <ChattingBox class="box-chat" />
@@ -61,10 +66,13 @@
       <header>
         <GameTimer :key="gameTimer" id="timer" />
       </header>
-      <p class="gameround">{{ round }} 라운드</p>
-      <!-- <RoundResult /> -->
-      <!-- <GameResult v-show="endGame" /> -->
-      <GameScore class="gamescore" />
+      <p class="gameround">{{ round }} ROUND</p>
+      <RoundResult />
+      <GameResult v-show="endGame"/>
+      <GameScore class="gamescore"/>
+      <div id="word" v-if="amIDescriber">
+        <p>제시어 : {{ word }}</p>
+        </div>
 
       <!-- 상대 팀 -->
       <div class="area-opponents">
@@ -88,9 +96,6 @@
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="sec-display" v-else>
-            <div id="word">
-              <p>제시어 : {{ word }}</p>
-            </div>
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="wrap-robot" v-if="!amIDescriber">
@@ -465,6 +470,18 @@ export default {
 
 <style lang="scss" scoped>
 /* ======= component-waiting ================================================================= */
+.wrap-timer {
+  position: fixed;
+}
+.start-timer {
+  margin-top: 15px;
+  height: 225px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+  width: 500px;
+}
 .background-ingame {
   width: 100vw;
   height: 100vh;
@@ -590,23 +607,31 @@ export default {
 }
 .gameround {
   font-size: 20px;
+  color: white;
+  font-family: "Orbitron", sans-serif;
   position: absolute;
-  width: 100px;
+  width: 200px;
   right: 0;
   top: 0;
   margin: 30px;
   color: white;
+  border-radius: 10px;
+  border: 1px solid rgba(81, 255, 255, 0.6);
+  box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
+  padding: 10px
 }
 #word {
-  width: 100%;
-  height: 100%;
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 7rem;
   color: rgb(81 255 255 / 67%);
   font-size: 25px;
   padding: 5px;
   font-weight: 600;
+  color: white;
+  border-radius: 10px;
+  border: 1px solid rgba(81, 255, 255, 0.6);
+  box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
+  padding: 10px
 }
 .component-ingame {
   width: 100%;
