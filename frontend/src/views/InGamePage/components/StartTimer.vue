@@ -43,7 +43,7 @@
   }
   .dialog {
     width: 400px;
-    background-color: rgb(245, 245, 220, 0);
+    background-color: rgb(255, 255, 255);
   }
   .text-caption {
     margin-bottom: 10px;

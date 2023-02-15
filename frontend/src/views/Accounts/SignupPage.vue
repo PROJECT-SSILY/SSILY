@@ -164,7 +164,11 @@ export default {
         );
         await store.commit("accountStore/setAlertIcon", "check");
         state.alert = true;
-        router.push('login')
+        state.alert = true;
+        setTimeout(() => {
+          router.push("login")
+        }, 2000
+        )
       }
     };
 

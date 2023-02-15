@@ -2,7 +2,7 @@
   <div class="wrap-dialog">
     <div class="dialog">
       <div class="tit-dialog">비밀번호 찾기</div>
-      <v-form ref="form" v-model="state.valid" lazy-validation>
+      <v-form ref="form" v-model="state.valid" lazy-validation @submit.prevent="onSubmit">
         <v-text-field
           v-model="state.form.name"
           :counter="10"
@@ -37,7 +37,7 @@
 <script>
 import { reactive } from "vue";
 import { useStore } from "vuex";
-// import { useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import AlertDialog from "../AlertDialog.vue";
 
 export default {
@@ -47,7 +47,7 @@ export default {
   },
   setup() {
     const store = useStore();
-    // const router = useRouter();
+    const router = useRouter();
     const state = reactive({
       form: {
         name: "",
@@ -75,15 +75,19 @@ export default {
       const result = await store.dispatch("accountStore/sendAction", params);
       if (result == 0) {
         state.alert = false;
-        store.commit("accountStore/setAlertColor", "success");
-        store.commit(
+        await store.commit("accountStore/setAlertColor", "success");
+        await store.commit(
           "accountStore/setAlertMessage",
           "임시 비밀번호를 전송했습니다."
         );
-        store.commit("accountStore/setAlertIcon", "check");
+        await store.commit("accountStore/setAlertIcon", "check");
         state.progress = false;
         state.alert = true;
-        // router.push("login");
+        setTimeout(() => {
+          router.push("login")
+        }, 2000
+        )
+        
       } else {
         state.progress = false
         state.alert = false;
