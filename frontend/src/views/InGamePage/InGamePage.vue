@@ -1,11 +1,6 @@
 <template>
-  <SettingDialog v-show="state.setDialog" />
-  <div
-    class="bg-dark"
-    :class="state.setDialog ? 'active' : ''"
-    @click="closeDialog"
-  ></div>
   <div class="wrap-page">
+    <FooterBoxVue v-if="!inGame"/>
     <!----------------------------------- 개발용 버튼 -------------------------------------->
     <p style="position: absolute; top: 0; opacity: 0.2; z-index: 3">
       <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
@@ -45,16 +40,7 @@
           <button class="btn-profile">내 프로필</button>
         </div>
       </div>
-      <footer>
-        <div class="inner-footer">
-          <button class="btn-exit" @click="clickExit">나가기</button>
-          <input class="notice" type="text" disabled value="notice" />
-          <button class="btn-store">상점</button>
-          <button class="btn-set" @click="state.setDialog = !state.setDialog">
-            설정
-          </button>
-        </div>
-      </footer>
+
       <!-- 배경 -->
       <div class="background">
         <div id="stars" class="rotating"></div>
@@ -131,7 +117,6 @@ import UserVideo from "./components/UserVideo.vue";
 import MyCanvasBox from "./components/MyCanvasBox.vue";
 import WaitingPage from "@/views/WaitingPage/WaitingPage.vue";
 import ChattingBox from "@/views/WaitingPage/components/ChattingBox.vue";
-import SettingDialog from "@/views/SettingDialog.vue";
 import $axios from "axios";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
@@ -143,6 +128,7 @@ import GameScore from "./components/GameScore.vue";
 import RoundResult from "./components/RoundResult.vue";
 import GameResult from "../InGamePage/components/GameResult.vue";
 import StartTimer from "@/views/InGamePage/components/StartTimer.vue"
+import FooterBoxVue from '../MainPage/Components/FooterBox.vue';
 //=================OpenVdue====================
 $axios.defaults.headers.post["Content-Type"] = "application/json";
 //=============================================
@@ -157,9 +143,9 @@ export default {
     ChattingBox,
     GameScore,
     RoundResult,
-    SettingDialog,
     GameResult,
-    StartTimer
+    StartTimer,
+    FooterBoxVue,
   },
   props: {
     ready: Boolean,
@@ -209,9 +195,6 @@ export default {
       // 게임 순서 관련
       ready: false,
       team: null,
-
-      // 모달 관련
-      setDialog: false,
     });
 
     // == OpenVidu State ==
@@ -262,13 +245,6 @@ export default {
       store.dispatch("gameStore/updateMainVideoStreamManager", stream);
     };
 
-    const clickExit = () => {
-      store.dispatch("gameStore/leaveSession");
-      router.push({
-        name: "main",
-      });
-    };
-
     const clickReady = () => {
       console.log("ready");
       state.ready = !state.ready
@@ -281,9 +257,6 @@ export default {
 
     const gameStart = () => {
       store.dispatch("gameStore/gameStart");
-    };
-    const closeDialog = () => {
-      state.setDialog = false;
     };
 
     const gameTimer = ref(0);
@@ -346,13 +319,11 @@ export default {
       round,
       currentPresenterId,
       endGame,
-      clickExit,
       clickReady,
       clickTeam,
       gameStart,
       joinSession,
       leaveSession,
-      closeDialog,
       updateMainVideoStreamManager,
       gameTimer,
       forceRender,
@@ -380,15 +351,6 @@ export default {
     rgba(85, 140, 164, 1) 50%,
     rgba(0, 0, 0, 1) 100%
   );
-}
-.wrap-page {
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 0;
 }
 .component-waiting {
   width: 800px;
@@ -420,6 +382,7 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
 }
 .box-btn {
   width: 400px;
@@ -486,61 +449,6 @@ export default {
   font-weight: 600;
   font-size: 15px;
   color: #8b8b8b;
-}
-footer {
-  width: 100%;
-  height: 50px;
-  left: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  align-items: center;
-  z-index: 4;
-}
-.inner-footer {
-  width: 800px;
-  height: 50px;
-  background: #636363;
-  border-top-left-radius: 60px;
-  border-top-right-radius: 60px;
-  padding: 10px;
-}
-.inner-footer > button,
-.inner-footer > .notice {
-  padding: 3px 20px;
-  margin: 0 10px;
-  border-radius: 10px;
-  height: 30px;
-}
-.btn-exit {
-  background: #e3ac00;
-  color: white;
-}
-.btn-exit:hover {
-  background: #ffbf00;
-}
-.btn-exit.active {
-  background: rgb(214, 160, 0);
-}
-.notice {
-  width: 400px;
-  background: #4f4f4f;
-  display: inline-block;
-  color: #c2c2c2;
-}
-.btn-store,
-.btn-set {
-  border: 1px solid #4b4b4b;
-  color: #efeded;
-}
-.btn-store:hover,
-.btn-set:hover {
-  background: #787878;
-}
-.btn-store:active,
-.btn-set:active {
-  background: #656565;
 }
 
 /* ----------------------------------- */
