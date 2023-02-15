@@ -95,6 +95,7 @@ footer {
   background: rgb(214, 160, 0);
 }
 .notice {
+  font-family: 'Noto Sans KR', sans-serif;
   width: 400px;
   position: relative;
   background: #4f4f4f;

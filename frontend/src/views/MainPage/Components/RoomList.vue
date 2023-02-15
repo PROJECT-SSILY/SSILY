@@ -31,12 +31,8 @@
           class="list-item"
         />
         <div v-if="state.roomlist.length == 0">
-          <div
-          class="list-item blank"
-          > 
-            <p class="wrap-item">
-              <span id="tit-room">입장 가능한 방이 없습니다😥</span>
-            </p>
+          <div class="list-item blank"> 
+            <p class="no-room">입장 가능한 방이 없습니다😥</p>
           </div>
           <div 
           class="list-item blank"
@@ -393,5 +389,10 @@ export default {
   font-size: 15px;
   line-height: initial;
   font-weight: 600;
+}
+
+.no-room {
+  padding: 11px; 
+  line-height:initial
 }
 </style>
