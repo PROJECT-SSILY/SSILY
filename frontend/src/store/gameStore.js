@@ -301,7 +301,14 @@ const mutations = {
   },
   setImageURL: (state, data) => {
     state.imageURL = data;
+  },
+  setAudioStatus: (state, data) => { 
+    state.publisher.publishAudio(data);
+    for (var j=0; state.subscribers.length > j; j++ ){
+      state.subscribers[j].subscribeToAudio(data)
+    }
   }
+
 };
 
 const actions = {
@@ -407,6 +414,7 @@ const actions = {
           // 게임시작 했으니까 라운드 받아오기
           console.log(event.data);
           context.commit('setRound', event.data.round);
+          context.commit("setAudioStatus", false); // 게임시작할 때 오디오 막기
           break;
         }
 
@@ -619,7 +627,7 @@ const actions = {
           let publisher = OV.initPublisher(undefined, {
             audioSource: undefined,
             videoSource: undefined,
-            publishAudio: true,
+            publishAudio: false,
             publishVideo: true,
             resolution: "640x360",
             frameRate: 30,

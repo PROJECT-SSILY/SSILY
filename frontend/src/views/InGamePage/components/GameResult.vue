@@ -55,6 +55,7 @@ export default {
       store.commit('gameStore/setEndGame', false)
       store.commit("gameStore/setInGame", false)
       store.commit("gameStore/setIsAllReady", false)
+      store.commit("gameStore/setAudioStatus", false)
     }
   return {
     gameResult,
