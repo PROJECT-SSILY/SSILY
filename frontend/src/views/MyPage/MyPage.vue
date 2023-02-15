@@ -26,7 +26,7 @@
             </tr>
             <tr>
                 <td>전적</td>
-                <td>{{ userinfo.record.plays }}전 {{ userinfo.record.wins }}승 {{ userinfo.record.draws }}무 {{ userinfo.record.loses }}패</td>
+                <td>{{ userinfo.record.plays }}전 {{ userinfo.record.wins }}승 {{ userinfo.record.draws }}패</td>
             </tr>
         </table>
         <div class="wrap-table-rate">
@@ -109,7 +109,6 @@ export default {
         plays: 0,
         wins: 0,
         draws: 0,
-        loses: 0,
         winrate: computed(() => Math.floor(userinfo.record.wins/userinfo.record.plays*100)) 
       },
     });
