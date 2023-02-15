@@ -6,7 +6,7 @@
     :user="user"
     :key="user.id"
     :class="clientNickname==user.nickname ?'active':''"
-     />
+    />
     <div class="list-users-item blank"
     v-for="blank in 4-userList.length"
     :key="blank">
