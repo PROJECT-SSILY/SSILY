@@ -152,7 +152,6 @@ export default {
     StartTimer,
     FooterBoxVue,
     // RoundResult,
-    SettingDialog,
     // GameResult,
   },
   props: {
