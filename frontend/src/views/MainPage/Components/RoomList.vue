@@ -341,6 +341,7 @@ export default {
 }
 .list-item.blank:hover {
   background: none;
+  color: black
 }
 .list-item.blank:active {
   background: none;
