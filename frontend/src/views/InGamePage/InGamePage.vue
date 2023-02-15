@@ -1,5 +1,20 @@
 <template>
   <div class="wrap-page">
+    <div class="text-center">
+      <v-snackbar
+        v-model="state.snackbar"
+        label="Top"
+        value="top"
+        :timeout="3000"
+        location="top"
+        color="#716add"
+        rounded="pill"
+      >
+        <p style="font-size: 15px;">&#127908; {{ state.text }}</p>
+        <template v-slot:actions>
+        </template>
+      </v-snackbar>
+    </div>
     <FooterBoxVue v-if="!inGame" />
     <!----------------------------------- 개발용 버튼 -------------------------------------->
     <!-- <p style="position: absolute; top: 0; opacity: 0.2; z-index: 3">
@@ -232,6 +247,10 @@ export default {
       // 게임 순서 관련
       ready: false,
       team: null,
+      // 스낵바 관련
+      snackbar: false,
+      text: '대화 시작! 마이크가 활성화되었습니다.',
+      timeout: 2000,
     });
 
     // == OpenVidu State ==
@@ -346,6 +365,7 @@ export default {
     let timerInterval;
     watch(endRound, (newValue) => {
       if (newValue) {
+        state.snackbar=true
         if (!isTimeOut.value && !endGame.value) {
           Swal.fire({
             title: round.value - 1 + "round 결과",
@@ -416,6 +436,7 @@ export default {
 
     watch(endGame, (newValue) => {
       if (newValue) {
+        state.snackbar=true
         Swal.fire({
           title: "게임 결과",
           padding: "3em",
@@ -468,6 +489,9 @@ export default {
         value.extraExp
       } Exp </h1>`;
     };
+
+    // ========음소거 풀기 ======================
+   
 
     return {
       router,
