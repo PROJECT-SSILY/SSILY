@@ -14,10 +14,8 @@
 
     <!-- 아래부터 대기방 페이지 관련 코드-->
     <div class="wrap-timer">
-      <div class="start-timer" 
-      v-if="state.startTimer"
-      >
-        <StartTimer/>
+      <div class="start-timer" v-if="state.startTimer">
+        <StartTimer />
       </div>
     </div>
     <div class="component-waiting" v-if="!inGame">
@@ -69,11 +67,11 @@
       </header>
       <p class="gameround">{{ round }} ROUND</p>
       <RoundResult />
-      <GameResult v-show="endGame"/>
-      <GameScore class="gamescore"/>
+      <GameResult v-show="endGame" />
+      <GameScore class="gamescore" />
       <div id="word" v-if="amIDescriber">
-          <p>제시어</p>
-          <p>{{ word }}</p>
+        <p>제시어</p>
+        <p>{{ word }}</p>
       </div>
 
       <!-- 상대 팀 -->
@@ -270,7 +268,7 @@ export default {
     // })
 
     onBeforeMount(async () => {
-      store.commit("gameStore/setInGame", false)
+      store.commit("gameStore/setInGame", false);
       await store.dispatch("accountStore/getMeAction");
       joinSession();
     });
@@ -358,7 +356,8 @@ export default {
               no-repeat
             `,
             html:
-              `<div>${winnerNickname.value} WON!!</div>` +
+              `<div>${winnerNickname.value} WIN!!</div>` +
+              `<div>정답 : ${word.value}</div>` +
               '<canvas class="canvas" width="560" height="330" id="aCanvas"></canvas>' +
               sortedUserList.value
                 .map((user) => `<div>${user.nickname} : ${user.score}점</div>`)
@@ -392,7 +391,9 @@ export default {
           Swal.fire({
             title: round.value - 1 + "round 결과",
             color: "#716add",
-            html: "<h1>정답자가 없습니다!!</h1>",
+            html:
+              "<h1>정답자가 없습니다!!</h1>" +
+              `<div>정답 : ${word.value}</div>`,
             timer: 5000,
             timerProgressBar: true,
             allowOutsideClick: false,
@@ -428,7 +429,7 @@ export default {
           html:
             "<div>" +
             winnerList.value
-              .map((winner) => `<h1>${winner} WON!!</h1>`)
+              .map((winner) => `<h1>${winner} WIN!!</h1>`)
               .join("") +
             "</div>" +
             "<div>" +
@@ -500,7 +501,7 @@ export default {
 .wrap-timer {
   position: fixed;
   width: 400px;
-  z-index: 5
+  z-index: 5;
 }
 .start-timer {
   margin-top: 15px;
@@ -651,10 +652,10 @@ export default {
   top: 7rem;
   color: rgb(81 255 255 / 67%);
 }
-#word>p:first-child {
+#word > p:first-child {
   font-size: 16px;
 }
-#word>p:last-child {
+#word > p:last-child {
   font-weight: 700;
   font-size: 30px;
 }
