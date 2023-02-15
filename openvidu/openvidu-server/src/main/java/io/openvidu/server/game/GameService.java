@@ -346,7 +346,7 @@ public class GameService   {
         List<String> wordList=null;
 
         try {
-            String serverURL = "http://localhost:5500";
+            String serverURL = "https://ssily.site:443";
             log.info("serverURL = {}", serverURL);
             url = new URL(serverURL+"/api/game/words");
             conn = (HttpURLConnection) url.openConnection();

@@ -27,14 +27,14 @@
       }),
       formattedTimeLeft() {
         const timeLeft = this.timeLeft;
-        const minutes = Math.floor(timeLeft / 60);
+        // const minutes = Math.floor(timeLeft / 60);
         let seconds = timeLeft % 60;
   
         if (seconds < 60) {
-          seconds = `0${seconds}`;
+          seconds = `${seconds}`;
         }
   
-        return `${minutes}:${seconds}`;
+        return `${seconds}`;
       },
   
       timeLeft() {
