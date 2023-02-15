@@ -20,7 +20,7 @@ public class Record {
     public Record updateRecord(boolean isWin){
         this.plays += 1;
         if(isWin) this.wins += 1;
-        else this.draws += 1;
+//        else this.draws += 1;
         return this;
     }
 }

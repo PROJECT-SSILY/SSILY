@@ -144,26 +144,18 @@ public class MemberService {
 
         List<Member> players = memberRepository.findMembersByNicknames(nickNames);
         List<String> winner = requestDto.getWinner();
+        log.info("winner = {}", winner);
 
-        for(int i = 0; i < players.size(); i++){
-            Member member = players.get(i);
-            boolean isWin = false;
-
+        for (Member member : players) {
             String nickname = member.getNickname();
-            for(int j = 0; j < winner.size(); j++){
-                if(winner.get(j).equals(nickname)){
-                    isWin = true;
-                    break;
-                }
-            }
+            boolean isWin = winner.contains(nickname);
 
-            for(int j = 0; j < player.size(); j++){
-                PlayerRequestDto playerRequestDto = player.get(j);
-                if(playerRequestDto.getNickname().equals(nickname)){
-                    member.updateState(playerRequestDto.getExtraExp(), playerRequestDto.getLevelUp(), isWin);
-                    break;
-                }
-            }
+            PlayerRequestDto playerRequestDto = player.stream()
+                    .filter(p -> p.getNickname().equals(nickname))
+                    .findAny()
+                    .orElseThrow(MemberNotFoundException::new);
+
+            member.updateState(playerRequestDto.getExtraExp(), playerRequestDto.getLevelUp(), isWin);
         }
 
     }
