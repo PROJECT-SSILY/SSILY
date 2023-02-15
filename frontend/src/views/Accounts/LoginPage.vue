@@ -15,7 +15,7 @@
           variant="underlined"
           @keyup.enter="clickLogIn"
         />
-        <v-text-field class="password-input"
+        <v-text-field
           v-model="state.form.password"
           type="password"
           label="비밀번호"
@@ -137,9 +137,6 @@ export default {
   justify-content: space-between;
   font-size: 14px;
   color: #6e6e6e;
-}
-.password-input {
-  font-family: 'Noto Sans KR', sans-serif;
 }
 
 </style>
