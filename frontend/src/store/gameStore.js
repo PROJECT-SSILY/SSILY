@@ -268,6 +268,12 @@ const mutations = {
     },
     setEndGame: (state, data) => {
       state.endGame = data
+      if (data == true) {
+        // 게임 종료시 참여자 소리 들림  ====> 아직 되는지 확실하지 않음
+        state.publisher.publishAudio(true);
+        for (var r=0; state.subscribers.length > r; r++ ){
+          state.subscribers[r].subscribeToAudio(true)
+        }}
     },
     setIsTimeOut: (state, data) => {
       state.isTimeOut = data
@@ -277,13 +283,11 @@ const mutations = {
     },
     setInGame: (state,data) => {
       state.inGame = data
-      if (data == true) {
-        // 게임 시작했을 때 음소거
+        // 게임 시작, 종료 변동 시 음소거
         state.publisher.publishAudio(false);
         for (var j=0; state.subscribers.length > j; j++ ){
           state.subscribers[j].subscribeToAudio(false)
         }
-      }
     },
     setUserIsHost: (state, data) => {
       var index = data.index
