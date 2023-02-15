@@ -679,7 +679,7 @@ public class GameService   {
         BufferedWriter bw = null;
 
         try{
-            String serverURL = "http://localhost:5500";
+            String serverURL = "https://ssily.site:443";
             URL url = new URL(serverURL+"/api/member/state");
 
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
