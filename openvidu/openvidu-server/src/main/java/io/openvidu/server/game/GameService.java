@@ -447,7 +447,7 @@ public class GameService   {
     private void finishRound(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
         log.info("finishRound is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
-
+        String imageURL = data.get("DataURL").toString();
         // 점수 증가
         Player winner = participant.getPlayer();
         winner.setScore(winner.getScore() + 2);

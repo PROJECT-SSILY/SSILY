@@ -49,7 +49,8 @@ const state = {
     word: '',
   inGame: false,
   //readyImage: false,
-    myFormData:'',
+  myFormData: '',
+  imageURL:'',
 }
 
 const getters = {
@@ -297,6 +298,9 @@ const mutations = {
   */
   setMyFormData: (state, data) => {
     state.myFormData = data;
+  },
+  setImageURL: (state, data) => {
+    state.imageURL = data;
   }
 };
 
@@ -465,6 +469,7 @@ const actions = {
           // 정답 제출 ( sendTopFive ) - 정답이면 응답 옴!
           console.log("5번 시그널 수신 완료");
           var winnerId = event.data.winnerId;
+          //context.dispatch("uploadImage", state.myFormData);
           console.log("5번 data : ", event.data);
           context.commit("setAnswer", event.data.answer);
           context.commit("setWinnerId", event.data.winnerId);
@@ -472,8 +477,6 @@ const actions = {
           context.commit('setRound', event.data.round)
           // => 여기서 정답자가 10번, 0번 신호 보낸다.
           if (winnerId == state.myConnectionId) {
-              console.log("정답자 FLAG myFormData : ", state.myFormData);
-            context.dispatch("uploadImage", state.myFormData);
             context.dispatch("finishRound");
           }
           break;
@@ -495,6 +498,7 @@ const actions = {
             context.commit("setEndRound", true);
           }
           console.log("10번 시그널 수신 - 라운드 끝 ===> ", event.data.round);
+          context.commit("setImageURL", event.data.DataURL);
           var scoreList = event.data.player;
           context.commit("setRound", event.data.round);
           var maxScore = -1;
@@ -823,6 +827,7 @@ const actions = {
       type: "game",
       data: {
         gameStatus: 10,
+        DataURL : state.imageURL,
       },
       to: [],
     });
@@ -855,7 +860,12 @@ const actions = {
       //console.log("res is: ", res);
       return res.data.data;
     } catch (error) {
-      return error.response.data.code;
+      const res = await $axios.get(`/api/image/no_image`, {
+        headers: {
+          Authorization: `Bearer ${context.rootState.accountStore.token}`,
+        },
+      });
+      return res.data.data;
     }
   },
 
@@ -1046,6 +1056,10 @@ const actions = {
     context.commit("setReadyImage", data);
   },
   */
+  changeImageURL: (context, data) => {
+    context.commit("setImageURL", data);
+  },
+
   saveMyFormData: (context, data) => {
     context.commit("setMyFormData", data);
   },
