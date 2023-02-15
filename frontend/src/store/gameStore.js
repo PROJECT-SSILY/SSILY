@@ -208,11 +208,11 @@ const mutations = {
     },
   delUserinUserList: (state, data) => {
     // UserList에서 퇴장한 유저의 id 삭제
-    state.userList.splice(data);
+    state.userList.splice(data, 1);
   },
   delUserinUserKey: (state, data) => {
     // UserKey에서 퇴장한 유저의 id 삭제 - 이은혁
-    state.userKey.splice(data);
+    state.userKey.splice(data, 1);
   },
 
   // 정답페이지 관련
