@@ -752,7 +752,7 @@ header {
 .wrap-robot {
   position: absolute;
   top: 45px;
-  left: 0;
+  left: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -761,6 +761,7 @@ header {
   min-width: 300px;
   z-index: 0;
 }
+// 수정 전: left 0 
 #robot {
   width: 300px;
   animation: hover 1.1s ease-in-out 0s infinite alternate;
@@ -804,7 +805,7 @@ $hover_bottom: 50px;
 }
 .sec-draw .stream-me {
   /* 그림 그릴 때 내 모습 */
-  height: 80px;
+  height: 110px;
   width: auto;
   position: absolute;
   left: 10px;
@@ -814,6 +815,7 @@ $hover_bottom: 50px;
   opacity: 0.8;
   z-index: 1;
 }
+// 수정 전 - height: 80
 .sec-display .stream-me {
   /* 그림 그릴 때 내 모습 */
   height: 300px;

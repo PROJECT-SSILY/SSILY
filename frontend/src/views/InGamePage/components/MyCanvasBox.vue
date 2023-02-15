@@ -10,10 +10,11 @@
       </div>
     </div>
     <canvas
-        width="560"
-        height="330"
+        width="650"
+        height="400"
         id="canvas"
     >
+    <!-- 수정 전:  560 * 330 -->
     </canvas>
     <v-alert
       v-if="state.alertFlag"
@@ -415,10 +416,11 @@ export default{
   padding: 5px 10px; 
   position: absolute; 
   z-index: 100; 
-  left: 490px;
+  left: 580px; 
   top:275px;
   color: aliceblue;
 }
+/* left : 490  */
 #submit:hover {
   background: rgba(255, 255, 255, 0.2);
 /* background: rgb(227, 227, 227); */
@@ -430,7 +432,7 @@ export default{
   margin-top: -50px;
   margin-left: 10px;
   top: 50%;
-  right: 10px;
+  right: -60px;
   z-index: 100;
   /*border-radius: 15px;*/
   /*box-shadow: 0px 0px 20px 0px #0000003b*/
