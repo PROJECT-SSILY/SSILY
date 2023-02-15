@@ -268,6 +268,12 @@ const mutations = {
     },
     setEndGame: (state, data) => {
       state.endGame = data
+      if (data == true) {
+        // 게임 종료시 참여자 소리 들림  ====> 아직 되는지 확실하지 않음
+        state.publisher.publishAudio(true);
+        for (var r=0; state.subscribers.length > r; r++ ){
+          state.subscribers[r].subscribeToAudio(true)
+        }}
     },
     setIsTimeOut: (state, data) => {
       state.isTimeOut = data
