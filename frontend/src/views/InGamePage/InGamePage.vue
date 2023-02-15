@@ -21,7 +21,6 @@
       </div>
     </div>
     <div class="component-waiting" v-if="!inGame">
-      
       <div class="users-component">
         <p id="title">{{ state.title }}</p>
         <WaitingPage
@@ -194,6 +193,7 @@ export default {
     const winnerList = computed(() => store.state.gameStore.winnerList);
     const isTimeOut = computed(() => store.state.gameStore.isTimeOut);
     const gameResult = computed(() => store.state.gameStore.gameResult);
+    const imageURL = computed(() => store.state.gameStore.imageURL);
     const currentPresenterId = computed(() => {
       /**
        * 토스트 실행
@@ -369,7 +369,8 @@ export default {
             allowOutsideClick: false,
             didOpen: async () => {
               Swal.showLoading();
-              const getFile = await store.dispatch("gameStore/downloadImage");
+              //const getFile = await store.dispatch("gameStore/downloadImage");
+              const getFile = imageURL.value;
               const myCanvas = Swal.getHtmlContainer().querySelector("Canvas");
               var ctx = myCanvas.getContext("2d");
               var img = new Image();
