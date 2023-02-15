@@ -104,7 +104,7 @@ export default {
 				// // }, 100)
 				// b.textContent=(round-1);
 				if (!isTimeOut.value) {
-					const getFile = await store.dispatch("gameStore/downloadImage");
+					//const getFile = await store.dispatch("gameStore/downloadImage");
 					const myCanvas = Swal.getHtmlContainer().getElementById("aCanvas");
 					var ctx = myCanvas.getContext("2d");
 					var img = new Image();

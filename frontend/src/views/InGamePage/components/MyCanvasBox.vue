@@ -41,7 +41,9 @@ export default{
   name: "MyCanvasBox",
   //components: { CanvasDialog },
   setup() {
-    const endRound = computed(() => store.state.gameStore.endRound)
+    const endRound = computed(() => {
+      eraseAll();
+      return store.state.gameStore.endRound})
     const answerOn = computed(() =>{
       /*
       if(store.state.gameStore.answerOn==true){
@@ -206,12 +208,12 @@ export default{
       // toDataURL()사용하여 png타입의 base64인코딩된 data url 형식의 문자열을 반환
       fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       const canvas = fabricCanvas.value;
-      var dataUrl = canvas.toDataURL("image/png");
+      var dataUrl = await canvas.toDataURL("image/png");
+      store.dispatch("gameStore/changeImageURL", dataUrl);
       // console.log(dataUrl);
       fabricCanvas.value.setBackgroundColor("rgba(81, 255, 255, 0.2)", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
       // data:image/jpeg;base64,/9j/4AAQSkZJRg...AAAAAB//2Q==
       // data : <type> <;base64> <data>
-
       // <data> 부분 뽑아내기
       // atob = ASCII -> binary
       // btoa = binary -> ASCII
@@ -228,7 +230,7 @@ export default{
       var myBlob = new Blob([new Uint8Array(array)], { type: "image/png" });
       console.log("myBlob is ==>", myBlob);
 
-      // ** Blob -> File 로 변환**
+      // Blob -> File 로 변환
       var file = new File([myBlob], "blobtofile.png");
       var formData = new FormData();
 
@@ -236,7 +238,6 @@ export default{
       formData.append("content", "Blob확인");
       formData.append("tagList", "blob");
       formData.append("username", "admin");
-
       console.log("formData : ", formData.get("answerImage"));
       console.log("token : ", store.state.accountStore.token);
       //const myToken = store.state.accountStore.token;
