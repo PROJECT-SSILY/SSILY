@@ -766,7 +766,22 @@ const actions = {
   },
 
   leaveSession: (context) => {
+    console.log('레디 정보 변경')
     if (state.session) {
+      for (var s=0;s<state.userList.length; s++) {
+        if (state.userList[s].connectionId == state.myConnectionId) {
+          if (state.userList[s].isReady) {
+            state.session.signal({
+              type: "game",
+              data: {
+                gameStatus: 4,
+              },
+              to: [],
+            });
+          }
+          break 
+        }
+      }
       state.session.signal({
         type: "game",
         data: {
@@ -774,10 +789,8 @@ const actions = {
         },
         to: [],
       });
-
       state.session.disconnect();
     }
-    
     context.commit("setSession", undefined);
     context.commit("setIsHost", false);
     context.commit("setMainStreamManager", undefined);
@@ -788,6 +801,7 @@ const actions = {
     context.commit("setClearUserKey");
     context.commit("setChatClear");
     context.commit("setEndGame", false);
+    context.commit("setIsAllReady", false);
   },
   updateMainVideoStreamManager: (commit, stream) => {
     if (state.mainStreamManager === stream) return;

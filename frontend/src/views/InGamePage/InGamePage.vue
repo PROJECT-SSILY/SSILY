@@ -145,7 +145,7 @@ import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { GetPlayerList } from "@/common/api/gameAPI";
 import { reactive, ref } from "@vue/reactivity";
-import { onBeforeMount, computed, watch } from "vue";
+import { onBeforeMount, computed, watch, onMounted } from "vue";
 import GameTimer from "./components/GameTimer.vue";
 import GameScore from "./components/GameScore.vue";
 import StartTimer from "@/views/InGamePage/components/StartTimer.vue";
@@ -262,8 +262,12 @@ export default {
       store.dispatch("gameStore/leaveSession");
       window.removeEventListener("beforeunload", leaveSession);
     };
+    onMounted(() => {
+      store.commit("gameStore/setInGame", false)
+    })
 
     onBeforeMount(async () => {
+      store.commit("gameStore/setInGame", false)
       await store.dispatch("accountStore/getMeAction");
       joinSession();
     });
@@ -333,7 +337,7 @@ export default {
         setTimeout(() => {
           state.startTimer = false;
           store.commit("gameStore/setInGame", true);
-        }, 5000);
+        }, 2000);
       }
     });
 
