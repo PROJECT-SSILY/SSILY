@@ -99,7 +99,11 @@
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="wrap-robot" v-if="!amIDescriber">
-            <v-img id="robot" :src="require(`@/assets/images/${state.robot}.svg`)" alt="robot" />
+            <v-img
+              id="robot"
+              :src="require(`@/assets/images/${state.robot}.svg`)"
+              alt="robot"
+            />
           </div>
         </div>
         <!-- <div class="ourteam-members">
@@ -211,12 +215,12 @@ export default {
       level: computed(() => store.state.accountStore.user.level),
       robot: computed(() => {
         if (state.level >= 0 && state.level < 6) {
-        return "ssily1"
-      } else if (state.level >= 6 && state.level < 11) {
-        return "ssily2"
-      } else {
-        return "ssily3"
-      }
+          return "ssily1";
+        } else if (state.level >= 6 && state.level < 11) {
+          return "ssily2";
+        } else {
+          return "ssily3";
+        }
       }),
       startTimer: false,
 
@@ -420,11 +424,8 @@ export default {
               .join("") +
             "</div>" +
             "<div>" +
-            Object.entries(gameResult.value).map(
-              ([key, value]) =>
-                `<h1> ${parseInt(key) + 1}등 ${value.nickname} + ${
-                  value.extraExp
-                } Exp </h1>`
+            Object.entries(gameResult.value).map(([key, value]) =>
+              rankContent(key, value)
             ) +
             "</div>",
           allowOutsideClick: false,
@@ -434,11 +435,29 @@ export default {
           if (result.isConfirmed) {
             store.commit("gameStore/setEndGame", false);
             store.commit("gameStore/setInGame", false);
-            store.commit("gameStore/setIsAllReady", false)
+            store.commit("gameStore/setIsAllReady", false);
           }
+          (rankIndex = 0), (rankValue = null);
         });
       }
     });
+
+    let rankIndex = 0;
+    let rankValue = null;
+    const rankContent = (key, value) => {
+      if (rankValue == value.extraExp) {
+        //공동 n등
+        return `<h1> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
+          value.extraExp
+        } Exp </h1>`;
+      } else {
+        rankIndex = key;
+        rankValue = value.extraExp;
+      }
+      return `<h1> ${parseInt(key) + 1}등 ${value.nickname} + ${
+        value.extraExp
+      } Exp </h1>`;
+    };
 
     return {
       router,
