@@ -88,7 +88,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+* {
+    font-family: 'Noto Sans KR', sans-serif;
+}
 .area-chat {
     width: 100%;
     display: flex;
