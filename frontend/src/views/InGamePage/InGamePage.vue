@@ -1,6 +1,6 @@
 <template>
   <div class="wrap-page">
-    <FooterBoxVue v-if="!inGame"/>
+    <FooterBoxVue v-if="!inGame" />
     <!----------------------------------- 개발용 버튼 -------------------------------------->
     <p style="position: absolute; top: 0; opacity: 0.2; z-index: 3">
       <v-btn @click="clickTest">게임 시작 테스트</v-btn> |
@@ -15,7 +15,7 @@
     <!-- 아래부터 대기방 페이지 관련 코드-->
     <div class="component-waiting" v-if="!inGame">
       <div class="users-component">
-        <p id="title">{{state.title}}</p>
+        <p id="title">{{ state.title }}</p>
         <WaitingPage
           :sessionId="state.sessionId"
           :playerList="state.playerList"
@@ -23,7 +23,7 @@
           :myConnectionId="state.connectionId"
           :team="state.team"
         />
-        <StartTimer v-if="state.startTimer"/>
+        <StartTimer v-if="state.startTimer" />
       </div>
       <div class="content-component">
         <ChattingBox class="box-chat" />
@@ -53,9 +53,9 @@
         <GameTimer :key="gameTimer" id="timer" />
       </header>
       <p class="gameround">{{ round }} 라운드</p>
-      <RoundResult />
-      <GameResult v-show="endGame"/>
-      <GameScore class="gamescore"/>
+      <!-- <RoundResult /> -->
+      <!-- <GameResult v-show="endGame" /> -->
+      <GameScore class="gamescore" />
 
       <!-- 상대 팀 -->
       <div class="area-opponents">
@@ -64,7 +64,12 @@
           v-for="sub in opponents"
           :key="sub.stream.connection.connectionId"
           :stream-manager="sub"
-          :class="sub.stream.connection.connectionId === currentPresenterId ? 'presenter': ''"/>
+          :class="
+            sub.stream.connection.connectionId === currentPresenterId
+              ? 'presenter'
+              : ''
+          "
+        />
       </div>
       <!-- 우리 팀 -->
       <div class="area-ourteam">
@@ -76,7 +81,7 @@
           <div class="sec-display" v-else>
             <div id="word">
               <p>제시어 : {{ word }}</p>
-              </div>
+            </div>
             <user-video :stream-manager="publisher" class="stream-me" />
           </div>
           <div class="wrap-robot" v-if="!amIDescriber">
@@ -104,7 +109,7 @@
         </div> -->
       </div>
       <footer></footer>
-      
+
       <div id="toast"></div>
       <!-- 배경 -->
       <div class="background-ingame"></div>
@@ -125,10 +130,12 @@ import { reactive, ref } from "@vue/reactivity";
 import { onBeforeMount, computed, watch } from "vue";
 import GameTimer from "./components/GameTimer.vue";
 import GameScore from "./components/GameScore.vue";
-import RoundResult from "./components/RoundResult.vue";
-import GameResult from "../InGamePage/components/GameResult.vue";
-import StartTimer from "@/views/InGamePage/components/StartTimer.vue"
-import FooterBoxVue from '../MainPage/Components/FooterBox.vue';
+import StartTimer from "@/views/InGamePage/components/StartTimer.vue";
+import FooterBoxVue from "../MainPage/Components/FooterBox.vue";
+// import RoundResult from "./components/RoundResult.vue";
+// import GameResult from "../InGamePage/components/GameResult.vue";
+import Swal from "sweetalert2";
+
 //=================OpenVdue====================
 $axios.defaults.headers.post["Content-Type"] = "application/json";
 //=============================================
@@ -142,8 +149,6 @@ export default {
     WaitingPage,
     ChattingBox,
     GameScore,
-    RoundResult,
-    GameResult,
     StartTimer,
     FooterBoxVue,
     // RoundResult,
@@ -162,22 +167,25 @@ export default {
     const round = computed(() => store.state.gameStore.round);
     const endGame = computed(() => store.state.gameStore.endGame);
     const endRound = computed(() => store.state.gameStore.endRound);
-    const inGame = computed(() => store.state.gameStore.inGame); 
-    const currentPresenterId = computed(
-      () => {
-        /**
-         * 토스트 실행
-         * 신대득
-         */
-        if(store.state.gameStore.presenterId!=""){
-          excuteToast(store.state.gameStore.presenterId);
-        }
-        return store.state.gameStore.presenterId
+    const inGame = computed(() => store.state.gameStore.inGame);
+    const sortedUserList = computed(() => store.state.gameStore.sortedUserList);
+    const winnerNickname = computed(() => store.state.gameStore.winnerNickname);
+    const winnerList = computed(() => store.state.gameStore.winnerList);
+    const isTimeOut = computed(() => store.state.gameStore.isTimeOut);
+    const gameResult = computed(() => store.state.gameStore.gameResult);
+    const currentPresenterId = computed(() => {
+      /**
+       * 토스트 실행
+       * 신대득
+       */
+      if (store.state.gameStore.presenterId != "") {
+        excuteToast(store.state.gameStore.presenterId);
       }
-    );
+      return store.state.gameStore.presenterId;
+    });
     const router = useRouter();
     const state = reactive({
-      title: computed(() => store.state.gameStore.title ),
+      title: computed(() => store.state.gameStore.title),
       isSecret: false,
       password: null,
       isTeamBattle: null,
@@ -232,12 +240,12 @@ export default {
     onBeforeMount(async () => {
       await store.dispatch("accountStore/getMeAction");
       console.log("join start");
-      if (state.level > -1 && state.level < 6)  {
-          state.robot = "../ssily1.svg"
+      if (state.level > -1 && state.level < 6) {
+        state.robot = "../ssily1.svg";
       } else if (state.level > 5 && state.level < 11) {
-          state.robot = "../ssily2.svg"
+        state.robot = "../ssily2.svg";
       } else {
-          state.robot = "../ssily3.svg"
+        state.robot = "../ssily3.svg";
       }
 
       joinSession();
@@ -249,7 +257,7 @@ export default {
 
     const clickReady = () => {
       console.log("ready");
-      state.ready = !state.ready
+      state.ready = !state.ready;
       store.dispatch("gameStore/changeReady");
     };
 
@@ -272,43 +280,152 @@ export default {
      * @param payload
      * @returns {Promise<void>}
      */
-    const excuteToast = async function (payload){
+    const excuteToast = async function (payload) {
       const players = await GetPlayerList(state.sessionId);
       console.log("toast 시작할 때 players : ", players);
-      let presenterNickname="";
+      let presenterNickname = "";
       for (let i = 0; i < players.content.length; i++) {
-        if(players.content[i].connectionId==payload){
-          presenterNickname=players.content[i].player.nickname;
+        if (players.content[i].connectionId == payload) {
+          presenterNickname = players.content[i].player.nickname;
         }
       }
       console.log("발표자 닉네임은?? : ", presenterNickname);
 
       let removeToast;
       const toast = document.getElementById("toast");
-      toast.classList.contains("reveal") ?
-      (clearTimeout(removeToast), removeToast = setTimeout(function () {
-        document.getElementById("toast").classList.remove("reveal")
-      }, 2000)) :
-      removeToast = setTimeout(function () {
-            document.getElementById("toast").classList.remove("reveal")
-            }, 2000)
-    toast.classList.add("reveal"),
-        toast.innerText = "설명자 : "+ presenterNickname;
+      toast.classList.contains("reveal")
+        ? (clearTimeout(removeToast),
+          (removeToast = setTimeout(function () {
+            document.getElementById("toast").classList.remove("reveal");
+          }, 2000)))
+        : (removeToast = setTimeout(function () {
+            document.getElementById("toast").classList.remove("reveal");
+          }, 2000));
+      toast.classList.add("reveal"),
+        (toast.innerText = "설명자 : " + presenterNickname);
     };
-    watch(inGame, (newValue) => { // 게임 시작했을 때, ready 버튼 모양 다시 초기화 
+    watch(inGame, (newValue) => {
+      // 게임 시작했을 때, ready 버튼 모양 다시 초기화
       if (newValue == true) {
-        state.ready = false
+        state.ready = false;
       }
-    })
-    watch(readyAll, (newValue) => {  
+    });
+    watch(readyAll, (newValue) => {
       if (newValue == true) {
-        state.startTimer = true
+        state.startTimer = true;
         setTimeout(() => {
-          state.startTimer = false
-          store.commit("gameStore/setInGame", true)
+          state.startTimer = false;
+          store.commit("gameStore/setInGame", true);
         }, 5000);
       }
-    })
+    });
+
+    //윤미작업
+    let timerInterval;
+    watch(endRound, (newValue) => {
+      if (newValue) {
+        if (!isTimeOut.value && !endGame.value) {
+          Swal.fire({
+            title: round.value - 1 + "round 결과",
+            color: "#716add",
+            backdrop: `
+              rgba(0,0,123,0.4)
+              left top
+              no-repeat
+            `,
+            html:
+              `<div>${winnerNickname.value} WON!!</div>` +
+              '<canvas class="canvas" width="560" height="330" id="aCanvas"></canvas>' +
+              sortedUserList.value
+                .map((user) => `<div>${user.nickname} : ${user.score}점</div>`)
+                .join(""),
+            timer: 5000,
+            width: 650,
+            timerProgressBar: true,
+            allowOutsideClick: false,
+            didOpen: async () => {
+              Swal.showLoading();
+              const getFile = await store.dispatch("gameStore/downloadImage");
+              const myCanvas = Swal.getHtmlContainer().querySelector("Canvas");
+              var ctx = myCanvas.getContext("2d");
+              var img = new Image();
+              img.src = getFile;
+              img.onload = function () {
+                ctx.drawImage(img, 0, 0); // Or at whatever offset you like
+              };
+            },
+            willClose: () => {
+              clearInterval(timerInterval);
+            },
+          }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === Swal.DismissReason.timer) {
+              store.dispatch("gameStore/changeRoundEnd", false);
+            }
+          });
+        } else if (isTimeOut.value) {
+          Swal.fire({
+            title: round.value - 1 + "round 결과",
+            color: "#716add",
+            html: "<h1>정답자가 없습니다!!</h1>",
+            timer: 5000,
+            timerProgressBar: true,
+            allowOutsideClick: false,
+            width: 650,
+            didOpen: async () => {
+              Swal.showLoading();
+            },
+            willClose: () => {
+              clearInterval(timerInterval);
+            },
+          }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === Swal.DismissReason.timer) {
+              store.dispatch("gameStore/changeRoundEnd", false);
+            }
+          });
+        }
+      }
+    });
+
+    watch(endGame, (newValue) => {
+      if (newValue) {
+        Swal.fire({
+          title: "게임 결과",
+          padding: "3em",
+          color: "#716add",
+          backdrop: `
+              rgba(0,0,123,0.4)
+              url("../gameRocket.gif")
+              left top
+              no-repeat
+            `,
+          html:
+            "<div>" +
+            winnerList.value
+              .map((winner) => `<h1>${winner} WON!!</h1>`)
+              .join("") +
+            "</div>" +
+            "<div>" +
+            Object.entries(gameResult.value).map(
+              ([key, value]) =>
+                `<h1> ${parseInt(key) + 1}등 ${value.nickname} + ${
+                  value.extraExp
+                } Exp </h1>`
+            ) +
+            "</div>",
+          allowOutsideClick: false,
+          confirmButtonText: "돌아가기",
+          confirmButtonColor: "#3085d6",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            store.commit("gameStore/setEndGame", false);
+            store.commit("gameStore/setInGame", false);
+          }
+        });
+      }
+    });
+
     return {
       router,
       state,
@@ -331,7 +448,7 @@ export default {
       forceRender,
       endRound,
       word,
-      inGame
+      inGame,
     };
   },
 };
@@ -416,25 +533,24 @@ export default {
   background: #24cb83;
   color: white;
   font-size: 25px;
-  box-shadow : 1px 3px 3px rgb(72, 72, 72);
+  box-shadow: 1px 3px 3px rgb(72, 72, 72);
 }
 .btn-ready:hover {
   background: #24cb83;
   font-size: 30px;
 }
 .btn-ready:active {
-  background: #80a000;;
+  background: #80a000;
 }
 .btn-ready.active {
-  background: #98be00;;
-  box-shadow : inset 0 3px 3px 0px #484848c2;
-
+  background: #98be00;
+  box-shadow: inset 0 3px 3px 0px #484848c2;
 }
 .btn-profile {
   background: #c6c6c6;
   color: white;
   font-size: 20px;
-  box-shadow : 1px 3px 3px rgb(72, 72, 72);
+  box-shadow: 1px 3px 3px rgb(72, 72, 72);
 }
 .btn-profile:hover {
   background: #b7b7b7;
@@ -542,14 +658,18 @@ header {
 }
 #robot {
   width: 300px;
-  animation:hover 1.1s ease-in-out 0s infinite alternate;
+  animation: hover 1.1s ease-in-out 0s infinite alternate;
 }
 $hover_top: 30px;
-$hover_bottom: 50px;  
+$hover_bottom: 50px;
 
-@keyframes hover { 
-    0% { transform: translate3d(0,$hover_top,0) }
-    100% { transform: translate3d(0,$hover_bottom,0) }
+@keyframes hover {
+  0% {
+    transform: translate3d(0, $hover_top, 0);
+  }
+  100% {
+    transform: translate3d(0, $hover_bottom, 0);
+  }
 }
 .sec-display {
   width: 100%;
@@ -601,26 +721,26 @@ $hover_bottom: 50px;
   z-index: 1;
 }
 #toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    padding: 15px 20px;
-    transform: translate(-50%, 10px);
-    border-radius: 30px;
-    overflow: hidden;
-    font-size: .8rem;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity .5s, visibility .5s, transform .5s;
-    background: rgba(0, 0, 0, .35);
-    color: #fff;
-    z-index: 10000;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  padding: 15px 20px;
+  transform: translate(-50%, 10px);
+  border-radius: 30px;
+  overflow: hidden;
+  font-size: 0.8rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s, visibility 0.5s, transform 0.5s;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  z-index: 10000;
 }
 
 #toast.reveal {
-    opacity: 1;
-    visibility: visible;
-    transform: translate(-50%, 0)
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
 }
 /* =========================================================================================== */
 </style>
