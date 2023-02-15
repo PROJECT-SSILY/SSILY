@@ -35,6 +35,7 @@ public class GameService   {
 
     static final int FINISH_ROUND = 10;
     static final int TIME_OVER_ROUND = 20;
+    static final int SKIP_ROUND = 30;
     static final int FINISH_GAME = 100;
 
 
@@ -54,7 +55,8 @@ public class GameService   {
     public static ConcurrentHashMap<String, List<String>> words=new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, ArrayList<Participant>> participantList=new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, Integer> presenterIndex=new ConcurrentHashMap<>();
-    public final List<String> allWords=getAllWords();
+    //public final List<String> allWords=getAllWords();
+    public static ConcurrentHashMap<String, List<String>> allWords=new ConcurrentHashMap<>();
 
     // RPC 프로토콜을 위한 전역변수
     static RpcNotificationService rpcNotificationService;
@@ -103,6 +105,9 @@ public class GameService   {
                 return;
             case TIME_OVER_ROUND:
                 timeOverRound(participant, sessionId, participants, params, data);
+                return;
+            case SKIP_ROUND:
+                skipRound(participant, sessionId, participants, params, data);
                 return;
             case FINISH_GAME:
                 finishGame(participant, sessionId, participants, params, data);
@@ -281,10 +286,14 @@ public class GameService   {
 
         log.info("gameStart is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
+        allWords.putIfAbsent(sessionId, new ArrayList<>());
+        allWords.put(sessionId, getAllWords());
+
+        allWords.get(sessionId);
 
         //제시어 불러오기
         words.putIfAbsent(sessionId, new ArrayList<>());
-        words.put(sessionId, pickWords());
+        words.put(sessionId, pickWords(sessionId));
 
         log.info("words는 뭐 들어 있나요? {}", words.get(sessionId));
         // 라운드 설정 : (1라운드)
@@ -389,12 +398,16 @@ public class GameService   {
      * 8개의 제시어 목록 반환
      * @return
      */
-    private List<String> pickWords() {
-        if(allWords==null){
+    private List<String> pickWords(String sessionId) {
+        List<String> curWords=allWords.get(sessionId);
+        if(curWords==null){
+            curWords=getAllWords();
+        }
+        if(curWords==null){
             return null;
         }
         List<String> pickedWords=new ArrayList<>();
-        ThreadLocalRandom.current().ints(0, allWords.size()).distinct().limit(8).forEach(index -> pickedWords.add(allWords.get(index).toString()));
+        ThreadLocalRandom.current().ints(0, curWords.size()).distinct().limit(8).forEach(index -> pickedWords.add(curWords.get(index).toString()));
         return pickedWords;
     }
 
@@ -524,6 +537,41 @@ public class GameService   {
         }
     }
 
+    private void skipRound(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data) {
+        log.info("skipRound is called by [{}]", participant.getPlayer());
+        if(!participant.getPlayer().isPresenter())
+            return;
+
+        int cnt = 0;
+        JsonObject playerJson = new JsonObject();
+        for (Participant p : participants) {
+            JsonObject player = new JsonObject();
+            player.addProperty("connectionId", p.getParticipantPublicId());
+            player.addProperty("score", p.getPlayer().getScore());
+            playerJson.add(String.valueOf(cnt), player);
+            cnt++;
+        }
+        data.add("player", playerJson);
+
+        data.addProperty("cnt", cnt);
+        // 라운드 증가
+        Integer nowRound = round.get(sessionId);
+
+        String word=words.get(sessionId).get(nowRound-1);
+        data.addProperty("word", word);
+
+        round.put(sessionId, nowRound+1);
+        data.addProperty("round", round.get(sessionId));
+
+        params.add("data", data);
+
+        // 라운드 종료 알라기
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
 
         /**
          * 서영탁
@@ -614,6 +662,7 @@ public class GameService   {
         words.remove(sessionId);
         participantList.remove(sessionId);
         presenterIndex.remove(sessionId);
+        allWords.remove(sessionId);
 
         HashMap<String, Boolean> ready = readyState.get(sessionId);
         ready.replaceAll((k, v) -> false);
