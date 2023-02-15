@@ -327,6 +327,9 @@ $hover_bottom: 0px;
   margin-left: 3px;
   border: 1px solid #e46b6b;
 }
+.btn-danger:first-child {
+  border-bottom: none;
+}
 .btn-danger:last-child {
   border-top: none;
 }
