@@ -56,7 +56,7 @@ const randomPrivate = (payload) => {
         }
     })
     .then(res => {
-        console.log(res)
+        console.log('제대로 가길바라',res)
         return res
     })
     .catch(error => {

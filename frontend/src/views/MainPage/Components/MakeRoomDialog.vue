@@ -13,6 +13,7 @@
             class="inp-txt form-control"
             label="방 제목"
             type="text"
+            :rules="[state.rules.titleRules]"
             required
           ></v-text-field>
       </div>
@@ -74,7 +75,9 @@ export default {
       },
       rules: {
       // required: value => !!value || '필수',
-        passwordRules: value => {
+        titleRules: (value) => (1 <= value.length && value.length <= 20) || "방제목은 20자 이내로 작성해주세요!"
+        ,
+        passwordRules: (value) => {
           if(state.form.isSecret){
             (/^\d{4}$/.test(value)) || '비밀번호는 4자리 숫자여야 합니다!'
           }
@@ -102,15 +105,22 @@ export default {
         await store.commit('accountStore/setAlertIcon', 'alert')
         state.alert = true
         return
+      } else if (1 > state.form.title.length || state.form.title.length > 20) {
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '방 제목은 20자 이내여야 합니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return
       } else {
-      store.commit("gameStore/setTitle", state.form.title);
-      store.commit("gameStore/setSecret", state.form.isSecret);
-      store.commit("gameStore/setPassword", state.form.password.value);
-      store.commit("gameStore/setTeam", state.form.isTeamBattle);
-      // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
-      const sessionId = await store.dispatch("gameStore/createSession");
-      console.log("sessionId : ", sessionId);
-      router.push({ name: "gameroom", params: { sessionId: sessionId } });
+        store.commit("gameStore/setTitle", state.form.title);
+        store.commit("gameStore/setSecret", state.form.isSecret);
+        store.commit("gameStore/setPassword", state.form.password.value);
+        store.commit("gameStore/setTeam", state.form.isTeamBattle);
+        // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
+        const sessionId = await store.dispatch("gameStore/createSession");
+        console.log("sessionId : ", sessionId);
+        router.push({ name: "gameroom", params: { sessionId: sessionId } });
       }
     };
     return {
