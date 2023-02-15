@@ -73,8 +73,9 @@
       <GameResult v-show="endGame"/>
       <GameScore class="gamescore"/>
       <div id="word" v-if="amIDescriber">
-        <p>제시어 : {{ word }}</p>
-        </div>
+          <p>제시어</p>
+          <p>{{ word }}</p>
+      </div>
 
       <!-- 상대 팀 -->
       <div class="area-opponents">
@@ -652,14 +653,13 @@ export default {
   position: absolute;
   top: 7rem;
   color: rgb(81 255 255 / 67%);
-  font-size: 25px;
-  padding: 5px;
-  font-weight: 600;
-  color: white;
-  // border-radius: 10px;
-  // border: 1px solid rgba(81, 255, 255, 0.6);
-  // box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
-  // padding: 10px
+}
+#word>p:first-child {
+  font-size: 16px;
+}
+#word>p:last-child {
+  font-weight: 700;
+  font-size: 30px;
 }
 .component-ingame {
   width: 100%;
@@ -774,8 +774,9 @@ $hover_bottom: 50px;
 .sec-display .stream-me {
   /* 그림 그릴 때 내 모습 */
   height: 300px;
-  width: auto;
+  width: 533px;
   border-radius: 30px;
+  border: 1px solid rgba(81, 255, 255, 0.5);
   box-shadow: 0 0 50px 1px rgb(81 255 255 / 50%);
 }
 .canvas {
