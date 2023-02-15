@@ -534,7 +534,7 @@ export default {
       endRound,
       word,
       inGame,
-      closeDialog
+      closeDialog,
       skipWord,
     };
   },
