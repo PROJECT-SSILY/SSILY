@@ -423,8 +423,6 @@ const actions = {
               console.log("state.userKey: ", state.userKey);
               context.commit("setUserKey", user.connectionId);
               context.commit("setUserList", user);
-              context.commit("setIsHost", user.isHost);
-
             }
             console.log("UserList: ", state.userList);
           }
