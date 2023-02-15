@@ -468,6 +468,10 @@ public class GameService   {
         data.addProperty("winnerNickname", winner.getNickname());
         // 라운드 증가
         Integer nowRound = round.get(sessionId);
+
+        String word=words.get(sessionId).get(nowRound-1);
+        data.addProperty("word", word);
+
         round.put(sessionId, nowRound+1);
         data.addProperty("round", round.get(sessionId));
 
@@ -504,6 +508,10 @@ public class GameService   {
         data.addProperty("cnt", cnt);
         // 라운드 증가
         Integer nowRound = round.get(sessionId);
+
+        String word=words.get(sessionId).get(nowRound-1);
+        data.addProperty("word", word);
+
         round.put(sessionId, nowRound+1);
         data.addProperty("round", round.get(sessionId));
 

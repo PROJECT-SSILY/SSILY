@@ -402,7 +402,7 @@ const actions = {
           }
           break;
         }
-        
+
         case 2: {
           // 게임시작 했으니까 라운드 받아오기
           console.log(event.data);
@@ -422,7 +422,7 @@ const actions = {
               context.commit("setMyConnectionId", key);
             }
             user.connectionId = key;
-            user.isReady = data[key].isReady;          
+            user.isReady = data[key].isReady;
             user.exp = data[key].player.exp;
             user.isHost = data[key].player.isHost;
             user.isPresenter = data[key].player.isPresenter;
@@ -494,13 +494,14 @@ const actions = {
         case 10: {
           // 라운드별 경험치 누적
           console.log("10번 event data : ", event.data);
-          if (event.data.round < 8) { 
+          if (event.data.round < 8) {
             context.commit("setEndRound", true);
           }
           console.log("10번 시그널 수신 - 라운드 끝 ===> ", event.data.round);
           context.commit("setImageURL", event.data.DataURL);
           var scoreList = event.data.player;
           context.commit("setRound", event.data.round);
+          context.commit('setWord', event.data.word)
           var maxScore = -1;
           var maxScoreUser = undefined;
           for (var x = 0; state.userList.length > x; x++) {
@@ -541,6 +542,7 @@ const actions = {
           console.log(event.data);
           context.commit("setIsTimeOut", true);
           context.commit("setRound", event.data.round);
+          context.commit('setWord', event.data.word)
           // 라운드를 8번 돌면 게임을 종료한다.
           if (event.data.round == 8 && state.isHost == true) {
             context.dispatch("finishGame");
@@ -565,8 +567,8 @@ const actions = {
           //   console.log('제 발', event.data.gameResult[h].extraExp)
           //   context.commit("setUserScore", {
           //     index: h,
-          //     value: state.userList[h].score + event.data.gameResult[h].extraExp 
-          //   });            
+          //     value: state.userList[h].score + event.data.gameResult[h].extraExp
+          //   });
           // }
           // var tmpList = state.userList;
           // tmpList.sort((a, b) => {
@@ -576,7 +578,7 @@ const actions = {
           // });
           // console.log('tmpList::::', tmpList)
           // context.commit("setSortedUserList", tmpList);
-          // 정렬 해보기 
+          // 정렬 해보기
           // context.commit("setUserScore", {
           //   index: y,
           //   value: scoreList[x].score,
@@ -782,7 +784,7 @@ const actions = {
               to: [],
             });
           }
-          break 
+          break
         }
       }
       state.session.signal({
