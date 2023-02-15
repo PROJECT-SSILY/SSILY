@@ -27,7 +27,7 @@
 <script>
 import className from "!raw-loader!@/assets/model/class_names.txt"; // computed()에서 바로 가져와 categorys에 바로 할당한다.
 import { reactive } from '@vue/reactivity'
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { fabric } from "fabric";
 import { disposeTFVariables, TFModel } from "@/utils/model";
 import { CLASS_NAMES } from "@/utils/class_names";
@@ -41,21 +41,18 @@ export default{
   name: "MyCanvasBox",
   //components: { CanvasDialog },
   setup() {
-    const endRound = computed(() => {
-      eraseAll();
-      return store.state.gameStore.endRound})
+    const store = useStore();
     const answerOn = computed(() =>{
-      /*
-      if(store.state.gameStore.answerOn==true){
-        console.log("여기 제발 와라");
-        canvasToImage();
-      }
-      */
     return store.state.gameStore.answerOn});
     const answer= computed(() => {
       return store.state.gameStore.answer});
+    const endRound = computed(() => store.state.gameStore.endRound);
+    watch(endRound, (newValue) => {
+       if (newValue) {
+        eraseAll();
+       }
+    });
     const fabricCanvas = ref({});
-    const store = useStore();
     const topFive = ref([]);
     let mousePressed = false;
     const classNames = [];
