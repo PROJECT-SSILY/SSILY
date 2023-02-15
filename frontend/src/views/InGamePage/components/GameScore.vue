@@ -25,8 +25,6 @@ export default {
 </script>
 
 <style>
-<<<<<<< Updated upstream
-=======
 .score-box {
   border-radius: 10px;
   border: 1px solid rgba(81, 255, 255, 0.6);
@@ -34,7 +32,6 @@ export default {
   padding: 20px;
   width: 100%;
 }
->>>>>>> Stashed changes
 .my-score {
 	color: white;
 }
