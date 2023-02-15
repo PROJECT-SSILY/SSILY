@@ -34,6 +34,15 @@
             class="btn-ready"
             :class="state.ready ? 'active' : ''"
             @click="clickReady"
+            v-if="!readyAll"
+          >
+            READY
+          </button>
+          <button
+            class="btn-ready"
+            disabled
+            :class="state.ready ? 'active' : ''"
+            v-if="readyAll"
           >
             READY
           </button>
@@ -421,6 +430,7 @@ export default {
           if (result.isConfirmed) {
             store.commit("gameStore/setEndGame", false);
             store.commit("gameStore/setInGame", false);
+            store.commit("gameStore/setIsAllReady", false)
           }
         });
       }

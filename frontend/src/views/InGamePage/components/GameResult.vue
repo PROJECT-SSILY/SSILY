@@ -54,6 +54,7 @@ export default {
     const clickReturn = () => { // 나가기 버튼 없애고, 돌아가기 버튼만 활용
       store.commit('gameStore/setEndGame', false)
       store.commit("gameStore/setInGame", false)
+      store.commit("gameStore/setIsAllReady", false)
     }
   return {
     gameResult,
