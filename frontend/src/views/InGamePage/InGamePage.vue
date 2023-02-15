@@ -92,6 +92,8 @@
       <div id="word" v-if="amIDescriber">
         <p>제시어</p>
         <p>{{ word }}</p>
+        <br/>
+        <button @click="skipWord">skip</button>
       </div>
 
       <!-- 상대 팀 -->
@@ -327,6 +329,11 @@ export default {
       gameTimer.value += 1;
     };
 
+    const skipWord=async function(){
+      console.log("skipWord 실행!!!");
+      store.dispatch('gameStore/skipRound');
+    };
+
     /**
      * 토스트 실행 신대득
      * @param payload
@@ -528,6 +535,7 @@ export default {
       word,
       inGame,
       closeDialog
+      skipWord,
     };
   },
 };

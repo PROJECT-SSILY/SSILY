@@ -562,6 +562,22 @@ const actions = {
 
           break;
         }
+        case 30: {
+          console.log("30번 시그널 수신 - 스킵 ==>",event.data.round);
+          if (event.data.round <= 9) {
+            context.commit("setEndRound", true);
+          }
+          console.log(event.data);
+          context.commit("setIsTimeOut", true);
+          context.commit("setRound", event.data.round);
+          context.commit('setWord', event.data.word)
+          // 라운드를 8번 돌면 게임을 종료한다.
+          if (event.data.round == 9 && state.isHost == true) {
+            setTimeout(() => context.dispatch("finishGame"), 5000);
+          }
+
+          break;
+        }
         case 100: {
           // 게임 끝 경험치 부여
           console.log("100번 시그널 수신 - 게임 끝");
@@ -1103,6 +1119,33 @@ const actions = {
       console.log(err);
     }
   },
+
+  skipRound: () => {
+        // 라운드 스킵 시그널 발송
+        try {
+          state.session.signal({
+            type: "game",
+            data: {
+              gameStatus: 30,
+            },
+            to: [],
+          });
+        } catch (err) {
+          console.log(err);
+        }
+        // 설명자 변경 시그널 발송
+        try {
+          state.session.signal({
+            type: "game",
+            data: {
+              gameStatus: 0,
+            },
+            to: [],
+          });
+        } catch (err) {
+          console.log(err);
+        }
+  }
 };
 export default {
   namespaced: true,
