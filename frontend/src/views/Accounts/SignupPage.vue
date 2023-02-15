@@ -29,7 +29,7 @@
           v-model="state.form.nickname.value"
           variant="underlined"
           ref="nicknameform"
-          :rules="[state.rules.required,state.rules.nicknameRules,state.rules.nicknameCheckRules,]"
+          :rules="[state.rules.required,state.rules.nicknameRules,state.rules.nicknameRules1,]"
           label="닉네임"
           @keyup.enter="checkNickname"
         >
@@ -39,8 +39,8 @@
             </v-fade-transition>
           </template>
         </v-text-field>
-        <v-text-field class="password-input"
-          v-model="state.form.password1"
+        <v-text-field
+          v-model="state.form.password1.value"
           :append-icon="state.show1 ? 'mdi-eye' : 'mdi-eye-off'"
           :type="state.show1 ? 'text' : 'password'"
           :rules="[state.rules.required, state.rules.passwordRules]"
@@ -50,8 +50,8 @@
           hint=""
           @click:append="state.show1 = !state.show1"
         ></v-text-field>
-        <v-text-field class="password-re-input"
-          v-model="state.form.password2"
+        <v-text-field
+          v-model="state.form.password2.value"
           :append-icon="state.show2 ? 'mdi-eye' : 'mdi-eye-off'"
           :type="state.show2 ? 'text' : 'password'"
           :rules="[state.rules.required, state.rules.passwordRules2]"
@@ -95,8 +95,8 @@ export default {
     const state = reactive({
       form: {
         name: "",
-        password1: "",
-        password2: "",
+        password1: { value: "", status: false },
+        password2: { value: "", status: false },
         email: { value: "", valid: true, status: false },
         nickname: { value: "", valid: true, status: false },
       },
@@ -108,8 +108,8 @@ export default {
         nameRules: (value) => (2 <= value.length && value.length <= 6) || "이름은 2자 이상 6자 이내로 작성해주세요",
         nicknameRules: (value) => (2 <= value.length && value.length <= 6) || "닉네임은 2자 이상 6자 이내로 작성해주세요",
         nicknameRules1: () => state.form.nickname.valid || "이미 사용 중인 닉네임입니다.",
-        passwordRules: (value) => /^.*(?=^)(?=.*\d)(?=.*[a-zA-Z]){8,16}.*$/.test(value) || "비밀번호는 문자와 숫자 조합(8 ~ 16자 이내)으로 작성해주세요",
-        passwordRules2: (value) => state.form.password1 == value || "비밀번호가 일치하지 않습니다",
+        passwordRules: (value) => /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$/.test(value) || "비밀번호는 문자와 숫자 조합(8 ~ 16자 이내)으로 작성해주세요", 
+        passwordRules2: (value) => state.form.password1.value == value || "비밀번호가 일치하지 않습니다",
       },
       valid: true,
       show1: false,
@@ -123,6 +123,22 @@ export default {
     );
     watch(() => state.form.nickname.value, (newValue, oldValue) => {
         state.form.nickname.status = false;
+        console.log("변화 감지", { newValue, oldValue });
+      }
+    );
+    watch(() => state.form.password1.value, (newValue, oldValue) => {
+        state.form.password1.status = false;
+        if(newValue == state.form.password2.value) {
+          state.form.password1.status = true;
+        }
+        console.log("변화 감지", { newValue, oldValue });
+      }
+    );
+    watch(() => state.form.password2.value, (newValue, oldValue) => {
+        state.form.password2.status = false;
+        if(newValue == state.form.password1.value) {
+          state.form.password2.status = true;
+        }
         console.log("변화 감지", { newValue, oldValue });
       }
     );
@@ -148,10 +164,20 @@ export default {
         await store.commit("accountStore/setAlertIcon", "alert");
         state.alert = true;
         return;
+      } else if (!state.form.password2.status) {
+        state.alert = false;
+        await store.commit("accountStore/setAlertColor", "error");
+        await store.commit(
+          "accountStore/setAlertMessage",
+          "비밀번호가 일치하지 않습니다!"
+        );
+        await store.commit("accountStore/setAlertIcon", "alert");
+        state.alert = true;
+        return;
       } else {
         const formData = {
           email: state.form.email.value,
-          password: state.form.password1,
+          password: state.form.password1.value,
           nickname: state.form.nickname.value,
           name: state.form.name,
         };
@@ -244,6 +270,19 @@ export default {
 </script>
 
 <style scoped>
+
+@font-face {
+    font-family: 'KOFIHDrLEEJWTTF-B';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-2@1.0/KOFIHDrLEEJWTTF-B.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+* {
+  font-family: 'KOFIHDrLEEJWTTF-B';
+  font-weight: normal;
+  font-style: normal;
+}
 .btn-dialog {
   background: #24cb83;
   color: white;
@@ -252,11 +291,6 @@ export default {
   background: #838383;
   color: white;
 }
-.password-input {
-  font-family: 'Noto Sans KR', sans-serif;
-}
-.password-re-input {
-  font-family: 'Noto Sans KR', sans-serif;
-}
+
 
 </style>

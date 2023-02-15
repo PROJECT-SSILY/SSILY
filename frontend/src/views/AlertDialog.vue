@@ -5,14 +5,12 @@
         max-width="500"
     >
         <v-card class="formbox">
-        <v-card-title>
+        <v-card-title class="title">
             <v-icon
             :color="color"
             >mdi-{{ icon }}-circle</v-icon>
             {{ message }}
         </v-card-title>
-        <v-card-text>
-        </v-card-text>
         <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
@@ -56,13 +54,17 @@ export default {
 </script>
 
 <style scoped>
+
+* {
+    font-family: 'KOFIHDrLEEJWTTF-B'
+}
 .my-custom-dialog {
     position: absolute;
     top: -70%;
     border-radius: 20px;
   }
 .formbox {
-    padding: 2rem;
+    padding: 1rem;
     width: 100%;
     border-radius: 20px;
     opacity: 100%;
@@ -75,5 +77,9 @@ export default {
     display: flex;
     flex-direction: column;
     border-radius: 20px;
+  }
+
+  .title {
+    margin-top: 3rem;
   }
 </style>

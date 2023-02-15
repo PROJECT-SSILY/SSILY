@@ -5,7 +5,7 @@
       <v-img id="character" :src="require(`@/assets/images/${state.robot}.svg`)" alt=""/>
     </div>
     <div class="box-nickname">
-      <p>{{ user.nickname }}</p>
+      <p class="nickname">{{ user.nickname }}</p>
     </div>
     <v-img src="@/assets/images/star.svg" alt="host" v-if="user.isHost" id="host"/>
     <!-- <p>레벨: {{ user.level }}</p>
@@ -60,8 +60,12 @@ export default {
   margin: 0 auto;
   font-size: 20px;
   padding: 10px;
-  color: #e8e8e8;
+  color: #ffffff;
 }
+.nickname {
+  text-shadow: -2px 0 #24cb83, 0 2px #24cb83, 2px 0 #24cb83, 0 -2px #24cb83;
+}
+
 $hover_top: 20px;
 $hover_bottom: 0px;  
 

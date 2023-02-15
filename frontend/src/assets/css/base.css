@@ -1,13 +1,14 @@
 /* App 공통 css */
 @font-face {
-font-family: 'KIMM_Bold';
-src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2212@1.0/KIMM_Bold.woff2') format('woff2');
-font-weight: 700;
-font-style: normal;
+    font-family: 'KOFIHDrLEEJWTTF-B';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-2@1.0/KOFIHDrLEEJWTTF-B.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
 }
+
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300&display=swap');
 #contents {
-  font-family: 'KIMM_Bold';
+  font-family: 'KOFIHDrLEEJWTTF-B';
   height: 100vh;
   width: 100vw;
   display: flex;
