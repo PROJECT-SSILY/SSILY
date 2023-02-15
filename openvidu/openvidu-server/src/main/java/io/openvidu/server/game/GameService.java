@@ -401,9 +401,6 @@ public class GameService   {
     private List<String> pickWords(String sessionId) {
         List<String> curWords=allWords.get(sessionId);
         if(curWords==null){
-            curWords=getAllWords();
-        }
-        if(curWords==null){
             return null;
         }
         List<String> pickedWords=new ArrayList<>();
