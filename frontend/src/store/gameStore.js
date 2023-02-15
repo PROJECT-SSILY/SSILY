@@ -474,8 +474,7 @@ const actions = {
             if (state.isHost) {
               context.dispatch("gameStart");
             }
-            context.commit("setIsAllReady", allready);
-          }
+           }
           break;
         }
         case 5: {

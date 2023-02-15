@@ -1,5 +1,6 @@
 <template>
   <div class="wrap-page">
+    <MyPageDialog v-show="state.myPageDialog"/>
     <div class="text-center">
       <v-snackbar
         v-model="state.snackbar"
@@ -65,10 +66,14 @@
           >
             READY
           </button>
-          <button class="btn-profile">내 프로필</button>
+          <button class="btn-profile" @click="state.myPageDialog=!state.myPageDialog">내 프로필</button>
+          <div
+          class="bg-dark"
+          :class="state.myPageDialog ? 'active':''"
+          @click="closeDialog"
+        ></div>
         </div>
       </div>
-
       <!-- 배경 -->
       <div class="background">
         <div id="stars" class="rotating"></div>
@@ -168,7 +173,7 @@ import FooterBoxVue from "../MainPage/Components/FooterBox.vue";
 // import RoundResult from "./components/RoundResult.vue";
 // import GameResult from "../InGamePage/components/GameResult.vue";
 import Swal from "sweetalert2";
-
+import MyPageDialog from "./components/MyPageDialog.vue";
 //=================OpenVdue====================
 $axios.defaults.headers.post["Content-Type"] = "application/json";
 //=============================================
@@ -184,6 +189,7 @@ export default {
     GameScore,
     StartTimer,
     FooterBoxVue,
+    MyPageDialog,
     // RoundResult,
     // GameResult,
   },
@@ -251,7 +257,12 @@ export default {
       snackbar: false,
       text: '대화 시작! 마이크가 활성화되었습니다.',
       timeout: 2000,
+      myPageDialog: false
     });
+    const closeDialog = () => {
+      state.myPageDialog = false;
+    };
+
 
     // == OpenVidu State ==
     const publisher = computed(() => store.state.gameStore.publisher);
@@ -516,6 +527,7 @@ export default {
       endRound,
       word,
       inGame,
+      closeDialog
     };
   },
 };
@@ -829,4 +841,13 @@ $hover_bottom: 50px;
   transform: translate(-50%, 0);
 }
 /* =========================================================================================== */
+
+.wrap-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
 </style>
