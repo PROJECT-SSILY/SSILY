@@ -802,7 +802,6 @@ const actions = {
     context.commit("setChatClear");
     context.commit("setEndGame", false);
     context.commit("setIsAllReady", false);
-    console.log('유저 정보', state.userList)
   },
   updateMainVideoStreamManager: (commit, stream) => {
     if (state.mainStreamManager === stream) return;

@@ -1,6 +1,6 @@
 <template>
   <div class="canvas_container">
-    <button @click="predictModel" style="background: white; padding: 5px 10px; position: absolute; z-index: 100; left: 60px;">제출</button>
+    <button @click="predictModel" id="submit">제출</button>
     <div class="group_button">
       <div id="brush" @click="allowDrawing">
         <v-img src="@/assets/canvas/brush.svg" alt="brush"/>
@@ -18,7 +18,6 @@
     <v-alert
       v-if="state.alertFlag"
       type="error"
-      title="Alert title"
       text="틀렸습니다!"
     ></v-alert>
     <div id="toast"></div>
@@ -154,46 +153,53 @@ export default{
       
       // fabricCanvas.value.setBackgroundColor("#FFFFFF")
       // fabricCanvas.value.renderAll()
-      
-      const mbb = getMinBox();
-      const dpi = window.devicePixelRatio;
+      try{
+        const mbb = getMinBox();
+        const dpi = window.devicePixelRatio;
 
-      // console.log("mbb = {}", mbb);
-      // console.log("mbb.max = {}", mbb.max);
-      let max = mbb.max;
-      let min = mbb.min;
+        // console.log("mbb = {}", mbb);
+        // console.log("mbb.max = {}", mbb.max);
+        let max = mbb.max;
+        let min = mbb.min;
 
-      if(max.x == Infinity || max.x == -Infinity || max.y == Infinity || max.y == -Infinity) return;
-      if(min.x == Infinity || min.x == -Infinity || min.y == Infinity || min.y == -Infinity) return;
+        if(max.x == Infinity || max.x == -Infinity || max.y == Infinity || max.y == -Infinity) return null;
+        if(min.x == Infinity || min.x == -Infinity || min.y == Infinity || min.y == -Infinity) return null;
 
 
-      fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
-      // const object = fabricCanvas.value.getActiveObject();
-      // object.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
-      
-      // fabricCanvas.value.stroke.setFill('black', fabricCanvas.value.renderAll.bind(fabricCanvas.value));
-      // fabricCanvas.value.getActiveObject().stroke.color = "black";
-      // fabricCanvas.value.renderAll();
-      const imageData = fabricCanvas.value.contextContainer.getImageData(
-        mbb.min.x * dpi,
-        mbb.min.y * dpi,
-        (mbb.max.x - mbb.min.x) * dpi,
-        (mbb.max.y - mbb.min.y) * dpi
-      );
-      // const imageData = fabricCanvas.value.contextContainer.getImageData(0, 0, fabricCanvas.value.width, fabricCanvas.value.height);
-      const data = imageData.data
-      for (var i = 0; i < data.length; i+= 4) {
-        if (data[i]!=255 || data[i+1]!=255 || data[i+2]!=255) {
-          // console.log("DDDD")
-          data[i] = 0; // Red
-          data[i+1] = 0; // Green
-          data[i+2] = 0; // Blue
+        fabricCanvas.value.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
+        // const object = fabricCanvas.value.getActiveObject();
+        // object.setBackgroundColor("#FFFFFF", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
+        
+        // fabricCanvas.value.stroke.setFill('black', fabricCanvas.value.renderAll.bind(fabricCanvas.value));
+        // fabricCanvas.value.getActiveObject().stroke.color = "black";
+        // fabricCanvas.value.renderAll();
+
+        const imageData = fabricCanvas.value.contextContainer.getImageData(
+          mbb.min.x * dpi,
+          mbb.min.y * dpi,
+          (mbb.max.x - mbb.min.x) * dpi,
+          (mbb.max.y - mbb.min.y) * dpi
+        );
+
+        // const imageData = fabricCanvas.value.contextContainer.getImageData(0, 0, fabricCanvas.value.width, fabricCanvas.value.height);
+        const data = imageData.data
+        for (var i = 0; i < data.length; i+= 4) {
+          if (data[i]!=255 || data[i+1]!=255 || data[i+2]!=255) {
+            // console.log("DDDD")
+            data[i] = 0; // Red
+            data[i+1] = 0; // Green
+            data[i+2] = 0; // Blue
+          }
         }
+
+        fabricCanvas.value.setBackgroundColor("rgba(81, 255, 255, 0.2)", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
+
+        return imageData;
+      } catch(err){
+        console.log("err = ", err);
+        return null;
       }
 
-      fabricCanvas.value.setBackgroundColor("rgba(81, 255, 255, 0.2)", fabricCanvas.value.renderAll.bind(fabricCanvas.value))
-
-      return imageData;
     };
 
       const canvasToImage = async function(){
@@ -242,8 +248,13 @@ export default{
        * Get image on canvas and submit it to the model for prediction
        */
       let imageData = getImageData();
-      if(imageData == null) raw_predictions = [];
-      else raw_predictions = model.predictClass(imageData);
+      try{
+        raw_predictions = model.predictClass(imageData);
+      } catch{
+        raw_predictions = [];
+      }
+      // if(imageData == null) raw_predictions = [];
+      // else raw_predictions = model.predictClass(imageData);
     };
 
     const findIndicesOfMax = function () {
@@ -289,13 +300,13 @@ export default{
       store.dispatch("gameStore/sendTopFive", topFive.value)
       setTimeout(function() {
         if (endRound.value == false) {
-          state.alertFlag = true
+          toast('틀렸습니다!')
         }
         }, 300);
-      setTimeout(function() {
-      if (state.alertFlag == true) {
-        state.alertFlag = false}
-      }, 1200);
+      // setTimeout(function() {
+      // if (state.alertFlag == true) {
+      //   state.alertFlag = false}
+      // }, 1200);
       canvasToImage();
     };
 
@@ -398,7 +409,22 @@ export default{
     border: 1px solid rgba(81, 255, 255, 0.6);
     box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
 }
-
+#submit {
+  background: rgb(255, 255, 255, 0.08); 
+  border-radius: 10px;
+  border: 1px solid rgba(81, 255, 255, 0.6);
+  box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
+  padding: 5px 10px; 
+  position: absolute; 
+  z-index: 100; 
+  left: 490px;
+  top:275px;
+  color: aliceblue;
+}
+#submit:hover {
+  background: rgba(255, 255, 255, 0.2);
+/* background: rgb(227, 227, 227); */
+}
 .group_button {
   width: 45px;
   height: 90px;
