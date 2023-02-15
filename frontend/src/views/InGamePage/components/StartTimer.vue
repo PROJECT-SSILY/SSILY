@@ -32,7 +32,7 @@
           return (this.value = 0)
         }
         this.value += 20
-      }, 1000)
+      }, 400)
     },
   }
   </script>
