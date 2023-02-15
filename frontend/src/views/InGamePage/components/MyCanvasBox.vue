@@ -22,17 +22,6 @@
       text="틀렸습니다!"
     ></v-alert>
     <div id="toast"></div>
-    <!-- 여기부터 신대득의 테스트 공간..-->
-    <!--canvas-dialog /--> <!-- v-if="answerOn" 넣어줘야함-->
-    <!-- <div style="margin: 1rem">
-      <canvas
-          width="600"
-          height="400"
-          id="answerCanvas"
-      ></canvas>
-      <v-btn @click="canvasToImage">그림보내기</v-btn>
-      <v-btn @click="imageToCanvas">그림받기</v-btn>
-    </div> -->
   </div>
 </template>
 
@@ -54,7 +43,16 @@ export default{
   //components: { CanvasDialog },
   setup() {
     const endRound = computed(() => store.state.gameStore.endRound)
-    const answerOn = computed(() => store.state.gameStore.answerOn);
+    const answerOn = computed(() =>{
+      /*
+      if(store.state.gameStore.answerOn==true){
+        console.log("여기 제발 와라");
+        canvasToImage();
+      }
+      */
+    return store.state.gameStore.answerOn});
+    const answer= computed(() => {
+      return store.state.gameStore.answer});
     const fabricCanvas = ref({});
     const store = useStore();
     const topFive = ref([]);
@@ -107,7 +105,7 @@ export default{
       fabricCanvas.value.backgroundColor = "rgba(81, 255, 255, 0.2)";
     };
 
-    const predictModel = function () {
+    const predictModel = async function () {
       if(!submitPossible) {
         toast("3초 후에 다시 제출할 수 있습니다!");
         return;
@@ -115,8 +113,8 @@ export default{
       else { //제출
         setTimeout(() => submitPossible=true, 3000);
         submitPossible=false;
-        submitCanvas();
-        submitDrawing();
+        await submitCanvas();
+        await submitDrawing();
       }
     };
 
@@ -228,7 +226,7 @@ export default{
       var file = new File([myBlob], "blobtofile.png");
       var formData = new FormData();
 
-      formData.append("answerImage", file);
+      await formData.append("answerImage", file);
       formData.append("content", "Blob확인");
       formData.append("tagList", "blob");
       formData.append("username", "admin");
@@ -236,26 +234,7 @@ export default{
       console.log("formData : ", formData.get("answerImage"));
       console.log("token : ", store.state.accountStore.token);
       //const myToken = store.state.accountStore.token;
-      store.dispatch("gameStore/uploadImage", formData);
-    };
-
-    const imageToCanvas= async function(){
-      store.dispatch("gameStore/answerImageOn", true);
-        console.log("imageToCanvas 시작!");
-        const getFile =await store.dispatch("gameStore/downloadImage");
-        console.log("getFile 찍자");
-        console.log(getFile);
-
-      var myCanvas=document.getElementById('answerCanvas');
-      var ctx = myCanvas.getContext('2d');
-      var img = new Image;
-      img.src = getFile;
-      
-      img.onload = function(){
-       ctx.drawImage(img,0,0); // Or at whatever offset you like
-      };
-
-
+      await store.dispatch("gameStore/saveMyFormData", formData);
     };
 
     const submitCanvas = function () {
@@ -394,10 +373,10 @@ export default{
       allowDrawing,
       eraseAll,
       answerOn,
+      answer,
       predictModel,
       success,
       canvasToImage,
-      imageToCanvas,
       endRound,
       state,
       submitPossible,
