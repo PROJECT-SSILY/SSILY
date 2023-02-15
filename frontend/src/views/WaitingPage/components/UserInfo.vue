@@ -2,7 +2,7 @@
 <div class="wrapper-item-userinfo ">
   <div class="item-userinfo">
     <div class="box-char">
-      <v-img id="character" :src="state.image" alt=""/>
+      <v-img id="character" :src="require(`@/assets/images/${state.robot}.svg`)" alt=""/>
     </div>
     <div class="box-nickname">
       <p>{{ user.nickname }}</p>
@@ -19,8 +19,7 @@
 
 <script>
 import { useStore } from "vuex"
-import { reactive } from "vue"
-
+import { computed, reactive } from "vue"
 
 export default {
   name: 'UserInfo',
@@ -30,15 +29,17 @@ export default {
   setup(props) {
     const store = useStore()
     const state = reactive({
-      image: null
+      image: null,
+      robot: computed(() => {
+        if (props.user.level >= 0 && props.user.level < 6) {
+          return "ssily1"
+        } else if (props.user.level >= 6 && props.user.level < 11) {
+          return "ssily2"
+        } else {
+          return "ssily3"
+        }
+      }),
     })
-    if (props.user.level > -1 && props.user.level < 6)  {
-        state.image = "../ssily1.svg"
-    } else if (props.user.level > 5 && props.user.level < 11) {
-        state.image = "../ssily2.svg"
-    } else {
-        state.image = "../ssily3.svg"
-    }
     return {
       store,
       state,

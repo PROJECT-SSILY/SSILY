@@ -1,27 +1,18 @@
 <template>
-    <changeNicknameDialog />
-    <changePasswordDialog />
-<!-- <v-btn id="logout-btn" @click="logOut"> LOGOUT </v-btn>
-<v-btn id="delete-btn" @click.stop="userinfo.dialog = true">회원 탈퇴</v-btn> -->
-<v-dialog v-model="userinfo.dialog" max-width="290">
-    <v-card class="formbox">
-        <v-card-text> 정말 탈퇴하시겠습니까? </v-card-text>
-        <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="error" text @click="deleteAccount">탈퇴</v-btn>
-            <v-btn color="success" text @click="userinfo.dialog = false"
-            >취소</v-btn
-            >
-        </v-card-actions>
-    </v-card>
-</v-dialog>
-<div class="background">
+  <div class="background">
     <div id="stars" class="rotating"></div>
-</div>
-<div class="wrap-page">
+  </div>
+  <div class="wrap-page">
+  <ChangeNicknameDialog v-show="state.nicknameDialog"/>
+  <changePasswordDialog v-show="state.passwordDialog"/>
+  <div
+      class="bg-dark"
+      :class="state.passwordDialog || state.nicknameDialog ? 'active':''"
+      @click="closeDialog"
+    ></div>
     <div class="inner-page">
         <div class="sec-img">
-            <v-img :src="userinfo.robot" alt="로봇" id="character"/>
+            <v-img :src="require(`@/assets/images/${userinfo.robot}.svg`)" alt="로봇" id="character"/>
         </div>
         <p id="nickname"><b>{{ userinfo.nickname }}(LV. {{ userinfo.level }})</b> 님</p>
         <table id="table-info">
@@ -50,13 +41,27 @@
         </div>  
         <div class="wrap-btn">
             <div class="group-btn">
-                <button class="btn-mypage">닉네임 변경</button>
-                <button class="btn-mypage">비밀번호 변경</button>
+                <button class="btn-mypage" @click="state.nicknameDialog=true">닉네임 변경</button>
+                <button class="btn-mypage" @click="state.passwordDialog=true">비밀번호 변경</button>
             </div>
-            <button class="btn-mypage btn-logout" @click="logOut">로그아웃</button>
+            <div class="group-btn">
+              <button class="btn-danger" @click="logOut">로그아웃</button>
+              <button class="btn-danger" @click.stop="userinfo.dialog = true">회원탈퇴</button>
+            </div>
         </div>
-        <span @click.stop="userinfo.dialog = true">회원 탈퇴</span>
     </div>
+    <v-dialog v-model="userinfo.dialog" max-width="290">
+    <v-card class="formbox">
+      <v-card-text> 정말 탈퇴하시겠습니까? </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="error" text @click="deleteAccount">탈퇴</v-btn>
+        <v-btn color="success" text @click="userinfo.dialog = false"
+        >취소</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </div>
 <FooterBox/>
 <div class="background">
@@ -64,6 +69,8 @@
 </div>
 </template>
 <script>
+import ChangeNicknameDialog from './components/ChangeNicknameDialog.vue';
+import ChangePasswordDialog from './components/ChangePasswordDialog.vue';
 import { reactive, onBeforeMount, computed } from "vue";
 import FooterBox from "../MainPage/Components/FooterBox.vue";
 import { useStore } from "vuex";
@@ -72,10 +79,16 @@ export default {
   name: "MyPage",
   components: {
     FooterBox,
+    ChangeNicknameDialog,
+    ChangePasswordDialog
   },
   setup() {
     const store = useStore();
     const router = useRouter();
+    const state = reactive({
+      nicknameDialog: false,
+      passwordDialog: false,
+    })
     const userinfo = reactive({
       dialog: false,
       name: "",
@@ -83,13 +96,21 @@ export default {
       email: "",
       level: 0,
       exp: 0,
-      robot: null,
+      robot: computed(() => {
+        if (userinfo.level >= 0 && userinfo.level < 6) {
+          return "ssily1"
+        } else if (userinfo.level >= 6 && userinfo.level < 11) {
+          return "ssily2"
+        } else {
+          return "ssily3"
+        }
+      }),
       record: {
         plays: 0,
         wins: 0,
         draws: 0,
         loses: 0,
-        winrate: computed(() => userinfo.record.wins/userinfo.record.plays*100) 
+        winrate: computed(() => Math.floor(userinfo.record.wins/userinfo.record.plays*100)) 
       },
     });
     const linechart = reactive({
@@ -155,13 +176,6 @@ export default {
         userinfo.record.winrate =
           Math.floor(res.record.wins / res.record.plays) * 100;
       }
-      if (res.level > -1 && res.level < 6) {
-        userinfo.robot = "./ssily1.svg";
-      } else if (res.level > 5 && res.level < 11) {
-        userinfo.robot = "./ssily2.svg";
-      } else {
-        userinfo.robot = "./ssily3.svg";
-      }
       linechart.series[0].data.push(userinfo.exprate);
     });
 
@@ -179,12 +193,19 @@ export default {
       // await router.push('/')
       await router.push("/");
     };
+    const closeDialog = () => {
+      state.nicknameDialog= false,
+      state.passwordDialog= false
+    };
+
     return {
       userinfo,
       linechart,
+      state,
       logOut,
       main,
       deleteAccount,
+      closeDialog,
     };
   },
 };
@@ -199,7 +220,7 @@ export default {
     background: white;
     border-radius: 50px;
     box-shadow: 0 3px 10px 0 #0000005c;
-    padding: 35px 35px 35px 390px;
+    padding: 35px 35px 35px 395px;
     position: relative;
 }
 .sec-img {
@@ -212,6 +233,18 @@ export default {
     left: -35px;
     padding: 20px;
     box-shadow: 2px 2px 7px 0 rgb(0 0 0 / 36%);
+}
+
+$hover_top: 20px;
+$hover_bottom: 0px;  
+
+#character {
+  animation:hover 1.1s ease-in-out 0s infinite alternate;
+}
+
+@keyframes hover { 
+    0% { transform: translate3d(0,$hover_top,0) }
+    100% { transform: translate3d(0,$hover_bottom,0) }
 }
 #nickname {
     font-size: 20px;
@@ -257,7 +290,7 @@ export default {
 .table-info>tr {
     text-align: center;
 }
-.btn-mypage {
+.btn-mypage, .btn-danger {
     width: 100%;
     padding: 3px 10px;
     background: #f1f1f1;
@@ -280,24 +313,25 @@ export default {
 .group-btn .btn-mypage:hover {
     background: #e7e7e7;
 }
-.group-btn>.btn-mypage:first-child {
+.group-btn>button:first-child {
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
 }
-.group-btn>.btn-mypage:last-child {
+.group-btn>button:last-child {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
-.btn-logout {
-    display: inline-block;
-    background: #e46b6b;
-    color: white;
-    border-radius: 10px;
-    width: 50%;
-    height: 70px;
-    margin-left: 3px;
+.btn-danger {
+  display: inline-block;
+  color: #e46b6b;
+  margin-left: 3px;
+  border: 1px solid #e46b6b;
 }
-.btn-logout:hover {
-    background: #ff3030;
+.btn-danger:last-child {
+  border-top: none;
+}
+.btn-danger:hover {
+  background: #ff3030;
+  color: white;
 }
 </style>
