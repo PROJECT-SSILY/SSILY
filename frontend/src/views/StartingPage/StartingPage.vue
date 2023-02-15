@@ -106,7 +106,6 @@ body {
 #rocket {
     display: block;
     margin: 0 auto;
-    margin-top: 150px;
 }
 
 /*=============================================

@@ -8,8 +8,12 @@
   <footer>
       <div class="inner-footer">
       <button class="btn-exit" @click="clickExit">메인으로</button>
-      <input class="notice" type="text" disabled value="notice" />
-      <button class="btn-store">상점</button>
+      <div class="notice">
+        <div class="track">
+          <div class="content">건강하고 쾌적한 게임 환경 조성을 위해 상대방을 존중해주세요.</div>
+        </div>
+      </div>
+           
       <button class="btn-set" @click="state.setDialog = !state.setDialog">
           설정
       </button>
@@ -66,10 +70,12 @@ footer {
 .inner-footer {
   width: 800px;
   height: 50px;
+  display: flex;
   background: #636363;
   border-top-left-radius: 60px;
   border-top-right-radius: 60px;
   padding: 10px;
+  justify-content: center;
 }
 .inner-footer > button,
 .inner-footer > .notice {
@@ -90,22 +96,35 @@ footer {
 }
 .notice {
   width: 400px;
+  position: relative;
   background: #4f4f4f;
   display: inline-block;
   color: #c2c2c2;
+  overflow-x: hidden; 
+  overflow-y: hidden; 
 }
-.btn-store,
 .btn-set {
   border: 1px solid #4b4b4b;
   color: #efeded;
 }
-.btn-store:hover,
 .btn-set:hover {
   background: #787878;
 }
-.btn-store:active,
 .btn-set:active {
   background: #656565;
+}
+
+ /* 움직이는 안내판 */
+/* .notice {font-size:60px; font-family:'Raleway',Sans-serif; font-weight:300; position: relative; width: 100%;max-width:100%; height: auto; padding:100px 0; overflow-x: hidden; overflow-y: hidden; } */
+.notice .track {
+  position: absolute; 
+  white-space: nowrap;
+  will-change: transform;
+  animation: marquee 10s linear infinite; 
+}
+@keyframes marquee {
+  from { transform: translateX(100%); }
+  to { transform: translateX(-100%); }
 }
 
 </style>
