@@ -638,10 +638,10 @@ export default {
   top: 0;
   margin: 30px;
   color: white;
-  border-radius: 10px;
-  border: 1px solid rgba(81, 255, 255, 0.6);
-  box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
-  padding: 10px
+  // border-radius: 10px;
+  // border: 1px solid rgba(81, 255, 255, 0.6);
+  // box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
+  // padding: 10px
 }
 #word {
   position: absolute;
@@ -651,10 +651,10 @@ export default {
   padding: 5px;
   font-weight: 600;
   color: white;
-  border-radius: 10px;
-  border: 1px solid rgba(81, 255, 255, 0.6);
-  box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
-  padding: 10px
+  // border-radius: 10px;
+  // border: 1px solid rgba(81, 255, 255, 0.6);
+  // box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
+  // padding: 10px
 }
 .component-ingame {
   width: 100%;
