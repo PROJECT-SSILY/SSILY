@@ -22,7 +22,9 @@
             </tr>
             <tr>
                 <td>승률  </td>
-                <td>{{ userinfo.record.winrate }}%</td>
+                <td v-if="!Object.is(userinfo.record.winrate, NaN)">{{ userinfo.record.winrate }}%</td>
+                <td v-if="Object.is(userinfo.record.winrate, NaN)">{{ 0 }}%</td>
+
             </tr>
             <tr>
                 <td>경험치 </td>

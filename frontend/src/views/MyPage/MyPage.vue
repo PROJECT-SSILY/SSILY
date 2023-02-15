@@ -32,8 +32,9 @@
         <div class="wrap-table-rate">
             <table id="rate" class="table-rate">
                 <tr>승률</tr>
-                <tr>{{ userinfo.record.winrate }}%</tr>
-            </table>
+                <tr v-if="Object.is(userinfo.record.winrate, NaN)">{{ 0 }}%</tr>
+                <tr v-if="!Object.is(userinfo.record.winrate, NaN)">{{ userinfo.record.winrate }}%</tr>
+              </table>
             <table id="exp" class="table-rate">
                 <tr>경험치</tr>
                 <tr>{{ userinfo.exp }} EXP</tr>
