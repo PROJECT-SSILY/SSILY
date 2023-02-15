@@ -5,7 +5,7 @@
         v-model="state.snackbar"
         label="Top"
         value="top"
-        :timeout="3000"
+        :timeout="2000"
         location="top"
         color="#716add"
         rounded="pill"
@@ -418,7 +418,7 @@ export default {
             timerProgressBar: true,
             allowOutsideClick: false,
             width: 650,
-            didOpen: async () => {
+            didOpen: async () => {``
               Swal.showLoading();
             },
             willClose: () => {

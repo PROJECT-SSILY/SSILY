@@ -25,8 +25,8 @@ const state = {
     isHost: false,
     playerList: undefined,
     messages: [],
-    media: 0.5,
-    alarm: 0.5,
+    media: true,
+    alarm: true,
     audio: new Audio(require('../../public/perception.mp3')),
     isAllReady: false,
     answerOn: false,
@@ -155,8 +155,13 @@ const mutations = {
     setPlayerList: (state, data) => {
         state.playerList = data
     },
-    setVolume1: (state, volume) => {
-      state.media = volume
+    setVolume1: (state, data) => {
+      state.media = data
+      if (data) {
+        state.audio.play()
+      } else {
+        state.audio.pause()
+      }
     },
     setVolume2: (state, volume) => {
       state.alarm = volume
@@ -980,13 +985,12 @@ const actions = {
     state.audio.loop = true;
     state.audio.play();
   },
-  changeVolume1: (context, volume) => {
-    context.commit("setVolume1", volume);
-    state.audio.volume = volume;
+  changeVolume1: (context, data) => {
+    console.log('배경음악', data)
+    context.commit("setVolume1", data);
   },
-  changeVolume2: (context, volume) => {
-    context.commit("setVolume2", volume);
-    // 아직 효과음 없어서 볼륨 조절 코드 없음 효과음 추가 이후 작성 예정
+  changeVolume2: (context, data) => {
+    context.commit("setVolume2", data);
     console.log("alarm 볼륨 조절");
   },
 
