@@ -14,7 +14,9 @@
 
     <!-- 아래부터 대기방 페이지 관련 코드-->
     <div class="wrap-timer">
-      <div class="start-timer" v-if="state.startTimer">
+      <div class="start-timer" 
+      v-if="state.startTimer"
+      >
         <StartTimer/>
       </div>
     </div>
@@ -495,10 +497,13 @@ export default {
 /* ======= component-waiting ================================================================= */
 .wrap-timer {
   position: fixed;
+  width: 400px;
+  z-index: 5
 }
 .start-timer {
   margin-top: 15px;
   height: 225px;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
