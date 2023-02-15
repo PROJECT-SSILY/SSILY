@@ -146,6 +146,8 @@ export default {
     GameResult,
     StartTimer,
     FooterBoxVue,
+    // RoundResult,
+    // GameResult,
   },
   props: {
     ready: Boolean,
