@@ -164,6 +164,16 @@ export default {
         await store.commit("accountStore/setAlertIcon", "alert");
         state.alert = true;
         return;
+      } else if (!state.form.password1.status) {
+        state.alert = false;
+        await store.commit("accountStore/setAlertColor", "error");
+        await store.commit(
+          "accountStore/setAlertMessage",
+          "비밀번호가 잘못되었습니다!"
+        );
+        await store.commit("accountStore/setAlertIcon", "alert");
+        state.alert = true;
+        return;
       } else if (!state.form.password2.status) {
         state.alert = false;
         await store.commit("accountStore/setAlertColor", "error");
