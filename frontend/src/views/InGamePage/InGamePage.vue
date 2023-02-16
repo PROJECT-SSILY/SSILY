@@ -85,7 +85,7 @@
       <header>
         <GameTimer :key="gameTimer" id="timer" />
       </header>
-      <p class="gameround">{{ round }} ROUND</p>
+      <p class="gameround">{{ state.showRound }} ROUND</p>
       <RoundResult />
       <GameResult v-show="endGame" />
       <GameScore class="gamescore" />
@@ -234,6 +234,7 @@ export default {
       mainStreamManager: undefined,
       sessionId: route.params.sessionId || null,
       isHost: true,
+      showRound:1,
       connectionId: null,
       nickname: computed(() => store.state.accountStore.user.nickname),
       level: computed(() => store.state.accountStore.user.level),
@@ -424,7 +425,10 @@ export default {
             /* Read more about handling dismissals below */
             if (result.dismiss === Swal.DismissReason.timer) {
               store.dispatch("gameStore/changeRoundEnd", false);
-              if(round.value<9) excuteToast(currentPresenterId.value);
+              if(round.value<9) {
+                excuteToast(currentPresenterId.value);
+                state.showRound=round.value;
+              }
             }
           });
         } else if (isTimeOut.value) {
@@ -448,7 +452,10 @@ export default {
             /* Read more about handling dismissals below */
             if (result.dismiss === Swal.DismissReason.timer) {
               store.dispatch("gameStore/changeRoundEnd", false);
-              if(round.value<9) excuteToast(currentPresenterId.value);
+              if(round.value<9) {
+                excuteToast(currentPresenterId.value);
+                state.showRound=round.value;
+              }
             }
           });
         }
