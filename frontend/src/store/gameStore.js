@@ -481,7 +481,6 @@ const actions = {
           break;
         }
         case 5: {
-          if(!state.endRound){
             // 정답 제출 ( sendTopFive ) - 정답이면 응답 옴!
            console.log("5번 시그널 수신 완료");
            var winnerId = event.data.winnerId;
@@ -495,7 +494,6 @@ const actions = {
             if (winnerId == state.myConnectionId) {
              context.dispatch("finishRound");
            }
-          }
           break;
         }
         case 6: {
@@ -552,7 +550,6 @@ const actions = {
           break;
         }
         case 20: {
-          if(!state.endRound){
           console.log("20번 시그널 수신 - 시간초과 ==>",event.data.round);
           if (event.data.round <= 9) {
             context.commit("setEndRound", true);
@@ -565,11 +562,9 @@ const actions = {
           if (event.data.round == 9 && state.isHost == true) {
             setTimeout(() => context.dispatch("finishGame"), 5000);
           }
-        }
           break;
         }
         case 30: {
-          if(!state.endRound){
           console.log("30번 시그널 수신 - 스킵 ==>",event.data.round);
           if (event.data.round <= 9) {
             context.commit("setEndRound", true);
@@ -582,7 +577,6 @@ const actions = {
           if (event.data.round == 9 && state.isHost == true) {
             setTimeout(() => context.dispatch("finishGame"), 5000);
           }
-        }
           break;
         }
         case 100: {
@@ -627,7 +621,6 @@ const actions = {
           context.commit("setGameResult", event.data.gameResult);
           console.log("endGame 변경");
           context.commit("setEndGame", true);
-          console.log("endgame 변경 되었는지 확인 => ?", state.endGame);
           // 게임 끝나면 userList와 round 초기화
           context.commit('setRound', 0)
           for (var w=0; state.userList.length>w;w++) {
@@ -1043,9 +1036,6 @@ const actions = {
     try {
       console.log("5번 시그널 보냄");
       console.log("보낸 데이터 : ", topFive);
-      if(state.endGame){
-        return;
-      }
       state.session.signal({
         type: "game",
         data: {
@@ -1104,9 +1094,6 @@ const actions = {
   },
   // 시간 초과 시 라운드 종료 시그널 - 수연
   timeOverRound: () => {
-    if(state.endGame){
-      return;
-    }
     // 시간초과 시그널 발송
     try {
       state.session.signal({
@@ -1136,9 +1123,6 @@ const actions = {
   skipRound: () => {
         // 라운드 스킵 시그널 발송
         try {
-          if(state.endGame){
-            return;
-          }
           state.session.signal({
             type: "game",
             data: {
