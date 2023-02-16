@@ -452,6 +452,10 @@ export default {
         }
       }
     });
+    watch(state.myPageDialog, () => {
+      console.log('정보??')
+      store.dispatch("accountStore/getMeAction");
+    }) // myPageDialog에 정보 업데이트 위해 추가
 
     watch(endGame, (newValue) => {
       if (newValue) {
@@ -507,7 +511,6 @@ export default {
         value.extraExp
       } Exp </h1>`;
     };
-
     // ========음소거 풀기 ======================
    
 

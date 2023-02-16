@@ -18,7 +18,7 @@
             </tr>
             <tr>
                 <td>전적  </td>
-                <td>{{ userinfo.record.plays }}전 {{ userinfo.record.wins }}승 {{ userinfo.record.draws }}패</td>
+                <td>{{ userinfo.record.plays }}전 {{ userinfo.record.wins }}승 {{ userinfo.record.plays - userinfo.record.wins }}패</td>
             </tr>
             <tr>
                 <td>승률  </td>
@@ -37,7 +37,7 @@
   
   <script>
   import { computed, onBeforeMount, reactive } from "vue";
-  // import { watch } from "vue";
+  import { watch } from "vue";
   import { useStore } from "vuex";
 
   export default {
@@ -45,6 +45,7 @@
       const store = useStore();
       const state = reactive({
       });
+      const inGame = computed(() => store.state.gameStore.inGame);
       const userinfo = reactive({
       dialog: false,
       name: "",
@@ -67,6 +68,29 @@
         draws: 0,
         winrate: computed(() => Math.floor(userinfo.record.wins/userinfo.record.plays*100)) 
       },
+    });
+    watch(inGame, async (newValue) => {
+      // 게임 끝났을 때, 유저 정보 다시 받아오기
+        console.log('watch  동작 ingame :', newValue)
+        if (newValue == false) {
+        const token = store.getters["accountStore/getToken"];
+        const res = await store.dispatch("accountStore/getMeAction", token);
+        userinfo.name = res.name;
+        userinfo.nickname = res.nickname;
+        userinfo.email = res.email;
+        userinfo.level = res.level;
+        userinfo.exp = res.exp;
+        userinfo.exprate = Math.floor(res.exp / res.level);
+        userinfo.record.plays = res.record.plays;
+        userinfo.record.wins = res.record.wins;
+        userinfo.record.draws = res.record.draws;
+        if (res.record.plays == 0) {
+          userinfo.record.winrate = 0;
+        } else {
+          userinfo.record.winrate =
+          Math.floor(res.record.wins / res.record.plays) * 100;
+      }
+      }
     });
     onBeforeMount(async () => {
       const token = store.getters["accountStore/getToken"];

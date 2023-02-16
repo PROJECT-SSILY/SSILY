@@ -26,7 +26,7 @@
             </tr>
             <tr>
                 <td>전적</td>
-                <td>{{ userinfo.record.plays }}전 {{ userinfo.record.wins }}승 {{ userinfo.record.draws }}패</td>
+                <td>{{ userinfo.record.plays }}전 {{ userinfo.record.wins }}승 {{ userinfo.record.plays - userinfo.record.wins }}패</td>
             </tr>
         </table>
         <div class="wrap-table-rate">
