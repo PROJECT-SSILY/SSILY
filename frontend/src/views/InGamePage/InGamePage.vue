@@ -826,7 +826,8 @@ $hover_bottom: 50px;
   border-radius: 30px;
   opacity: 0.5;
   border: 1px solid rgba(81, 255, 255, 0.5);
-  transition: 0.2s
+  transition: 0.2s;
+  position: relative;
 }
 @keyframes blink-effect {
   50% {
