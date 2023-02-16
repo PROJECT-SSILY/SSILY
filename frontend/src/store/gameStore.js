@@ -75,6 +75,9 @@ const getters = {
   getPresenterId: (state) => {
     return state.presenterId;
   },
+  getEndRound:(state)=>{
+    return state.endRound;
+  },
   // 우리편 팀원들을 골라서 뽑아내는 메서드
   getMyTeams: (state) => {
     const res = [];
@@ -478,18 +481,20 @@ const actions = {
           break;
         }
         case 5: {
-          // 정답 제출 ( sendTopFive ) - 정답이면 응답 옴!
-          console.log("5번 시그널 수신 완료");
-          var winnerId = event.data.winnerId;
-          //context.dispatch("uploadImage", state.myFormData);
-          console.log("5번 data : ", event.data);
-          context.commit("setAnswer", event.data.answer);
-          context.commit("setWinnerId", event.data.winnerId);
-          context.commit("setWinnerNickname", event.data.winnerNickname);
-          context.commit('setRound', event.data.round)
-          // => 여기서 정답자가 10번, 0번 신호 보낸다.
-          if (winnerId == state.myConnectionId) {
-            context.dispatch("finishRound");
+          if(!state.endRound){
+            // 정답 제출 ( sendTopFive ) - 정답이면 응답 옴!
+           console.log("5번 시그널 수신 완료");
+           var winnerId = event.data.winnerId;
+           //context.dispatch("uploadImage", state.myFormData);
+            console.log("5번 data : ", event.data);
+           context.commit("setAnswer", event.data.answe);
+            context.commit("setWinnerId", event.data.winnerId);
+           context.commit("setWinnerNickname", event.data.winnerNickname);
+           context.commit('setRound', event.data.round)
+           // => 여기서 정답자가 10번, 0번 신호 보낸다.
+            if (winnerId == state.myConnectionId) {
+             context.dispatch("finishRound");
+           }
           }
           break;
         }
@@ -547,6 +552,7 @@ const actions = {
           break;
         }
         case 20: {
+          if(!state.endRound){
           console.log("20번 시그널 수신 - 시간초과 ==>",event.data.round);
           if (event.data.round <= 9) {
             context.commit("setEndRound", true);
@@ -559,10 +565,11 @@ const actions = {
           if (event.data.round == 9 && state.isHost == true) {
             setTimeout(() => context.dispatch("finishGame"), 5000);
           }
-
+        }
           break;
         }
         case 30: {
+          if(!state.endRound){
           console.log("30번 시그널 수신 - 스킵 ==>",event.data.round);
           if (event.data.round <= 9) {
             context.commit("setEndRound", true);
@@ -575,7 +582,7 @@ const actions = {
           if (event.data.round == 9 && state.isHost == true) {
             setTimeout(() => context.dispatch("finishGame"), 5000);
           }
-
+        }
           break;
         }
         case 100: {
