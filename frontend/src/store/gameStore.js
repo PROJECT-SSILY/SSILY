@@ -1043,6 +1043,9 @@ const actions = {
     try {
       console.log("5번 시그널 보냄");
       console.log("보낸 데이터 : ", topFive);
+      if(state.endGame){
+        return;
+      }
       state.session.signal({
         type: "game",
         data: {
@@ -1101,6 +1104,9 @@ const actions = {
   },
   // 시간 초과 시 라운드 종료 시그널 - 수연
   timeOverRound: () => {
+    if(state.endGame){
+      return;
+    }
     // 시간초과 시그널 발송
     try {
       state.session.signal({
@@ -1130,6 +1136,9 @@ const actions = {
   skipRound: () => {
         // 라운드 스킵 시그널 발송
         try {
+          if(state.endGame){
+            return;
+          }
           state.session.signal({
             type: "game",
             data: {
