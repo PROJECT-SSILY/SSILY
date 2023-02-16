@@ -147,7 +147,7 @@
         </div> -->
       </div>
       <footer>
-        <button @click="skipWord" id="skip">skip</button>
+        <button @click="skipWord" id="skip" v-if="amIDescriber">skip</button>
       </footer>
 
       <div id="toast"></div>
@@ -473,12 +473,12 @@ export default {
             "<div>" +
             winnerList.value
               .map((winner) => `<h1>${winner} WIN!!</h1>`)
-              .join("") +
+              .join('') +
             "</div>" +
             "<div>" +
             Object.entries(gameResult.value).map(([key, value]) =>
               rankContent(key, value)
-            ) +
+            ).join('')+
             "</div>",
           allowOutsideClick: false,
           confirmButtonText: "돌아가기",
@@ -507,9 +507,9 @@ export default {
         rankIndex = key;
         rankValue = value.extraExp;
       }
-      return `<h1> ${parseInt(key) + 1}등 ${value.nickname} + ${
+      return `<h1> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
         value.extraExp
-      } Exp </h1>`;
+      } Exp</h1>`;
     };
     // ========음소거 풀기 ======================
    
