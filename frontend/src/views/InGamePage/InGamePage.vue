@@ -100,6 +100,7 @@
           class="stream-opponent"
           v-for="sub in opponents"
           :key="sub.stream.connection.connectionId"
+          :userId="sub.stream.connection.connectionId"
           :stream-manager="sub"
           :class="
             sub.stream.connection.connectionId === currentPresenterId
