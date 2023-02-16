@@ -396,24 +396,25 @@ export default {
             html:
               `<div>${winnerNickname.value} WIN!!</div>` +
               `<div>정답 : ${word.value}</div>` +
-              '<canvas class="canvas" width="560" height="330" id="aCanvas"></canvas>' +
+              '<canvas class="canvas" width="650" height="400" id="aCanvas"></canvas>' +
               sortedUserList.value
                 .map((user) => `<div>${user.nickname} : ${user.score}점</div>`)
                 .join(""),
             timer: 5000,
-            width: 650,
+            width: 750,
             timerProgressBar: true,
             allowOutsideClick: false,
             didOpen: async () => {
               Swal.showLoading();
               //const getFile = await store.dispatch("gameStore/downloadImage");
               const getFile = imageURL.value;
-              const myCanvas = Swal.getHtmlContainer().querySelector("Canvas");
+              const myCanvas = Swal.getHtmlContainer().querySelector("canvas");
               var ctx = myCanvas.getContext("2d");
               var img = new Image();
               img.src = getFile;
               img.onload = function () {
                 ctx.drawImage(img, 0, 0); // Or at whatever offset you like
+                //ctx.scale(0.8, 0.8);
               };
             },
             willClose: () => {
