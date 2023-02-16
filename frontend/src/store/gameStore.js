@@ -37,7 +37,7 @@ const state = {
     amIDescriber: false,
     winnerNickname: '', // [라운드 결과] 승리 유저
     winnerId: '',
-    round: 0, // 현재 라운드
+    round: 1, // 현재 라운드
     answer: '',
     presenterId: null,
     sortedUserList: [], // [라운드 결과] score 내림차순으로 정렬된 유저 리스트
@@ -427,6 +427,7 @@ const actions = {
 
         case 2: {
           // 게임시작 했으니까 라운드 받아오기
+          console.log('2번 시그널 수신 완료')
           console.log(event.data);
           context.commit('setRound', event.data.round);
           context.commit("setAudioStatus", false); // 게임시작할 때 오디오 막기
@@ -629,7 +630,7 @@ const actions = {
           console.log("endGame 변경");
           context.commit("setEndGame", true);
           // 게임 끝나면 userList와 round 초기화
-          context.commit('setRound', 0)
+          context.commit('setRound', 1)
           for (var w=0; state.userList.length>w;w++) {
             context.commit('setUserScore', {
               index: w,
