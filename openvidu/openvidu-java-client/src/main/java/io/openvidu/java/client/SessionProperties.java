@@ -361,6 +361,10 @@ public class SessionProperties {
 
 	public void setTitle(String title) { this.title=title; }
 
+	public void setIsPlaying(boolean playing){
+		this.isPlaying = playing;
+	}
+
 	/**
 	 * 김윤미
 	 * @return

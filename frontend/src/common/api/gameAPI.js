@@ -24,9 +24,10 @@ const room=(sessionId) => {
         return res.data;
     })
     .catch(error => {
-        if(error.response.status===404) {
-            return false;
-        }
+        // if(error.response.status===404) {
+        //     return false;
+        // }
+        return error.response.status;
     })
 }
 const randomTeam = (payload) => {
