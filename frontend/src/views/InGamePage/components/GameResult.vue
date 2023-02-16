@@ -18,7 +18,8 @@
           <div v-for="(user, index) in gameResult"
           :user="user"
           :key="user.id">
-              <h1>{{ parseInt(index) + 1 }}등 {{ user.nickname }} + {{ user.extraExp }} Exp </h1>
+              <!-- <h1>{{ parseInt(index) + 1 }}등 {{ user.nickname }} + {{ user.extraExp }} Exp </h1> -->
+              <p v-html="rankContent(index,user)"></p>
           </div>
         </v-card-text>
         <v-card-actions>
@@ -57,6 +58,24 @@ export default {
       store.commit("gameStore/setIsAllReady", false)
       store.commit("gameStore/setAudioStatus", false)
     }
+
+    let rankIndex = 0;
+    let rankValue = null;
+    const rankContent = (key, value) => {
+      if (rankValue == value.extraExp) {
+        //공동 n등
+        return `<h1> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
+          value.extraExp
+        } Exp </h1>`;
+      } else {
+        rankIndex = key;
+        rankValue = value.extraExp;
+      }
+      return `<h1> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
+        value.extraExp
+      } Exp</h1>`;
+    };
+
   return {
     gameResult,
     store,
@@ -64,6 +83,7 @@ export default {
     readyAll,
     clickReturn,
     winnerList,
+    rankContent,
     sortedUserList
   }
   }
