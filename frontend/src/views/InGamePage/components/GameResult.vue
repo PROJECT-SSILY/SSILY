@@ -66,24 +66,24 @@ export default {
     let rankIndex = 0;
     let rankValue = null;
     const rankContent = (key, value) => {
+      console.log('레벨업 되었음?????? =>',value.levelUp)
       if (rankValue == value.extraExp) {
         //공동 n등
         if (value.levelUp) {
-          return `<h2> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
-          value.extraExp
-        } Exp <span id="ico-levelup">Level Up!</span></h2>`;
+          console.log('레벨업 !!')
+          return `<h2> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${value.extraExp} Exp <span id="ico-levelup">Level Up!</span></h2>`;
         } else {
-          return `<h2> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
-          value.extraExp
-        } Exp </h2>`;
+          return `<h2> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${value.extraExp} Exp </h2>`;
         }
       } else {
         rankIndex = key;
         rankValue = value.extraExp;
       }
-      return `<h2> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
-        value.extraExp
-      } Exp</h2>`;
+      if(value.levelUp){
+        return `<h2> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${value.extraExp} Exp <span id="ico-levelup">Level Up!</span></h2>`;
+      }else{
+        return `<h2> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${value.extraExp} Exp</h2>`;
+      }
     };
 
   return {
