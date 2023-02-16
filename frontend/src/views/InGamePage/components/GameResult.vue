@@ -1,26 +1,30 @@
 <template>
   <v-row justify="center">
-    <v-dialog
+    <v-dialog class="result-dialog"
       v-model="endGame"
       persistent
-      max-width="1000"
     >
       <v-card class="formbox">
-        <v-card-title>
-          게임 결과
-        </v-card-title>
-        <v-card-text>
-          <div v-for="winner in winnerList"
-          :winner="winner"
-          :key="winner.id">
-            <h1>{{ winner }}</h1>
-          </div> <h1>WON!</h1>
-          <div v-for="(user, index) in gameResult"
-          :user="user"
-          :key="user.id">
-              <!-- <h1>{{ parseInt(index) + 1 }}등 {{ user.nickname }} + {{ user.extraExp }} Exp </h1> -->
-              <p v-html="rankContent(index,user)"></p>
+        <v-card-text class="inner-result">
+          <div class="box-winner">
+            <h1>WINNER</h1>
+            <div class="list-winner">
+            <span v-for="winner in winnerList"
+            :winner="winner"
+            :key="winner.id"
+            class="winner">
+              {{ winner }}!&nbsp;
+            </span>
           </div>
+          </div>
+          <div class="box-users">
+            <div v-for="(user, index) in gameResult"
+            :user="user"
+            :key="user.id">
+            <p v-html="rankContent(index,user)"></p>
+            </div>
+          </div>
+              <!-- <h1>{{ parseInt(index) + 1 }}등 {{ user.nickname }} + {{ user.extraExp }} Exp </h1> -->
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -64,16 +68,22 @@ export default {
     const rankContent = (key, value) => {
       if (rankValue == value.extraExp) {
         //공동 n등
-        return `<h1> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
+        if (value.levelUp) {
+          return `<h2> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
           value.extraExp
-        } Exp </h1>`;
+        } Exp <span id="ico-levelup">Level Up!</span></h2>`;
+        } else {
+          return `<h2> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
+          value.extraExp
+        } Exp </h2>`;
+        }
       } else {
         rankIndex = key;
         rankValue = value.extraExp;
       }
-      return `<h1> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
+      return `<h2> ${parseInt(rankIndex) + 1}등 ${value.nickname} + ${
         value.extraExp
-      } Exp</h1>`;
+      } Exp</h2>`;
     };
 
   return {
@@ -91,13 +101,52 @@ export default {
 </script>
 
 <style scoped>
+
+.winnerStyle{
+  font-size: 40px;
+  text-align: center;
+}
+.result-dialog {
+  font-family: 'KOFIHDrLEEJWTTF-B';
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  max-width: 800px;
+  padding: 40px;
+}
 .formbox {
-  padding: 2rem;
+  padding: 60px 30px 20px 30px;
   width: 100%;
   border-radius: 20px;
   opacity: 100%;
-  font-family: 'MaplestoryOTFBold';
-  font-weight: normal;
-  font-style: normal;
+
+}
+.v-dialog .v-overlay__content > .v-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+  }
+.inner-result {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.box-winner {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.winner {
+  font-size: 50px;
+}
+.box-users {
+  width: auto;
+}
+#ico-levelup {
+  background: linear-gradient(90deg, rgb(219 130 130) 0%, rgb(249 215 155) 24%, rgb(71 246 137) 47%, rgb(102 206 199) 62%, rgb(146 92 233) 84%, rgb(186 91 220) 100%);
+  color: transparent;
+  -webkit-background-clip: text;
 }
 </style>
