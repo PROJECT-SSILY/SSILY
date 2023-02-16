@@ -87,8 +87,8 @@
       </header>
       <p class="gameround">{{ state.showRound }} ROUND</p>
       <!-- <RoundResult /> -->
-      <GameResult v-show="endGame" />
       <GameScore class="gamescore" />
+      <GameResult v-show="endGame" class="result-dialog"/>
       <div id="word" v-if="amIDescriber">
         <p>제시어</p>
         <p>{{ word }}</p>
@@ -557,6 +557,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.result-dialog {
+  font-family: 'KOFIHDrLEEJWTTF-B';
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+}
 /* -----------개발용------------*/
 
 #skip {
