@@ -144,9 +144,13 @@ export default {
       state.room.isTeamBattle = roominfo.isTeamBattle
       state.room.isSecret = roominfo.isSecret
       state.room.sessionId = roominfo.sessionId
+      // console.log("roomInfo = ", roominfo.isPlaying);
   
-      const isExistRoom = await getRoom(roominfo.sessionId);
-      if(!isExistRoom) {
+      const response = await getRoom(roominfo.sessionId);
+
+      console.log("response = ", response);
+
+      if(response == 404) {
         // 존재하지 않는 방 입장 시
         state.alert = false
         await store.commit('accountStore/setAlertColor', 'error')
@@ -154,11 +158,25 @@ export default {
         await store.commit('accountStore/setAlertIcon', 'alert')
         state.alert = true
         return
-
+      } else if(response.isPlaying){
+        // 이미 시작한 방
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '이미 게임이 시작한 방입니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return
+      } else if(response.connections.numberOfElements >= 4){
+        // 가득찬 방
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '가득찬 방입니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return
       } else if (roominfo.isSecret && !state.passwordDialog) { 
         // 비밀번호 입력이 필요한 방에 입장하는 경우
         state.passwordDialog = true
-
       } else { 
         // 입장이 가능한 경우
         store.commit("gameStore/setTitle", state.room.title);

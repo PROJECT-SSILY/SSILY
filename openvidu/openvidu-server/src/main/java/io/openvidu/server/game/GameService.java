@@ -2,6 +2,7 @@ package io.openvidu.server.game;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.openvidu.client.internal.ProtocolElements;
+import io.openvidu.java.client.SessionProperties;
 import io.openvidu.server.config.PropertyConfig;
 import io.openvidu.server.core.Participant;
 import io.openvidu.server.core.SessionManager;
@@ -286,6 +287,9 @@ public class GameService   {
                           JsonObject params, JsonObject data, RpcNotificationService notice) {
 
         log.info("gameStart is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+        SessionProperties sessionProperties = sessionManager.getSessionWithNotActive(sessionId).getSessionProperties();
+        sessionProperties.setIsPlaying(true);
 
         allWords.putIfAbsent(sessionId, new ArrayList<>());
         allWords.put(sessionId, getAllWords());
@@ -678,7 +682,6 @@ public class GameService   {
             ssilyThread.interrupt();
         }
 
-
         params.add("data", data);
 
         //게임 종료 알리기
@@ -686,6 +689,9 @@ public class GameService   {
             rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
                     ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
         }
+
+        SessionProperties sessionProperties = sessionManager.getSessionWithNotActive(sessionId).getSessionProperties();
+        sessionProperties.setIsPlaying(false);
     }
 
     /**
