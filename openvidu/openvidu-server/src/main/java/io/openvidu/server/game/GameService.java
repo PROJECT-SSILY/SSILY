@@ -457,7 +457,7 @@ public class GameService   {
     private void finishRound(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
         log.info("finishRound is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
-        String imageURL = data.get("DataURL").toString();
+
         // 점수 증가
         Player winner = participant.getPlayer();
         winner.setScore(winner.getScore() + 2);
@@ -466,8 +466,13 @@ public class GameService   {
         JsonObject playerJson = new JsonObject();
         for (Participant p : participants) {
             JsonObject player = new JsonObject();
+            Player playerData = p.getPlayer();
+            if(playerData.isPresenter()){
+                playerData.setScore(playerData.getScore() + 1);
+            }
+
             player.addProperty("connectionId", p.getParticipantPublicId());
-            player.addProperty("score", p.getPlayer().getScore());
+            player.addProperty("score", playerData.getScore());
             playerJson.add(String.valueOf(cnt), player);
             cnt++;
         }
@@ -696,8 +701,8 @@ public class GameService   {
             }
         }
 
-        if(isWinner) return participant.getPlayer().getScore()+20;
-        else return participant.getPlayer().getScore();
+        if(isWinner) return participant.getPlayer().getScore() + 30;
+        else return participant.getPlayer().getScore() + 10;
     }
 
     /**
