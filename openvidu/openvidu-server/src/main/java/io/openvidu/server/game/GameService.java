@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -457,7 +458,7 @@ public class GameService   {
     private void finishRound(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data){
 
         log.info("finishRound is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
-        String imageURL = data.get("DataURL").toString();
+
         // 점수 증가
         Player winner = participant.getPlayer();
         winner.setScore(winner.getScore() + 2);
@@ -466,8 +467,13 @@ public class GameService   {
         JsonObject playerJson = new JsonObject();
         for (Participant p : participants) {
             JsonObject player = new JsonObject();
+            Player playerData = p.getPlayer();
+            if(playerData.isPresenter()){
+                playerData.setScore(playerData.getScore() + 1);
+            }
+
             player.addProperty("connectionId", p.getParticipantPublicId());
-            player.addProperty("score", p.getPlayer().getScore());
+            player.addProperty("score", playerData.getScore());
             playerJson.add(String.valueOf(cnt), player);
             cnt++;
         }
@@ -696,8 +702,8 @@ public class GameService   {
             }
         }
 
-        if(isWinner) return participant.getPlayer().getScore()+20;
-        else return participant.getPlayer().getScore();
+        if(isWinner) return participant.getPlayer().getScore() + 30;
+        else return participant.getPlayer().getScore() + 10;
     }
 
     /**
@@ -731,7 +737,7 @@ public class GameService   {
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 
             conn.setRequestMethod("PUT"); // http 메서드
-            conn.setRequestProperty("Content-Type", "application/json"); // header Content-Type 정보
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8"); // header Content-Type 정보
             conn.setDoInput(true); // 서버에 전달할 값이 있다면 true
             conn.setDoOutput(true); // 서버로부터 받는 값이 있다면 true
 
@@ -739,7 +745,7 @@ public class GameService   {
             requestBody.put("winner", winnerNicknames);
             requestBody.put("player", playerList);
 
-            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8);
             out.write(requestBody.toJSONString());
             out.close();
             conn.getInputStream();
@@ -752,7 +758,6 @@ public class GameService   {
                 e.printStackTrace();
             }
         }
-
     }
 
 }
