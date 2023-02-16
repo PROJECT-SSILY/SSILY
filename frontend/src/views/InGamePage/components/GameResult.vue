@@ -144,9 +144,5 @@ export default {
 .box-users {
   width: auto;
 }
-#ico-levelup {
-  background: linear-gradient(90deg, rgb(219 130 130) 0%, rgb(249 215 155) 24%, rgb(71 246 137) 47%, rgb(102 206 199) 62%, rgb(146 92 233) 84%, rgb(186 91 220) 100%);
-  color: transparent;
-  -webkit-background-clip: text;
-}
+
 </style>
