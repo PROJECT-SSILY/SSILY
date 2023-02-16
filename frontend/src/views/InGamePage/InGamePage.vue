@@ -368,6 +368,8 @@ export default {
       // 게임 시작했을 때, ready 버튼 모양 다시 초기화
       if (newValue == true) {
         state.ready = false;
+      } else {
+        state.showRound = 1
       }
     });
     watch(readyAll, (newValue) => {
