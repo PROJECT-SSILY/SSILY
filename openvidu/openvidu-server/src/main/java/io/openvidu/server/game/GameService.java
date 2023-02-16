@@ -294,11 +294,13 @@ public class GameService   {
         allWords.putIfAbsent(sessionId, new ArrayList<>());
         allWords.put(sessionId, getAllWords());
 
-        allWords.get(sessionId);
-
         //제시어 불러오기
         words.putIfAbsent(sessionId, new ArrayList<>());
         words.put(sessionId, pickWords(sessionId));
+
+        // 시연용 단어
+        List<String> list = List.of("코끼리", "토끼", "자전거", "사다리", "꽃", "안경", "문", "악어");
+        words.put(sessionId, list);
 
         log.info("words는 뭐 들어 있나요? {}", words.get(sessionId));
         // 라운드 설정 : (1라운드)
