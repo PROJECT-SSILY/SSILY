@@ -47,10 +47,11 @@ const state = {
     endGame: false, // [게임 결과] 게임 끝났을 때 true, 게임 진행중일 때 false
     isTimeOut: false,
     word: '',
-  inGame: false,
-  //readyImage: false,
-  myFormData: '',
-  imageURL:'',
+    inGame: false,
+    //readyImage: false,
+    myFormData: '',
+    imageURL:'',
+    preventSubmit: false,
 }
 
 const getters = {
@@ -77,6 +78,9 @@ const getters = {
   },
   getEndRound:(state)=>{
     return state.endRound;
+  },
+  getPreventSubmit: (state)=> {
+    return state.preventSubmit
   },
   // 우리편 팀원들을 골라서 뽑아내는 메서드
   getMyTeams: (state) => {
@@ -315,8 +319,11 @@ const mutations = {
     for (var j=0; state.subscribers.length > j; j++ ){
       state.subscribers[j].subscribeToAudio(data)
     }
+  },
+  setPreventSubmit: (state, data) => {
+    console.log('왔음???')
+    state.preventSubmit = data
   }
-
 };
 
 const actions = {
@@ -544,7 +551,7 @@ const actions = {
             }
           }
           // 라운드를 8번 돌면 게임을 종료한다.
-          if (event.data.round == 9 && maxScoreUser == state.myConnectionId) {
+          if (event.data.round >= 9 && maxScoreUser == state.myConnectionId) {
             setTimeout(() => context.dispatch("finishGame"), 5000);
           }
           break;
@@ -559,7 +566,7 @@ const actions = {
           context.commit("setRound", event.data.round);
           context.commit('setWord', event.data.word)
           // 라운드를 8번 돌면 게임을 종료한다.
-          if (event.data.round == 9 && state.isHost == true) {
+          if (event.data.round >= 9 && state.isHost == true) {
             setTimeout(() => context.dispatch("finishGame"), 5000);
           }
           break;
@@ -574,7 +581,7 @@ const actions = {
           context.commit("setRound", event.data.round);
           context.commit('setWord', event.data.word)
           // 라운드를 8번 돌면 게임을 종료한다.
-          if (event.data.round == 9 && state.isHost == true) {
+          if (event.data.round >= 9 && state.isHost == true) {
             setTimeout(() => context.dispatch("finishGame"), 5000);
           }
           break;

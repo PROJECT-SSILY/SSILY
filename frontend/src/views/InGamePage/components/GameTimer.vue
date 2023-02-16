@@ -6,6 +6,7 @@
   
   <script>
   import { mapState } from 'vuex';
+
   const TIME_LIMIT =  20;
   
   export default {
@@ -23,6 +24,9 @@
         },
         isHost(state) {
           return state.gameStore.isHost
+        },
+        preventSubmit(state) {
+          return state.gameStore.preventSubmit
         }
       }),
       formattedTimeLeft() {
@@ -56,6 +60,8 @@
           if (this.isHost) {
             this.timeOver()
           }
+        } else if (newValue === 1) { // 1초 남았을 때 제출 막기 위해 추가
+          this.$store.commit('gameStore/setPreventSubmit', true)
         }
       },
       endRound(newValue) {
@@ -68,6 +74,8 @@
           console.log('타이머 시작')
           // 라운드가 시작되면 타이머 시작
           this.startTimer();
+          // 1초 남았을 때 제출 막기 위해 추가
+          this.$store.commit('gameStore/setPreventSubmit', false)
         }
       }
     },

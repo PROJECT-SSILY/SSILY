@@ -48,6 +48,7 @@ export default{
     const answer= computed(() => {
       return store.state.gameStore.answer});
     const endRound = computed(() => store.state.gameStore.endRound);
+    const preventSubmit = computed(() => store.getters["gameStore/getPreventSubmit"]);
     watch(endRound, (newValue) => {
        if (newValue) {
         eraseAll();
@@ -105,11 +106,14 @@ export default{
     };
 
     const predictModel = async function () {
+      let temp = store.state.gameStore.preventSubmit
+      if (temp) {
+        return
+      }
       if(!submitPossible) {
         toast("3초 후에 다시 제출할 수 있습니다!");
         return;
-      }
-      else { //제출
+      } else { //제출
         setTimeout(() => submitPossible=true, 3000);
         submitPossible=false;
         await submitCanvas();
@@ -380,6 +384,7 @@ export default{
     };
 
     return {
+      preventSubmit,
       allowDrawing,
       eraseAll,
       answerOn,
@@ -391,7 +396,7 @@ export default{
       state,
       submitPossible,
       removeToast,
-      toast
+      toast,
     };
   },
 };

@@ -271,7 +271,6 @@ export default {
     const publisher = computed(() => store.state.gameStore.publisher);
     const myTeams = computed(() => store.getters["gameStore/getMyTeams"]);
     const opponents = computed(() => store.getters["gameStore/getOpponents"]);
-
     const joinSession = async function () {
       const players = await GetPlayerList(state.sessionId);
       console.log("players : ", players);
