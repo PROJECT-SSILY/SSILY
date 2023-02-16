@@ -7,7 +7,7 @@
   <script>
   import { mapState } from 'vuex';
 
-  const TIME_LIMIT =  20;
+  const TIME_LIMIT =  400;
   
   export default {
     data() {
@@ -31,14 +31,9 @@
       }),
       formattedTimeLeft() {
         const timeLeft = this.timeLeft;
-        // const minutes = Math.floor(timeLeft / 60);
-        let seconds = timeLeft % 60;
-  
-        if (seconds < 60) {
-          seconds = `${seconds}`;
-        }
-  
-        return `${seconds}`;
+        let second = parseInt(timeLeft / 10);
+
+        return `${second}`;
       },
   
       timeLeft() {
@@ -60,7 +55,8 @@
           if (this.isHost) {
             this.timeOver()
           }
-        } else if (newValue === 1) { // 1초 남았을 때 제출 막기 위해 추가
+        } else if (newValue === 7) { // 0.7초 남았을 때 제출 막기 위해 추가
+          console.log("0.7초 입니다~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
           this.$store.commit('gameStore/setPreventSubmit', true)
         }
       },
@@ -92,7 +88,7 @@
   
       startTimer() {
         console.log("timerCheck : start");
-        this.timerInterval = setInterval(() => (this.timePassed += 1), 1000);
+        this.timerInterval = setInterval(() => (this.timePassed += 1), 100);
         this.$store.commit('gameStore/setIsTimeOut', false)
       },
       timeOver() {
