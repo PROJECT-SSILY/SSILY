@@ -481,8 +481,10 @@ const actions = {
           }
           // 모두 레디 했을 때, 게임 시작됨
           if (allready) {
+            console.log('allready 됐음')
             // context.commit("setInGame", true)
             if (state.isHost) {
+              console.log('내가 방장')
               context.dispatch("gameStart");
             }
            }
@@ -510,6 +512,9 @@ const actions = {
           for (var g=0;g<state.userList.length;g++) {
             if (state.userList[g].connectionId == event.data.host) {
               context.commit("setUserIsHost", {index: g, value: true})
+              if (state.userList[g].connectionId == state.myConnectionId) {
+                context.commit("setIsHost", true)
+              }
             }
           }
           break
