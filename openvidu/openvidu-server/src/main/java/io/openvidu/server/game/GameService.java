@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -736,7 +737,7 @@ public class GameService   {
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 
             conn.setRequestMethod("PUT"); // http 메서드
-            conn.setRequestProperty("Content-Type", "application/json"); // header Content-Type 정보
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8"); // header Content-Type 정보
             conn.setDoInput(true); // 서버에 전달할 값이 있다면 true
             conn.setDoOutput(true); // 서버로부터 받는 값이 있다면 true
 
@@ -744,7 +745,7 @@ public class GameService   {
             requestBody.put("winner", winnerNicknames);
             requestBody.put("player", playerList);
 
-            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8);
             out.write(requestBody.toJSONString());
             out.close();
             conn.getInputStream();
@@ -757,7 +758,6 @@ public class GameService   {
                 e.printStackTrace();
             }
         }
-
     }
 
 }
