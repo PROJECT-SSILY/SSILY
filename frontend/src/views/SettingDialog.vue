@@ -2,26 +2,27 @@
   <div class="wrap-dialog">
     <div class="dialog">
       <div class="tit-dialog">볼륨 설정</div>
-      <div class="text-caption">배경음악</div>
-      <v-slider
-        v-model="state.volume1"
-        :max="state.max"
-        :min="state.min"
-        @click="clickSlider1"
-        @mouseup="clickSlider1"
-        @mouseleave="clickSlider1"
-        prepend-icon="mdi-volume-high"
-      ></v-slider>
-      <div class="text-caption">효과음</div>
-      <v-slider
-        v-model="state.volume2"
-        :max="state.max"
-        :min="state.min"
-        @click="clickSlider2"
-        @mouseup="clickSlider2"
-        @mouseleave="clickSlider2"
-        prepend-icon="mdi-volume-high"
-      ></v-slider>
+      <div class="text-caption">배경음악
+        <v-switch
+            prepend-icon="mdi-volume-high" 
+            @click="clickBtn1"
+            v-model="state.media"
+            hide-details
+            true-value="on"
+            false-value="off"
+            :label="`${state.media}`"
+          ></v-switch>
+      </div>
+      <div class="text-caption">효과음
+        <v-switch
+          prepend-icon="mdi-volume-high" 
+          v-model="state.alarm"
+          hide-details
+          true-value="on"
+          false-value="off"
+          :label="`${state.alarm}`"
+        ></v-switch>
+      </div>
     </div>
   </div>
 </template>
@@ -29,44 +30,55 @@
   <script>
 import { reactive } from "@vue/reactivity";
 import { useStore } from "vuex";
-import { onMounted } from "@vue/runtime-core";
+import { computed, onMounted } from "@vue/runtime-core";
+
 export default {
   setup() {
     const store = useStore();
+		const media = computed(() => store.state.gameStore.media);
+    const alarm = computed(() => store.state.gameStore.alarm);
     const state = reactive({
-      max: 1,
-      min: 0,
-      volume1: 0,
-      volume2: 0,
+        media: undefined,
+        alarm: undefined,
     });
-    const clickDialog = () => {
-      state.volume1 = store.state.gameStore.media;
-      state.volume2 = store.state.gameStore.alarm;
-    };
-    // const media = computed(()=> store.state.gameStore.media)
-    const clickSlider1 = () => {
-      console.log("media전: ", store.state.gameStore.media);
-      store.dispatch("gameStore/changeVolume1", state.volume1);
-      console.log("media후: ", store.state.gameStore.media);
-    };
-
-    const clickSlider2 = () => {
-      console.log("alarm 전: ", store.state.gameStore.alarm);
-      store.dispatch("gameStore/changeVolume2", state.volume2);
-      console.log("alarm 후: ", store.state.gameStore.alarm);
-    };
-
-    return { store, state, clickSlider1, clickSlider2, clickDialog, onMounted };
+    onMounted(()=>{
+      if (media) {
+        state.media = 'on'
+      } else {
+        state.media ='off'
+      }
+      if (alarm) {
+        state.alarm = 'on'
+      } else {
+        state.alarm = 'off'
+      }
+    });
+    const clickBtn1 = () => {
+      if (state.media == 'on') {
+        store.dispatch("gameStore/changeVolume1", false);
+      } else {
+        store.dispatch("gameStore/changeVolume1", true);
+      }
+    }
+    const clickBtn2 = () => {
+      if (state.alarm == 'on') {
+        store.dispatch("gameStore/changeVolume2", false);
+      } else {
+        store.dispatch("gameStore/changeVolume2", true);
+      }
+    }
+    return { store, state, media, alarm, onMounted, clickBtn1, clickBtn2 };
   },
 };
 </script>
   
-<style>
-.dialog {
-  width: 400px;
-}
+<style scoped>
 .text-caption {
   margin-bottom: 10px;
+}
+
+.dialog {
+  padding: 50px 196px
 }
 </style>
   

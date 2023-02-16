@@ -1,9 +1,3 @@
-// import {
-//     requestLogin,
-//     requestRegister,
-//     requestMe,
-//     requestId,
-//   } from "../common/api/accountAPI";
 import $axios from "axios";
 
 import { requestLogin, requestRegister, checkEmail, checkNickname, sendNewPwAction, requestMe, changeNickname, deleteAccount } from "@/common/api/accountAPI";

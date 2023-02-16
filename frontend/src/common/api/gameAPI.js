@@ -12,6 +12,24 @@ const roomList = () => {
     })
     .then(res => res.data)
 }
+const room=(sessionId) => {
+    return $axios.get(`${OPENVIDU_SERVER_URL}/api/rooms/${sessionId}`, {
+        auth: {
+            username: 'OPENVIDUAPP',
+            password: OPENVIDU_SERVER_SECRET,
+        }
+    })
+    .then(res => {
+        console.log(res)
+        return res.data;
+    })
+    .catch(error => {
+        // if(error.response.status===404) {
+        //     return false;
+        // }
+        return error.response.status;
+    })
+}
 const randomTeam = (payload) => {
     console.log(payload);
     return $axios.post(`${OPENVIDU_SERVER_URL}/api/rooms/random`, JSON.stringify(payload),
@@ -39,11 +57,12 @@ const randomPrivate = (payload) => {
         }
     })
     .then(res => {
-        console.log(res)
-        return res.data
+        console.log('제대로 가길바라',res)
+        return res
     })
     .catch(error => {
-        return error.response.data
+        console.log("code : ", error.response.data.code);
+        return error.response.data.code
     });
 }
 
@@ -108,5 +127,5 @@ const sendScore = (playerId, score) => {
 }
 
 
-export { roomList, GetPlayerList, randomTeam, randomPrivate, sendExp, resetExp, sendScore };
+export { roomList, room, GetPlayerList, randomTeam, randomPrivate, sendExp, resetExp, sendScore };
 

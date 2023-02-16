@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PreDestroy;
 
+import io.openvidu.server.game.GameService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.kurento.client.GenericMediaElement;
 import org.kurento.client.GenericMediaEvent;
@@ -107,7 +108,9 @@ public class KurentoSessionManager extends SessionManager {
     @Override
     /* Protected by Session.closingLock.readLock */
     public void joinRoom(Participant participant, String sessionId, Integer transactionId) {
-        log.info("participant player = {}", participant.getPlayer().getScore());
+        log.info("participant player = {}", participant.getPlayer().getNickname());
+        log.info("join room player is host = {}", participant.getPlayer().isHost());
+
         Set<Participant> existingParticipants = null;
         try {
 
@@ -198,6 +201,11 @@ public class KurentoSessionManager extends SessionManager {
         }
     }
 
+    /**
+     * 서영탁
+     * 방에서 나가면 초기화
+     * 방장이 나가면 랜덤으로 방장을 준다.
+     */
     @Override
     public boolean leaveRoom(Participant participant, Integer transactionId, EndReason reason,
                              boolean scheduleWebsocketClose) {
@@ -221,6 +229,15 @@ public class KurentoSessionManager extends SessionManager {
         try {
             if (session.joinLeaveLock.tryLock(15, TimeUnit.SECONDS)) {
                 try {
+
+                    /**
+                     * 서영탁
+                     */
+                    HashMap<String, Boolean> readyState = GameService.readyState.getOrDefault(sessionId, null);
+                    if(readyState != null){
+                        readyState.remove(participant.getParticipantPublicId());
+                        GameService.readyState.computeIfPresent(sessionId, (k, v) -> v = readyState);
+                    }
 
                     session.leave(participant.getParticipantPrivateId(), reason);
 
@@ -264,6 +281,23 @@ public class KurentoSessionManager extends SessionManager {
                     if (!EndReason.sessionClosedByServer.equals(reason)) {
 
                         if (remainingParticipants.isEmpty()) {
+
+                            /**
+                             * 서영탁
+                             * 게임 자원 반납
+                             */
+                            Thread thread = GameService.gameThread.get(sessionId);
+                            GameService.gameThread.remove(sessionId);
+                            GameService.readyState.remove(sessionId);
+                            GameService.presenterIndex.remove(sessionId);
+                            GameService.round.remove(sessionId);
+                            GameService.words.remove(sessionId);
+                            GameService.participantList.remove(sessionId);
+
+                            if(thread != null){
+                                thread.interrupt();
+                            }
+
                             if (this.recordingManager.sessionIsBeingRecorded(sessionId)) {
                                 // Start countdown to stop recording. Will be aborted if a Publisher starts
                                 // before timeout. This only applies to INDIVIDUAL recordings, as for COMPOSED

@@ -1,4 +1,7 @@
 <template>
+  <div class="background">
+    <div id="stars" class="rotating"></div>
+  </div>
   <div class="wrap-page">
     <MakeRoomDialog v-show="state.roomDialog" />
     <TutorialDialog v-show="state.tutorDialog" />
@@ -24,6 +27,7 @@
             {{ state.nickname }} 님
             </router-link>
         </div>
+        <alert-dialog v-if="state.alert"/>
         <div class="sec-btn">
           <button @click="state.roomDialog = !state.roomDialog">방 만들기</button>
           <button @click="randomPrivate">바로 입장</button>
@@ -38,9 +42,11 @@ import MakeRoomDialog from "./Components/MakeRoomDialog.vue";
 import SettingDialog from "../SettingDialog.vue";
 import TutorialDialog from "./Components/TutorialDialog.vue";
 import RoomList from "./Components/RoomList.vue";
+import AlertDialog from '../AlertDialog.vue'
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { computed, reactive, onMounted } from "vue";
+import { room } from "@/common/api/gameAPI";
 
 
 export default {
@@ -50,6 +56,7 @@ export default {
     TutorialDialog,
     SettingDialog,
     RoomList,
+    AlertDialog
   },
   setup() {
     const store = useStore();
@@ -60,6 +67,7 @@ export default {
       tutorDialog: false,
       settingDialog: false,
       nickname: computed(() => store.getters["accountStore/getUser"].nickname),
+      alert: false
     });
 
     const closeDialog = () => {
@@ -70,24 +78,54 @@ export default {
 
     const randomPrivate = async function () {
       const response = await store.dispatch('gameStore/randomPrivateAction')
-      console.log('response : ', response)
-      router.push({
-        name: "gameroom",
-        params: { sessionId: response.sessionId },
-      });
+      console.log('response : ', response.status)
+      if (response == -404) {
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '바로 입장 가능한 방이 없습니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return;
+      } else if (response == -400){
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '이미 가득 찬 방입니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return;
+      } else if (response == -401){
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '이미 게임이 진행중인 방입니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return;
+      } else {
+        console.log('=====================================================', response.data);
+        const roomTitle= await room(response.data.sessionId);
+        console.log("roomTitle 뭐오냐?", roomTitle.title);
+        await store.commit('gameStore/setTitle', roomTitle.title);
+        router.push({
+          name: "gameroom",
+          params: { sessionId: response.data.sessionId },
+        });
+    }
     };
 
-    onMounted(() => 
-      store.dispatch('accountStore/getMeAction') // 메인페이지에서 닉네임 사라지지 않도록 처리
+    onMounted(() => {
+        store.dispatch('accountStore/getMeAction') // 메인페이지에서 닉네임 사라지지 않도록 처리
+        store.dispatch("gameStore/leaveSession");
+        store.commit("gameStore/setInGame", false)
+        
+      }
     )
-
 
     return {
       store,
       router,
       state,
       closeDialog,
-      randomPrivate
+      randomPrivate,
     };
   },
 };
@@ -95,10 +133,6 @@ export default {
 </script>
 
 <style scoped>
-/* 공용 css */
-
-/* -------------- */
-
 .wrap-page {
   display: flex;
   flex-direction: column;

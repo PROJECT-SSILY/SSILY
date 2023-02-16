@@ -165,6 +165,8 @@ class TFModel {
   }
 
   predictClass(img) {
+    if(img == null) return [];
+
     return tf.tidy(() => {
       let preprocessed_img = preprocess(img);
       return this.model.predict(preprocessed_img).dataSync();

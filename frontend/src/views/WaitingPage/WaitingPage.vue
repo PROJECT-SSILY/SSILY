@@ -1,17 +1,17 @@
 <template>
   <div class="list-users">
-    <PasswordInput
-    v-if="isSecret && !isHost"/>
-          <UserInfo
-          class="list-users-item"
-          v-for="user in userList"
-          :user="user"
-          :key="user.id"
-          />
-          <div class="list-users-item blank"
-          v-for="blank in 4-userList.length"
-          :key="blank"></div>
-      </div>
+    <UserInfo
+    class="list-users-item"
+    v-for="user in userList"
+    :user="user"
+    :key="user.id"
+    :class="clientNickname==user.nickname ?'active':''"
+    />
+    <div class="list-users-item blank"
+    v-for="blank in 4-userList.length"
+    :key="blank">
+    </div>
+  </div>
 </template>
 <script>
 import { ref } from '@vue/reactivity'
@@ -20,7 +20,6 @@ import UserInfo from './components/UserInfo.vue';
 import $axios from "axios";
 import { computed } from 'vue'
 import { useStore } from 'vuex';
-import PasswordInput from './components/PasswordInput.vue'
 
 $axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -28,7 +27,6 @@ export default {
   name: 'WaitingPage',
   components: {
     UserInfo,
-    PasswordInput
   },
   props: {
     session: Object,
@@ -38,6 +36,7 @@ export default {
   setup(props) {
     const router = useRouter()
     const store = useStore()
+    const clientNickname= computed(() => store.state.accountStore.user.nickname)
     const userList = computed(() => store.state.gameStore.userList)
     const isSecret = computed(() => store.state.gameStore.isSecret)
     const isHost = computed(() => store.state.gameStore.isHost)
@@ -47,6 +46,7 @@ export default {
     return {
 		router,
     Id,
+    clientNickname,
     myTeam,
     userList,
     isSecret,
@@ -66,10 +66,15 @@ export default {
   width: 161px;
   height: 161px;
   border-radius: 30px;
-  background: #ffffff;
-  padding: 10px;
+  background: #b7b7b7;
   margin: 7px;
   box-shadow: 0 -1px 5px #00000025;
+  position: relative;
+}
+.list-users-item.active {
+  border: 3px solid #ffffff;
+  background: #d8d8d8;
+  box-shadow: 0 0 17px 3px #ffffff;
 }
 .blank {
   background: #ECECEC;

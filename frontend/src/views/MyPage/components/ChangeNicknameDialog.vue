@@ -1,27 +1,12 @@
 <template>
-<div class="text-center">
-  <v-dialog
-    v-model="state.dialog"
-    width="500"
-  >
-    <template v-slot:activator="{ attrs }">
-      <v-btn
-        block
-        dark
-        v-bind="attrs"
-        @click.stop="state.dialog = true"
-      >
-        닉네임 변경
-      </v-btn>
-    </template>
-    <v-card class="formbox">
-      <v-card-title>
-        닉네임 변경
-      </v-card-title>
+  <div class="wrap-dialog">
+    <div class="dialog">
+      <div class="tit-dialog">닉네임 변경</div>
       <v-form
       ref="form"
       v-model="state.valid"
       lazy-validation
+      @submit.prevent="checkNickname"
       >
           <div id="join-dialog" class="jumbotron vertical-center">
             <div class="form-group">
@@ -49,9 +34,8 @@
           </p>
         </v-card-actions>
       </v-form>
-    </v-card>
-  </v-dialog>
-</div>
+    </div>
+  </div>
 </template>
   
 <script>
@@ -145,5 +129,11 @@
   font-weight: normal;
   font-style: normal;
 }
+#nickname-btn {
+    height:3rem;
+    font-size: 1.5rem;
+    opacity: 89%;
+    border-radius:10px
+  }
 
 </style>

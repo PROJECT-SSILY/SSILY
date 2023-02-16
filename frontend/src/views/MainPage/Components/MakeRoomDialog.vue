@@ -9,10 +9,11 @@
     @submit.prevent="joinSession">
         <div class="form-group">
           <v-text-field
-            v-model="state.title"
+            v-model="state.form.title"
             class="inp-txt form-control"
             label="방 제목"
             type="text"
+            :rules="[state.rules.titleRules]"
             required
           ></v-text-field>
       </div>
@@ -32,6 +33,8 @@
         v-if="state.form.isSecret == true"
         label="비밀번호 숫자 4자리를 입력하세요."
         hide-details="auto"
+        type="password"
+        maxlength="4"
         v-model="state.form.password.value"
         :rules="[state.rules.passwordRules]"
       ></v-text-field>
@@ -46,7 +49,7 @@
 
 <script>
 import { useRouter } from "vue-router";
-import { onUpdated, reactive } from "vue";
+import { onMounted, reactive } from "vue";
 // import { watch } from "vue";
 import { useStore } from "vuex";
 import $axios from "axios";
@@ -72,13 +75,16 @@ export default {
       },
       rules: {
       // required: value => !!value || '필수',
-      passwordRules: value => (
-        /^\d{4}$/.test(value)
-        ) || '비밀번호는 4자리 숫자여야 합니다!',
-        
+        titleRules: (value) => (1 <= value.length && value.length <= 20) || "방제목은 20자 이내로 작성해주세요!"
+        ,
+        passwordRules: (value) => {
+          if(state.form.isSecret){
+            (/^\d{4}$/.test(value)) || '비밀번호는 4자리 숫자여야 합니다!'
+          }
+        },
       }
     });
-    onUpdated(() => {
+    onMounted(() => {
       // 방 타이틀 랜덤 생성
       const titlelist = [
         "함께 즐겨요",
@@ -91,25 +97,31 @@ export default {
     });
 
     const joinSession = async function () {
-      if (state.form.isSecret) {
-        if (!(/^\d{4}$/.test(state.form.password.value))) 
-      {
+      if (state.form.isSecret && !(/^\d{4}$/.test(state.form.password.value))) {
+      
         state.alert = false
         await store.commit('accountStore/setAlertColor', 'error')
         await store.commit('accountStore/setAlertMessage', '비밀번호는 4자리 숫자여야 합니다.')
         await store.commit('accountStore/setAlertIcon', 'alert')
         state.alert = true
         return
+      } else if (1 > state.form.title.length || state.form.title.length > 20) {
+        state.alert = false
+        await store.commit('accountStore/setAlertColor', 'error')
+        await store.commit('accountStore/setAlertMessage', '방 제목은 20자 이내여야 합니다.')
+        await store.commit('accountStore/setAlertIcon', 'alert')
+        state.alert = true
+        return
       } else {
-      store.commit("gameStore/setTitle", state.form.title);
-      store.commit("gameStore/setSecret", state.form.isSecret);
-      store.commit("gameStore/setPassword", state.form.password.value);
-      store.commit("gameStore/setTeam", state.form.isTeamBattle);
-      // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
-      const sessionId = await store.dispatch("gameStore/createSession");
-      console.log("sessionId : ", sessionId);
-      router.push({ name: "gameroom", params: { sessionId: sessionId } });
-    }}
+        store.commit("gameStore/setTitle", state.form.title);
+        store.commit("gameStore/setSecret", state.form.isSecret);
+        store.commit("gameStore/setPassword", state.form.password.value);
+        store.commit("gameStore/setTeam", state.form.isTeamBattle);
+        // 세션을 먼저 만든 후 세션ID를 발급받아 해당 URL로 이동
+        const sessionId = await store.dispatch("gameStore/createSession");
+        console.log("sessionId : ", sessionId);
+        router.push({ name: "gameroom", params: { sessionId: sessionId } });
+      }
     };
     return {
       router,

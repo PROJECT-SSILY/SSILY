@@ -2,6 +2,7 @@ package io.openvidu.server.game;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.openvidu.client.internal.ProtocolElements;
+import io.openvidu.java.client.SessionProperties;
 import io.openvidu.server.config.PropertyConfig;
 import io.openvidu.server.core.Participant;
 import io.openvidu.server.core.SessionManager;
@@ -16,10 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -34,9 +33,11 @@ public class GameService   {
     static final int JOIN_ROOM = 3;
     static final int CHANGE_READY_STATE = 4;
     static final int SUBMIT_ANSWER = 5;
+    static final int CHANGE_HOST = 6;
 
     static final int FINISH_ROUND = 10;
     static final int TIME_OVER_ROUND = 20;
+    static final int SKIP_ROUND = 30;
     static final int FINISH_GAME = 100;
 
 
@@ -56,7 +57,8 @@ public class GameService   {
     public static ConcurrentHashMap<String, List<String>> words=new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, ArrayList<Participant>> participantList=new ConcurrentHashMap<>();
     public static ConcurrentHashMap<String, Integer> presenterIndex=new ConcurrentHashMap<>();
-    public final List<String> allWords=getAllWords();
+    //public final List<String> allWords=getAllWords();
+    public static ConcurrentHashMap<String, List<String>> allWords=new ConcurrentHashMap<>();
 
     // RPC 프로토콜을 위한 전역변수
     static RpcNotificationService rpcNotificationService;
@@ -106,8 +108,14 @@ public class GameService   {
             case TIME_OVER_ROUND:
                 timeOverRound(participant, sessionId, participants, params, data);
                 return;
+            case SKIP_ROUND:
+                skipRound(participant, sessionId, participants, params, data);
+                return;
             case FINISH_GAME:
                 finishGame(participant, sessionId, participants, params, data);
+                return;
+            case CHANGE_HOST:
+                changeHost(participant, sessionId, participants, params, data);
                 return;
         }
     }
@@ -188,7 +196,7 @@ public class GameService   {
             }
         }
 
-        if(cnt == participants.size()) {
+        if(participants.size() >= 2 && cnt == participants.size()) {
             if(isTeamBattle) data.addProperty("isAllReady", (red == 2 && blue == 2));
             else data.addProperty("isAllReady", true);
         }
@@ -233,13 +241,28 @@ public class GameService   {
             curParticipantList.get(curPresenterIndex).getPlayer().setPresenter(true);
             curPresenterId=curParticipantList.get(curPresenterIndex).getParticipantPublicId();
         }
+
         data.addProperty("curPresenterId", curPresenterId);
         params.add("data", data);
 
+        JsonObject presenterData= (JsonObject) JsonParser.parseString(data.toString());
+        JsonObject presenterParams=params.deepCopy();
+        Integer nowRound=round.get(sessionId);
+        String word=words.get(sessionId).get(nowRound-1);
+
+        presenterData.addProperty("word", word);
+        presenterParams.add("data", presenterData);
+
         //방 참여자들에게 바뀐 데이터 보내주기.
         for (Participant p : gameParticipants) {
-            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
-                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+            if(p.getParticipantPublicId().equals(curPresenterId)) {
+                rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                        ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, presenterParams);
+            }
+            else {
+                rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                        ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+            }
         }
     }
 
@@ -265,10 +288,19 @@ public class GameService   {
 
         log.info("gameStart is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
+        SessionProperties sessionProperties = sessionManager.getSessionWithNotActive(sessionId).getSessionProperties();
+        sessionProperties.setIsPlaying(true);
+
+        allWords.putIfAbsent(sessionId, new ArrayList<>());
+        allWords.put(sessionId, getAllWords());
 
         //제시어 불러오기
         words.putIfAbsent(sessionId, new ArrayList<>());
-        words.put(sessionId, pickWords());
+        words.put(sessionId, pickWords(sessionId));
+
+        // 시연용 단어
+        List<String> list = List.of("코끼리", "토끼", "문", "사다리", "꽃", "안경", "자전거", "악어");
+        words.put(sessionId, list);
 
         log.info("words는 뭐 들어 있나요? {}", words.get(sessionId));
         // 라운드 설정 : (1라운드)
@@ -278,15 +310,47 @@ public class GameService   {
         ArrayList<Participant> gameParticipants=new ArrayList<>(participants);
         participantList.putIfAbsent(sessionId, gameParticipants);
 
+        data.addProperty("round", round.get(sessionId));
+        params.add("data", data);
         //설명자 부여
 
         //설명자 누구인지 알려주기
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
     }
 
     /**
-     * 김윤미
-     * @return : 전체 단어 조회
+     * 서영탁
+     * 방장 변경 알리기
      */
+    private void changeHost(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data) {
+
+        log.info("changeHost is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
+
+        if(!participant.getPlayer().isHost() || participants.size() <= 1) return;
+
+        Participant newHost = participants.stream()
+                .filter(p -> !p.getPlayer().isHost())
+                .findAny()
+                .get();
+
+        newHost.getPlayer().changeHost();
+
+        data.addProperty("host", newHost.getParticipantPublicId());
+        params.add("data", data);
+
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
+        /**
+         * 김윤미
+         * @return : 전체 단어 조회
+         */
     private List<String> getAllWords() {
 
         URL url = null;
@@ -298,7 +362,7 @@ public class GameService   {
         List<String> wordList=null;
 
         try {
-            String serverURL = "http://localhost:5500";
+            String serverURL = "https://ssily.site:443";
             log.info("serverURL = {}", serverURL);
             url = new URL(serverURL+"/api/game/words");
             conn = (HttpURLConnection) url.openConnection();
@@ -338,15 +402,16 @@ public class GameService   {
 
     /**
      * 김윤미
-     * 12개의 제시어 목록 반환
+     * 8개의 제시어 목록 반환
      * @return
      */
-    private List<String> pickWords() {
-        if(allWords==null){
+    private List<String> pickWords(String sessionId) {
+        List<String> curWords=allWords.get(sessionId);
+        if(curWords==null){
             return null;
         }
         List<String> pickedWords=new ArrayList<>();
-        ThreadLocalRandom.current().ints(0, allWords.size()).distinct().limit(12).forEach(index -> pickedWords.add(allWords.get(index).toString()));
+        ThreadLocalRandom.current().ints(0, curWords.size()).distinct().limit(8).forEach(index -> pickedWords.add(curWords.get(index).toString()));
         return pickedWords;
     }
 
@@ -359,8 +424,8 @@ public class GameService   {
         log.info("submitAnswer is called by [{}, nickname : [{}]]", participant.getParticipantPublicId(), participant.getPlayer().getNickname());
 
         Integer nowRound = round.get(sessionId);
-//        String answer = words.get(sessionId).get(nowRound);
-        String answer = "바다(해변)";
+        String answer = words.get(sessionId).get(nowRound-1);
+//        String answer = "바다(해변)";
 
         String answers = data.get("answer").toString();
         answers = answers.substring(4, answers.length()-4);
@@ -408,8 +473,13 @@ public class GameService   {
         JsonObject playerJson = new JsonObject();
         for (Participant p : participants) {
             JsonObject player = new JsonObject();
+            Player playerData = p.getPlayer();
+            if(playerData.isPresenter()){
+                playerData.setScore(playerData.getScore() + 1);
+            }
+
             player.addProperty("connectionId", p.getParticipantPublicId());
-            player.addProperty("score", p.getPlayer().getScore());
+            player.addProperty("score", playerData.getScore());
             playerJson.add(String.valueOf(cnt), player);
             cnt++;
         }
@@ -420,8 +490,12 @@ public class GameService   {
         data.addProperty("winnerNickname", winner.getNickname());
         // 라운드 증가
         Integer nowRound = round.get(sessionId);
+
+        String word=words.get(sessionId).get(nowRound-1);
+        data.addProperty("word", word);
+
         round.put(sessionId, nowRound+1);
-        data.addProperty("round", nowRound);
+        data.addProperty("round", round.get(sessionId));
 
         params.add("data", data);
 
@@ -456,8 +530,47 @@ public class GameService   {
         data.addProperty("cnt", cnt);
         // 라운드 증가
         Integer nowRound = round.get(sessionId);
+
+        String word=words.get(sessionId).get(nowRound-1);
+        data.addProperty("word", word);
+
         round.put(sessionId, nowRound+1);
-        data.addProperty("round", nowRound);
+        data.addProperty("round", round.get(sessionId));
+
+        params.add("data", data);
+
+        // 라운드 종료 알라기
+        for (Participant p : participants) {
+            rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
+                    ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
+        }
+    }
+
+    private void skipRound(Participant participant, String sessionId, Set<Participant> participants, JsonObject params, JsonObject data) {
+        log.info("skipRound is called by [{}]", participant.getPlayer());
+        if(!participant.getPlayer().isPresenter())
+            return;
+
+        int cnt = 0;
+        JsonObject playerJson = new JsonObject();
+        for (Participant p : participants) {
+            JsonObject player = new JsonObject();
+            player.addProperty("connectionId", p.getParticipantPublicId());
+            player.addProperty("score", p.getPlayer().getScore());
+            playerJson.add(String.valueOf(cnt), player);
+            cnt++;
+        }
+        data.add("player", playerJson);
+
+        data.addProperty("cnt", cnt);
+        // 라운드 증가
+        Integer nowRound = round.get(sessionId);
+
+        String word=words.get(sessionId).get(nowRound-1);
+        data.addProperty("word", word);
+
+        round.put(sessionId, nowRound+1);
+        data.addProperty("round", round.get(sessionId));
 
         params.add("data", data);
 
@@ -515,7 +628,7 @@ public class GameService   {
         // 경험치 추가
         JsonObject gameResult = new JsonObject();
         ArrayList<JsonObject> playerList = new ArrayList<>();
-        int cnt = 0;
+
         for (Participant p : participants) {
             int extraExp = calcExp(p, winner);
             p.getPlayer().addExp(extraExp);
@@ -527,15 +640,24 @@ public class GameService   {
             player.addProperty("levelUp", levelUp);
             player.addProperty("nickname", p.getPlayer().getNickname());
 
-            gameResult.add(String.valueOf(cnt), player);
             playerList.add(player);
+        }
+        playerList.sort(new Comparator<JsonObject>() {
+            @Override
+            public int compare(JsonObject o1, JsonObject o2) {
+                return Integer.valueOf(String.valueOf(o2.get("extraExp")))
+                        .compareTo(Integer.valueOf(String.valueOf(o1.get("extraExp"))));
+            }
+        });
+
+        int cnt = 0;
+        for(JsonObject p:playerList) {
+            gameResult.add(String.valueOf(cnt), p);
             cnt++;
         }
 
         // 백엔드 전송
         updateMemberState(winnerNicknames, playerList);
-
-
         // 게임 결과
         data.add("gameResult", gameResult);
 
@@ -544,7 +666,15 @@ public class GameService   {
 
 
         // TODO : 모든 자원 반납
+        gameThread.remove(sessionId);
+        round.remove(sessionId);
+        words.remove(sessionId);
+        participantList.remove(sessionId);
+        presenterIndex.remove(sessionId);
+        allWords.remove(sessionId);
 
+        HashMap<String, Boolean> ready = readyState.get(sessionId);
+        ready.replaceAll((k, v) -> false);
 
         for (Participant p : participants) {
             p.getPlayer().initPlayerState();  // 상태 초기화 (다시 대기방으로 돌아가기 위해)
@@ -554,7 +684,6 @@ public class GameService   {
             ssilyThread.interrupt();
         }
 
-
         params.add("data", data);
 
         //게임 종료 알리기
@@ -562,6 +691,9 @@ public class GameService   {
             rpcNotificationService.sendNotification(p.getParticipantPrivateId(),
                     ProtocolElements.PARTICIPANTSENDMESSAGE_METHOD, params);
         }
+
+        SessionProperties sessionProperties = sessionManager.getSessionWithNotActive(sessionId).getSessionProperties();
+        sessionProperties.setIsPlaying(false);
     }
 
     /**
@@ -578,8 +710,8 @@ public class GameService   {
             }
         }
 
-        if(isWinner) return participant.getPlayer().getScore()+20;
-        else return participant.getPlayer().getScore();
+        if(isWinner) return participant.getPlayer().getScore() + 30;
+        else return participant.getPlayer().getScore() + 10;
     }
 
     /**
@@ -607,13 +739,13 @@ public class GameService   {
         BufferedWriter bw = null;
 
         try{
-            String serverURL = "http://localhost:5500";
+            String serverURL = "https://ssily.site:443";
             URL url = new URL(serverURL+"/api/member/state");
 
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 
             conn.setRequestMethod("PUT"); // http 메서드
-            conn.setRequestProperty("Content-Type", "application/json"); // header Content-Type 정보
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8"); // header Content-Type 정보
             conn.setDoInput(true); // 서버에 전달할 값이 있다면 true
             conn.setDoOutput(true); // 서버로부터 받는 값이 있다면 true
 
@@ -621,7 +753,7 @@ public class GameService   {
             requestBody.put("winner", winnerNicknames);
             requestBody.put("player", playerList);
 
-            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream(), StandardCharsets.UTF_8);
             out.write(requestBody.toJSONString());
             out.close();
             conn.getInputStream();
@@ -634,7 +766,6 @@ public class GameService   {
                 e.printStackTrace();
             }
         }
-
     }
 
 }

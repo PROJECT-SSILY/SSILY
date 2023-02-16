@@ -6,34 +6,18 @@
   </p>
 </template>
 <script>
-import { useRouter } from "vue-router";
-import { useStore } from "vuex";
 export default {
   props: {
     room: Object,
   },
   setup() {
-    const router = useRouter();
-    const store = useStore();
-    const getInRoom = function (params) {
-      const roominfo = JSON.parse(JSON.stringify(params));
-      store.commit("gameStore/setTitle", roominfo.title);
-      store.commit("gameStore/setTeam", roominfo.isTeamBattle);
-      router.push({
-        name: "gameroom",
-        params: { sessionId: roominfo.sessionId },
-      });
-    };
     return {
-      router,
-      store,
-      getInRoom,
     };
   },
 };
 </script>
 
-<style>
+<style scoped>
 .wrap-item {
   display: flex;
   flex-direction: row;

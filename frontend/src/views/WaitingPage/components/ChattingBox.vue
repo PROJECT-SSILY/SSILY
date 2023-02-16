@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class='area-chat'>
+        <div class='area-chat' id="chatDiv">
             <div v-for="val in chat" v-bind:key="val.id">
                 <div v-if="val.user === nickname" class="text-chat-me">
                     <div>{{ val.text }}</div>
@@ -29,31 +29,50 @@ export default {
     name:'ChattingBox',
     setup() {
         const store = useStore()
-        const chat = computed(() => store.state.gameStore.chat);
+        const chat = computed(() =>{
+            return store.state.gameStore.chat
+            })
         const state = reactive({
             chattings:'',
             chat: [] ,
             userNick:'',
             sendData:'',
         })
+
+        /*
+        watch(
+            chat.value,(cur, prev)=>{
+                chatDiv.scrollTo({
+                    top: chatDiv.scrollHeight - chatDiv.clientHeight,
+                    behavior: 'smooth'
+                    console.log(cur,prev);
+                 })
+            },
+            {
+                immediate: true,
+            }
+        )
+        */
         
         const nickname = store.state.accountStore.user.nickname || '';
         console.log("chattingBox nick", nickname);
 
-        watch(() => chat, (newValue, oldValue) => {
+        watch(chat.value, (newValue, oldValue) => {
             console.log('chat변화감지', {newValue, oldValue })
             setTimeout(() => {
-            var chatDiv = document.getElementById("chat-area");
+            var chatDiv = document.getElementById("chatDiv");
             chatDiv.scrollTo({
-            top: chatDiv.scrollHeight - chatDiv.clientHeight,
+            top: chatDiv.scrollHeight,
             behavior: 'smooth'
                  })
             }, 50);
         })
 
         const sendMessage = () => {
-            store.dispatch('gameStore/sendMessage', state.chattings)
-            state.chattings = ''
+            if(state.chattings!=''){
+                store.dispatch('gameStore/sendMessage', state.chattings)
+                state.chattings = ''
+            }
         }
   
         return {
@@ -69,12 +88,14 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+* {
+    font-family: 'Noto Sans KR', sans-serif;
+}
 .area-chat {
     width: 100%;
-    height: 100%;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     padding: 5px 25px;
     overflow-y: auto;
     overflow-x: hidden;
