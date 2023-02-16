@@ -130,6 +130,7 @@ export default {
         state.form.password1.status = false;
         if(newValue == state.form.password2.value) {
           state.form.password1.status = true;
+          state.form.password2.status = true;
         }
         console.log("변화 감지", { newValue, oldValue });
       }
@@ -137,6 +138,7 @@ export default {
     watch(() => state.form.password2.value, (newValue, oldValue) => {
         state.form.password2.status = false;
         if(newValue == state.form.password1.value) {
+          state.form.password1.status = true;
           state.form.password2.status = true;
         }
         console.log("변화 감지", { newValue, oldValue });

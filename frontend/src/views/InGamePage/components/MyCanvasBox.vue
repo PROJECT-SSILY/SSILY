@@ -1,6 +1,6 @@
 <template>
   <div class="canvas_container">
-    <button @click="predictModel" id="submit">제출</button>
+    <button @click="predictModel" id="submit">제출하기</button>
     <div class="group_button">
       <div id="brush" @click="allowDrawing">
         <v-img src="@/assets/canvas/brush.svg" alt="brush"/>
@@ -409,16 +409,18 @@ export default{
     box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
 }
 #submit {
-  background: rgb(255, 255, 255, 0.08); 
-  border-radius: 10px;
-  border: 1px solid rgba(81, 255, 255, 0.6);
-  box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
-  padding: 5px 10px; 
+  background: rgb(255, 255, 255, 0.1); 
+  border-top-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  padding: 10px 20px; 
   position: absolute; 
   z-index: 100; 
-  left: 580px; 
-  top:275px;
-  color: aliceblue;
+  color: rgba(240, 248, 255, 0.699);
+  bottom: 0;
+  right: 0;
+  font-size: 18px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 600;
 }
 /* left : 490  */
 #submit:hover {
@@ -432,7 +434,7 @@ export default{
   margin-top: -50px;
   margin-left: 10px;
   top: 50%;
-  right: -60px;
+  right: 10px;
   z-index: 100;
   /*border-radius: 15px;*/
   /*box-shadow: 0px 0px 20px 0px #0000003b*/

@@ -92,9 +92,7 @@
       <div id="word" v-if="amIDescriber">
         <p>제시어</p>
         <p>{{ word }}</p>
-        <br/>
-        <button @click="skipWord">skip</button>
-      </div>
+      </div>     
 
       <!-- 상대 팀 -->
       <div class="area-opponents">
@@ -148,7 +146,9 @@
           </div>
         </div> -->
       </div>
-      <footer></footer>
+      <footer>
+        <button @click="skipWord" id="skip">skip</button>
+      </footer>
 
       <div id="toast"></div>
       <!-- 배경 -->
@@ -461,7 +461,6 @@ export default {
           color: "#716add",
           backdrop: `
               rgba(0,0,123,0.4)
-              url("../gameRocket.gif")
               left top
               no-repeat
             `,
@@ -542,6 +541,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/* -----------개발용------------*/
+
+#skip {
+  width: 500px;
+  height: 300px;
+  margin: 20px;
+  color: transparent;
+}
+#skip:hover {
+  color: white;
+}
+/* -----------개발용------------*/
+
+
+
+
+
+
+
 /* ======= component-waiting ================================================================= */
 .wrap-timer {
   position: fixed;
@@ -683,26 +701,24 @@ export default {
 }
 .gameround {
   font-size: 30px;
-  color: white;
+  color: rgb(67 193 193);
   font-family: "Orbitron", sans-serif;
   position: absolute;
   width: 200px;
   right: 0;
   top: 0;
   margin: 30px;
-  color: white;
 }
 #word {
   position: absolute;
   top: 7rem;
   color: rgb(81 255 255 / 67%);
 }
-#word > p:first-child {
-  font-size: 16px;
+#word p:first-child {
+  font-size: 20px;
 }
-#word > p:last-child {
-  font-weight: 700;
-  font-size: 30px;
+#word p:last-child {
+  font-size: 33px;
 }
 .component-ingame {
   width: 100%;
@@ -726,7 +742,7 @@ header {
   font-family: "Orbitron", sans-serif;
 }
 .area-opponents {
-  width: 40%;
+  width: 30%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -738,7 +754,7 @@ header {
   overflow: hidden;
 }
 .area-ourteam {
-  width: 60%;
+  width: 70%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -795,15 +811,21 @@ $hover_bottom: 50px;
   border-radius: 30px;
   opacity: 0.5;
   border: 1px solid rgba(81, 255, 255, 0.5);
+  transition: 0.2s
+}
+@keyframes blink-effect {
+  50% {
+    box-shadow: none;
+  }
 }
 .stream-opponent.presenter {
   height: 196.8px;
   margin: 10px 0;
   width: 350px;
-  opacity: 0.9;
-  box-shadow: 0 0 17px 3px #ffffff;
-  border: 1px solid #ffffff;
-
+  opacity: 1;
+  box-shadow: 0 0 20px 5px rgb(81 255 255 / 70%);
+  box-sizing: content-box;
+  animation: blink-effect 2s ease-in-out infinite;
 }
 // 수정 전 : box-shadow: 0 0 10px 5px gba(81, 255, 255, 0.5);
 // border 없었음   width: 350px;

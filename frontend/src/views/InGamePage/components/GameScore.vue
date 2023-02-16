@@ -1,6 +1,6 @@
 <template>
   <div class="score-box" v-if="!isTimeOut">
-    <span id="score-board">SCORE BOARD</span>
+    <!-- <span id="score-board">SCORE BOARD</span> -->
     <p v-for="user in userList" :user="user" :key="user.id" class="my-score">
     <span id="nickname">{{ user.nickname }}</span><span id="score">{{ user.score }}점</span>
     </p>
@@ -27,25 +27,20 @@ export default {
 <style>
 .score-box {
   border-radius: 10px;
-  border: 1px solid rgba(81, 255, 255, 0.6);
-  box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5);
+  /* border: 1px solid rgba(81, 255, 255, 0.6);
+  box-shadow: 0 0 20px 3px rgba(81, 255, 255, 0.5); */
   padding: 20px;
   width: 100%;
+  text-align: left;
+  color: rgb(67 193 193);
 }
-.my-score {
-	color: white;
-}
+
 #nickname {
 	font-size: 15px;
   margin-right: 15px;
+  font-weight: 100;
 }
 #score {
 	font-size: 20px;
-	
-}
-#score-board {
-  font-size: 30px;
-  color: white;
-  font-family: "Orbitron", sans-serif;
 }
 </style>
