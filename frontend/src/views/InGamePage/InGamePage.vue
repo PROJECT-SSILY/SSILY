@@ -86,7 +86,7 @@
         <GameTimer :key="gameTimer" id="timer" />
       </header>
       <p class="gameround">{{ state.showRound }} ROUND</p>
-      <RoundResult />
+      <!-- <RoundResult /> -->
       <GameResult v-show="endGame" />
       <GameScore class="gamescore" />
       <div id="word" v-if="amIDescriber">
@@ -173,7 +173,7 @@ import GameScore from "./components/GameScore.vue";
 import StartTimer from "@/views/InGamePage/components/StartTimer.vue";
 import FooterBoxVue from "../MainPage/Components/FooterBox.vue";
 // import RoundResult from "./components/RoundResult.vue";
-// import GameResult from "../InGamePage/components/GameResult.vue";
+import GameResult from "../InGamePage/components/GameResult.vue";
 import Swal from "sweetalert2";
 import MyPageDialog from "./components/MyPageDialog.vue";
 //=================OpenVdue====================
@@ -193,7 +193,7 @@ export default {
     FooterBoxVue,
     MyPageDialog,
     // RoundResult,
-    // GameResult,
+    GameResult,
   },
   props: {
     ready: Boolean,
@@ -211,9 +211,9 @@ export default {
     const inGame = computed(() => store.state.gameStore.inGame);
     const sortedUserList = computed(() => store.state.gameStore.sortedUserList);
     const winnerNickname = computed(() => store.state.gameStore.winnerNickname);
-    const winnerList = computed(() => store.state.gameStore.winnerList);
+    //const winnerList = computed(() => store.state.gameStore.winnerList);
     const isTimeOut = computed(() => store.state.gameStore.isTimeOut);
-    const gameResult = computed(() => store.state.gameStore.gameResult);
+    //const gameResult = computed(() => store.state.gameStore.gameResult);
     const imageURL = computed(() => store.state.gameStore.imageURL);
     const currentPresenterId = computed(() => {
       /**
@@ -465,44 +465,45 @@ export default {
       store.dispatch("accountStore/getMeAction");
     }) // myPageDialog에 정보 업데이트 위해 추가
 
-    watch(endGame, (newValue) => {
-      if (newValue) {
-        state.snackbar=true
-        Swal.fire({
-          title: "게임 결과",
-          padding: "3em",
-          color: "#716add",
-          backdrop: `
-              rgba(0,0,123,0.4)
-              left top
-              no-repeat
-            `,
-          html:
-            "<div>" +
-            winnerList.value
-              .map((winner) => `<h1>${winner} WIN!!</h1>`)
-              .join('') +
-            "</div>" +
-            "<div>" +
-            Object.entries(gameResult.value).map(([key, value]) =>
-              rankContent(key, value)
-            ).join('')+
-            "</div>",
-          allowOutsideClick: false,
-          confirmButtonText: "돌아가기",
-          confirmButtonColor: "#3085d6",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            store.commit("gameStore/setEndGame", false);
-            store.commit("gameStore/setInGame", false);
-            store.commit("gameStore/setIsAllReady", false);
-            store.commit("gameStore/setAudioStatus", false);
-          }
-          (rankIndex = 0), (rankValue = null);
-        });
-      }
-    });
+    // watch(endGame, (newValue) => {
+    //   if (newValue) {
+    //     state.snackbar=true
+    //     Swal.fire({
+    //       title: "게임 결과",
+    //       padding: "3em",
+    //       color: "#716add",
+    //       backdrop: `
+    //           rgba(0,0,123,0.4)
+    //           left top
+    //           no-repeat
+    //         `,
+    //       html:
+    //         "<div>" +
+    //         winnerList.value
+    //           .map((winner) => `<h1>${winner} WIN!!</h1>`)
+    //           .join('') +
+    //         "</div>" +
+    //         "<div>" +
+    //         Object.entries(gameResult.value).map(([key, value]) =>
+    //           rankContent(key, value)
+    //         ).join('')+
+    //         "</div>",
+    //       allowOutsideClick: false,
+    //       confirmButtonText: "돌아가기",
+    //       confirmButtonColor: "#3085d6",
+    //     }).then((result) => {
+    //       if (result.isConfirmed) {
+    //         store.commit("gameStore/setEndGame", false);
+    //         store.commit("gameStore/setInGame", false);
+    //         store.commit("gameStore/setIsAllReady", false);
+    //         store.commit("gameStore/setAudioStatus", false);
+    //       }
+    //       (rankIndex = 0), (rankValue = null);
+    //     });
+    //   }
+    // });
 
+    /*
     let rankIndex = 0;
     let rankValue = null;
     const rankContent = (key, value) => {
@@ -519,6 +520,8 @@ export default {
         value.extraExp
       } Exp</h1>`;
     };
+    */
+   
     // ========음소거 풀기 ======================
    
 
