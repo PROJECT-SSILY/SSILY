@@ -92,7 +92,7 @@
       <div id="word" v-if="amIDescriber">
         <p>제시어</p>
         <p>{{ word }}</p>
-      </div>     
+      </div>
 
       <!-- 상대 팀 -->
       <div class="area-opponents">
@@ -275,18 +275,18 @@ export default {
     const joinSession = async function () {
       const players = await GetPlayerList(state.sessionId);
       console.log("players : ", players);
-      // for (let i = 0; i < players.content.length; i++) {
-      //   console.log(
-      //     "접근 가능 여부 확인중.. ",
-      //     players.content[i].player.nickname,
-      //     state.nickname
-      //   );
-      //   if (players.content[i].player.nickname === state.nickname) {
-      //     alert("잘못된 접근입니다.");
-      //     router.push({ name: "main" });
-      //     return;
-      //   }
-      // }
+      for (let i = 0; i < players.content.length; i++) {
+        console.log(
+          "접근 가능 여부 확인중.. ",
+          players.content[i].player.nickname,
+          state.nickname
+        );
+        if (players.content[i].player.nickname === state.nickname) {
+          alert("잘못된 접근입니다.");
+          router.push({ name: "main" });
+          return;
+        }
+      }
       store.commit("gameStore/setSessionId", state.sessionId); // 실행 전 세션id 저장 | 이은혁
       console.log("여기까지");
       await store.dispatch("gameStore/joinSession", state.sessionId);
@@ -522,9 +522,9 @@ export default {
       } Exp</h1>`;
     };
     */
-   
+
     // ========음소거 풀기 ======================
-   
+
 
     return {
       router,
@@ -801,7 +801,7 @@ header {
   min-width: 300px;
   z-index: 0;
 }
-// 수정 전: left 0 
+// 수정 전: left 0
 #robot {
   width: 300px;
   animation: hover 1.1s ease-in-out 0s infinite alternate;
