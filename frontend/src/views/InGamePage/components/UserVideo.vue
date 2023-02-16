@@ -2,6 +2,7 @@
 <!-- <p>{{streamManager}}</p> -->
 <div v-if="streamManager">
 	<ov-video :stream-manager="streamManager" class="video"/>
+	<div id=nickname>내 이름</div>
 </div>
 </template>
 
@@ -33,5 +34,16 @@ export default {
 	height: inherit;
 	border-radius: inherit;
 	background: black;
+}
+#nickname {
+	position: absolute;
+    bottom: 2px;
+    color: white;
+    margin: 0 auto;
+    width: 100%;
+    font-weight: 100;
+	opacity: .7;
+	font-size: 13px;
+	font-family: "Orbitron", sans-serif;
 }
 </style>
