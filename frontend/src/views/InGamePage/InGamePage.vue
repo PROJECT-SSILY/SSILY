@@ -220,7 +220,7 @@ export default {
        * 토스트 실행
        * 신대득
        */
-      if (store.state.gameStore.presenterId != "") {
+      if (round.value==1 && store.state.gameStore.presenterId != "") {
         excuteToast(store.state.gameStore.presenterId);
       }
       return store.state.gameStore.presenterId;
@@ -424,6 +424,7 @@ export default {
             /* Read more about handling dismissals below */
             if (result.dismiss === Swal.DismissReason.timer) {
               store.dispatch("gameStore/changeRoundEnd", false);
+              if(round.value<9) excuteToast(currentPresenterId.value);
             }
           });
         } else if (isTimeOut.value) {
@@ -447,6 +448,7 @@ export default {
             /* Read more about handling dismissals below */
             if (result.dismiss === Swal.DismissReason.timer) {
               store.dispatch("gameStore/changeRoundEnd", false);
+              if(round.value<9) excuteToast(currentPresenterId.value);
             }
           });
         }
