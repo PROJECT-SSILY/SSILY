@@ -299,8 +299,8 @@ public class GameService   {
         words.put(sessionId, pickWords(sessionId));
 
         // 시연용 단어
-        List<String> list = List.of("코끼리", "토끼", "문", "사다리", "꽃", "안경", "자전거", "악어");
-        words.put(sessionId, list);
+        // List<String> list = List.of("코끼리", "토끼", "문", "사다리", "꽃", "안경", "자전거", "악어");
+        // words.put(sessionId, list);
 
         log.info("words는 뭐 들어 있나요? {}", words.get(sessionId));
         // 라운드 설정 : (1라운드)
